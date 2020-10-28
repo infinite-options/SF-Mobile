@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Application xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="ServingFresh.App">
+    <Application.Resources>
+        <Style TargetType="NavigationPage">
+            <Setter Property="BarBackgroundColor" Value="#136D74"> </Setter>
+            <Setter Property="BarTextColor" Value="White"></Setter>
+        </Style>
+        <Style TargetType="Label">
+            <Setter Property="TextColor" Value="Gray"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+        <Style TargetType="Label" Class="white">
+            <Setter Property="TextColor" Value="White"/>
+        </Style>
+        <Style TargetType="Label" Class="black">
+            <Setter Property="TextColor" Value="Black"/>
+        </Style>
+        <Style TargetType="Label" Class="primary">
+            <Setter Property="TextColor" Value="#136D74"/>
+        </Style>
+        <Style TargetType="Button" Class="primary">
+            <Setter Property="TextColor" Value="#136D74"/>
+            <Setter Property="BackgroundColor" Value="LightGray"/>
+        </Style>
+        <Style TargetType="Label" Class="secondary">
+            <Setter Property="TextColor" Value="#FF8500"/>
+        </Style>
+        <Style TargetType="Button" Class="secondary">
+            <Setter Property="BackgroundColor" Value="#FF8500"/>
+            <Setter Property="TextColor" Value="White"/>
+        </Style>
+        <Style TargetType="Button" Class="secondary-outline">
+            <Setter Property="TextColor" Value="#FF8500"/>
+            <Setter Property="BackgroundColor" Value="Transparent"/>
+            <Setter Property="BorderColor" Value="LightGray"/>
+            <Setter Property="BorderWidth" Value="1"/>
+            <Setter Property="Margin" Value="5,0,5,5"/>
+        </Style>
+        <Style TargetType="Label" Class="center">
+            <Setter Property="HorizontalTextAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="Label" Class="h1">
+            <Setter Property="FontSize" Value="30"/>
+            <Setter Property="FontAttributes" Value="Bold"/>
+        </Style>
+        <Style TargetType="Label" Class="h2">
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontAttributes" Value="Bold"/>
+        </Style>
+        <Style TargetType="Label" Class="h3">
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontAttributes" Value="Bold"/>
+        </Style>
+        <Style TargetType="Label" Class="p">
+            <Setter Property="FontSize" Value="15"/>
+        </Style>
+        <Style TargetType="StackLayout" Class="header">
+            <Setter Property="BackgroundColor" Value="LightGray"/>
+            <Setter Property="Padding" Value="10"/>
+        </Style>
+        <Style TargetType="ImageButton" Class="imgbtn">
+            <Setter Property="BackgroundColor" Value="Transparent"/>
+            <Setter Property="VerticalOptions" Value="CenterAndExpand"/>
+            <Setter Property="HeightRequest" Value="32"/>
+            <Setter Property="WidthRequest" Value="32"/>
+        </Style>
+        <Style TargetType="Image" Class="img">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="HeightRequest" Value="100"/>
+            <Setter Property="WidthRequest" Value="100"/>
+        </Style>
+        <Style TargetType="Image" Class="coupon">
+            <Setter Property="HeightRequest" Value="130"/>
+            <Setter Property="WidthRequest" Value="200"/>
+            <Setter Property="Margin" Value="10, 0"/>
+            <Setter Property="Aspect" Value="AspectFill"/>
+        </Style>
+        <Style TargetType="Button" Class="btn">
+            <Setter Property="Padding" Value="10, 5"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="TextTransform" Value="None"/>
+        </Style>
+        <Style TargetType="BoxView" Class="box">
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="BackgroundColor" Value="Gray"/>
+        </Style>
+        <Style TargetType="BoxView" Class="spacer">
+            <Setter Property="HeightRequest" Value="1"/>
+            <Setter Property="BackgroundColor" Value="LightGray"/>
+        </Style>
+    </Application.Resources>
+</Application>

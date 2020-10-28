@@ -1,0 +1,376 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:maps="clr-namespace:Xamarin.Forms.Maps;assembly=Xamarin.Forms.Maps"
+    x:Class="ServingFresh.Views.CheckoutPage"
+    xmlns:local="clr-namespace:ServingFresh.Models"
+    xmlns:servingfresh="clr-namespace:ServingFresh.Effects">
+     <ContentPage.Content>
+        <Grid RowSpacing="0" x:Name="GridInfo">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="35"></RowDefinition>
+                <RowDefinition Height="95"></RowDefinition>
+                <RowDefinition Height="1"></RowDefinition>
+                <RowDefinition Height="65"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition x:Name="cardframe" Height="0" ></RowDefinition>
+                <RowDefinition x:Name="addresframe" Height="0" ></RowDefinition>
+                <RowDefinition x:Name="contactframe" Height="0" ></RowDefinition>
+                <RowDefinition Height="80"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid.GestureRecognizers>
+               <TapGestureRecognizer Tapped="UpdateTotalAmount"></TapGestureRecognizer>
+            </Grid.GestureRecognizers>
+            <Label Grid.Row="0" BackgroundColor="#136D74"></Label>
+            <Grid Grid.Row="1" BackgroundColor="#136D74">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="70"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="70"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Label
+                    Grid.Column="1"
+                    HeightRequest="136"
+                    HorizontalTextAlignment="Center"
+                    VerticalTextAlignment="Center"
+                    Text="Orders"
+                    TextColor="White"
+                    FontSize="34"
+                    FontAttributes="Bold">
+                </Label>
+                <ImageButton
+                    Grid.Column="2"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    HeightRequest="40"
+                    Source="CartIcon"
+                    BackgroundColor="Transparent">
+                    <ImageButton.Effects>
+                        <servingfresh:TintImageEffect TintColor="White"/>
+                    </ImageButton.Effects>
+                </ImageButton>
+                <Label
+                    Grid.Column="2"
+                    x:Name="CartTotal"
+                    StyleClass="secondary"
+                    FontAttributes="Bold"
+                    TranslationX="-14"
+                    TranslationY="-12"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"/>
+            </Grid>
+            <BoxView Grid.Row="2" HeightRequest="1" BackgroundColor="Black"></BoxView>
+            <Grid
+                Grid.Row="3"
+                ColumnSpacing="0.5"
+                BackgroundColor="#136D74">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="1"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="1"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Label Text="Checkout" StyleClass="h3, secondary, center" Grid.Column="0" VerticalTextAlignment="Center"/>
+                <BoxView WidthRequest="1" BackgroundColor="Black" VerticalOptions="FillAndExpand" Grid.Column="1"/>
+                <Label Text="History" StyleClass="h3, white, center" Grid.Column="2" VerticalTextAlignment="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="openHistory"/>
+                    </Label.GestureRecognizers>
+                </Label>
+                <BoxView WidthRequest="1" BackgroundColor="Black" VerticalOptions="FillAndExpand" Grid.Column="3"/>
+                <Label Text="Refund" StyleClass="h3, white, center" Grid.Column="4" VerticalTextAlignment="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="openRefund"/>
+                    </Label.GestureRecognizers>
+                </Label>
+            </Grid>
+            <StackLayout Grid.Row="4" >
+                <ScrollView>
+                    <StackLayout>
+                        <Grid Padding="15">
+                            <StackLayout Grid.Column="0">
+                                <Label Text="Delivery Address:" StyleClass="h3, primary"></Label>
+                                <Label Text="Change address" StyleClass="secondary">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Tapped="ChangeAddressClick">
+                                        </TapGestureRecognizer>
+                                    </Label.GestureRecognizers>
+                                </Label>
+                            </StackLayout>
+                            <StackLayout Grid.Column="1" Spacing="15">
+                                <StackLayout Spacing="0">
+                                    <Label x:Name="DeliveryAddress1" FontSize="Micro" StyleClass="p, black"/>
+                                    <Label x:Name="DeliveryAddress2" FontSize="Micro" StyleClass="p, black"/>
+                                </StackLayout>
+                            </StackLayout>
+                        </Grid>
+                        <BoxView StyleClass="spacer"/>
+                        <Grid Padding="15">
+                            <StackLayout Grid.Column="0">
+                                <Label Text="Contact info:" StyleClass="h3, primary"></Label>
+                                <Label Text="Change contact info" StyleClass="secondary">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Tapped="ChangeContactInfoClick">
+                                        </TapGestureRecognizer>
+                                    </Label.GestureRecognizers>
+                                </Label>
+                            </StackLayout>
+                            <StackLayout Grid.Column="1" Spacing="15">
+                                <StackLayout Spacing="0">
+                                    <Label x:Name="FullName" FontSize="Micro" StyleClass="p, black"/>
+                                    <Label x:Name="PhoneNumber" FontSize="Micro" StyleClass="p, black"/>
+                                    <Label x:Name="EmailAddress" FontSize="Micro" StyleClass="p, black"/>
+                                </StackLayout>
+                            </StackLayout>
+                        </Grid>
+                        <BoxView StyleClass="spacer"/>
+                        <Grid Padding="15">
+                            <Label Grid.Column="0" Text="Expected Delivery:" StyleClass="h3, primary"/>
+                            <StackLayout Grid.Column="1">
+                                <Label x:Name="deliveryDate" FontSize="Micro" StyleClass="p, black"/>
+                                <Label x:Name="deliveryTime" FontSize="Micro" StyleClass="p, black"/>
+                            </StackLayout>
+                        </Grid>
+                        <BoxView StyleClass="spacer"/>
+                        <FlexLayout JustifyContent="SpaceBetween" Padding="15">
+                            <Label Text="Your Order" StyleClass="h2, black"/>
+                            <Button Text="+ Add Items" StyleClass="btn, secondary" HeightRequest="30" Clicked="TestDateFormat"/>
+                        </FlexLayout>
+                        <BoxView StyleClass="spacer"/>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <CollectionView x:Name="CartItems" Footer="">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackLayout>
+                                            <Grid Padding="15">
+                                                <Label Text="{Binding name}" Grid.Column="0" Grid.ColumnSpan="3" StyleClass="p, black"/>
+                                                <FlexLayout JustifyContent="SpaceBetween" Grid.Column="3" VerticalOptions="Center" >
+                                                    <Label Text="_" FontSize="Medium" Padding="0,-7,0,0" HorizontalTextAlignment="Center" FontAttributes="Bold" WidthRequest="30" StyleClass="p, secondary">
+                                                        <Label.GestureRecognizers>
+                                                            <TapGestureRecognizer Tapped="decrease_qty" CommandParameter="{Binding .}"/>
+                                                        </Label.GestureRecognizers>
+                                                    </Label>
+                                                    <!--"{Binding qty}"-->
+                                                    <Label Text="{Binding qty}" VerticalTextAlignment="Center" StyleClass="p, secondary"/>
+                                                    <Label Text="+" HorizontalTextAlignment="Center" FontSize="Medium" FontAttributes="Bold" WidthRequest="30"  StyleClass="p, secondary">
+                                                        <Label.GestureRecognizers>
+                                                            <TapGestureRecognizer Tapped="increase_qty" CommandParameter="{Binding .}"/>
+                                                        </Label.GestureRecognizers>
+                                                    </Label>
+                                                </FlexLayout>
+                                                <Label Padding="0,5,10,0" StyleClass="p, black" Grid.Column="4" HorizontalTextAlignment="End" Text="{Binding total_price}"/>
+                                            </Grid>
+                                            <BoxView StyleClass="spacer"/>
+                                        </StackLayout>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </Grid>
+                        <Label Text="Choose one of the eligible promos to apply" StyleClass="black" Margin="15"/>
+                        <ScrollView Orientation="Horizontal" Padding="0" Margin="0">
+                            <StackLayout Orientation="Horizontal" Spacing="20" Padding="0" Margin="0">
+                                <Grid>
+                                    <Image Source="CouponIcon" StyleClass="coupon">
+                                        <Image.Effects>
+                                            <servingfresh:TintImageEffect TintColor="#FF8500"/>
+                                        </Image.Effects>
+                                    </Image>
+                                    <Label Text="10% off" VerticalOptions="Center" StyleClass="h2, black" Margin="50, 0"/>
+                                    <Label Text="&#10;&#10;&#10;orders above $60" VerticalOptions="Center" StyleClass="black" Margin="50, 0" FontSize="10"/>
+                                </Grid>
+                                <Grid>
+                                    <Image Source="CouponIcon" StyleClass="coupon">
+                                        <Image.Effects>
+                                            <servingfresh:TintImageEffect TintColor="LightGray"/>
+                                        </Image.Effects>
+                                    </Image>
+                                    <Label Text="15% off" VerticalOptions="Center" StyleClass="h2" Margin="50, 0"/>
+                                    <Label Text="&#10;&#10;&#10;orders above $75" VerticalOptions="Center" StyleClass="black" Margin="50, 0" FontSize="10"/>
+                                </Grid>
+                                <Grid>
+                                    <Image Source="CouponIcon" StyleClass="coupon">
+                                        <Image.Effects>
+                                            <servingfresh:TintImageEffect TintColor="LightGray"/>
+                                        </Image.Effects>
+                                    </Image>
+                                    <Label Text="Free&#10;delivery" VerticalOptions="Center" StyleClass="h2" Margin="50, 0"/>
+                                    <Label Text="&#10;&#10;&#10;&#10;&#10;orders above $50" VerticalOptions="Center" StyleClass="black" Margin="50, 0" FontSize="10"/>
+                                </Grid>
+                            </StackLayout>
+                        </ScrollView>
+                        <BoxView StyleClass="spacer"/>
+                        <FlexLayout JustifyContent="SpaceBetween" Padding="0,10,0,10">
+                            <Label Padding="15,0,0,0" Text="Subtotal" StyleClass="p, black"/>
+                            <Label Padding="0,0,30,0" x:Name="SubTotal" StyleClass="p, black"/>
+                        </FlexLayout>
+                        <BoxView StyleClass="spacer"/>
+                        <FlexLayout JustifyContent="SpaceBetween" Padding="0,10,0,10">
+                            <Label Padding="15,0,0,0" Text="Promo applied" StyleClass="p, primary"/>
+                            <Label Padding="0,0,30,0" x:Name="Discount" StyleClass="p, black"/>
+                        </FlexLayout>
+                        <BoxView StyleClass="spacer"/>
+                        <FlexLayout JustifyContent="SpaceBetween" Padding="0,10,0,10">
+                            <Label Padding="15,0,0,0" Text="Delivery Fee" StyleClass="p, black"/>
+                            <Label Padding="0,0,30,0" x:Name="DeliveryFee" StyleClass="p, black"/>
+                        </FlexLayout>
+                        <BoxView StyleClass="spacer"/>
+                        <FlexLayout JustifyContent="SpaceBetween" Padding="0,10,0,10">
+                            <Label Padding="15,0,0,0" Text="Service Fee" StyleClass="p, black"/>
+                            <Label Padding="0,0,30,0" x:Name="ServiceFee" Text="$ 5.00" StyleClass="p, black"/>
+                        </FlexLayout>
+                        <BoxView StyleClass="spacer"/>
+                        <FlexLayout JustifyContent="SpaceBetween" Padding="0,10,0,10">
+                            <Label Padding="15,0,0,0" Text="Driver Tip" StyleClass="p, black"/>
+                            <StackLayout Orientation="Horizontal" Spacing="0" Margin="0,0,0,0">
+                                <Label  Text="$ " StyleClass="p, black"/>
+                                <local:CustomEntry HeightRequest="20" Completed="DriverTip_Completed" WidthRequest="60" Placeholder="Tip" FontSize="Small" Keyboard="Numeric" x:Name="DriverTip" StyleClass="p, black"/>
+                            </StackLayout>
+                        </FlexLayout>
+                        <BoxView StyleClass="spacer"/>
+                        <FlexLayout JustifyContent="SpaceBetween" Padding="0,10,0,10">
+                            <Label Padding="15,0,0,0" Text="Taxes" StyleClass="p, black"/>
+                            <Label Padding="0,0,30,0" x:Name="Taxes" StyleClass="p, black"/>
+                        </FlexLayout>
+                        <BoxView StyleClass="spacer"/>
+                        <FlexLayout JustifyContent="SpaceBetween" Padding="0,10,0,10">
+                            <Label Padding="15,0,0,0" Text="Total" StyleClass="h3, black"/>
+                            <Label Padding="0,0,30,0" x:Name="GrandTotal" StyleClass="p, black"/>
+                        </FlexLayout>
+                        <StackLayout Spacing="0">
+                            <Button Text="Checkout with Paypal" Clicked="checkoutAsync" StyleClass="btn, secondary-outline"/>
+                            <Button Text="Checkout with Stripe" Clicked="checkoutAsync" StyleClass="btn, secondary-outline"/>
+                        </StackLayout>
+                    </StackLayout>
+                </ScrollView>
+            </StackLayout>
+            <Frame Grid.Row="5" x:Name="CardInfo">
+                <ScrollView>
+                    <StackLayout>
+                       
+                            <Label  Text="Payment Information" TextColor="Black" FontAttributes="Bold" FontSize="Medium" ></Label>
+                            <Entry  Placeholder="Email Address" x:Name="cardHolderEmail"></Entry>
+                            <Entry  Placeholder="Cardholder Name" x:Name="cardHolderName"></Entry>
+                            <Entry  Placeholder="Card Number" x:Name="cardHolderNumber" MaxLength="16"></Entry>
+                           
+                                <Grid >
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Entry Grid.Row="0" Grid.Column="0" Placeholder="Exp MM" x:Name="cardExpMonth" MaxLength="2"></Entry>
+                                    <Entry Grid.Row="0" Grid.Column="1" Placeholder="Exp YY" x:Name="cardExpYear" MaxLength="2"></Entry>
+                                    <Entry Grid.Row="0" Grid.Column="2" Placeholder="CVV" x:Name="cardCVV" MaxLength="3"></Entry>
+                                </Grid>
+                          
+                                <Entry Placeholder="Address" x:Name="cardHolderAddress"></Entry>
+                                 <Entry Placeholder="Unit" x:Name="cardHolderUnit"></Entry>
+                                  <StackLayout >
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Entry Grid.Row="0" Grid.Column="0" Placeholder="City" x:Name="cardCity" ></Entry>
+                                    <Entry Grid.Row="0" Grid.Column="1" Placeholder="State" x:Name="cardState" ></Entry>
+                                    <Entry Grid.Row="0" Grid.Column="2" Placeholder="Zip" x:Name="cardZip" ></Entry>
+                                </Grid>
+                                <Entry Placeholder="Purchase Description" x:Name="cardDescription"></Entry>
+                            </StackLayout>
+                      
+
+                        <Button Text="Complete Payment" TextColor="White" FontAttributes="Bold" Clicked="CompletePaymentClick" BackgroundColor="#FF8500"></Button>
+                        <Button Text="Cancel" TextColor="#FF8500" FontAttributes="Bold" BorderColor="LightGray" BorderWidth="0.5" Clicked="CancelPaymentClick"></Button>
+                    </StackLayout>
+                </ScrollView>
+            </Frame>
+            <Frame Grid.Row="6" x:Name="AddressInfo">
+                <ScrollView>
+                    <StackLayout>
+                         <Label Grid.Row="0" Grid.Column="0" Text="Change Address" TextColor="Black" FontAttributes="Bold" FontSize="Medium" Padding="0,0,0,10"></Label>
+                         <Entry
+                            x:Name="newUserAddress"
+                            Placeholder="Street Address">
+                        </Entry>
+                        <Entry
+                            x:Name="newUserUnitNumber"
+                            Placeholder="Apt number">
+                        </Entry>
+                        <Grid>
+                            <Entry
+                                x:Name="newUserCity"
+                                Grid.Column="0"
+                                Placeholder="City">
+                            </Entry>
+                            <Entry
+                                x:Name="newUserState"
+                                Grid.Column="1"
+                                Placeholder="State">
+                            </Entry>
+                            <Entry
+                                x:Name="newUserZipcode"
+                                Grid.Column="2"
+                                Placeholder="Zipcode">
+                            </Entry>
+                        </Grid>
+                        <Entry x:Name="newUserDeliveryInstructions" Placeholder="Delivery instructions"></Entry>
+                        <Frame HasShadow="False" BackgroundColor="Gray" Padding="0" HeightRequest="150">
+                            <maps:Map
+                                x:Name="map"
+                                IsVisible="true">
+                            </maps:Map>
+                        </Frame>
+                        <Button x:Name="addressButton" Text="Verify Address" TextColor="White" FontAttributes="Bold" Clicked="ValidateAddressClick" BackgroundColor="#FF8500"></Button>
+                        <Button Text="Save Address" TextColor="#FF8500" FontAttributes="Bold" BorderColor="#FF8500" BorderWidth="0.5" Clicked="SaveAddressClick"></Button>
+                        <Button Text="Cancel" TextColor="#FF8500" FontAttributes="Bold" BorderColor="#FF8500" BorderWidth="0.5" Clicked="ChangeAddressCancelClick"></Button>
+                    </StackLayout>
+                </ScrollView>
+            </Frame>
+            <Frame Grid.Row="7" x:Name="ContactInfo">
+                <ScrollView>
+                    <StackLayout>
+                        <Label Grid.Row="0" Grid.Column="0" Text="Change Contact Info" TextColor="Black" FontAttributes="Bold" FontSize="Medium" Padding="0,0,0,10"></Label>
+                        <Entry x:Name="newUserFirstName" Placeholder="First name"></Entry>
+                        <Entry x:Name="newUserLastName" Placeholder="Last name"></Entry>
+                        <Entry x:Name="newUserPhoneNum" Placeholder="Phone number"></Entry>
+                        <Entry x:Name="newUserEmailAddress" Placeholder="Email Address"></Entry>
+                        <Button Text="Save Address" TextColor="#FF8500" FontAttributes="Bold" BorderColor="#FF8500" BorderWidth="0.5" Clicked="SaveChangesClick"></Button>
+                        <Button Text="Cancel" TextColor="#FF8500" FontAttributes="Bold" BorderColor="#FF8500" BorderWidth="0.5" Clicked="ChangeContactInfoCancelClick"></Button>
+                    </StackLayout>
+                </ScrollView>
+            </Frame>
+            <Grid Grid.Row="8" BackgroundColor="WhiteSmoke">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="45"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <ImageButton Grid.Row="0" Grid.Column="0" BackgroundColor="Transparent" Source="CalendarI" Clicked="DeliveryDaysClick" Padding="6"></ImageButton>
+                <Label Grid.Row="1" Grid.Column="0" Text="Days" HorizontalTextAlignment="Center"></Label>
+                <ImageButton Grid.Row="0" Grid.Column="1" BackgroundColor="Transparent" Source="RefundIcon" Clicked="OrdersClick" Padding="6">
+                    <ImageButton.Effects>
+                        <servingfresh:TintImageEffect TintColor="#FF8500"/>
+                    </ImageButton.Effects>
+                </ImageButton>
+                <Label Grid.Row="1" Grid.Column="1" Text="Orders" HorizontalTextAlignment="Center"></Label>
+                <ImageButton Grid.Row="0" Grid.Column="2" BackgroundColor="Transparent" Source="InfoIcon" Clicked="InfoClick" Padding="6"></ImageButton>
+                <Label Grid.Row="1" Grid.Column="2" Text="Info" HorizontalTextAlignment="Center"></Label>
+                <ImageButton Grid.Row="0" Grid.Column="3" BackgroundColor="Transparent" Source="UserIcon" Clicked="ProfileClick" Padding="6"></ImageButton>
+                <Label Grid.Row="1" Grid.Column="3" Text="Profile" HorizontalTextAlignment="Center"></Label>
+            </Grid>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

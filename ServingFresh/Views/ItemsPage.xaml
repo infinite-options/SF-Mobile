@@ -1,0 +1,210 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="ServingFresh.Views.ItemsPage"
+    xmlns:servingfresh="clr-namespace:ServingFresh.Effects">
+    <ContentPage.Content>
+        <Grid RowSpacing="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="35"></RowDefinition>
+                <RowDefinition Height="95"></RowDefinition>
+                <RowDefinition Height="1"></RowDefinition>
+                <RowDefinition Height="65"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="80"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Label Grid.Row="0" BackgroundColor="#136D74"></Label>
+            <Grid Grid.Row="1" BackgroundColor="#136D74">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="70"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="70"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Label
+                    Grid.Column="1"
+                    HeightRequest="136"
+                    HorizontalTextAlignment="Center"
+                    VerticalTextAlignment="Center"
+                    x:Name="titlePage"
+                    TextColor="White"
+                    FontSize="34"
+                    FontAttributes="Bold">
+                </Label>
+                <ImageButton
+                    Grid.Column="2"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    HeightRequest="40"
+                    Source="CartIcon"
+                    BackgroundColor="Transparent"
+                    Clicked="CheckOutClickBusinessPage">
+                    <ImageButton.Effects>
+                        <servingfresh:TintImageEffect TintColor="White"/>
+                    </ImageButton.Effects>
+                </ImageButton>
+                <Label
+                    Grid.Column="2"
+                    x:Name="CartTotal"
+                    StyleClass="secondary"
+                    FontAttributes="Bold"
+                    TranslationX="-14"
+                    TranslationY="-12"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"/>
+            </Grid>
+            <BoxView Grid.Row="2" HeightRequest="1" BackgroundColor="Black"></BoxView>
+            <FlexLayout Grid.Row="3" JustifyContent="SpaceBetween" Padding="15" BackgroundColor="#136D74">
+                <StackLayout Spacing="0">
+                    <ImageButton x:Name="fruit" Source="OrangeIcon" Clicked="Change_Color" StyleClass="imgbtn">
+                        <ImageButton.Effects>
+                            <servingfresh:TintImageEffect TintColor="White"/>
+                        </ImageButton.Effects>
+                    </ImageButton>
+                    <Label Text="Fruits" StyleClass="white, center"/>
+                </StackLayout>
+                <StackLayout Spacing="0">
+                    <ImageButton x:Name="vegetable" Source="VegIcon" Clicked="Change_Color" StyleClass="imgbtn">
+                        <ImageButton.Effects>
+                            <servingfresh:TintImageEffect TintColor="White"/>
+                        </ImageButton.Effects>
+                    </ImageButton>
+                    <Label Text="Vegetables" StyleClass="white, center"/>
+                </StackLayout>
+                <StackLayout Spacing="0">
+                    <ImageButton x:Name="dessert" Source="Donut_Icon" Clicked="Change_Color" StyleClass="imgbtn">
+                        <ImageButton.Effects>
+                            <servingfresh:TintImageEffect TintColor="White"/>
+                        </ImageButton.Effects>
+                    </ImageButton>
+                    <Label Text="Desserts" StyleClass="white, center"/>
+                </StackLayout>
+                <StackLayout Spacing="0">
+                    <ImageButton x:Name="other" Source="Bread_Icon" Clicked="Change_Color" StyleClass="imgbtn">
+                        <ImageButton.Effects>
+                            <servingfresh:TintImageEffect TintColor="White"/>
+                        </ImageButton.Effects>
+                    </ImageButton>
+                    <Label Text="Other" StyleClass="white, center"/>
+                </StackLayout>
+            </FlexLayout>
+            <StackLayout Grid.Row="4">
+                <CollectionView x:Name="itemList"  BackgroundColor="White" SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid HorizontalOptions="Center" Padding="15,5,5,0" BackgroundColor="White">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="{Binding width}"></RowDefinition>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions >
+                                    <ColumnDefinition Width="{Binding width}"></ColumnDefinition>
+                                        <ColumnDefinition Width="{Binding width}"></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <RelativeLayout
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    IsVisible="{Binding isItemLeftVisiable}"
+                                    IsEnabled="{Binding isItemLeftEnable}">
+                                    <ImageButton
+                                        HeightRequest="{Binding width}"
+                                        WidthRequest="{Binding width}"
+                                        Source="{Binding imageSourceLeft}"
+                                        Aspect="Fill"
+                                        CornerRadius="20"
+                                        BackgroundColor="WhiteSmoke">
+                                    </ImageButton>
+                                    <Button
+                                        Text="{Binding quantityLeft}"
+                                        TextColor="#FF8500"
+                                        FontAttributes="Bold"
+                                        Opacity="0.9"
+                                        WidthRequest="40"
+                                        BackgroundColor="WhiteSmoke">
+                                    </Button>
+                                    <Grid>
+                                        <StackLayout Grid.Row="2">
+                                            <Frame Padding="0" HeightRequest="35" HasShadow="False" BackgroundColor="WhiteSmoke" Opacity="0.9" BorderColor="LightGray">
+                                                <Grid>
+                                                    <Button Grid.Column="0" WidthRequest="92" Text="-" TextColor="#FF8500" Font="35" Clicked="SubtractItemLeft" CommandParameter="{Binding .}"></Button>
+                                                    <Button Grid.Column="1" WidthRequest="92" Text="+" TextColor="#FF8500" Font="25" Clicked="AddItemLeft" CommandParameter="{Binding .}"></Button>
+                                                </Grid>
+                                            </Frame>
+                                            <Frame Padding="0" Margin="0,-7,0,0" HeightRequest="35" HasShadow="False" BorderColor="LightGray">
+                                                <Grid>
+                                                    <Label Grid.Column="0" WidthRequest="120" Padding="10,0,0,0" Text="{Binding itemNameLeft}" TextColor="Black" HorizontalTextAlignment="Start" FontSize="Micro"></Label>
+                                                    <Label Grid.Column="1" WidthRequest="75" Text="{Binding itemPriceLeft}" TextColor="Black" HorizontalTextAlignment="Center" FontSize="Micro"></Label>
+                                                </Grid>
+                                            </Frame>
+                                        </StackLayout>
+                                    </Grid>
+                                </RelativeLayout>
+                                <RelativeLayout
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    IsVisible="{Binding isItemRightVisiable}"
+                                    IsEnabled="{Binding isItemRightEnable}">
+                                    <ImageButton
+                                        HeightRequest="{Binding width}"
+                                        WidthRequest="{Binding width}"
+                                        Source="{Binding imageSourceRight}"
+                                        CornerRadius="20"
+                                        BackgroundColor="WhiteSmoke">
+                                    </ImageButton>
+                                    <Button
+                                        Text="{Binding quantityRight}"
+                                        TextColor="#FF8500"
+                                        FontAttributes="Bold"
+                                        Opacity="0.9"
+                                        WidthRequest="40"
+                                        BackgroundColor="WhiteSmoke">
+                                    </Button>
+                                    <Grid>
+                                        <StackLayout Grid.Row="2">
+                                            <Frame Padding="0" HeightRequest="35" HasShadow="False" BackgroundColor="WhiteSmoke" Opacity="0.9" BorderColor="LightGray">
+                                                <Grid>
+                                                    <Button Grid.Column="0" WidthRequest="120" Text="-" TextColor="#FF8500" Font="35" Clicked="SubtractItemRight" CommandParameter="{Binding .}"></Button>
+                                                    <Button Grid.Column="1" WidthRequest="75" Text="+" TextColor="#FF8500" Font="25" Clicked="AddItemRight" CommandParameter="{Binding .}"></Button>
+                                                </Grid>
+                                            </Frame>
+                                            <Frame Padding="0" Margin="0,-7,0,0" HeightRequest="35" HasShadow="False" BorderColor="LightGray">
+                                                <Grid>
+                                                    <Label Grid.Column="0" WidthRequest="120" Text="{Binding itemNameRight}" Padding="10,0,0,0" TextColor="Black" HorizontalTextAlignment="Start" FontSize="Micro"></Label>
+                                                    <Label Grid.Column="1" WidthRequest="92" Text="{Binding itemPriceRight}" TextColor="Black" HorizontalTextAlignment="Center" FontSize="Micro"></Label>
+                                                </Grid>
+                                            </Frame>
+                                        </StackLayout>
+                                    </Grid>
+                                </RelativeLayout>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </StackLayout>
+            <Grid Grid.Row="5" BackgroundColor="WhiteSmoke">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="45"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <ImageButton Grid.Row="0" Grid.Column="0" BackgroundColor="Transparent" Source="CalendarI" Clicked="DeliveryDaysClick" Padding="6">
+                    <ImageButton.Effects>
+                        <servingfresh:TintImageEffect TintColor="#FF8500"/>
+                    </ImageButton.Effects>
+                </ImageButton>
+                <Label Grid.Row="1" Grid.Column="0" Text="Days" HorizontalTextAlignment="Center"></Label>
+                <ImageButton Grid.Row="0" Grid.Column="1" BackgroundColor="Transparent" Source="RefundIcon" Clicked="OrdersClick" Padding="6"></ImageButton>
+                <Label Grid.Row="1" Grid.Column="1" Text="Orders" HorizontalTextAlignment="Center"></Label>
+                <ImageButton Grid.Row="0" Grid.Column="2" BackgroundColor="Transparent" Source="InfoIcon" Clicked="InfoClick" Padding="6"></ImageButton>
+                <Label Grid.Row="1" Grid.Column="2" Text="Info" HorizontalTextAlignment="Center"></Label>
+                <ImageButton Grid.Row="0" Grid.Column="3" BackgroundColor="Transparent" Source="UserIcon" Clicked="ProfileClick" Padding="6"></ImageButton>
+                <Label Grid.Row="1" Grid.Column="3" Text="Profile" HorizontalTextAlignment="Center"></Label>
+            </Grid>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

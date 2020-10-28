@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="ServingFresh.Views.LogInPage">
+    <ContentPage.Content>
+        <RelativeLayout
+            HorizontalOptions="Fill"
+            VerticalOptions="Fill"
+            BackgroundColor="WhiteSmoke">
+            <Image
+                Source="welcomeBackground.png"
+                Aspect="Fill">
+            </Image>
+            <StackLayout
+                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}"
+                RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}">
+                <Frame BackgroundColor="Transparent" HasShadow="False">
+                    <Image
+                        Source="servingFreshIcon.png">
+                    </Image>
+                    <Frame.Padding>
+                        <OnPlatform x:TypeArguments="Thickness">
+                            <On Platform="Android" Value="50,0,50,0"></On>
+                            <On Platform="iOS" Value="50,40,50,0"></On>
+                        </OnPlatform>
+                    </Frame.Padding>
+                </Frame>
+                <StackLayout Padding="50,0,50,0">
+                    <Entry
+                        x:Name="userEmailAddress"
+                        Placeholder="Email address"
+                        HorizontalTextAlignment="Center">
+                    </Entry>
+                    <Entry
+                        x:Name="userPassword"
+                        Placeholder="Password"
+                        IsPassword="True"
+                        HorizontalTextAlignment="Center">
+                    </Entry>
+                    <Button
+                        x:Name="logInButton"
+                        Text="LOGIN"
+                        TextColor="White"
+                        BackgroundColor="#136D74"
+                        Clicked="DirectLogInClick">
+                    </Button>
+                    <Label
+                        Text="LOGIN OR SIGN UP WITH"
+                        TextColor="Gray"
+                        FontSize="Medium"
+                        FontAttributes="Bold"
+                        HorizontalOptions="Center"
+                        Padding="0,20,0,0">
+                    </Label>
+                    <Grid HeightRequest="100">
+                        <ImageButton
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Source="facebookIcon.png"
+                            Padding="0,0,25,0"
+                            BackgroundColor="Transparent"
+                            Clicked="FacebookLogInClick">
+                        </ImageButton>
+                        <ImageButton
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Source="googleIcon.png"
+                            Padding="10,0,10,0"
+                            BackgroundColor="Transparent"
+                            Clicked="GoogleLogInClick">
+                        </ImageButton>
+                        <ImageButton
+                            x:Name="appleLogInButton"
+                            Grid.Row="0"
+                            Grid.Column="2"
+                            Source="appleIcon.png"
+                            Padding="25,0,0,0"
+                            BackgroundColor="Transparent"
+                            Clicked="AppleLogInClick"
+                            Command = "{Binding SignInWithAppleCommand}">
+                        </ImageButton>
+                    </Grid>
+                    <Grid>
+                        <ImageButton
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Source="asGuestIcon.png"
+                            BackgroundColor="Transparent"
+                            Clicked="ProceedAsGuestClick">
+                        </ImageButton>
+                        <ImageButton
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Source="signUpIcon.png"
+                            BackgroundColor="Transparent"
+                            Clicked="SignUpClick">
+                        </ImageButton>
+                    </Grid>
+                </StackLayout>
+            </StackLayout>  
+        </RelativeLayout>
+    </ContentPage.Content>
+</ContentPage>

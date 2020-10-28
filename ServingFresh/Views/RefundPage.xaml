@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="ServingFresh.Views.RefundPage"
+    xmlns:servingfresh="clr-namespace:ServingFresh.Effects">
+    <ContentPage.Content>
+        <Grid RowSpacing="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="35"></RowDefinition>
+                <RowDefinition Height="95"></RowDefinition>
+                <RowDefinition Height="1"></RowDefinition>
+                <RowDefinition Height="65"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="80"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Label Grid.Row="0" BackgroundColor="#136D74"></Label>
+            <Grid Grid.Row="1" BackgroundColor="#136D74">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="70"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="70"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Label
+                    Grid.Column="1"
+                    HeightRequest="136"
+                    HorizontalTextAlignment="Center"
+                    VerticalTextAlignment="Center"
+                    Text="Orders"
+                    TextColor="White"
+                    FontSize="34"
+                    FontAttributes="Bold">
+                </Label>
+                
+                <ImageButton
+                    Grid.Column="2"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    HeightRequest="40"
+                    Source="CartIcon"
+                    BackgroundColor="Transparent">
+                    <ImageButton.Effects>
+                        <servingfresh:TintImageEffect TintColor="White"/>
+                    </ImageButton.Effects>
+                </ImageButton>
+            </Grid>
+            <BoxView Grid.Row="2" HeightRequest="1" BackgroundColor="Black"></BoxView>
+            <Grid
+                Grid.Row="3"
+                ColumnSpacing="0.5"
+                BackgroundColor="#136D74">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="1"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="1"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Label Text="Checkout" StyleClass="h3, white, center" Grid.Column="0" VerticalTextAlignment="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="openCheckout"/>
+                    </Label.GestureRecognizers>
+                </Label>
+                <BoxView WidthRequest="1" BackgroundColor="Black" VerticalOptions="FillAndExpand" Grid.Column="1"/>
+                <Label Text="History" StyleClass="h3, white, center" Grid.Column="2" VerticalTextAlignment="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="openHistory"/>
+                    </Label.GestureRecognizers>
+                </Label>
+                <BoxView WidthRequest="1" BackgroundColor="Black" VerticalOptions="FillAndExpand" Grid.Column="3"/>
+                <Label Text="Refund" StyleClass="h3, secondary, center" Grid.Column="4" VerticalTextAlignment="Center"/>
+            </Grid>
+            <StackLayout Grid.Row="4">
+                <ScrollView>
+                    <StackLayout>
+                        <BoxView HeightRequest="300" BackgroundColor="LightGray"/>
+                        <Button Text="Take Photo" StyleClass="btn, secondary-outline"/>
+                        <Button Text="Choose a Photo from Gallery" StyleClass="btn, secondary-outline"/>
+                        <StackLayout Padding="15,0" Spacing="15">
+                            <Label Text="Easy Peasy Return Instructions" StyleClass="h1, black, center"/>
+                            <Label Text="1. Take a picture of what you want to return" StyleClass="p, black"/>
+                            <Label Text="2. Enter your email address and a note (required)" StyleClass="p, black"/>
+                            <Label Text="3. Press send" StyleClass="p, black"/>
+                            <Label Text="We'll either add your items to our next delivery or issue you a coupon code for your next order! Tell us if you have a preference. Easy peasy!" StyleClass="p, black"/>
+                        </StackLayout>
+                    </StackLayout>
+                </ScrollView>
+            </StackLayout>
+            <Grid Grid.Row="5" BackgroundColor="WhiteSmoke">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="45"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <ImageButton Grid.Row="0" Grid.Column="0" BackgroundColor="Transparent" Source="CalendarI" Padding="6" Clicked="DeliveryDaysClick"></ImageButton>
+                <Label Grid.Row="1" Grid.Column="0" Text="Days" HorizontalTextAlignment="Center"></Label>
+                <ImageButton Grid.Row="0" Grid.Column="1" BackgroundColor="Transparent" Source="RefundIcon" Padding="6" Clicked="OrdersClick">
+                    <ImageButton.Effects>
+                        <servingfresh:TintImageEffect TintColor="#FF8500"/>
+                    </ImageButton.Effects>
+                </ImageButton>
+                <Label Grid.Row="1" Grid.Column="1" Text="Orders" HorizontalTextAlignment="Center"></Label>
+                <ImageButton Grid.Row="0" Grid.Column="2" BackgroundColor="Transparent" Source="InfoIcon" Padding="6" Clicked="InfoClick"></ImageButton>
+                <Label Grid.Row="1" Grid.Column="2" Text="Info" HorizontalTextAlignment="Center"></Label>
+                <ImageButton Grid.Row="0" Grid.Column="3" BackgroundColor="Transparent" Source="UserIcon" Padding="6" Clicked="ProfileClick"></ImageButton>
+                <Label Grid.Row="1" Grid.Column="3" Text="Profile" HorizontalTextAlignment="Center"></Label>
+            </Grid>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

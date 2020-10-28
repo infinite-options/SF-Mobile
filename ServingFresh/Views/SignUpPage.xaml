@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:maps="clr-namespace:Xamarin.Forms.Maps;assembly=Xamarin.Forms.Maps"
+    xmlns:servingfresh="clr-namespace:ServingFresh.Models"
+    x:Class="ServingFresh.Views.SignUpPage">
+    <ContentPage.Content>
+                <StackLayout Padding="0,0,0,0">
+            <Label
+                HeightRequest="136"
+                HorizontalTextAlignment="Center"
+                VerticalTextAlignment="Center"
+                Text="Sign Up"
+                TextColor="White"
+                FontSize="34"
+                FontAttributes="Bold"
+                BackgroundColor="#136D74">
+
+            </Label>
+            <ScrollView>
+                <StackLayout
+                    Margin="10,10,10,0">
+                    <Entry
+                        x:Name="userEmailAddress"
+                        Placeholder="Email Address">
+                    </Entry>
+                    <Entry
+                        x:Name="userConfirmEmailAddress"
+                        Placeholder="Confirm Email Address"></Entry>
+                    <Entry
+                        x:Name="userPassword"
+                        Placeholder="Enter Password">
+                    </Entry>
+                    <Entry
+                        x:Name="userConfirmPassword"
+                        Placeholder="Confirm Password">
+                    </Entry>
+                    <Grid>
+                        <servingfresh:CustomEntry Placeholder="Push Notification" IsReadOnly="True" Margin="7,0,0,0"></servingfresh:CustomEntry>
+                        <Switch HorizontalOptions="End" Grid.Column="1" IsToggled="True"></Switch>
+                    </Grid>
+                    <Entry
+                        x:Name="userFirstName"
+                        Placeholder="First name">
+                    </Entry>
+                    <Entry
+                        x:Name="userLastName"
+                        Placeholder="Last name">
+                    </Entry>
+                    <Entry
+                        x:Name="userPhoneNumber"
+                        Placeholder="Phone number">
+                    </Entry>
+                    <Entry
+                        x:Name="userAddress"
+                        Placeholder="Street Address">
+                    </Entry>
+                    <Entry
+                        x:Name="userUnitNumber"
+                        Placeholder="Apt number">
+                    </Entry>
+                    <Grid>
+                        <Entry
+                            x:Name="userCity"
+                            Grid.Column="0"
+                            Placeholder="City">
+                        </Entry>
+                        <Entry
+                            x:Name="userState"
+                            Grid.Column="1"
+                            Placeholder="State">
+                        </Entry>
+                        <Entry
+                            x:Name="userZipcode"
+                            Grid.Column="2"
+                            Placeholder="Zipcode">
+                        </Entry>
+                    </Grid>
+                    <Entry x:Name="userDeliveryInstructions" Placeholder="Delivery instructions"></Entry>
+                    <Frame HasShadow="False" BackgroundColor="Gray" Padding="0" HeightRequest="200">
+                        <maps:Map
+                            x:Name="map"
+                            IsVisible="true">
+                        </maps:Map>
+                    </Frame>
+                    <Button
+                        Text="Validate Address"
+                        TextColor="#FF8500"
+                        FontAttributes="Bold"
+                        CornerRadius="5"
+                        BorderColor="LightGray"
+                        BorderWidth="1"
+                        HeightRequest="40"
+                        BackgroundColor="White"
+                        Clicked="ValidateAddressClick">
+
+                    </Button>
+                    <Button
+                        Text="Sign up"
+                        TextColor="White"
+                        CornerRadius="5"
+                        BorderColor="LightGray"
+                        BorderWidth="1"
+                        HeightRequest="40"
+                        BackgroundColor="#FF8500"
+                        Clicked="SignUpNewUser">
+                    </Button>
+                </StackLayout>
+            </ScrollView>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

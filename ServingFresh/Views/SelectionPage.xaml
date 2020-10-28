@@ -1,0 +1,215 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
+    xmlns:servingfresh="clr-namespace:ServingFresh.Effects"
+    x:Class="ServingFresh.Views.SelectionPage">
+  <ContentPage.Content>
+        <Grid RowSpacing="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="35"></RowDefinition>
+                <RowDefinition Height="95"></RowDefinition>
+                <RowDefinition Height="0.5"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="80"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Label Grid.Row="0" BackgroundColor="#136D74"></Label>
+            <Grid Grid.Row="1" BackgroundColor="#136D74">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="70"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="70"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Label
+                    Grid.Column="1"
+                    HeightRequest="136"
+                    HorizontalTextAlignment="Center"
+                    VerticalTextAlignment="Center"
+                    Text="Delivery Days"
+                    TextColor="White"
+                    FontSize="34"
+                    FontAttributes="Bold">
+                </Label>
+                <ImageButton
+                    Grid.Column="2"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    HeightRequest="40"
+                    Source="CartIcon"
+                    BackgroundColor="Transparent"
+                    Clicked="Open_Checkout">
+                    <ImageButton.Effects>
+                        <servingfresh:TintImageEffect TintColor="White"/>
+                    </ImageButton.Effects>
+                </ImageButton>
+                <Label
+                    Grid.Column="2"
+                    x:Name="CartTotal"
+                    StyleClass="secondary"
+                    FontAttributes="Bold"
+                    TranslationX="-14"
+                    TranslationY="-12"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"/>
+            </Grid>
+            <BoxView Grid.Row="2" BackgroundColor="Black"></BoxView>
+            <StackLayout Grid.Row="3" Padding="0">
+              <ScrollView Orientation="Horizontal" HeightRequest="120" MinimumHeightRequest="120" BackgroundColor="#136D74">
+                  <StackLayout Orientation="Horizontal">
+                      <CollectionView x:Name="delivery_list" ItemsLayout="HorizontalList">
+                          <CollectionView.ItemTemplate>
+                              <DataTemplate>
+                                  <StackLayout Padding="10">
+                                      <Frame Padding="0" CornerRadius="10" HasShadow="False" BackgroundColor="White" HeightRequest="100" WidthRequest="100">
+                                          <StackLayout Spacing="0">
+                                              <StackLayout.GestureRecognizers>
+                                                  <TapGestureRecognizer Tapped="Open_Farm" CommandParameter="{Binding .}"/>
+                                              </StackLayout.GestureRecognizers>
+                                              <Frame BackgroundColor="#FF8500" HasShadow="False" CornerRadius="10" Padding="0, 5">
+                                                  <Label Text="{Binding delivery_shortname}" StyleClass="h2, white, center"/>
+                                              </Frame>
+                                              <Label Text="{Binding delivery_date}" StyleClass="h2, primary, center" VerticalTextAlignment="Center" VerticalOptions="FillAndExpand"/>
+                                          </StackLayout>
+                                      </Frame>
+                                  </StackLayout>
+                              </DataTemplate>
+                          </CollectionView.ItemTemplate>
+                      </CollectionView>
+                  </StackLayout>
+              </ScrollView>
+              <ScrollView VerticalOptions="FillAndExpand" BackgroundColor="White">
+                  <StackLayout>
+                      <Label Margin="10">
+                          <Label.FormattedText>
+                              <FormattedString>
+                                  <Span Text="Filter by " TextColor="Black" FontAttributes="Bold" FontSize="Small"/>
+                                  <Span Text="Farmer's market" TextColor="#136D74" FontAttributes="Bold" FontSize="Small"/>
+                              </FormattedString>
+                          </Label.FormattedText>
+                      </Label>
+                      <ScrollView Orientation="Horizontal" HeightRequest="160">
+                          <StackLayout Orientation="Horizontal">
+                              <CollectionView x:Name="market_list" ItemsLayout="HorizontalList">
+                                  <CollectionView.ItemTemplate>
+                                      <DataTemplate>
+                                          <StackLayout Padding="10" WidthRequest="100">
+                                              <Frame Padding="1" CornerRadius="10" HasShadow="False" BorderColor="{Binding border_color}" HeightRequest="100" WidthRequest="100">
+                                              <Frame Padding="1" CornerRadius="10" HasShadow="False" BorderColor="{Binding border_color}">
+                                                  <Frame.GestureRecognizers>
+                                                      <TapGestureRecognizer Tapped="Change_Border_Color" CommandParameter="{Binding .}"/>
+                                                  </Frame.GestureRecognizers>
+                                                  <Image Source="{Binding business_image}" HeightRequest="100"/>
+                                              </Frame>
+                                              </Frame>
+                                              <Label Text="{Binding business_name}" StyleClass="black, center"/>
+                                          </StackLayout>
+                                      </DataTemplate>
+                                  </CollectionView.ItemTemplate>
+                              </CollectionView>
+                          </StackLayout>
+                      </ScrollView>
+                      <BoxView StyleClass="spacer"/>
+                      <Label Margin="10">
+                          <Label.FormattedText>
+                              <FormattedString>
+                                  <Span Text="Filter by " TextColor="Black" FontAttributes="Bold" FontSize="Small"/>
+                                  <Span Text="Farm" TextColor="#136D74" FontAttributes="Bold" FontSize="Small"/>
+                              </FormattedString>
+                          </Label.FormattedText>
+                      </Label>
+                      <ScrollView Orientation="Horizontal" HeightRequest="150">
+                          <StackLayout Orientation="Horizontal">
+                              <CollectionView x:Name="farm_list" ItemsLayout="HorizontalList">
+                                  <CollectionView.ItemTemplate>
+                                      <DataTemplate>
+                                          <StackLayout Padding="10" WidthRequest="100">
+                                              <Frame Padding="1" CornerRadius="10" HasShadow="False" BorderColor="{Binding border_color}" HeightRequest="100" WidthRequest="100">
+                                              <Frame Padding="1" CornerRadius="10" HasShadow="False" BorderColor="{Binding border_color}">
+                                                  <Frame.GestureRecognizers>
+                                                      <TapGestureRecognizer Tapped="Change_Border_Color" CommandParameter="{Binding .}"/>
+                                                  </Frame.GestureRecognizers>
+                                                  <Image Source="{Binding business_image}" HeightRequest="100"/>
+                                              </Frame>
+                                              </Frame>
+                                              <Label Text="{Binding business_name}" StyleClass="black, center"/>
+                                          </StackLayout>
+                                      </DataTemplate>
+                                  </CollectionView.ItemTemplate>
+                              </CollectionView>
+                          </StackLayout>
+                      </ScrollView>
+                      <BoxView StyleClass="spacer"/>
+                      <Label Margin="10">
+                          <Label.FormattedText>
+                              <FormattedString>
+                                  <Span Text="Filter by " TextColor="Black" FontAttributes="Bold" FontSize="Small"/>
+                                  <Span Text="Item category" TextColor="#136D74" FontAttributes="Bold" FontSize="Small"/>
+                              </FormattedString>
+                          </Label.FormattedText>
+                      </Label>
+                      <FlexLayout JustifyContent="SpaceBetween" Padding="15">
+                          <StackLayout>
+                              <ImageButton x:Name="FruitIcon" Source="OrangeIcon" Clicked="Change_Color" BackgroundColor="Transparent" HeightRequest="75">
+                                  <ImageButton.Effects>
+                                      <servingfresh:TintImageEffect TintColor="#136D74"/>
+                                  </ImageButton.Effects>
+                              </ImageButton>
+                              <Label Text="Fruits" StyleClass="black, center"/>
+                          </StackLayout>
+                          <StackLayout>
+                              <ImageButton x:Name="VegetableIcon" Source="VegIcon" Clicked="Change_Color" BackgroundColor="Transparent" HeightRequest="75">
+                                  <ImageButton.Effects>
+                                      <servingfresh:TintImageEffect TintColor="#136D74"/>
+                                  </ImageButton.Effects>
+                              </ImageButton>
+                              <Label Text="Vegetables" StyleClass="black, center"/>
+                          </StackLayout>
+                          <StackLayout>
+                              <ImageButton x:Name="DessertIcon" Source="Donut_Icon" Clicked="Change_Color" BackgroundColor="Transparent" HeightRequest="75">
+                                  <ImageButton.Effects>
+                                      <servingfresh:TintImageEffect TintColor="#136D74"/>
+                                  </ImageButton.Effects>
+                              </ImageButton>
+                              <Label Text="Desserts" StyleClass="black, center"/>
+                          </StackLayout>
+                          <StackLayout>
+                              <ImageButton x:Name="OtherIcon" Source="Bread_Icon" Clicked="Change_Color" BackgroundColor="Transparent" HeightRequest="75">
+                                  <ImageButton.Effects>
+                                      <servingfresh:TintImageEffect TintColor="#136D74"/>
+                                  </ImageButton.Effects>
+                              </ImageButton>
+                              <Label Text="Other" StyleClass="black, center"/>
+                          </StackLayout>
+                      </FlexLayout>
+                      <BoxView StyleClass="spacer"/>
+                    </StackLayout>
+                </ScrollView>
+            </StackLayout>
+            <Grid Grid.Row="4" BackgroundColor="WhiteSmoke">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="45"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <ImageButton Grid.Row="0" Grid.Column="0" BackgroundColor="Transparent" Source="CalendarI" Clicked="DeliveryDaysClick" Padding="6">
+                    <ImageButton.Effects>
+                        <servingfresh:TintImageEffect TintColor="#FF8500"/>
+                    </ImageButton.Effects>
+                </ImageButton>
+                <Label Grid.Row="1" Grid.Column="0" Text="Days" HorizontalTextAlignment="Center"></Label>
+                <ImageButton Grid.Row="0" Grid.Column="1" BackgroundColor="Transparent" Source="RefundIcon" Clicked="OrdersClick" Padding="6"></ImageButton>
+                <Label Grid.Row="1" Grid.Column="1" Text="Orders" HorizontalTextAlignment="Center"></Label>
+                <ImageButton Grid.Row="0" Grid.Column="2" BackgroundColor="Transparent" Source="InfoIcon" Clicked="InfoClick" Padding="6"></ImageButton>
+                <Label Grid.Row="1" Grid.Column="2" Text="Info" HorizontalTextAlignment="Center"></Label>
+                <ImageButton Grid.Row="0" Grid.Column="3" BackgroundColor="Transparent" Source="UserIcon" Clicked="ProfileClick" Padding="6"></ImageButton>
+                <Label Grid.Row="1" Grid.Column="3" Text="Profile" HorizontalTextAlignment="Center"></Label>
+            </Grid>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>
