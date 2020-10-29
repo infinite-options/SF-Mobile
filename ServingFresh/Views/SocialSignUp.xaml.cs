@@ -327,7 +327,7 @@ namespace ServingFresh.Views
                     Application.Current.Properties["user_delivery_instructions"] = userDeliveryInstructions.Text;
 
                     _ = Application.Current.SavePropertiesAsync();
-                    Application.Current.MainPage = new HomePage();
+                    Application.Current.MainPage = new SelectionPage();
                 }
             }
             else

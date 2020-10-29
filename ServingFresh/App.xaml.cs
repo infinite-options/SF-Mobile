@@ -17,31 +17,31 @@ namespace ServingFresh
         public App()
         {
             InitializeComponent();
-            // Application.Current.Properties.Clear();
-            // SecureStorage.RemoveAll();
-            if (Application.Current.Properties.ContainsKey("user_id"))
+            // Application.Current.Properties.Clear();                                              // When is this command used?
+            // SecureStorage.RemoveAll();                                                           // When is this command used?
+            if (Application.Current.Properties.ContainsKey("user_id"))                              // Where is complete list defined or can you add as necessary?  Additional parameters defined in LoginPage.xaml.cs
             {
                 if (Application.Current.Properties.ContainsKey("time_stamp"))
                 {
                     DateTime today = DateTime.Now;
-                    DateTime expTime = (DateTime)Application.Current.Properties["time_stamp"];
+                    DateTime expTime = (DateTime)Application.Current.Properties["time_stamp"];      // Explain this format.  Why (DateTime)?
 
                     if (today <= expTime)
                     {
-                        MainPage = new SelectionPage();
+                        MainPage = new SelectionPage(); 
                     }
-                    else
+                    else                                                                            // Don't we want to check if direct or social here?
                     {
-                        LogInPage client = new LogInPage();
+                        LogInPage client = new LogInPage();                                         // Why not simply MainPage = new LogInPage();  What is the advantage of client?
                         MainPage = client;
 
-                        if (Application.Current.Properties.ContainsKey("time_stamp"))
+                        if (Application.Current.Properties.ContainsKey("time_stamp"))               // Why check time_stamp again?
                         {
                             string socialPlatform = (string)Application.Current.Properties["platform"];
 
-                            if (socialPlatform.Equals(Constant.Facebook))
+                            if (socialPlatform.Equals(Constant.Facebook))                           // Explain this format
                             {
-                                client.FacebookLogInClick(new object(), new EventArgs());
+                                client.FacebookLogInClick(new object(), new EventArgs());           // Explain this format
                             }
                             else if (socialPlatform.Equals(Constant.Google))
                             {
@@ -69,14 +69,16 @@ namespace ServingFresh
             }
         }
 
+        // Initialization function that checks if a user has logged in through Apple
         protected override async void OnStart()
         {
             var appleSignInService = DependencyService.Get<IAppleSignInService>();
 
+            // Retrieve user info if user is signed on via Apple ID)
             if (appleSignInService != null)
             {
                 userId = await SecureStorage.GetAsync(AppleUserIdKey);
-                System.Diagnostics.Debug.WriteLine("This is userID :" + userId);
+                System.Diagnostics.Debug.WriteLine("This is the Apple userID :" + userId);
                 if (appleSignInService.IsAvailable && !string.IsNullOrEmpty(userId))
                 {
                     var credentialState = await appleSignInService.GetCredentialStateAsync(userId);
@@ -89,7 +91,7 @@ namespace ServingFresh
                             //Logout;
                             SecureStorage.Remove(AppleUserIdKey);
                             Preferences.Set(LoggedInKey, false);
-                            MainPage = new HomePage();
+                            MainPage = new LogInPage();
                             break;
                     }
                 }

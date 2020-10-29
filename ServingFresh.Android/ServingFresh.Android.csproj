@@ -78,10 +78,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Renderers\CustomEntryRenderer.cs" />
-    <Compile Include="SignUpPage.xaml.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' ">
-      <DependentUpon>SignUpPage.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -185,12 +181,6 @@
       <Project>{ED7EDBE8-CB1A-49F5-8A1D-788600CC2256}</Project>
       <Name>ServingFresh</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="SignUpPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
-    </EmbeddedResource>
   </ItemGroup>
  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>
