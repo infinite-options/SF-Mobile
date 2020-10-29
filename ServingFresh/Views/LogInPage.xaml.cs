@@ -17,12 +17,12 @@ namespace ServingFresh.Views
 {
     public partial class LogInPage : ContentPage
     {
-        public event EventHandler SignIn;
-        public bool createAccount = false;
+        public event EventHandler SignIn;                                                                   // Variable of EventHandler used for Apple
+        public bool createAccount = false;                                                                  // Initalized boolean value called createAccount
 
-        public LogInPage()                                                                                  // 
+        public LogInPage()                                                                                  // This is the class Constructor
         {
-            InitializeComponent();                                                                          // What is this?
+            InitializeComponent();                                                                          // This is a Xamarin default
             InitializeAppProperties();                                                                      // This refers to class below
 
             if (Device.RuntimePlatform == Device.Android)
@@ -36,8 +36,8 @@ namespace ServingFresh.Views
         }
 
         public void InitializeAppProperties()                                                               // Initializes most (not all) Application.Current.Properties
-        {
-            Application.Current.Properties["user_email"] = "";
+        {                                                                                                   // You can create additional parameters on the fly
+            Application.Current.Properties["user_email"] = "";                                              // If you don't initialize it you can get a Null Reference
             Application.Current.Properties["user_first_name"] = "";
             Application.Current.Properties["user_last_name"] = "";
             Application.Current.Properties["user_phone_num"] = "";
@@ -54,17 +54,18 @@ namespace ServingFresh.Views
         public void InitializedAppleLogin()                                                                 // Explain this format
         {
             var vm = new LoginViewModel();
-            vm.AppleError += AppleError;
+            vm.AppleError += AppleError;                                                                    // Assigns handler class from LoginViewModel.cs <== Need further review += creates a button handler like OnClick in xaml
             BindingContext = vm;
         }
 
         private async void DirectLogInClick(System.Object sender, System.EventArgs e)                       // Clicked from LogInPage.xaml
         {
-            logInButton.IsEnabled = false;                                                                  // Login button seems enabled.  Is this turning button off?
-            if (String.IsNullOrEmpty(userEmailAddress.Text) || String.IsNullOrEmpty(userPassword.Text))     // Is this how you get input from a Mobile App?
+            logInButton.IsEnabled = false;                                                                  // Login button is disabled after clicked.  You don't want button constantly enabled
+            if (String.IsNullOrEmpty(userEmailAddress.Text) || String.IsNullOrEmpty(userPassword.Text))     // This is how you get input from a Mobile App.  Linked to xaml file.
             { 
                 await DisplayAlert("Error", "Please fill in all fields", "OK");                             
                 logInButton.IsEnabled = true;
+                                                                                                            // code to set for use outside of LogInPage:  Application.Current.Properties["user_email"] = userEmailAddress.Text;
             }
             else
             {
@@ -147,35 +148,35 @@ namespace ServingFresh.Views
 
                 // Store email in saltPost                                                                              // This is a Login Class in Login > Classes
                 SaltPost saltPost = new SaltPost();                                                                     // Creates a new object saltPost of class SaltPost
-                saltPost.email = userEmail;                                                                             // Sets value of saltPost = userEmail
-                System.Diagnostics.Debug.WriteLine("saltPost_email: " + saltPost.email);
+                saltPost.email = userEmail;                                                                             // Sets value of saltPost = userEmail  In English it would read:  "of type SaltPost, create a new object called saltPost and set equal to an object of that type"
+                System.Diagnostics.Debug.WriteLine("saltPost_email: " + saltPost.email);                                // Now we can call a property of that class using dot notation
 
                 // Create JSON object to send in endpoint
                 var saltPostSerilizedObject = JsonConvert.SerializeObject(saltPost);                                    // JSONifies everything is saltPost (Serialize)
                 var saltPostContent = new StringContent(saltPostSerilizedObject, Encoding.UTF8, "application/json");    // converts JSON object into a string (Stringify)
                 System.Diagnostics.Debug.WriteLine("JSON object: " + saltPostSerilizedObject);
                 // System.Diagnostics.Debug.WriteLine(saltPostSerilizedObject);
-                System.Diagnostics.Debug.WriteLine("JSON string: " + saltPostContent);                                  // Only prints: System.Net.Http.StringContent
+                System.Diagnostics.Debug.WriteLine("JSON string: " + saltPostContent);                                  // Encodes JSON object.  Only prints: System.Net.Http.StringContent
 
                 // Setup, call and receive Endpoint message
                 var client = new HttpClient();                                                                          // Endpoint call is httpClient with URL and stringified JSON Object                        
                 var DRSResponse = await client.PostAsync(Constant.AccountSaltUrl, saltPostContent);                     // Calls endpoint with JSON object.
                 var DRSMessage = await DRSResponse.Content.ReadAsStringAsync();
-                // System.Diagnostics.Debug.WriteLine("DRSResponse :" + DRSResponse);                                   // Response is a non-useful JSON object
+                System.Diagnostics.Debug.WriteLine("DRSResponse :" + DRSResponse);                                      // Response is a non-useful JSON object
                 System.Diagnostics.Debug.WriteLine("DRSMessage:" + DRSMessage);                                         // Message is backend response with Success/Fail codes & contains Salt info
                 //System.Diagnostics.Debug.WriteLine(DRSMessage);   
 
 
                 // Route based on Endpoint message
-                AccountSalt userInformation = null;                                                                     // Initializes AccountSalt object
-
+                AccountSalt userInformation = null;                                                                     // Initializes AccountSalt object.  All properties set to null
+                                                                                                                        // TRY PRINTING userInformation.password_algorithm
                 if (DRSResponse.IsSuccessStatusCode)
                 {
                     var result = await DRSResponse.Content.ReadAsStringAsync();                                         // result is the same as DRSMessage
                                                                                                                         // This is a Login Class in Login > Classes                                                  
                     AcountSaltCredentials data = new AcountSaltCredentials();                                           // Creates a new object data of class AcountSaltCredentials
-                    data = JsonConvert.DeserializeObject<AcountSaltCredentials>(result);                                // Explain syntax.  Why use the same name as the Object?  data contains JSON object
-                    System.Diagnostics.Debug.WriteLine("data: " + data);                                                // What is this?
+                    data = JsonConvert.DeserializeObject<AcountSaltCredentials>(result);                                // Deserialize JSON object.  Definition is given by Class Definition. data contains JSON object
+                    System.Diagnostics.Debug.WriteLine("data: " + data);                                                
 
                     // If accidentally using Direct Login for Social Media Login
                     if (DRSMessage.Contains(Constant.UseSocialMediaLogin))                                              // code 401
@@ -220,7 +221,7 @@ namespace ServingFresh.Views
             {
                 SHA512 sHA512 = new SHA512Managed();                                                                    // Calls Xamarin Class.  Why SHA512 and SHA512Managed?
                 var client = new HttpClient();
-                byte[] data = sHA512.ComputeHash(Encoding.UTF8.GetBytes(userPassword + accountSalt.password_salt));     // What does accountSalt.password_salt mean?
+                byte[] data = sHA512.ComputeHash(Encoding.UTF8.GetBytes(userPassword + accountSalt.password_salt));     // Calls actual hashing.  What does accountSalt.password_salt mean?
                 string hashedPassword = BitConverter.ToString(data).Replace("-", string.Empty).ToLower();               // Stores hashedPassword
 
                 LogInPost loginPostContent = new LogInPost();                                                           // Calls LogInPost Class and sets variables in loginPostContent
@@ -255,7 +256,9 @@ namespace ServingFresh.Views
             }
         }
 
-        public void FacebookLogInClick(System.Object sender, System.EventArgs e)
+
+        // comes from LoginPage.xaml or App.xaml.cs
+        public void FacebookLogInClick(System.Object sender, System.EventArgs e)                                        // Linked to Clicked="FacebookLogInClick" from LogInPage.xaml
         {
             string clientID = string.Empty;
             string redirectURL = string.Empty;
@@ -428,6 +431,9 @@ namespace ServingFresh.Views
             await DisplayAlert("Authentication error: ", e.Message, "OK");
         }
 
+
+
+        // comes from LoginPage.xaml or App.xaml.cs
         public void GoogleLogInClick(System.Object sender, System.EventArgs e)
         {
             string clientId = string.Empty;
@@ -606,7 +612,9 @@ namespace ServingFresh.Views
         }
 
 
-        // comes from LoginPage.xaml
+
+
+        // comes from LoginPage.xaml or App.xaml.cs
         public void AppleLogInClick(System.Object sender, System.EventArgs e)
         {
             SignIn?.Invoke(sender, e);

@@ -17,31 +17,31 @@ namespace ServingFresh
         public App()
         {
             InitializeComponent();
-            // Application.Current.Properties.Clear();                                              // When is this command used?
-            // SecureStorage.RemoveAll();                                                           // When is this command used?
-            if (Application.Current.Properties.ContainsKey("user_id"))                              // Where is complete list defined or can you add as necessary?  Additional parameters defined in LoginPage.xaml.cs
+            // Application.Current.Properties.Clear();                                              // Resets user info in the app.  Use for debug
+            // SecureStorage.RemoveAll();                                                           // Allows Xamarin to reset Apple security storage info stored in hardware.  Use for debug
+            if (Application.Current.Properties.ContainsKey("user_id"))                              // Additional parameters defined in LoginPage.xaml.cs.  You can add more on the fly
             {
                 if (Application.Current.Properties.ContainsKey("time_stamp"))
                 {
                     DateTime today = DateTime.Now;
-                    DateTime expTime = (DateTime)Application.Current.Properties["time_stamp"];      // Explain this format.  Why (DateTime)?
+                    DateTime expTime = (DateTime)Application.Current.Properties["time_stamp"];      // DateTime) is casting the data in Date Time format
 
                     if (today <= expTime)
                     {
                         MainPage = new SelectionPage(); 
                     }
-                    else                                                                            // Don't we want to check if direct or social here?
+                    else                                                                            // Could use an else if statment here
                     {
                         LogInPage client = new LogInPage();                                         // Why not simply MainPage = new LogInPage();  What is the advantage of client?
-                        MainPage = client;
+                        MainPage = client;                                                          // Perhaps need client to check client.* below
 
-                        if (Application.Current.Properties.ContainsKey("time_stamp"))               // Why check time_stamp again?
+                        if (Application.Current.Properties.ContainsKey("platform"))                 // Check for Platform
                         {
                             string socialPlatform = (string)Application.Current.Properties["platform"];
-
-                            if (socialPlatform.Equals(Constant.Facebook))                           // Explain this format
+                            
+                            if (socialPlatform.Equals(Constant.Facebook))                           // Compares two strings.  Same as "Facebook".Equals"Facebook".  C# syntax
                             {
-                                client.FacebookLogInClick(new object(), new EventArgs());           // Explain this format
+                                client.FacebookLogInClick(new object(), new EventArgs());           // Event Handlers.  Calls *LogInClick Function in LogInPage.xaml.cs as if clicked
                             }
                             else if (socialPlatform.Equals(Constant.Google))
                             {
