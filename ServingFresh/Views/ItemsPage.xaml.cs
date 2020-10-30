@@ -17,7 +17,7 @@ namespace ServingFresh.Views
 {
     public partial class ItemsPage : ContentPage
     {
-        public class Items
+        public class Items                                                  // Defining Items Class
         {
             public string item_uid { get; set; }
             public string created_at { get; set; }
@@ -35,7 +35,7 @@ namespace ServingFresh.Views
             public string business_delivery_hours { get; set; }
         }
 
-        public class ServingFreshBusinessItems
+        public class ServingFreshBusinessItems                              // Structure should match JSON object received
         {
             public string message { get; set; }
             public int code { get; set; }
@@ -66,13 +66,13 @@ namespace ServingFresh.Views
         public int totalCount = 0;
         //ServingFreshBusinessItems data = new ServingFreshBusinessItems();
 
-        public ItemsPage(List<string> types, List<string> b_uids, string day)
+        public ItemsPage(List<string> types, List<string> b_uids, string day)               // Called from Selection Page
         {
             InitializeComponent();
             try
             {
                 SetInitialFilters(types);
-                _ = GetData(types, b_uids);
+                _ = GetData(types, b_uids);                                                  // _ = is a function of type async
                 titlePage.Text = day;
                 itemList.ItemsSource = datagrid;
                 CartTotal.Text = totalCount.ToString();
@@ -118,30 +118,32 @@ namespace ServingFresh.Views
             {
 
 
-                GetItemPost post = new GetItemPost();
-                post.type = types;
-                post.ids = b_uids;
+                GetItemPost post = new GetItemPost();                                                                   // Create object(variable) named post of class (type) GetItemPost 
+                post.type = types;                                                                                      // Filters that have been cicked
+                post.ids = b_uids;                                                                                      // Buisness uids passed in
 
                 var client = new HttpClient();
-                var getItemsString = JsonConvert.SerializeObject(post);
+                var getItemsString = JsonConvert.SerializeObject(post);                                                 // Creates a JSON object of the businesses that filtered
                 var getItemsStringMessage = new StringContent(getItemsString, Encoding.UTF8, "application/json");
-                var request = new HttpRequestMessage();
-                request.Method = HttpMethod.Post;
-                request.Content = getItemsStringMessage;
+                //var request = new HttpRequestMessage();                                                               // Old method of calling endpoint
+                //request.Method = HttpMethod.Post;
+                //request.Content = getItemsStringMessage;                                                              
 
                 var httpResponse = await client.PostAsync(Constant.GetItemsUrl, getItemsStringMessage);
-                var r = await httpResponse.Content.ReadAsStreamAsync();
-                StreamReader sr = new StreamReader(r);
-                JsonReader reader = new JsonTextReader(sr);
+                var r = await httpResponse.Content.ReadAsStreamAsync();                                                 // Retrieves data from http Response as a Stream
+                StreamReader sr = new StreamReader(r);                                                                  // Converts streamed raw response into a string
+                JsonReader reader = new JsonTextReader(sr);                                                             // Converts string to JSON object.  Contains the JSON object data
 
-                if (httpResponse.IsSuccessStatusCode)
+                if (httpResponse.IsSuccessStatusCode)                                                                   // True or False
                 {
-                    JsonSerializer serializer = new JsonSerializer();
-                    data = serializer.Deserialize<ServingFreshBusinessItems>(reader);
+                    JsonSerializer serializer = new JsonSerializer();                                                   // 
+                    data = serializer.Deserialize<ServingFreshBusinessItems>(reader);                                   //
 
                     this.datagrid.Clear();
                     int n = data.result.Count;
                     int j = 0;
+
+                    // Nothing returned then show nothing
                     if (n == 0)
                     {
                         this.datagrid.Add(new ItemsModel()
@@ -165,6 +167,8 @@ namespace ServingFresh.Views
                             quantityR = 0
                         });
                     }
+
+                    // If even show filled rows
                     if (isAmountItemsEven(n))
                     {
                         for (int i = 0; i < n / 2; i++)
@@ -196,6 +200,8 @@ namespace ServingFresh.Views
                             j = j + 2;
                         }
                     }
+
+                    // If not even create an extra row with only on box
                     else
                     {
                         for (int i = 0; i < n / 2; i++)
@@ -226,6 +232,8 @@ namespace ServingFresh.Views
                             });
                             j = j + 2;
                         }
+
+                        // Last Row.  RHS is not visible
                         this.datagrid.Add(new ItemsModel()
                         {
                             height = this.Width / 2 + 25,
@@ -250,7 +258,10 @@ namespace ServingFresh.Views
                         });
                     }
                 }
-            }catch(Exception ex)
+            }
+
+            // Catch if endpoint doens't work or index is wrong
+            catch(Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine(ex.Message);
             }
@@ -326,6 +337,8 @@ namespace ServingFresh.Views
             return e;
         }
 
+
+        // Add and Subtract functionality
         void SubtractItemLeft(System.Object sender, System.EventArgs e)
         {
             var button = (Button)sender;
@@ -471,11 +484,15 @@ namespace ServingFresh.Views
             }
         }
 
+
+        // Checkout Page
         void CheckOutClickBusinessPage(System.Object sender, System.EventArgs e)
         {
             Application.Current.MainPage = new CheckoutPage(order);
         }
 
+
+        // Menu icons at the bottom
         void DeliveryDaysClick(System.Object sender, System.EventArgs e)
         {
             Application.Current.MainPage = new SelectionPage();

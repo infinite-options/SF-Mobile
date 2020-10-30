@@ -147,8 +147,8 @@ namespace ServingFresh.Views
                 // System.Diagnostics.Debug.WriteLine(userEmail);
 
                 // Store email in saltPost                                                                              // This is a Login Class in Login > Classes
-                SaltPost saltPost = new SaltPost();                                                                     // Creates a new object saltPost of class SaltPost
-                saltPost.email = userEmail;                                                                             // Sets value of saltPost = userEmail  In English it would read:  "of type SaltPost, create a new object called saltPost and set equal to an object of that type"
+                SaltPost saltPost = new SaltPost();                                                                     // Creates a new object saltPost of class SaltPost.  In English it would read:  "of type SaltPost, create a new object called saltPost and set equal to an object of that type"
+                saltPost.email = userEmail;                                                                             // Sets value of saltPost.email = userEmail  
                 System.Diagnostics.Debug.WriteLine("saltPost_email: " + saltPost.email);                                // Now we can call a property of that class using dot notation
 
                 // Create JSON object to send in endpoint
@@ -257,6 +257,7 @@ namespace ServingFresh.Views
         }
 
 
+        // Facebook
         // comes from LoginPage.xaml or App.xaml.cs
         public void FacebookLogInClick(System.Object sender, System.EventArgs e)                                        // Linked to Clicked="FacebookLogInClick" from LogInPage.xaml
         {
@@ -275,31 +276,36 @@ namespace ServingFresh.Views
                     break;
             }
 
-            var authenticator = new OAuth2Authenticator(clientID, Constant.FacebookScope, new Uri(Constant.FacebookAuthorizeUrl), new Uri(redirectURL), null, false);
+            var authenticator = new OAuth2Authenticator(clientID, Constant.FacebookScope, new Uri(Constant.FacebookAuthorizeUrl), new Uri(redirectURL), null, false);  // Initializes variable authenticator
             var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
 
-            authenticator.Completed += FacebookAuthenticatorCompleted;
-            authenticator.Error += FacebookAutheticatorError;
-
-            presenter.Login(authenticator);
+            // Is this like clicking a button?  ie I just clicked FacebookAuthenticatorCompleted and then that function ran?
+            authenticator.Completed += FacebookAuthenticatorCompleted;                                                  // += Creates a button handler (like OnClick in xaml).  Assignment to submit button on the Facebook page
+            authenticator.Error += FacebookAutheticatorError;                                                           // Assignment to Cancel button on the Facebook page
+            
+            presenter.Login(authenticator);                                                                             // Calls Facebook and invokes Facebook UI.  Authenticator contains app_uid,etc
         }
 
-        public void FacebookAuthenticatorCompleted(object sender, AuthenticatorCompletedEventArgs e)
+
+        // Verifies Facebook Authenticated
+        public void FacebookAuthenticatorCompleted(object sender, AuthenticatorCompletedEventArgs e)                    // Called when Facebook submitt is clicked.  Facebook send in "sender" (event handler calls) and "e" contains user parameters
         {
-            var authenticator = sender as OAuth2Authenticator;
+            var authenticator = sender as OAuth2Authenticator;                                                          // Casting sender an an OAuth2Authenticator type
 
             if (authenticator != null)
-            {
-                authenticator.Completed -= FacebookAuthenticatorCompleted;
-                authenticator.Error -= FacebookAutheticatorError;
+            {                   
+                authenticator.Completed -= FacebookAuthenticatorCompleted;                                              
+                authenticator.Error -= FacebookAutheticatorError;                                                       
             }
 
-            if (e.IsAuthenticated)
+            if (e.IsAuthenticated)                                                                                      // How does this statement work?
             {
                 FacebookUserProfileAsync(e.Account.Properties["access_token"]);
             }
         }
 
+
+        // Checks if they have an accoutn with us
         public async void FacebookUserProfileAsync(string accessToken)
         {
 
@@ -419,6 +425,8 @@ namespace ServingFresh.Views
             }
         }
 
+
+        // Closes button handlers if they click Cancel in Facebook
         private async void FacebookAutheticatorError(object sender, AuthenticatorErrorEventArgs e)
         {
             var authenticator = sender as OAuth2Authenticator;
@@ -433,6 +441,9 @@ namespace ServingFresh.Views
 
 
 
+
+
+        // Google
         // comes from LoginPage.xaml or App.xaml.cs
         public void GoogleLogInClick(System.Object sender, System.EventArgs e)
         {
@@ -613,7 +624,7 @@ namespace ServingFresh.Views
 
 
 
-
+        // Apple
         // comes from LoginPage.xaml or App.xaml.cs
         public void AppleLogInClick(System.Object sender, System.EventArgs e)
         {
