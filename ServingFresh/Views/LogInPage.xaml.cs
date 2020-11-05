@@ -27,6 +27,7 @@ namespace ServingFresh.Views
 
             if (Device.RuntimePlatform == Device.Android)
             {
+                Console.WriteLine("guid: " + Preferences.Get("guid", null));
                 appleLogInButton.IsEnabled = false;
             }
             else
