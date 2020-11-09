@@ -5,7 +5,7 @@
     x:Class="ServingFresh.Views.RefundPage"
     xmlns:servingfresh="clr-namespace:ServingFresh.Effects">
     <ContentPage.Content>
-        <Grid RowSpacing="0">
+        <Grid RowSpacing="0" Margin="0,0,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="35"></RowDefinition>
                 <RowDefinition Height="95"></RowDefinition>
@@ -72,10 +72,10 @@
             </Grid>
             <StackLayout Grid.Row="4">
                 <ScrollView>
-                    <StackLayout>
-                        <BoxView HeightRequest="300" BackgroundColor="LightGray"/>
-                        <Button Text="Take Photo" StyleClass="btn, secondary-outline"/>
-                        <Button Text="Choose a Photo from Gallery" StyleClass="btn, secondary-outline"/>
+                    <StackLayout Padding="10,0,10,0">
+                        <Image x:Name="refundItemImage" HeightRequest="300" BackgroundColor="LightGray"/>
+                        <Button Text="Take Photo" StyleClass="btn, secondary-outline" Clicked="TakePictureClick"/>
+                        <Button Text="Choose a Photo from Gallery" StyleClass="btn, secondary-outline" Clicked="ChoosePictureFromGalleryClick"/>
                         <StackLayout Padding="15,0" Spacing="15">
                             <Label Text="Easy Peasy Return Instructions" StyleClass="h1, black, center"/>
                             <Label Text="1. Take a picture of what you want to return" StyleClass="p, black"/>
@@ -83,6 +83,9 @@
                             <Label Text="3. Press send" StyleClass="p, black"/>
                             <Label Text="We'll either add your items to our next delivery or issue you a coupon code for your next order! Tell us if you have a preference. Easy peasy!" StyleClass="p, black"/>
                         </StackLayout>
+                        <Entry x:Name="refundEmail" Placeholder="Your Email Goes Here"></Entry>
+                        <Entry x:Name="refundNote" Placeholder="Add Note Goes Here"></Entry>
+                        <Button Text="Send" TextColor="White" FontAttributes="Bold" BackgroundColor="#FF8500" Clicked="SendRefundRequest"></Button>
                     </StackLayout>
                 </ScrollView>
             </StackLayout>

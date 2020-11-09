@@ -252,7 +252,7 @@ namespace ServingFresh.Views
             else
             {
                 isAddessValidated = true;
-                await DisplayAlert("We validated your address", "Please click on the Sign up button to create your account!", "OK");
+                // await DisplayAlert("We validated your address", "Please click on the Sign up button to create your account!", "OK");
                 await Application.Current.SavePropertiesAsync();
             }
         }

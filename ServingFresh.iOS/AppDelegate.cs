@@ -6,6 +6,9 @@ using Foundation;
 using ServingFresh.LogIn.Classes;
 using UIKit;
 using Xamarin.Forms.Platform.iOS;
+using UserNotifications;
+using ServingFresh.Notifications;
+
 namespace ServingFresh.iOS
 {
     // The UIApplicationDelegate for the application. This class is responsible for launching the 
@@ -14,6 +17,10 @@ namespace ServingFresh.iOS
     [Register("AppDelegate")]
     public partial class AppDelegate : global::Xamarin.Forms.Platform.iOS.FormsApplicationDelegate
     {
+        
+
+
+
         //
         // This method is invoked when the application has loaded and is ready to run. In this 
         // method you should instantiate the window, load the UI into it and then make the window
@@ -27,6 +34,11 @@ namespace ServingFresh.iOS
             global::Xamarin.Forms.Forms.Init();
             Xamarin.FormsMaps.Init();
             global::Xamarin.Forms.Forms.Init();
+
+            //UIApplication.SharedApplication.UnregisterForRemoteNotifications();
+            //var answer = RegistedDeviceToPushNotifications();
+            //IsEnable = answer;
+            //System.Diagnostics.Debug.WriteLine(answer);
             LoadApplication(new App());
 
             base.FinishedLaunching(app, options);
@@ -75,6 +87,30 @@ namespace ServingFresh.iOS
             AuthenticationState.Authenticator.OnPageLoading(uri);
 
             return true;
+        }
+
+        public bool RegistedDeviceToPushNotifications()
+        {
+            if (UIDevice.CurrentDevice.CheckSystemVersion(10, 0))
+            {
+                UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound,
+                                                                        (granted, error) => InvokeOnMainThread(UIApplication.SharedApplication.RegisterForRemoteNotifications));
+            }
+            else if (UIDevice.CurrentDevice.CheckSystemVersion(8, 0))
+            {
+                var pushSettings = UIUserNotificationSettings.GetSettingsForTypes(
+                        UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound,
+                        new NSSet());
+
+                UIApplication.SharedApplication.RegisterUserNotificationSettings(pushSettings);
+                UIApplication.SharedApplication.RegisterForRemoteNotifications();
+            }
+            else
+            {
+                UIRemoteNotificationType notificationTypes = UIRemoteNotificationType.Alert | UIRemoteNotificationType.Badge | UIRemoteNotificationType.Sound;
+                UIApplication.SharedApplication.RegisterForRemoteNotificationTypes(notificationTypes);
+            }
+            return UIApplication.SharedApplication.IsRegisteredForRemoteNotifications;
         }
     }
 }

@@ -8,12 +8,12 @@ using System.Collections.ObjectModel;
 using System.Net.Http;
 using Newtonsoft.Json;
 
-namespace ServingFresh.Views                                                        // Zach's work
+namespace ServingFresh.Views
 {
     public partial class SelectionPage : ContentPage
     {
 
-        class BusinessCard                                                          // Class Definition.  Could have been in a different file
+        class BusinessCard
         {
             public string business_image { get; set; }
             public string business_name { get; set; }
@@ -22,10 +22,9 @@ namespace ServingFresh.Views                                                    
             public string business_type { get; set; }
             public Color border_color { get; set; }
         }
-
-        BusinessCard unselectedBusiness(Business b)                                 // Creating Function of Class Buisness Card and pass in b as type Business                               
+        BusinessCard unselectedBusiness(Business b)
         {
-            return new BusinessCard()                                               // Return BusinessCard with these updated attributes 
+            return new BusinessCard()
             {
                 business_image = b.business_image,
                 business_name = b.business_name,
@@ -35,7 +34,6 @@ namespace ServingFresh.Views                                                    
                 border_color = Color.LightGray
             };
         }
-
         BusinessCard selectedBusiness(Business b)
         {
             return new BusinessCard()
@@ -49,9 +47,8 @@ namespace ServingFresh.Views                                                    
             };
         }
 
-        // Initializing Variables
-        List<DeliveriesModel> AllDeliveries = new List<DeliveriesModel>();                                  // type (List data structure of Deliveries Model type) called AllDeliveries
-        List<Business> AllFarms = new List<Business>();                                                     // List of Businesses called AllFarms (Can't add anything to this list that is not a Business)
+        List<DeliveriesModel> AllDeliveries = new List<DeliveriesModel>();
+        List<Business> AllFarms = new List<Business>();
         List<Business> AllFarmersMarkets = new List<Business>();
         ObservableCollection<DeliveriesModel> Deliveries = new ObservableCollection<DeliveriesModel>();
         ObservableCollection<BusinessCard> Farms = new ObservableCollection<BusinessCard>();
@@ -61,10 +58,10 @@ namespace ServingFresh.Views                                                    
         string selected_market_id = "";
         string selected_farm_id = "";
 
-        public SelectionPage()                                                      // Constructor matches class name.  Constructor defines how the class is supposed to look
+        public SelectionPage()
         {
-            InitializeComponent();                                                  // Given by Visual Studio
-            Init();                                                                 // Function created below
+            InitializeComponent();
+            Init();
             GetBusinesses();
             GetDays();
             CartTotal.Text = CheckoutPage.total_qty.ToString();
@@ -72,16 +69,16 @@ namespace ServingFresh.Views                                                    
 
         void Init()
         {
-            BackgroundColor = Constants.PrimaryColor;                               //  Get this data from ...
-            delivery_list.ItemsSource = Deliveries;                                 //  delivery_list from xaml is linked to ... Get this data from ...
-            market_list.ItemsSource = FarmersMarkets;                               //  Get this data from ...
-            farm_list.ItemsSource = Farms;                                          //  Get this data from ...  Binding to get data out of a list
+            BackgroundColor = Constants.PrimaryColor;
+            delivery_list.ItemsSource = Deliveries;
+            market_list.ItemsSource = FarmersMarkets;
+            farm_list.ItemsSource = Farms;
         }
 
         void GetDays()
         {
-            AllDeliveries.Clear();                                                  // Data stored in AllDeliveries
-            var date = DateTime.Now.AddHours(7);                                    // Time horizon of 7 days
+            AllDeliveries.Clear();
+            var date = DateTime.Now.AddHours(7);
             var monthNames = new List<string>();
             monthNames.Add("");
             monthNames.Add("Jan");
@@ -98,20 +95,19 @@ namespace ServingFresh.Views                                                    
             monthNames.Add("Dec");
             for (int i = 0; i < 7; i++)
             {
-                AllDeliveries.Add(new DeliveriesModel()                             // Delivery Model 
+                AllDeliveries.Add(new DeliveriesModel()
                 {
-                    delivery_dayofweek = date.DayOfWeek.ToString(),                 
+                    delivery_dayofweek = date.DayOfWeek.ToString(),
                     delivery_shortname = date.DayOfWeek.ToString().Substring(0, 3).ToUpper(),
-                    delivery_date = monthNames[date.Month] + " " + date.Day         // Constructs the Month & Day
+                    delivery_date = monthNames[date.Month] + " " + date.Day
                 });
                 date = date.AddDays(1);
             }
             Deliveries.Clear();
-
-            foreach (DeliveriesModel dm in AllDeliveries) Deliveries.Add(dm);       // Puts data into Deliveries
+            foreach (DeliveriesModel dm in AllDeliveries) Deliveries.Add(dm);
         }
 
-        void ResetDays()                                                            // Function that filters through which Businesses (Farms & Farmers Markets) are currently open
+        void ResetDays()
         {
             List<string> business_uids = new List<string>();
             if (selected_farm_id != "")
@@ -131,9 +127,9 @@ namespace ServingFresh.Views                                                    
                 if (anyBusinessesOpen(business_uids, dm.delivery_dayofweek))
                     Deliveries.Add(dm);
             }
-        }                                                                           
+        }
 
-        void ResetFarms()                                                            // Function that filters through which Farms are currently open
+        void ResetFarms()
         {
             if (selected_farm_id != "") return;
             Farms.Clear();
@@ -200,7 +196,7 @@ namespace ServingFresh.Views                                                    
             }
         }
 
-        async void GetBusinesses()                                                              // Finds which businesses belong to the customers zone
+        async void GetBusinesses()
         {
             string userLat = (string)Application.Current.Properties["user_latitude"];
             string userLong = (string)Application.Current.Properties["user_longitude"];
@@ -236,18 +232,17 @@ namespace ServingFresh.Views                                                    
                 if (b.business_uid == business_uid)
                 {
                     var hours = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(b.business_delivery_hours);
-                    return hours[weekday][0] != hours[weekday][1];                              // Closed if starting hours = ending hours
+                    return hours[weekday][0] != hours[weekday][1];
                 }
             }
             return false;
         }
-
-        bool anyBusinessesOpen(List<string> business_uids, string weekday)  
+        bool anyBusinessesOpen(List<string> business_uids, string weekday)
         {
             bool anyOpen = false;
             foreach (string s in business_uids)
             {
-                if (isBusinessOpen(s, weekday))                                                                 // Calls isBusnesOpen
+                if (isBusinessOpen(s, weekday))
                 {
                     anyOpen = true;
                 }
@@ -255,19 +250,19 @@ namespace ServingFresh.Views                                                    
             return anyOpen;
         }
 
-        void Open_Checkout(Object sender, EventArgs e)                                                          //Event handler to go to checkout page
+        void Open_Checkout(Object sender, EventArgs e)
         {
 
             Application.Current.MainPage = new CheckoutPage(null);
         }
 
-        void Open_Farm(Object sender, EventArgs e)                                                              //Event handler to go to ItemsPage
+        void Open_Farm(Object sender, EventArgs e)
         {
             var sl = (StackLayout)sender;
             var tgr = (TapGestureRecognizer)sl.GestureRecognizers[0];
             var dm = (DeliveriesModel)tgr.CommandParameter;
             string weekday = dm.delivery_dayofweek;
-            if (types.Count == 0)                                                                               // Selects all types if no type is selected
+            if (types.Count == 0)
             {
                 types.Add("fruit");
                 types.Add("vegetable");
@@ -292,7 +287,7 @@ namespace ServingFresh.Views                                                    
             // Delivery Times of all business who are avaiable this weeek day
             string startTime = "";
             string endTime = "";
-            if(b_uids.Count != 0)                                                                               // Selects delivery date
+            if(b_uids.Count != 0)
             {
                 foreach (string ids in b_uids)
                 {
@@ -337,8 +332,8 @@ namespace ServingFresh.Views                                                    
             }
 
             ItemsPage businessItemPage = new ItemsPage(types, b_uids, weekday);
-            Application.Current.MainPage = businessItemPage;                                                    // Goes to Items Page
-        }           
+            Application.Current.MainPage = businessItemPage;
+        }
 
         void Change_Color(Object sender, EventArgs e)
         {

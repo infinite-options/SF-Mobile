@@ -12,13 +12,14 @@ using ServingFresh.Config;
 using Xamarin.Forms;
 using Xamarin.Forms.Maps;
 using ServingFresh.Models;
+using System.Diagnostics;
 using static ServingFresh.Views.ItemsPage;
 using Application = Xamarin.Forms.Application;
 using Stripe;
 
 namespace ServingFresh.Views
 {
-    public class ItemObject : INotifyPropertyChanged                                            // INotifyPropertyChanged - don't have to render entire page only the items you changed
+    public class ItemObject : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
         public string item_uid { get; set; }
@@ -41,7 +42,6 @@ namespace ServingFresh.Views
             PropertyChanged(this, new PropertyChangedEventArgs("total_price"));
         }
     }
-
     public class PurchaseDataObject
     {
         public string pur_customer_uid { get; set; }
@@ -75,14 +75,12 @@ namespace ServingFresh.Views
         public string charge_id { get; set; }
         public string payment_type { get; set; }
     }
-
     public class PurchaseResponse
     {
         public int code { get; set; }
         public string message { get; set; }
         public string sql { get; set; }
     }
-
     public partial class CheckoutPage : ContentPage
     {
         public PurchaseDataObject purchaseObject;
@@ -102,6 +100,7 @@ namespace ServingFresh.Views
         public CheckoutPage(IDictionary<string, ItemPurchased> order = null, string day = "")
         {
             InitializeComponent();
+            GetAvailiableCoupons();
             InitializeMap();
             if (order != null)
             {
@@ -118,7 +117,6 @@ namespace ServingFresh.Views
                     });
                 }
             }
-
             purchaseObject = new PurchaseDataObject()
             {
                 pur_customer_uid = Application.Current.Properties.ContainsKey("user_id") ? (string)Application.Current.Properties["user_id"] : "",
@@ -144,24 +142,18 @@ namespace ServingFresh.Views
 
             };
 
-            // Delivery Info Data from Purchase Object
             DeliveryAddress1.Text = purchaseObject.delivery_address;
             DeliveryAddress2.Text = purchaseObject.delivery_city + ", " + purchaseObject.delivery_state + ", " + purchaseObject.delivery_zip;
-
-            // Contact Information
             FullName.Text = purchaseObject.delivery_first_name + " " + purchaseObject.delivery_last_name;
             PhoneNumber.Text = purchaseObject.delivery_phone_num;
             EmailAddress.Text = purchaseObject.delivery_email;
 
-            // Expected Delivery Date
             deliveryDate.Text = Application.Current.Properties.ContainsKey("delivery_date") ? (string)Application.Current.Properties["delivery_date"] : "";
             deliveryTime.Text = Application.Current.Properties.ContainsKey("delivery_time") ? (string)Application.Current.Properties["delivery_time"] : "";
 
-            // Cart info
             CartItems.ItemsSource = cartItems;
             CartItems.HeightRequest = 56 * cartItems.Count;
 
-            // Fees
             delivery_fee = Constant.deliveryFee;
             service_fee = Constant.serviceFee;
             ServiceFee.Text = "$ " + service_fee.ToString("N2");
@@ -174,6 +166,24 @@ namespace ServingFresh.Views
             Position point = new Position(37.334789, -121.888138);
             var mapSpan = new MapSpan(point, 5, 5);
             map.MoveToRegion(mapSpan);
+        }
+
+        public async void GetAvailiableCoupons()
+        {
+            var client = new HttpClient();
+            var email = "xyz@gmail.com";
+            var RDSResponse = await client.GetAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/available_Coupons/" + email);
+            if (RDSResponse.IsSuccessStatusCode)
+            {
+                var result = await RDSResponse.Content.ReadAsStringAsync();
+                var data = JsonConvert.DeserializeObject<CouponResponse>(result);
+
+                Debug.WriteLine(result);
+                //foreach(Models.Coupon c in data.result)
+                //{
+                    
+                //}
+            }
         }
 
         public void updateTotals()
@@ -217,7 +227,6 @@ namespace ServingFresh.Views
                               now.Minute.ToString("D2") + ":" +
                               now.Second.ToString("D2"));
         }
-
         public void checkoutAsync(object sender, EventArgs e)
         {
 
@@ -396,7 +405,6 @@ namespace ServingFresh.Views
         {
             cardframe.Height = 0;
         }
-
         public void increase_qty(object sender, EventArgs e)
         {
             Label l = (Label)sender;
@@ -406,7 +414,6 @@ namespace ServingFresh.Views
 
             updateTotals();
         }
-
         public void decrease_qty(object sender, EventArgs e)
         {
             Label l = (Label)sender;
@@ -416,7 +423,6 @@ namespace ServingFresh.Views
 
             updateTotals();
         }
-
         public void openHistory(object sender, EventArgs e)
         {
             Application.Current.MainPage = new HistoryPage();
@@ -441,7 +447,6 @@ namespace ServingFresh.Views
         {
             Application.Current.MainPage = new RefundPage();
         }
-
         void DeliveryDaysClick(System.Object sender, System.EventArgs e)
         {
             Application.Current.MainPage = new SelectionPage();
@@ -638,6 +643,7 @@ namespace ServingFresh.Views
         {
             contactframe.Height = this.Height / 2;
         }
+
 
         void ChangeContactInfoCancelClick(System.Object sender, System.EventArgs e)
         {

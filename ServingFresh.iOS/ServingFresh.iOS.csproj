@@ -78,6 +78,7 @@
     <Compile Include="AppleSignIn\AppleSignInService.cs" />
     <Compile Include="Effects\TintImageEffect.cs" />
     <Compile Include="Renderers\CustomEntryRenderer.cs" />
+    <Compile Include="AppleNotificationService\NotificationService.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="Resources\LaunchScreen.storyboard" />
@@ -182,6 +183,7 @@
     <Folder Include="Assets.xcassets\CalendarI.imageset\" />
     <Folder Include="Assets.xcassets\CouponIcon.imageset\" />
     <Folder Include="Renderers\" />
+    <Folder Include="AppleNotificationService\" />
   </ItemGroup>
   <ItemGroup>
     <ITunesArtwork Include="iTunesArtwork" />

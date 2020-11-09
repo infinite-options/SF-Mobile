@@ -32,16 +32,23 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidLinkMode>None</AndroidLinkMode>
+    <AndroidKeyStore>True</AndroidKeyStore>
+    <AndroidSigningKeyStore>/Users/geysit/Desktop/InfiniteOptionsManifest.keystore</AndroidSigningKeyStore>
+    <AndroidSigningStorePass>1nfinitePC!</AndroidSigningStorePass>
+    <AndroidSigningKeyAlias>Serving Fresh</AndroidSigningKeyAlias>
+    <AndroidSigningKeyPass>servingfresh</AndroidSigningKeyPass>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>portable</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidManagedSymbols>true</AndroidManagedSymbols>
     <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
+    <AndroidSigningKeyStore>/Users/geysit/Desktop/InfiniteOptionsManifest.keystore</AndroidSigningKeyStore>
+    <AndroidSigningStorePass>1nfinitePC!</AndroidSigningStorePass>
+    <AndroidSigningKeyAlias>infiniteoptionsmanifest</AndroidSigningKeyAlias>
+    <AndroidSigningKeyPass>1nfinitePC!</AndroidSigningKeyPass>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Mono.Android" />
@@ -169,12 +176,17 @@
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>
+    <AndroidResource Include="Resources\xml\file_paths.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
     <Folder Include="GoogleInterceptor\" />
     <Folder Include="Effects\" />
     <Folder Include="Renderers\" />
+    <Folder Include="Resources\xml\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ServingFresh\ServingFresh.csproj">
