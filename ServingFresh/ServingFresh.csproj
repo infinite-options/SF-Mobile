@@ -21,6 +21,8 @@
     <PackageReference Include="Xam.Plugin.Media" Version="5.0.1" />
     <PackageReference Include="Acr.UserDialogs" Version="7.1.0.466" />
   </ItemGroup>
+  <--!<PackageReference Include="Stripe.net" Version="39.22.0" />-->
+
   <ItemGroup>
     <Folder Include="Config\" />
     <Folder Include="LogIn\" />
