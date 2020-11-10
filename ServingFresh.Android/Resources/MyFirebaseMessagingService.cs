@@ -148,6 +148,7 @@ namespace ServingFresh.Droid
             {
                 messageBody = message.Data.Values.First();
             }
+            Console.WriteLine("Serving Fresh: Received Notification: " + messageBody);
 
             // convert the incoming message to a local notification
             SendLocalNotification(messageBody);
@@ -158,28 +159,53 @@ namespace ServingFresh.Droid
 
         void SendLocalNotification(string body)
         {
+            //var intent = new Intent(this, typeof(MainActivity));
+            //intent.AddFlags(ActivityFlags.ClearTop);
+            //intent.PutExtra("message", body);
+
+            ////Unique request code to avoid PendingIntent collision.
+            //var requestCode = new Random().Next();
+            //var pendingIntent = PendingIntent.GetActivity(this, requestCode, intent, PendingIntentFlags.OneShot);
+
+            //var notificationBuilder = new NotificationCompat.Builder(this)
+            //    .SetContentTitle("Serving Now")
+            //    .SetSmallIcon(Resource.Drawable.ic_launcher)
+            //    .SetContentText(body)
+            //    .SetAutoCancel(true)
+            //    .SetShowWhen(false)
+            //    .SetContentIntent(pendingIntent);
+
+            //if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
+            //{
+            //    notificationBuilder.SetChannelId(AppConstants.NotificationChannelName);
+            //}
+
+            //var notificationManager = NotificationManager.FromContext(this);
+            //notificationManager.Notify(0, notificationBuilder.Build());
+
             var intent = new Intent(this, typeof(MainActivity));
             intent.AddFlags(ActivityFlags.ClearTop);
-            intent.PutExtra("message", body);
+            //intent.PutExtra("message", body);
+
 
             //Unique request code to avoid PendingIntent collision.
+            // ServingFresh.Droid.Resource.Drawable.ic_launcher
             var requestCode = new Random().Next();
-            var pendingIntent = PendingIntent.GetActivity(this, requestCode, intent, PendingIntentFlags.OneShot);
+            var pendingIntent = PendingIntent.GetActivity(this, 0, intent, PendingIntentFlags.OneShot);
 
-            var notificationBuilder = new NotificationCompat.Builder(this)
-                .SetContentTitle("Serving Now")
-                .SetSmallIcon(Resource.Drawable.ic_launcher)
-                .SetContentText(body)
-                .SetAutoCancel(true)
-                .SetShowWhen(false)
-                .SetContentIntent(pendingIntent);
+            // needed chanel and needed icon and need to get internt put extra out
+            // I think we also beed to increase id num
+            var notificationBuilder = new NotificationCompat.Builder(this, MainActivity.CHANNEL_ID);
 
-            if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
-            {
-                notificationBuilder.SetChannelId(AppConstants.NotificationChannelName);
-            }
+            notificationBuilder.SetContentTitle("Serving Fresh")
+                        .SetSmallIcon(Resource.Drawable.servingFreshIcon)
+                        .SetContentText(body)
+                        .SetAutoCancel(true)
+                        .SetShowWhen(false)
+                        .SetContentIntent(pendingIntent);
 
             var notificationManager = NotificationManager.FromContext(this);
+
             notificationManager.Notify(0, notificationBuilder.Build());
         }
 
