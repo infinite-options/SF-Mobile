@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<--! Carlos original code 
+<!-- Carlos original code 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="1.0" package="com.infiniteoptions.servingfresh" android:versionCode="5">
 	<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="28" />
 	<application android:label="Serving Fresh" android:theme="@style/MainTheme">
@@ -7,18 +7,15 @@
 		<provider android:name="android.support.v4.content.FileProvider" android:authorities="${applicationId}.fileprovider" android:exported="false" android:grantUriPermissions="true">
 			<meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths"></meta-data>
 		</provider> -->
-
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="1.0" package="com.infiniteoptions.servingfresh" android:versionCode="5">
-<--!<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" package="com.servingfresh">-->
-	<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="28" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="1.0" package="com.servingfresh" android:versionCode="5">
+	<!--<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" package="com.servingfresh">-->
+	<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="30" />
 	<!-- copied from https://docs.microsoft.com/en-us/azure/notification-hubs/xamarin-notification-hubs-push-notifications-android-gcm#create-a-firebase-project-and-enable-firebase-cloud-messaging -->
 	<uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 	<uses-permission android:name="android.permission.WAKE_LOCK" />
 	<uses-permission android:name="android.permission.GET_ACCOUNTS" />
-
-	<application android:label="Serving Fresh" android:theme="@style/MainTheme">
-	<--!<application android:label="ServingFresh.Android" android:theme="@style/MainTheme">-->
+	<application android:theme="@style/MainTheme" android:label="Serving Fresh">
+		<!--<application android:label="ServingFresh.Android" android:theme="@style/MainTheme">-->
 		<meta-data android:name="com.google.android.maps.v2.API_KEY" android:value="AIzaSyBMTKc0lR-6nRxpZLvQjrauRW8xQw4LVTk" />
 		<!-- copied from https://docs.microsoft.com/en-us/azure/notification-hubs/xamarin-notification-hubs-push-notifications-android-gcm#create-a-firebase-project-and-enable-firebase-cloud-messaging -->
 		<receiver android:name="com.google.firebase.iid.FirebaseInstanceIdInternalReceiver" android:exported="false" />
@@ -29,14 +26,14 @@
 				<category android:name="${applicationId}" />
 			</intent-filter>
 		</receiver>
-
 		<provider android:name="android.support.v4.content.FileProvider" android:authorities="${applicationId}.fileprovider" android:exported="false" android:grantUriPermissions="true">
 			<meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths"></meta-data>
 		</provider>
-
 	</application>
 	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.ACCEPT_HANDOVER" />
+	<uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
 </manifest>

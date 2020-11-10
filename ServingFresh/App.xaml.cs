@@ -29,6 +29,11 @@ namespace ServingFresh
 
                     if (today <= expTime)
                     {
+                        System.Diagnostics.Debug.WriteLine("There is a time stam go in selection page");
+                        System.Diagnostics.Debug.WriteLine("expTime"+ expTime);
+
+                        System.Diagnostics.Debug.WriteLine("Running on Android: Line 35");
+                        Console.WriteLine("guid: " + Preferences.Get("guid", null));
                         MainPage = new SelectionPage();
                     }
                     else

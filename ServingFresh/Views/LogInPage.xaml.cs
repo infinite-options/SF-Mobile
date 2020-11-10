@@ -29,6 +29,7 @@ namespace ServingFresh.Views
             
             if (Device.RuntimePlatform == Device.Android)
             {
+                System.Diagnostics.Debug.WriteLine("Running on Android: Line 32");
                 Console.WriteLine("guid: " + Preferences.Get("guid", null));
                 appleLogInButton.IsEnabled = false;
             }
@@ -135,6 +136,11 @@ namespace ServingFresh.Views
                 }
                 logInButton.IsEnabled = true;
             }
+        }
+
+        public async void AddMessage(string body)
+        {
+            await DisplayAlert("Aler!", body, "OK");
         }
 
         private async Task<AccountSalt> RetrieveAccountSalt(string userEmail)

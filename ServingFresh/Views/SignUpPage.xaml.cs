@@ -336,7 +336,9 @@ namespace ServingFresh.Views
                 System.Diagnostics.Debug.WriteLine(directSignUpSerializedObject);
 
                 var signUpclient = new HttpClient();
+                System.Diagnostics.Debug.WriteLine("Line 339: About to call sign up end point");
                 var RDSResponse = await signUpclient.PostAsync(Constant.SignUpUrl, content);
+                System.Diagnostics.Debug.WriteLine("Line 341: Done calling sign up end point");
                 var RDSMessage = await RDSResponse.Content.ReadAsStringAsync();
 
                 System.Diagnostics.Debug.WriteLine(RDSMessage);

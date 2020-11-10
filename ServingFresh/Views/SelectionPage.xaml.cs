@@ -7,6 +7,7 @@ using ServingFresh.Models;
 using System.Collections.ObjectModel;
 using System.Net.Http;
 using Newtonsoft.Json;
+using Xamarin.Essentials;
 
 namespace ServingFresh.Views
 {

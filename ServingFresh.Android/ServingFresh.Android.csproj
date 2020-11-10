@@ -32,7 +32,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidLinkMode>None</AndroidLinkMode>
-    <AndroidKeyStore>True</AndroidKeyStore>
     <AndroidSigningKeyStore>/Users/geysit/Desktop/InfiniteOptionsManifest.keystore</AndroidSigningKeyStore>
     <AndroidSigningStorePass>1nfinitePC!</AndroidSigningStorePass>
     <AndroidSigningKeyAlias>Serving Fresh</AndroidSigningKeyAlias>
@@ -213,6 +212,10 @@
       <Generator></Generator>
     </AndroidResource>
     <AndroidResource Include="Resources\xml\file_paths.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\drawable\ic.png">
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>
