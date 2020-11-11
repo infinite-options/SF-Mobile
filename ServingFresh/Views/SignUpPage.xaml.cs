@@ -13,6 +13,7 @@ using ServingFresh.Notifications;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Maps;
+using System.Diagnostics;
 
 namespace ServingFresh.Views
 {
@@ -21,6 +22,7 @@ namespace ServingFresh.Views
         public SignUpPost directSignUp = new SignUpPost();
         public bool isAddessValidated = false;
         INotifications appleNotification = DependencyService.Get<INotifications>();
+        private string deviceId = null;
 
         public SignUpPage()
         {
@@ -31,16 +33,19 @@ namespace ServingFresh.Views
 
             if (Device.RuntimePlatform == Device.iOS)
             {
-                var r = appleNotification.IsNotifications();
-                System.Diagnostics.Debug.WriteLine(r);
-                localNotificationButton.IsToggled = r;
+                //var r = appleNotification.IsNotifications();
+                //System.Diagnostics.Debug.WriteLine(r);
+                //localNotificationButton.IsToggled = r;
+                System.Diagnostics.Debug.WriteLine("This is the iOS GUID from Direct Sign Up: " + Preferences.Get("guid", null));
+                deviceId = Preferences.Get("guid", null);
+
             }
             else
             {
-                
-            }
-          
 
+                System.Diagnostics.Debug.WriteLine("This is the Android GUID from Direct Sign Up: " + Preferences.Get("guid", null));
+                deviceId = Preferences.Get("guid", null);
+            }
         }
 
         public void InitializeSignUpPost()
@@ -367,45 +372,31 @@ namespace ServingFresh.Views
 
                     _ = Application.Current.SavePropertiesAsync();
 
-                    if (localNotificationButton.IsToggled)
+                    if (deviceId != null)
                     {
-                        var id = Preferences.Get("my_id", string.Empty);
-                        if (string.IsNullOrWhiteSpace(id))
+                        NotificationPost notificationPost = new NotificationPost();
+                        notificationPost.uid = (string)Application.Current.Properties["user_id"];
+                        notificationPost.guid = deviceId.Substring(5);
+                        notificationPost.notification = "TRUE";
+
+                        var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
+                        Debug.WriteLine(notificationSerializedObject);
+                        // {"uid":"100-000356","guid":"2fec397f-9bdb-452a-bae2-3bf6be4a8f7a","notification":"TRUE"}
+                        var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
+
+                        var client = new HttpClient();
+                        var clientResponse = await client.PostAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/update_guid_notification/customer", notificationContent);
+                        if (clientResponse.IsSuccessStatusCode)
                         {
-                            id = System.Guid.NewGuid().ToString();
-                            Preferences.Set("my_id", id);
+                            System.Diagnostics.Debug.WriteLine("We have post the guid to the database");
                         }
-
-                        if (id != null || Equals(id, ""))
+                        else
                         {
-                            NotificationPost notificationPost = new NotificationPost();
-                            notificationPost.uid = (string)Application.Current.Properties["user_id"];
-                            notificationPost.guid = id;
-                            notificationPost.notification = "TRUE";
-
-                            var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
-                            System.Diagnostics.Debug.WriteLine(notificationSerializedObject);
-                            // {"uid":"100-000356","guid":"2fec397f-9bdb-452a-bae2-3bf6be4a8f7a","notification":"TRUE"}
-                            var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
-
-                            var client = new HttpClient();
-                            var clientResponse = await client.PostAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/update_guid_notification/customer", notificationContent);
-                            if (clientResponse.IsSuccessStatusCode)
-                            {
-                                System.Diagnostics.Debug.WriteLine("We have post the guid to the database");
-                            }
-                            else
-                            {
-                                await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
-                            }
+                            await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
                         }
                     }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine("Notifications will be send to this device");
-                    }
 
-                    Application.Current.MainPage = new SelectionPage();
+                    //Application.Current.MainPage = new SelectionPage();
                 }
             }
             else

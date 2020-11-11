@@ -185,7 +185,7 @@ namespace ServingFresh.iOS
                 var tag = "guid_" + guid.ToString();
                 Console.WriteLine("guid:" + tag);
                 Preferences.Set("guid", tag);
-
+                System.Diagnostics.Debug.WriteLine("This is the GUID from RegisteredForRemoteNotifications: " + Preferences.Get("guid", string.Empty));
                 var tags = new NSSet(AppConstants.SubscriptionTags.Append(tag).ToArray());
 
                 Hub.RegisterNative(deviceToken, tags, (errorCallback) =>
