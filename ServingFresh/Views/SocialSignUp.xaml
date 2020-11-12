@@ -27,7 +27,7 @@
                     </Entry>
                     <Grid>
                         <servingfresh:CustomEntry Placeholder="Push Notification" IsReadOnly="True" Margin="7,0,0,0"></servingfresh:CustomEntry>
-                        <Switch HorizontalOptions="End" Grid.Column="1" IsToggled="True"></Switch>
+                        <Switch x:Name="localSocialNotificationButton" HorizontalOptions="End" Grid.Column="1" IsToggled="True"></Switch>
                     </Grid>
                     <Entry
                         x:Name="userFirstName"

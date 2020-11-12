@@ -43,18 +43,24 @@ namespace ServingFresh.Views
 
             if (Device.RuntimePlatform == Device.iOS)
             {
-                //var r = appleNotification.IsNotifications();
-                //System.Diagnostics.Debug.WriteLine(r);
-                //localNotificationButton.IsToggled = r;
-                System.Diagnostics.Debug.WriteLine("This is the iOS GUID from Direct Sign Up: " + Preferences.Get("guid", null));
                 deviceId = Preferences.Get("guid", null);
+                if (deviceId != null) { Debug.WriteLine("This is the iOS GUID from Social Sign Up: " + deviceId); }
+
 
             }
             else
             {
-
-                System.Diagnostics.Debug.WriteLine("This is the Android GUID from Direct Sign Up: " + Preferences.Get("guid", null));
                 deviceId = Preferences.Get("guid", null);
+                if (deviceId != null) { Debug.WriteLine("This is the Android GUID from Social Sign Up " + deviceId); }
+            }
+
+            if (deviceId != null)
+            {
+                localSocialNotificationButton.IsToggled = true;
+            }
+            else
+            {
+                localSocialNotificationButton.IsToggled = false;
             }
         }
 
@@ -272,7 +278,7 @@ namespace ServingFresh.Views
             else
             {
                 isAddessValidated = true;
-                // await DisplayAlert("We validated your address", "Please click on the Sign up button to create your account!", "OK");
+                await DisplayAlert("We validated your address", "Please click on the Sign up button to create your account!", "OK");
                 await Application.Current.SavePropertiesAsync();
             }
         }
@@ -319,8 +325,12 @@ namespace ServingFresh.Views
 
                 System.Diagnostics.Debug.WriteLine(socialSignUpSerializedObject);
 
+                var handler = new HttpClientHandler();
+                handler.AllowAutoRedirect = true;
+
                 var signUpclient = new HttpClient();
                 var RDSResponse = await signUpclient.PostAsync(Constant.SignUpUrl, content);
+
                 var RDSMessage = await RDSResponse.Content.ReadAsStringAsync();
 
                 System.Diagnostics.Debug.WriteLine(RDSMessage);
@@ -361,7 +371,7 @@ namespace ServingFresh.Views
                         var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
 
                         var client = new HttpClient();
-                        var clientResponse = await client.PostAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/update_guid_notification/customer", notificationContent);
+                        var clientResponse = await client.PostAsync(Constant.Notifications, notificationContent);
                         if (clientResponse.IsSuccessStatusCode)
                         {
                             System.Diagnostics.Debug.WriteLine("We have post the guid to the database");
@@ -371,7 +381,7 @@ namespace ServingFresh.Views
                             await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
                         }
                     }
-                    //Application.Current.MainPage = new SelectionPage();
+                    Application.Current.MainPage = new SelectionPage();
                 }
             }
             else
