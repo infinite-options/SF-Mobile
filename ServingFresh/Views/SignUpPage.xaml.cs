@@ -17,12 +17,18 @@ using System.Diagnostics;
 
 namespace ServingFresh.Views
 {
+    
     public partial class SignUpPage : ContentPage
     {
         public SignUpPost directSignUp = new SignUpPost();
         public bool isAddessValidated = false;
         INotifications appleNotification = DependencyService.Get<INotifications>();
         private string deviceId = null;
+
+        public class EmailVerificationObject
+        {
+            public string email { get; set; }
+        }
 
         public SignUpPage()
         {
@@ -214,6 +220,10 @@ namespace ServingFresh.Views
             {
                 userDeliveryInstructions.Text = "";
             }
+            else
+            {
+              
+            }
 
             // Setting request for USPS API
             XDocument requestDoc = new XDocument(
@@ -339,71 +349,98 @@ namespace ServingFresh.Views
         {
             if (isAddessValidated)
             {
+                var client = new HttpClient();
                 var directSignUpSerializedObject = JsonConvert.SerializeObject(directSignUp);
                 var content = new StringContent(directSignUpSerializedObject, Encoding.UTF8, "application/json");
 
-                System.Diagnostics.Debug.WriteLine(directSignUpSerializedObject);
+                System.Diagnostics.Debug.WriteLine("Sign up JSON Object: " + directSignUpSerializedObject);
 
-                var handler = new HttpClientHandler();
-                handler.AllowAutoRedirect = true;
+                //var handler = new HttpClientHandler();
+                //handler.AllowAutoRedirect = true;
 
-                var signUpclient = new HttpClient();
-                System.Diagnostics.Debug.WriteLine("Line 339: About to call sign up end point");
-                var RDSResponse = await signUpclient.PostAsync(Constant.SignUpUrl, content);
-                System.Diagnostics.Debug.WriteLine("Line 341: Done calling sign up end point");
+                Debug.WriteLine("Line 361: About to call sign up end point");
+                var RDSResponse = await client.PostAsync(Constant.SignUpUrl, content);
+                Debug.WriteLine("Line 365: Done calling sign up end point");
+
                 var RDSMessage = await RDSResponse.Content.ReadAsStringAsync();
 
-                System.Diagnostics.Debug.WriteLine(RDSMessage);
+                Debug.WriteLine("Status code: " + RDSResponse.IsSuccessStatusCode);
+                Debug.WriteLine("Message from request: " + RDSMessage);
 
                 if (RDSResponse.IsSuccessStatusCode)
                 {
-                    var RDSData = JsonConvert.DeserializeObject<SignUpResponse>(RDSMessage);
-                    DateTime today = DateTime.Now;
-                    DateTime expDate = today.AddDays(Constant.days);
-
-                    Application.Current.Properties["user_id"] = RDSData.result.customer_uid;
-                    Application.Current.Properties["time_stamp"] = expDate;
-                    Application.Current.Properties["platform"] = "DIRECT";
-                    Application.Current.Properties["user_email"] = directSignUp.email;
-                    Application.Current.Properties["user_first_name"] = directSignUp.first_name;
-                    Application.Current.Properties["user_last_name"] = directSignUp.last_name;
-                    Application.Current.Properties["user_phone_num"] = directSignUp.phone_number;
-                    Application.Current.Properties["user_address"] = directSignUp.address;
-                    Application.Current.Properties["user_unit"] = directSignUp.unit;
-                    Application.Current.Properties["user_city"] = directSignUp.city;
-                    Application.Current.Properties["user_state"] = directSignUp.state;
-                    Application.Current.Properties["user_zip_code"] = directSignUp.zip_code;
-                    Application.Current.Properties["user_latitude"] = directSignUp.latitude;
-                    Application.Current.Properties["user_longitude"] = directSignUp.longitude;
-                    Application.Current.Properties["user_delivery_instructions"] = userDeliveryInstructions.Text;
-
-                    _ = Application.Current.SavePropertiesAsync();
-
-                    if (deviceId != null)
+                    if (RDSMessage.Contains("200"))
                     {
-                        NotificationPost notificationPost = new NotificationPost();
-                        notificationPost.uid = (string)Application.Current.Properties["user_id"];
-                        notificationPost.guid = deviceId.Substring(5);
-                        notificationPost.notification = "TRUE";
+                        var RDSData = JsonConvert.DeserializeObject<SignUpResponse>(RDSMessage);
+                        DateTime today = DateTime.Now;
+                        DateTime expDate = today.AddDays(Constant.days);
 
-                        var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
-                        Debug.WriteLine(notificationSerializedObject);
-                        // {"uid":"100-000356","guid":"2fec397f-9bdb-452a-bae2-3bf6be4a8f7a","notification":"TRUE"}
-                        var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
+                        Application.Current.Properties["user_id"] = RDSData.result.customer_uid;
+                        Application.Current.Properties["time_stamp"] = expDate;
+                        Application.Current.Properties["platform"] = "DIRECT";
+                        Application.Current.Properties["user_email"] = directSignUp.email;
+                        Application.Current.Properties["user_first_name"] = directSignUp.first_name;
+                        Application.Current.Properties["user_last_name"] = directSignUp.last_name;
+                        Application.Current.Properties["user_phone_num"] = directSignUp.phone_number;
+                        Application.Current.Properties["user_address"] = directSignUp.address;
+                        Application.Current.Properties["user_unit"] = directSignUp.unit;
+                        Application.Current.Properties["user_city"] = directSignUp.city;
+                        Application.Current.Properties["user_state"] = directSignUp.state;
+                        Application.Current.Properties["user_zip_code"] = directSignUp.zip_code;
+                        Application.Current.Properties["user_latitude"] = directSignUp.latitude;
+                        Application.Current.Properties["user_longitude"] = directSignUp.longitude;
+                        Application.Current.Properties["user_delivery_instructions"] = userDeliveryInstructions.Text;
 
-                        var client = new HttpClient();
-                        var clientResponse = await client.PostAsync(Constant.Notifications, notificationContent);
-                        if (clientResponse.IsSuccessStatusCode)
+                        _ = Application.Current.SavePropertiesAsync();
+
+                        EmailVerificationObject user = new EmailVerificationObject();
+                        user.email = directSignUp.email;
+
+                        var userSerializedObject = JsonConvert.SerializeObject(user);
+                        var userContent = new StringContent(userSerializedObject, Encoding.UTF8, "application/json");
+
+                        Debug.WriteLine("Email Verification JSON Object to send: " + userSerializedObject);
+
+                        var response = await client.PostAsync(Constant.EmailVerificationUrl, userContent);
+
+                        Debug.WriteLine("Status code: " + response.IsSuccessStatusCode);
+                        if (!response.IsSuccessStatusCode)
                         {
-                            System.Diagnostics.Debug.WriteLine("We have post the guid to the database");
+                            await DisplayAlert("Ooops!", "We weren't able to send you a verification link to your email.", "OK");
                         }
-                        else
+
+                        if (deviceId != null)
                         {
-                            await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
+                            NotificationPost notificationPost = new NotificationPost();
+
+                            notificationPost.uid = (string)Application.Current.Properties["user_id"];
+                            notificationPost.guid = deviceId.Substring(5);
+                            notificationPost.notification = "TRUE";
+
+                            var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
+                            var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
+
+                            Debug.WriteLine("Notification JSON Object to send: " + notificationSerializedObject);
+
+                            var clientResponse = await client.PostAsync(Constant.NotificationsUrl, notificationContent);
+
+                            Debug.WriteLine("Status code: " + clientResponse.IsSuccessStatusCode);
+                            if (clientResponse.IsSuccessStatusCode)
+                            {
+                                System.Diagnostics.Debug.WriteLine("We have post the guid to the database");
+                            }
+                            else
+                            {
+                                await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
+                            }
                         }
+
+                        Application.Current.MainPage = new SelectionPage();
                     }
-                   
-                    Application.Current.MainPage = new SelectionPage();
+                    else
+                    {
+                        await DisplayAlert("Alert!", "This email already exists", "OK");
+                    }
                 }
             }
             else

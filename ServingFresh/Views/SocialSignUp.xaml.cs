@@ -18,6 +18,11 @@ namespace ServingFresh.Views
 {
     public partial class SocialSignUp : ContentPage
     {
+        public class EmailVerificationObject
+        {
+            public string email { get; set; }
+        }
+
         public SignUpPost socialSignUp = new SignUpPost();
         public bool isAddessValidated = false;
         private string deviceId = null;
@@ -320,20 +325,23 @@ namespace ServingFresh.Views
         {
             if (isAddessValidated)
             {
+                var client = new HttpClient();
                 var socialSignUpSerializedObject = JsonConvert.SerializeObject(socialSignUp);
                 var content = new StringContent(socialSignUpSerializedObject, Encoding.UTF8, "application/json");
 
-                System.Diagnostics.Debug.WriteLine(socialSignUpSerializedObject);
+                Debug.WriteLine("Social Sign up JSON Object to send: " + socialSignUpSerializedObject);
 
-                var handler = new HttpClientHandler();
-                handler.AllowAutoRedirect = true;
+                //var handler = new HttpClientHandler();
+                //handler.AllowAutoRedirect = true;
 
-                var signUpclient = new HttpClient();
-                var RDSResponse = await signUpclient.PostAsync(Constant.SignUpUrl, content);
+                var RDSResponse = await client.PostAsync(Constant.SignUpUrl, content);
+
+                Debug.WriteLine("Status code: " + RDSResponse.IsSuccessStatusCode);
 
                 var RDSMessage = await RDSResponse.Content.ReadAsStringAsync();
 
-                System.Diagnostics.Debug.WriteLine(RDSMessage);
+                Debug.WriteLine("Message returned: " + RDSMessage);
+
                 if (RDSResponse.IsSuccessStatusCode)
                 {
                     var RDSData = JsonConvert.DeserializeObject<SignUpResponse>(RDSMessage);
@@ -358,20 +366,41 @@ namespace ServingFresh.Views
 
                     _ = Application.Current.SavePropertiesAsync();
 
+                    EmailVerificationObject user = new EmailVerificationObject();
+
+                    user.email = socialSignUp.email;
+
+                    var userSerializedObject = JsonConvert.SerializeObject(user);
+                    var userContent = new StringContent(userSerializedObject, Encoding.UTF8, "application/json");
+
+                    Debug.WriteLine("Email Verification JSON Object to send: " + userSerializedObject);
+
+                    var response = await client.PostAsync(Constant.EmailVerificationUrl, userContent);
+
+                    Debug.WriteLine("Status code: " + response.IsSuccessStatusCode);
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        await DisplayAlert("Ooops!", "We weren't able to send you a verification link to your email.", "OK");
+                    }
+
                     if (deviceId != null)
                     {
                         NotificationPost notificationPost = new NotificationPost();
+
                         notificationPost.uid = (string)Application.Current.Properties["user_id"];
                         notificationPost.guid = deviceId.Substring(5);
                         notificationPost.notification = "TRUE";
 
                         var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
-                        Debug.WriteLine(notificationSerializedObject);
-                        // {"uid":"100-000356","guid":"2fec397f-9bdb-452a-bae2-3bf6be4a8f7a","notification":"TRUE"}
+                        Debug.WriteLine("Notification JSON Object to send: " + notificationSerializedObject);
+                        
                         var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
 
-                        var client = new HttpClient();
-                        var clientResponse = await client.PostAsync(Constant.Notifications, notificationContent);
+                        var clientResponse = await client.PostAsync(Constant.NotificationsUrl, notificationContent);
+
+                        Debug.WriteLine("Status code: " + clientResponse.IsSuccessStatusCode);
+
                         if (clientResponse.IsSuccessStatusCode)
                         {
                             System.Diagnostics.Debug.WriteLine("We have post the guid to the database");
@@ -381,6 +410,7 @@ namespace ServingFresh.Views
                             await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
                         }
                     }
+
                     Application.Current.MainPage = new SelectionPage();
                 }
             }
