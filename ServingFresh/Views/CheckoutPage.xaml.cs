@@ -42,6 +42,8 @@ namespace ServingFresh.Views
             PropertyChanged(this, new PropertyChangedEventArgs("total_price"));
         }
     }
+
+  
     public class PurchaseDataObject
     {
         public string pur_customer_uid { get; set; }
@@ -83,8 +85,14 @@ namespace ServingFresh.Views
     }
     public partial class CheckoutPage : ContentPage
     {
+        public class couponImage
+        {
+            public string image { get; set; }
+        }
+
         public PurchaseDataObject purchaseObject;
         public static ObservableCollection<ItemObject> cartItems = new ObservableCollection<ItemObject>();
+        public static ObservableCollection<couponImage> couponsList = new ObservableCollection<couponImage>();
         public double subtotal;
         public double discount;
         public double delivery_fee;
@@ -179,10 +187,13 @@ namespace ServingFresh.Views
                 var data = JsonConvert.DeserializeObject<CouponResponse>(result);
 
                 Debug.WriteLine(result);
-                //foreach(Models.Coupon c in data.result)
+                //foreach (Models.Coupon c in data.result)
                 //{
-                    
+                //    var ima = new couponImage();
+                //    ima.image = "CouponIcon.png";
+                //    couponsList.Add(ima);
                 //}
+                //coupons_list.ItemsSource = couponsList;
             }
         }
 
@@ -229,8 +240,16 @@ namespace ServingFresh.Views
         }
         public void checkoutAsync(object sender, EventArgs e)
         {
+            cardHolderEmail.Text = purchaseObject.delivery_email;
+            cardHolderName.Text = purchaseObject.delivery_first_name + " " + purchaseObject.delivery_last_name;
+            cardHolderAddress.Text = purchaseObject.delivery_address;
+            cardHolderUnit.Text = purchaseObject.delivery_unit;
+            cardState.Text = purchaseObject.delivery_state;
+            cardCity.Text = purchaseObject.delivery_city;
+            cardZip.Text = purchaseObject.delivery_zip;
 
             cardframe.Height = this.Height / 2;
+
 
             string dateTime = DateTime.Parse((string)Application.Current.Properties["delivery_date"]).ToString("yyyy-MM-dd");
 

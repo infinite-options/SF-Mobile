@@ -124,13 +124,13 @@
                                     </Button>
                                     <Grid>
                                         <StackLayout Grid.Row="2">
-                                            <Frame Padding="0" HeightRequest="35" HasShadow="False" BackgroundColor="WhiteSmoke" Opacity="0.9" BorderColor="LightGray">
+                                            <Frame Padding="0" HeightRequest="90" HasShadow="False" BackgroundColor="WhiteSmoke" Opacity="0.9" BorderColor="LightGray">
                                                 <Grid>
                                                     <Button Grid.Column="0" WidthRequest="92" Text="-" TextColor="#FF8500" Font="35" Clicked="SubtractItemLeft" CommandParameter="{Binding .}"></Button>
                                                     <Button Grid.Column="1" WidthRequest="92" Text="+" TextColor="#FF8500" Font="25" Clicked="AddItemLeft" CommandParameter="{Binding .}"></Button>
                                                 </Grid>
                                             </Frame>
-                                            <Frame Padding="0" Margin="0,-7,0,0" HeightRequest="35" HasShadow="False" BorderColor="LightGray">
+                                            <Frame Padding="0" Margin="0,-7,0,0" HeightRequest="90" HasShadow="False" BorderColor="LightGray">
                                                 <Grid>
                                                     <Label Grid.Column="0" WidthRequest="120" Padding="10,0,0,0" Text="{Binding itemNameLeft}" TextColor="Black" HorizontalTextAlignment="Start" FontSize="Micro"></Label>
                                                     <Label Grid.Column="1" WidthRequest="75" Text="{Binding itemPriceLeft}" TextColor="Black" HorizontalTextAlignment="Center" FontSize="Micro"></Label>
@@ -161,13 +161,13 @@
                                     </Button>
                                     <Grid>
                                         <StackLayout Grid.Row="2">
-                                            <Frame Padding="0" HeightRequest="35" HasShadow="False" BackgroundColor="WhiteSmoke" Opacity="0.9" BorderColor="LightGray">
+                                            <Frame Padding="0" HeightRequest="90" HasShadow="False" BackgroundColor="WhiteSmoke" Opacity="0.9" BorderColor="LightGray">
                                                 <Grid>
                                                     <Button Grid.Column="0" WidthRequest="120" Text="-" TextColor="#FF8500" Font="35" Clicked="SubtractItemRight" CommandParameter="{Binding .}"></Button>
                                                     <Button Grid.Column="1" WidthRequest="75" Text="+" TextColor="#FF8500" Font="25" Clicked="AddItemRight" CommandParameter="{Binding .}"></Button>
                                                 </Grid>
                                             </Frame>
-                                            <Frame Padding="0" Margin="0,-7,0,0" HeightRequest="35" HasShadow="False" BorderColor="LightGray">
+                                            <Frame Padding="0" Margin="0,-7,0,0" HeightRequest="90" HasShadow="False" BorderColor="LightGray">
                                                 <Grid>
                                                     <Label Grid.Column="0" WidthRequest="120" Text="{Binding itemNameRight}" Padding="10,0,0,0" TextColor="Black" HorizontalTextAlignment="Start" FontSize="Micro"></Label>
                                                     <Label Grid.Column="1" WidthRequest="92" Text="{Binding itemPriceRight}" TextColor="Black" HorizontalTextAlignment="Center" FontSize="Micro"></Label>

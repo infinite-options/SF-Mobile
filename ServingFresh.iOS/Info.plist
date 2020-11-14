@@ -45,8 +45,6 @@
 	</array>
 	<key>CFBundleShortVersionString</key>
 	<string>1.1</string>
-	<key>CFBundleVersion</key>
-	<string>6</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.servingfresh</string>
 	<key>UIStatusBarStyle</key>
@@ -63,5 +61,7 @@
 	<string>This app needs access to the photo gallery so that you can select a photo of the damaged product.</string>
 	<key>UIUserInterfaceStyle</key>
 	<string>Light</string>
+	<key>CFBundleVersion</key>
+	<string>8</string>
 </dict>
 </plist>

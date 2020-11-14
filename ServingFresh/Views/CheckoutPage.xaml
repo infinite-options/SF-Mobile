@@ -204,6 +204,28 @@
                                     <Label Text="&#10;&#10;&#10;&#10;&#10;orders above $50" VerticalOptions="Center" StyleClass="black" Margin="50, 0" FontSize="10"/>
                                 </Grid>
                             </StackLayout>
+
+
+                  
+                      <!--<CollectionView x:Name="coupons_list" ItemsLayout="HorizontalList">
+                          <CollectionView.ItemTemplate>
+                              <DataTemplate>
+                                  <StackLayout Orientation="Horizontal" Spacing="20" Padding="0" Margin="0">
+                                <Grid>
+                                    <Image Source="{Binding image}" StyleClass="coupon">
+                                        <Image.Effects>
+                                            <servingfresh:TintImageEffect TintColor="#FF8500"/>
+                                        </Image.Effects>
+                                    </Image>
+                                    <Label Text="10% off" VerticalOptions="Center" StyleClass="h2, black" Margin="50, 0"/>
+                                    <Label Text="&#10;&#10;&#10;orders above $60" VerticalOptions="Center" StyleClass="black" Margin="50, 0" FontSize="10"/>
+                                </Grid>
+                                      </StackLayout>
+                              </DataTemplate>
+                          </CollectionView.ItemTemplate>
+                      </CollectionView>-->
+                  
+
                         </ScrollView>
                         <BoxView StyleClass="spacer"/>
                         <FlexLayout JustifyContent="SpaceBetween" Padding="0,10,0,10">
