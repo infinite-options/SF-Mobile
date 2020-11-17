@@ -90,6 +90,7 @@ namespace ServingFresh.Views
         {
             public string image { get; set; }
             public string couponNote { get; set; }
+            public string index { get; set; }
         }
 
         public PurchaseDataObject purchaseObject;
@@ -105,6 +106,17 @@ namespace ServingFresh.Views
         private bool isAddressValidated;
         private string latitude = "0";
         private string longitude = "0";
+
+        // Coupons Lists
+        // Coupon types: percent, amount, and fee.
+        private List<double> percents = new List<double>();
+        private List<double> amounts = new List<double>();
+        private List<double> fees = new List<double>();
+
+        // Coupon original order
+        private List<double> unsortedCouponList = new List<double>();
+        private List<double> sortedCouponList = new List<double>();
+        private int defaultCouponIndex = 0;
 
 
         public CheckoutPage(IDictionary<string, ItemPurchased> order = null, string day = "")
@@ -167,7 +179,7 @@ namespace ServingFresh.Views
             delivery_fee = Constant.deliveryFee;
             service_fee = Constant.serviceFee;
             ServiceFee.Text = "$ " + service_fee.ToString("N2");
-            updateTotals();
+            // updateTotals(unsortedCouponList[defaultCouponIndex]);
         }
 
         public void InitializeMap()
@@ -188,15 +200,65 @@ namespace ServingFresh.Views
                 var result = await RDSResponse.Content.ReadAsStringAsync();
                 var data = JsonConvert.DeserializeObject<CouponResponse>(result);
                 couponsList.Clear();
+                unsortedCouponList.Clear();
+                sortedCouponList.Clear();
                 Debug.WriteLine(result);
+
+                double currentSubtotal = GetSubTotal();
+                double currentDeliveryFee = GetDeliveryFee();
+                int placement = 0;
                 foreach (Models.Coupon c in data.result)
                 {
+                    double percentDiscount = 0;
+                    double amountDiscount = 0;
+                    double deliveryFeeDiscount = 0;
+                    double maxPercentAmount = 0;
+                    double maxDiscount = 0;
                     var coupons = new couponImage();
                     coupons.image = "CouponIcon.png";
                     coupons.couponNote = c.notes;
+                    coupons.index = placement.ToString();
                     couponsList.Add(coupons);
-                    
+
+                    percentDiscount = currentSubtotal * (c.discount_percent / 100);
+                    amountDiscount = c.discount_amount;
+                    deliveryFeeDiscount = c.discount_shipping;
+
+                    maxPercentAmount = Math.Max(percentDiscount, amountDiscount);
+                    maxDiscount = Math.Max(maxPercentAmount, deliveryFeeDiscount);
+
+                    Debug.WriteLine("You save: " + maxDiscount);
+                    unsortedCouponList.Add(maxDiscount);
+                    sortedCouponList.Add(maxDiscount);
+                    placement++;
                 }
+
+                sortedCouponList.Sort();
+
+                Debug.Write("Unsorted List: ");
+                foreach(double i in unsortedCouponList)
+                {
+                    Debug.Write(i + ", ");
+                }
+                Debug.WriteLine("");
+                Debug.Write("Sorted List: ");
+                foreach (double i in sortedCouponList)
+                {
+                    Debug.Write(i + ", ");
+                }
+                Debug.WriteLine("");
+
+                Debug.WriteLine("");
+                for(int i = 0; i < unsortedCouponList.Count; i++)
+                {
+                    if(sortedCouponList[sortedCouponList.Count - 1] == unsortedCouponList[i]){
+                        defaultCouponIndex = i;
+                        break;
+                    }
+                }
+
+                Debug.WriteLine("This is the coupon index that will save you the most money: " + defaultCouponIndex);
+                updateTotals(unsortedCouponList[defaultCouponIndex]);
                 coupon_list.ItemsSource = couponsList;
             }
         }
@@ -213,6 +275,8 @@ namespace ServingFresh.Views
                         if (tint.TintColor.Equals(Color.Black))
                         {
                             tint.TintColor = Constants.SecondaryColor;
+                            int couponNum = Int32.Parse(imgbtn.ClassId);
+                            updateTotals(unsortedCouponList[couponNum]);
                         }
                         else
                         {
@@ -220,11 +284,12 @@ namespace ServingFresh.Views
                         }
                         imgbtn.Effects.Insert(0, tint);
                     }
+                    
                 }
-            }
+            }            
         }
 
-        public void updateTotals()
+        public void updateTotals(double discount)
         {
             subtotal = 0.0;
             total_qty = 0;
@@ -235,7 +300,7 @@ namespace ServingFresh.Views
                 subtotal += (item.qty * item.price);
             }
             SubTotal.Text = "$ " + subtotal.ToString("N2");
-            discount = subtotal * .1;
+            //discount = subtotal * .1;
             Discount.Text = "-$ " + discount.ToString("N2");
             DeliveryFee.Text = "$ " + delivery_fee.ToString("N2");
             taxes = subtotal * 0.085;
@@ -252,6 +317,26 @@ namespace ServingFresh.Views
             GrandTotal.Text = "$ " + total.ToString("N2") ;
 
             CartTotal.Text = total_qty.ToString();
+        }
+
+        // This function return the subtotal amount upon initial purchase
+        public double GetSubTotal()
+        {
+            subtotal = 0.0;
+            total_qty = 0;
+
+            foreach (ItemObject item in cartItems)
+            {
+                total_qty += item.qty;
+                subtotal += (item.qty * item.price);
+            }
+            return subtotal;
+        }
+
+        // This function return the delivery fee amount
+        public double GetDeliveryFee()
+        {
+            return Constant.deliveryFee;
         }
 
         public void TestDateFormat(object sender, EventArgs e)
@@ -457,8 +542,8 @@ namespace ServingFresh.Views
             TapGestureRecognizer tgr = (TapGestureRecognizer)l.GestureRecognizers[0];
             ItemObject item = (ItemObject)tgr.CommandParameter;
             if (item != null) item.increase_qty();
-
-            updateTotals();
+            // Recall calculate GetNewCouponIndex(subtotal,fee)
+            updateTotals(unsortedCouponList[defaultCouponIndex]);
         }
         public void decrease_qty(object sender, EventArgs e)
         {
@@ -466,8 +551,8 @@ namespace ServingFresh.Views
             TapGestureRecognizer tgr = (TapGestureRecognizer)l.GestureRecognizers[0];
             ItemObject item = (ItemObject)tgr.CommandParameter;
             if (item != null) item.decrease_qty();
-
-            updateTotals();
+            //
+            updateTotals(unsortedCouponList[defaultCouponIndex]);
         }
         public void openHistory(object sender, EventArgs e)
         {
@@ -486,7 +571,7 @@ namespace ServingFresh.Views
 
         void UpdateTotalAmount(System.Object sender, System.EventArgs e)
         {
-            updateTotals();
+            updateTotals(unsortedCouponList[defaultCouponIndex]);
         }
 
         public void openRefund(object sender, EventArgs e)

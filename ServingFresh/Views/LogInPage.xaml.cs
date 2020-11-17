@@ -13,6 +13,7 @@ using System.Windows.Input;
 using Xamarin.Essentials;
 using ServingFresh.LogIn.Apple;
 using ServingFresh.Notifications;
+using System.Diagnostics;
 
 namespace ServingFresh.Views
 {
@@ -453,7 +454,15 @@ namespace ServingFresh.Views
 
             if (e.IsAuthenticated)
             {
-                GoogleUserProfileAsync(e.Account.Properties["access_token"], e.Account.Properties["refresh_token"], e);
+                try
+                {
+                    GoogleUserProfileAsync(e.Account.Properties["access_token"], e.Account.Properties["refresh_token"], e);
+                }
+                catch(Exception g)
+                {
+                    Debug.WriteLine(g.Message);
+                }
+                
             }
             else
             {
@@ -463,117 +472,133 @@ namespace ServingFresh.Views
 
         public async void GoogleUserProfileAsync(string accessToken, string refreshToken, AuthenticatorCompletedEventArgs e)
         {
-            var client = new HttpClient();
-            var socialLogInPost = new SocialLogInPost();
-
-            var request = new OAuth2Request("GET", new Uri(Constant.GoogleUserInfoUrl), null, e.Account);
-            var GoogleResponse = await request.GetResponseAsync();
-            var userData = GoogleResponse.GetResponseText();
-
-            System.Diagnostics.Debug.WriteLine(userData);
-            GoogleResponse googleData = JsonConvert.DeserializeObject<GoogleResponse>(userData);
-
-            socialLogInPost.email = googleData.email;
-            socialLogInPost.password = "";
-            socialLogInPost.social_id = googleData.id;
-            socialLogInPost.signup_platform = "GOOGLE";
-
-            var socialLogInPostSerialized = JsonConvert.SerializeObject(socialLogInPost);
-            var postContent = new StringContent(socialLogInPostSerialized, Encoding.UTF8, "application/json");
-
-            System.Diagnostics.Debug.WriteLine(socialLogInPostSerialized);
-
-            var RDSResponse = await client.PostAsync(Constant.LogInUrl, postContent);
-            var responseContent = await RDSResponse.Content.ReadAsStringAsync();
-
-            System.Diagnostics.Debug.WriteLine(responseContent);
-            System.Diagnostics.Debug.WriteLine(RDSResponse.IsSuccessStatusCode);
-
-            if (RDSResponse.IsSuccessStatusCode)
+            try
             {
-                if (responseContent != null)
+                var client = new HttpClient();
+                var socialLogInPost = new SocialLogInPost();
+
+                var request = new OAuth2Request("GET", new Uri(Constant.GoogleUserInfoUrl), null, e.Account);
+                var GoogleResponse = await request.GetResponseAsync();
+                var userData = GoogleResponse.GetResponseText();
+
+                System.Diagnostics.Debug.WriteLine(userData);
+                GoogleResponse googleData = JsonConvert.DeserializeObject<GoogleResponse>(userData);
+
+                socialLogInPost.email = googleData.email;
+                socialLogInPost.password = "";
+                socialLogInPost.social_id = googleData.id;
+                socialLogInPost.signup_platform = "GOOGLE";
+
+                var socialLogInPostSerialized = JsonConvert.SerializeObject(socialLogInPost);
+                var postContent = new StringContent(socialLogInPostSerialized, Encoding.UTF8, "application/json");
+
+                System.Diagnostics.Debug.WriteLine(socialLogInPostSerialized);
+
+                var RDSResponse = await client.PostAsync(Constant.LogInUrl, postContent);
+                var responseContent = await RDSResponse.Content.ReadAsStringAsync();
+
+                System.Diagnostics.Debug.WriteLine(responseContent);
+                System.Diagnostics.Debug.WriteLine(RDSResponse.IsSuccessStatusCode);
+
+                if (RDSResponse.IsSuccessStatusCode)
                 {
-                    if (responseContent.Contains(Constant.EmailNotFound))
+                    if (responseContent != null)
                     {
-                        var signUp = await DisplayAlert("Message", "It looks like you don't have a Serving Fresh account. Please sign up!", "OK", "Cancel");
-                        if (signUp)
+                        if (responseContent.Contains(Constant.EmailNotFound))
                         {
-                            Application.Current.MainPage = new SocialSignUp(googleData.id, googleData.given_name, googleData.family_name, googleData.email, accessToken, refreshToken, "GOOGLE");
-                        }
-                    }
-                    if (responseContent.Contains(Constant.AutheticatedSuccesful))
-                    {
-                        var data = JsonConvert.DeserializeObject<SuccessfulSocialLogIn>(responseContent);
-                        Application.Current.Properties["user_id"] = data.result[0].customer_uid;
-
-                        UpdateTokensPost updateTokesPost = new UpdateTokensPost();
-                        updateTokesPost.uid = data.result[0].customer_uid;
-                        updateTokesPost.mobile_access_token = accessToken;
-                        updateTokesPost.mobile_refresh_token = refreshToken;
-
-                        var updateTokesPostSerializedObject = JsonConvert.SerializeObject(updateTokesPost);
-                        var updateTokesContent = new StringContent(updateTokesPostSerializedObject, Encoding.UTF8, "application/json");
-                        var updateTokesResponse = await client.PostAsync(Constant.UpdateTokensUrl, updateTokesContent);
-                        var updateTokenResponseContent = await updateTokesResponse.Content.ReadAsStringAsync();
-                        System.Diagnostics.Debug.WriteLine(updateTokenResponseContent);
-
-                        if (updateTokesResponse.IsSuccessStatusCode)
-                        {
-                            var GoogleRequest = new RequestUserInfo();
-                            GoogleRequest.uid = data.result[0].customer_uid;
-
-                            var requestSelializedObject = JsonConvert.SerializeObject(GoogleRequest);
-                            var requestContent = new StringContent(requestSelializedObject, Encoding.UTF8, "application/json");
-
-                            var clientRequest = await client.PostAsync(Constant.GetUserInfoUrl, requestContent);
-
-                            if (clientRequest.IsSuccessStatusCode)
+                            var signUp = await DisplayAlert("Message", "It looks like you don't have a Serving Fresh account. Please sign up!", "OK", "Cancel");
+                            if (signUp)
                             {
-                                var SFUser = await clientRequest.Content.ReadAsStringAsync();
-                                var GoogleUserData = JsonConvert.DeserializeObject<UserInfo>(SFUser);
+                                Application.Current.MainPage = new SocialSignUp(googleData.id, googleData.given_name, googleData.family_name, googleData.email, accessToken, refreshToken, "GOOGLE");
+                            }
+                        }
+                        if (responseContent.Contains(Constant.AutheticatedSuccesful))
+                        {
+                            try
+                            {
 
-                                DateTime today = DateTime.Now;
-                                DateTime expDate = today.AddDays(Constant.days);
 
+                                var data = JsonConvert.DeserializeObject<SuccessfulSocialLogIn>(responseContent);
                                 Application.Current.Properties["user_id"] = data.result[0].customer_uid;
-                                Application.Current.Properties["time_stamp"] = expDate;
-                                Application.Current.Properties["platform"] = "GOOGLE";
-                                Application.Current.Properties["user_email"] = GoogleUserData.result[0].customer_email;
-                                Application.Current.Properties["user_first_name"] = GoogleUserData.result[0].customer_first_name;
-                                Application.Current.Properties["user_last_name"] = GoogleUserData.result[0].customer_last_name;
-                                Application.Current.Properties["user_phone_num"] = GoogleUserData.result[0].customer_phone_num;
-                                Application.Current.Properties["user_address"] = GoogleUserData.result[0].customer_address;
-                                Application.Current.Properties["user_unit"] = GoogleUserData.result[0].customer_unit;
-                                Application.Current.Properties["user_city"] = GoogleUserData.result[0].customer_city;
-                                Application.Current.Properties["user_state"] = GoogleUserData.result[0].customer_state;
-                                Application.Current.Properties["user_zip_code"] = GoogleUserData.result[0].customer_zip;
-                                Application.Current.Properties["user_latitude"] = GoogleUserData.result[0].customer_lat;
-                                Application.Current.Properties["user_longitude"] = GoogleUserData.result[0].customer_long;
 
-                                _ = Application.Current.SavePropertiesAsync();
-                                Application.Current.MainPage = new SelectionPage();
+                                UpdateTokensPost updateTokesPost = new UpdateTokensPost();
+                                updateTokesPost.uid = data.result[0].customer_uid;
+                                updateTokesPost.mobile_access_token = accessToken;
+                                updateTokesPost.mobile_refresh_token = refreshToken;
+
+                                var updateTokesPostSerializedObject = JsonConvert.SerializeObject(updateTokesPost);
+                                var updateTokesContent = new StringContent(updateTokesPostSerializedObject, Encoding.UTF8, "application/json");
+                                var updateTokesResponse = await client.PostAsync(Constant.UpdateTokensUrl, updateTokesContent);
+                                var updateTokenResponseContent = await updateTokesResponse.Content.ReadAsStringAsync();
+                                System.Diagnostics.Debug.WriteLine(updateTokenResponseContent);
+
+                                if (updateTokesResponse.IsSuccessStatusCode)
+                                {
+                                    var GoogleRequest = new RequestUserInfo();
+                                    GoogleRequest.uid = data.result[0].customer_uid;
+
+                                    var requestSelializedObject = JsonConvert.SerializeObject(GoogleRequest);
+                                    var requestContent = new StringContent(requestSelializedObject, Encoding.UTF8, "application/json");
+
+                                    var clientRequest = await client.PostAsync(Constant.GetUserInfoUrl, requestContent);
+
+                                    if (clientRequest.IsSuccessStatusCode)
+                                    {
+                                        var SFUser = await clientRequest.Content.ReadAsStringAsync();
+                                        var GoogleUserData = JsonConvert.DeserializeObject<UserInfo>(SFUser);
+
+                                        DateTime today = DateTime.Now;
+                                        DateTime expDate = today.AddDays(Constant.days);
+
+                                        Application.Current.Properties["user_id"] = data.result[0].customer_uid;
+                                        Application.Current.Properties["time_stamp"] = expDate;
+                                        Application.Current.Properties["platform"] = "GOOGLE";
+                                        Application.Current.Properties["user_email"] = GoogleUserData.result[0].customer_email;
+                                        Application.Current.Properties["user_first_name"] = GoogleUserData.result[0].customer_first_name;
+                                        Application.Current.Properties["user_last_name"] = GoogleUserData.result[0].customer_last_name;
+                                        Application.Current.Properties["user_phone_num"] = GoogleUserData.result[0].customer_phone_num;
+                                        Application.Current.Properties["user_address"] = GoogleUserData.result[0].customer_address;
+                                        Application.Current.Properties["user_unit"] = GoogleUserData.result[0].customer_unit;
+                                        Application.Current.Properties["user_city"] = GoogleUserData.result[0].customer_city;
+                                        Application.Current.Properties["user_state"] = GoogleUserData.result[0].customer_state;
+                                        Application.Current.Properties["user_zip_code"] = GoogleUserData.result[0].customer_zip;
+                                        Application.Current.Properties["user_latitude"] = GoogleUserData.result[0].customer_lat;
+                                        Application.Current.Properties["user_longitude"] = GoogleUserData.result[0].customer_long;
+
+                                        _ = Application.Current.SavePropertiesAsync();
+                                        Application.Current.MainPage = new SelectionPage();
+                                    }
+                                    else
+                                    {
+                                        await DisplayAlert("Alert!", "Our internal system was not able to retrieve your user information. We are working to solve this issue.", "OK");
+                                    }
+                                }
+                                else
+                                {
+                                    await DisplayAlert("Oops", "We are facing some problems with our internal system. We weren't able to update your credentials", "OK");
+                                }
                             }
-                            else
+                            catch (Exception second)
                             {
-                                await DisplayAlert("Alert!", "Our internal system was not able to retrieve your user information. We are working to solve this issue.", "OK");
+                                Debug.WriteLine(second.Message);
                             }
                         }
-                        else
+                        if (responseContent.Contains(Constant.ErrorPlatform))
                         {
-                            await DisplayAlert("Oops", "We are facing some problems with our internal system. We weren't able to update your credentials", "OK");
+                            var RDSCode = JsonConvert.DeserializeObject<RDSLogInMessage>(responseContent);
+                            await DisplayAlert("Message", RDSCode.message, "OK");
                         }
-                    }
-                    if (responseContent.Contains(Constant.ErrorPlatform))
-                    {
-                        var RDSCode = JsonConvert.DeserializeObject<RDSLogInMessage>(responseContent);
-                        await DisplayAlert("Message", RDSCode.message, "OK");
-                    }
 
-                    if (responseContent.Contains(Constant.ErrorUserDirectLogIn))
-                    {
-                        await DisplayAlert("Oops!", "You have an existing Serving Fresh account. Please use direct login", "OK");
+                        if (responseContent.Contains(Constant.ErrorUserDirectLogIn))
+                        {
+                            await DisplayAlert("Oops!", "You have an existing Serving Fresh account. Please use direct login", "OK");
+                        }
                     }
                 }
+            }
+            catch (Exception first)
+            {
+                Debug.WriteLine(first.Message);
             }
         }
 

@@ -180,12 +180,12 @@
                                     <DataTemplate>
                                         <Frame Padding="3,0,3,0" HasShadow="False" CornerRadius="0">
                                             <StackLayout WidthRequest="250">
-                                                <Image Source="{Binding image}">
+                                                <Image Source="{Binding image}" ClassId="{Binding index}">
                                                     <Image.Effects>
                                                         <servingfresh:TintImageEffect TintColor="Black"/>
                                                     </Image.Effects>
                                                     <Image.GestureRecognizers>
-                                                            <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"  />
+                                                            <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"/>
                                                     </Image.GestureRecognizers>
                                                 </Image>
                                                 <Label Text="{Binding couponNote}" StyleClass="h2, black" Margin="50,-150,0,0"></Label>
