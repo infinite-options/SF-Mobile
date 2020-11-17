@@ -173,59 +173,27 @@
                                 </CollectionView.ItemTemplate>
                             </CollectionView>
                         </Grid>
-                        <Label Text="Choose one of the eligible promos to apply" StyleClass="black" Margin="15"/>
-                        <ScrollView Orientation="Horizontal" Padding="0" Margin="0">
-                            <StackLayout Orientation="Horizontal" Spacing="20" Padding="0" Margin="0">
-                                <Grid>
-                                    <Image Source="CouponIcon" StyleClass="coupon">
-                                        <Image.Effects>
-                                            <servingfresh:TintImageEffect TintColor="#FF8500"/>
-                                        </Image.Effects>
-                                    </Image>
-                                    <Label Text="10% off" VerticalOptions="Center" StyleClass="h2, black" Margin="50, 0"/>
-                                    <Label Text="&#10;&#10;&#10;orders above $60" VerticalOptions="Center" StyleClass="black" Margin="50, 0" FontSize="10"/>
-                                </Grid>
-                                <Grid>
-                                    <Image Source="CouponIcon" StyleClass="coupon">
-                                        <Image.Effects>
-                                            <servingfresh:TintImageEffect TintColor="LightGray"/>
-                                        </Image.Effects>
-                                    </Image>
-                                    <Label Text="15% off" VerticalOptions="Center" StyleClass="h2" Margin="50, 0"/>
-                                    <Label Text="&#10;&#10;&#10;orders above $75" VerticalOptions="Center" StyleClass="black" Margin="50, 0" FontSize="10"/>
-                                </Grid>
-                                <Grid>
-                                    <Image Source="CouponIcon" StyleClass="coupon">
-                                        <Image.Effects>
-                                            <servingfresh:TintImageEffect TintColor="LightGray"/>
-                                        </Image.Effects>
-                                    </Image>
-                                    <Label Text="Free&#10;delivery" VerticalOptions="Center" StyleClass="h2" Margin="50, 0"/>
-                                    <Label Text="&#10;&#10;&#10;&#10;&#10;orders above $50" VerticalOptions="Center" StyleClass="black" Margin="50, 0" FontSize="10"/>
-                                </Grid>
-                            </StackLayout>
-
-
-                  
-                      <!--<CollectionView x:Name="coupons_list" ItemsLayout="HorizontalList">
-                          <CollectionView.ItemTemplate>
-                              <DataTemplate>
-                                  <StackLayout Orientation="Horizontal" Spacing="20" Padding="0" Margin="0">
-                                <Grid>
-                                    <Image Source="{Binding image}" StyleClass="coupon">
-                                        <Image.Effects>
-                                            <servingfresh:TintImageEffect TintColor="#FF8500"/>
-                                        </Image.Effects>
-                                    </Image>
-                                    <Label Text="10% off" VerticalOptions="Center" StyleClass="h2, black" Margin="50, 0"/>
-                                    <Label Text="&#10;&#10;&#10;orders above $60" VerticalOptions="Center" StyleClass="black" Margin="50, 0" FontSize="10"/>
-                                </Grid>
-                                      </StackLayout>
-                              </DataTemplate>
-                          </CollectionView.ItemTemplate>
-                      </CollectionView>-->
-                  
-
+                        <Label Text="Choose one of the eligible promos to apply" StyleClass="black" Padding="15,0,15,0"/>
+                        <ScrollView Orientation="Horizontal" HeightRequest="250" Padding="0">
+                            <CollectionView x:Name="coupon_list" ItemsLayout="HorizontalList">
+                                <CollectionView.ItemTemplate >
+                                    <DataTemplate>
+                                        <Frame Padding="3,0,3,0" HasShadow="False" CornerRadius="0">
+                                            <StackLayout WidthRequest="250">
+                                                <Image Source="{Binding image}">
+                                                    <Image.Effects>
+                                                        <servingfresh:TintImageEffect TintColor="Black"/>
+                                                    </Image.Effects>
+                                                    <Image.GestureRecognizers>
+                                                            <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"  />
+                                                    </Image.GestureRecognizers>
+                                                </Image>
+                                                <Label Text="{Binding couponNote}" StyleClass="h2, black" Margin="50,-150,0,0"></Label>
+                                            </StackLayout>                                                                                     
+                                        </Frame>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
                         </ScrollView>
                         <BoxView StyleClass="spacer"/>
                         <FlexLayout JustifyContent="SpaceBetween" Padding="0,10,0,10">

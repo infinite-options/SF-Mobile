@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Net.Http;
 using Newtonsoft.Json;
 using Xamarin.Essentials;
+using System.Diagnostics;
 
 namespace ServingFresh.Views
 {
@@ -338,30 +339,38 @@ namespace ServingFresh.Views
 
         void Change_Color(Object sender, EventArgs e)
         {
-            var imgbtn = (ImageButton)sender;
-            var sl = (StackLayout)imgbtn.Parent;
-            var l = (Label)sl.Children[1];
-            var type = "";
-            if (l.Text == "Fruits") type = "fruit";
-            else if (l.Text == "Vegetables") type = "vegetable";
-            else if (l.Text == "Desserts") type = "dessert";
-            else if (l.Text == "Other") type = "other";
-            var tint = (TintImageEffect)imgbtn.Effects[0];
-            if (tint.TintColor == Constants.PrimaryColor)
+            try
             {
-                tint.TintColor = Constants.SecondaryColor;
-                types.Add(type);
+                var imgbtn = (ImageButton)sender;
+                var sl = (StackLayout)imgbtn.Parent;
+                var l = (Label)sl.Children[1];
+                var type = "";
+                if (l.Text == "Fruits") type = "fruit";
+                else if (l.Text == "Vegetables") type = "vegetable";
+                else if (l.Text == "Desserts") type = "dessert";
+                else if (l.Text == "Other") type = "other";
+                var tint = (TintImageEffect)imgbtn.Effects[0];
+                if (tint.TintColor == Constants.PrimaryColor)
+                {
+                    tint.TintColor = Constants.SecondaryColor;
+                    types.Add(type);
+                }
+                else if (tint.TintColor == Constants.SecondaryColor)
+                {
+                    tint.TintColor = Constants.PrimaryColor;
+                    types.Remove(type);
+                }
+                imgbtn.Effects.Clear();
+                imgbtn.Effects.Add(tint);
+                ResetFarmersMarkets();
+                ResetFarms();
+                ResetDays();
             }
-            else if (tint.TintColor == Constants.SecondaryColor)
+            catch (Exception ex)
             {
-                tint.TintColor = Constants.PrimaryColor;
-                types.Remove(type);
+                Debug.WriteLine(ex.Message);
             }
-            imgbtn.Effects.Clear();
-            imgbtn.Effects.Add(tint);
-            ResetFarmersMarkets();
-            ResetFarms();
-            ResetDays();
+           
         }
 
         void Update_Item_Types()

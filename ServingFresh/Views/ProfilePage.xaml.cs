@@ -86,6 +86,9 @@ namespace ServingFresh.Views
 
         public void RemoveAppProperties()
         {
+            // Application properties would only be removed up on unstalling the app
+            // It is advace to user essentials preperance instead...
+            // This is why you still are able to see the time stamp and user id...
             Application.Current.Properties.Remove("user_id");
             Application.Current.Properties.Remove("time_stamp");
             Application.Current.Properties.Remove("platform");
@@ -101,6 +104,7 @@ namespace ServingFresh.Views
             Application.Current.Properties.Remove("user_latitude");
             Application.Current.Properties.Remove("user_longitude");
             Application.Current.Properties.Remove("user_delivery_instructions");
+            
         }
     }
 }

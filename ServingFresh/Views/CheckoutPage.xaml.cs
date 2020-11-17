@@ -16,6 +16,7 @@ using System.Diagnostics;
 using static ServingFresh.Views.ItemsPage;
 using Application = Xamarin.Forms.Application;
 using Stripe;
+using ServingFresh.Effects;
 
 namespace ServingFresh.Views
 {
@@ -88,6 +89,7 @@ namespace ServingFresh.Views
         public class couponImage
         {
             public string image { get; set; }
+            public string couponNote { get; set; }
         }
 
         public PurchaseDataObject purchaseObject;
@@ -185,15 +187,40 @@ namespace ServingFresh.Views
             {
                 var result = await RDSResponse.Content.ReadAsStringAsync();
                 var data = JsonConvert.DeserializeObject<CouponResponse>(result);
-
+                couponsList.Clear();
                 Debug.WriteLine(result);
-                //foreach (Models.Coupon c in data.result)
-                //{
-                //    var ima = new couponImage();
-                //    ima.image = "CouponIcon.png";
-                //    couponsList.Add(ima);
-                //}
-                //coupons_list.ItemsSource = couponsList;
+                foreach (Models.Coupon c in data.result)
+                {
+                    var coupons = new couponImage();
+                    coupons.image = "CouponIcon.png";
+                    coupons.couponNote = c.notes;
+                    couponsList.Add(coupons);
+                    
+                }
+                coupon_list.ItemsSource = couponsList;
+            }
+        }
+
+        void TapGestureRecognizer_Tapped(System.Object sender, System.EventArgs e)
+        {
+            if (sender is Image imgbtn)
+            {
+                if(imgbtn.Effects.Count != 0)
+                {
+                    if (imgbtn.Effects[0] is TintImageEffect tint)
+                    {
+                        imgbtn.Effects.RemoveAt(0);
+                        if (tint.TintColor.Equals(Color.Black))
+                        {
+                            tint.TintColor = Constants.SecondaryColor;
+                        }
+                        else
+                        {
+                            tint.TintColor = Color.Black;
+                        }
+                        imgbtn.Effects.Insert(0, tint);
+                    }
+                }
             }
         }
 
