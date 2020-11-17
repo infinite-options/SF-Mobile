@@ -86,7 +86,7 @@ namespace ServingFresh.Views
     }
     public partial class CheckoutPage : ContentPage
     {
-        public class couponImage
+        public class couponItem
         {
             public string image { get; set; }
             public string couponNote { get; set; }
@@ -95,7 +95,7 @@ namespace ServingFresh.Views
 
         public PurchaseDataObject purchaseObject;
         public static ObservableCollection<ItemObject> cartItems = new ObservableCollection<ItemObject>();
-        public static ObservableCollection<couponImage> couponsList = new ObservableCollection<couponImage>();
+        public static ObservableCollection<couponItem> couponsList = new ObservableCollection<couponItem>();
         public double subtotal;
         public double discount;
         public double delivery_fee;
@@ -108,10 +108,11 @@ namespace ServingFresh.Views
         private string longitude = "0";
 
         // Coupons Lists
+        private CouponResponse couponData = null;
         // Coupon types: percent, amount, and fee.
-        private List<double> percents = new List<double>();
-        private List<double> amounts = new List<double>();
-        private List<double> fees = new List<double>();
+        // private List<double> percents = new List<double>();
+        // private List<double> amounts = new List<double>();
+        // private List<double> fees = new List<double>();
 
         // Coupon original order
         private List<double> unsortedCouponList = new List<double>();
@@ -198,23 +199,23 @@ namespace ServingFresh.Views
             if (RDSResponse.IsSuccessStatusCode)
             {
                 var result = await RDSResponse.Content.ReadAsStringAsync();
-                var data = JsonConvert.DeserializeObject<CouponResponse>(result);
+                couponData = JsonConvert.DeserializeObject<CouponResponse>(result);
                 couponsList.Clear();
                 unsortedCouponList.Clear();
                 sortedCouponList.Clear();
                 Debug.WriteLine(result);
 
                 double currentSubtotal = GetSubTotal();
-                double currentDeliveryFee = GetDeliveryFee();
                 int placement = 0;
-                foreach (Models.Coupon c in data.result)
+                foreach (Models.Coupon c in couponData.result)
                 {
                     double percentDiscount = 0;
                     double amountDiscount = 0;
                     double deliveryFeeDiscount = 0;
                     double maxPercentAmount = 0;
                     double maxDiscount = 0;
-                    var coupons = new couponImage();
+
+                    var coupons = new couponItem();
                     coupons.image = "CouponIcon.png";
                     coupons.couponNote = c.notes;
                     coupons.index = placement.ToString();
@@ -284,7 +285,6 @@ namespace ServingFresh.Views
                         }
                         imgbtn.Effects.Insert(0, tint);
                     }
-                    
                 }
             }            
         }
@@ -541,17 +541,78 @@ namespace ServingFresh.Views
             Label l = (Label)sender;
             TapGestureRecognizer tgr = (TapGestureRecognizer)l.GestureRecognizers[0];
             ItemObject item = (ItemObject)tgr.CommandParameter;
-            if (item != null) item.increase_qty();
-            // Recall calculate GetNewCouponIndex(subtotal,fee)
-            updateTotals(unsortedCouponList[defaultCouponIndex]);
+            if (item != null)
+            {
+                item.increase_qty();
+                GetNewDefaltCoupon();
+            }
         }
+
         public void decrease_qty(object sender, EventArgs e)
         {
             Label l = (Label)sender;
             TapGestureRecognizer tgr = (TapGestureRecognizer)l.GestureRecognizers[0];
             ItemObject item = (ItemObject)tgr.CommandParameter;
-            if (item != null) item.decrease_qty();
-            //
+            if (item != null)
+            {
+                item.decrease_qty();
+                GetNewDefaltCoupon();
+            }
+        }
+
+        public void GetNewDefaltCoupon()
+        {
+            unsortedCouponList.Clear();
+            sortedCouponList.Clear();
+            double currentSubtotal = GetSubTotal();
+            int placement = 0;
+            foreach (Models.Coupon c in couponData.result)
+            {
+                double percentDiscount = 0;
+                double amountDiscount = 0;
+                double deliveryFeeDiscount = 0;
+                double maxPercentAmount = 0;
+                double maxDiscount = 0;
+
+                percentDiscount = currentSubtotal * (c.discount_percent / 100);
+                amountDiscount = c.discount_amount;
+                deliveryFeeDiscount = c.discount_shipping;
+
+                maxPercentAmount = Math.Max(percentDiscount, amountDiscount);
+                maxDiscount = Math.Max(maxPercentAmount, deliveryFeeDiscount);
+
+                Debug.WriteLine("You save: " + maxDiscount);
+                unsortedCouponList.Add(maxDiscount);
+                sortedCouponList.Add(maxDiscount);
+                placement++;
+            }
+
+            sortedCouponList.Sort();
+
+            Debug.Write("Unsorted List: ");
+            foreach (double i in unsortedCouponList)
+            {
+                Debug.Write(i + ", ");
+            }
+            Debug.WriteLine("");
+            Debug.Write("Sorted List: ");
+            foreach (double i in sortedCouponList)
+            {
+                Debug.Write(i + ", ");
+            }
+            Debug.WriteLine("");
+
+            Debug.WriteLine("");
+            for (int i = 0; i < unsortedCouponList.Count; i++)
+            {
+                if (sortedCouponList[sortedCouponList.Count - 1] == unsortedCouponList[i])
+                {
+                    defaultCouponIndex = i;
+                    break;
+                }
+            }
+
+            Debug.WriteLine("This is the coupon index that will save you the most money: " + defaultCouponIndex);
             updateTotals(unsortedCouponList[defaultCouponIndex]);
         }
         public void openHistory(object sender, EventArgs e)
