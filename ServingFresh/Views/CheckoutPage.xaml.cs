@@ -86,11 +86,22 @@ namespace ServingFresh.Views
     }
     public partial class CheckoutPage : ContentPage
     {
-        public class couponItem
+        public class couponItem : INotifyPropertyChanged
         {
+            public event PropertyChangedEventHandler PropertyChanged = delegate { };
             public string image { get; set; }
             public string couponNote { get; set; }
             public string index { get; set; }
+
+            public void update()
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs("image"));
+            }
+        }
+
+        public class CouponObject
+        {
+            public string coupon_uid { get; set; }
         }
 
         public PurchaseDataObject purchaseObject;
@@ -115,9 +126,12 @@ namespace ServingFresh.Views
         // private List<double> fees = new List<double>();
 
         // Coupon original order
-        private List<double> unsortedCouponList = new List<double>();
-        private List<double> sortedCouponList = new List<double>();
+        private List<double> unsortedNewTotals = new List<double>();
+        private List<double> unsortedDiscounts = new List<double>();
+        private List<double> sortedDiscounts = new List<double>();
         private int defaultCouponIndex = 0;
+        double savings = 0;
+        //private bool isDiscountGreaterSubTotal = false;
 
 
         public CheckoutPage(IDictionary<string, ItemPurchased> order = null, string day = "")
@@ -194,102 +208,188 @@ namespace ServingFresh.Views
         public async void GetAvailiableCoupons()
         {
             var client = new HttpClient();
-            var email = "xyz@gmail.com";
+            var email = (string)Application.Current.Properties["user_email"];
             var RDSResponse = await client.GetAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/available_Coupons/" + email);
             if (RDSResponse.IsSuccessStatusCode)
             {
                 var result = await RDSResponse.Content.ReadAsStringAsync();
                 couponData = JsonConvert.DeserializeObject<CouponResponse>(result);
+
                 couponsList.Clear();
-                unsortedCouponList.Clear();
-                sortedCouponList.Clear();
+                unsortedNewTotals.Clear();
+                unsortedDiscounts.Clear();
+                sortedDiscounts.Clear();
                 Debug.WriteLine(result);
 
-                double currentSubtotal = GetSubTotal();
+                
+                double initialSubTotal = GetSubTotal();
+                double initialDeliveryFee = GetDeliveryFee();
+                double initialServiceFee = GetServiceFee();
+                double initialTaxes = GetTaxes();
+                double initialTotal = initialSubTotal + initialDeliveryFee + initialServiceFee + initialTaxes;
                 int placement = 0;
+
+
+                
                 foreach (Models.Coupon c in couponData.result)
                 {
-                    double percentDiscount = 0;
-                    double amountDiscount = 0;
-                    double deliveryFeeDiscount = 0;
-                    double maxPercentAmount = 0;
-                    double maxDiscount = 0;
+                    
+                    double discount = 0;
+                    double newTotal = 0;
 
                     var coupons = new couponItem();
+                    
                     coupons.image = "CouponIcon.png";
                     coupons.couponNote = c.notes;
                     coupons.index = placement.ToString();
                     couponsList.Add(coupons);
 
-                    percentDiscount = currentSubtotal * (c.discount_percent / 100);
-                    amountDiscount = c.discount_amount;
-                    deliveryFeeDiscount = c.discount_shipping;
+                //if(c.threshold > initialSubTotal)
+                //{
+                    if(initialSubTotal > c.discount_amount)
+                    {
+                        // Apply full coupon: % discount, $ discount, $ shipping
+                        if(c.discount_amount == 0 && c.discount_amount == 0)
+                        {
+                            discount = 0;
+                        }
+                        else
+                        {
+                            discount = (initialSubTotal - c.discount_amount) * (1.0 - (c.discount_percent / 100.0));
+                        }
 
-                    maxPercentAmount = Math.Max(percentDiscount, amountDiscount);
-                    maxDiscount = Math.Max(maxPercentAmount, deliveryFeeDiscount);
+                        if(initialSubTotal > discount)
+                        {
+                            newTotal = initialSubTotal - discount + initialServiceFee + (initialDeliveryFee - c.discount_shipping) + initialTaxes;
+                            unsortedNewTotals.Add(newTotal);
+                            unsortedDiscounts.Add(discount);
+                            sortedDiscounts.Add(discount);
+                        }
+                        else
+                        {
+                            discount = initialSubTotal;
+                            newTotal = initialSubTotal - discount + initialServiceFee + (initialDeliveryFee - c.discount_shipping) + initialTaxes;
+                            unsortedNewTotals.Add(newTotal);
+                            unsortedDiscounts.Add(discount);
+                            sortedDiscounts.Add(discount);
 
-                    Debug.WriteLine("You save: " + maxDiscount);
-                    unsortedCouponList.Add(maxDiscount);
-                    sortedCouponList.Add(maxDiscount);
+                        }
+                    }
+                    else
+                    {
+                        // Partly apply coupon: % discount and $ shipping
+                        discount = (initialSubTotal - 0) * (1.0 - (c.discount_percent / 100.0));
+                        if (c.discount_amount == 0)
+                        {
+                            discount = 0;
+                        }
+                        else
+                        {
+                            discount = discount = (initialSubTotal - 0) * (1.0 - (c.discount_percent / 100.0));
+                        }
+                        if (initialSubTotal > discount)
+                        {
+                            newTotal = initialSubTotal - discount + initialServiceFee + (initialDeliveryFee - c.discount_shipping) + initialTaxes;
+                            unsortedNewTotals.Add(newTotal);
+                            unsortedDiscounts.Add(discount);
+                            sortedDiscounts.Add(discount);
+                        }
+                        else
+                        {
+                            discount = initialSubTotal;
+                            newTotal = initialSubTotal - discount + initialServiceFee + (initialDeliveryFee - c.discount_shipping) + initialTaxes;
+                            unsortedNewTotals.Add(newTotal);
+                            unsortedDiscounts.Add(discount);
+                            sortedDiscounts.Add(discount);
+                        }
+                    }
+
+                    //}
+                    //else // You are not eligible for this coupon. Thus you save $0.
+                    //{
                     placement++;
                 }
 
-                sortedCouponList.Sort();
-
-                Debug.Write("Unsorted List: ");
-                foreach(double i in unsortedCouponList)
+                sortedDiscounts.Sort();
+                int j = 0;
+                foreach (couponItem c in couponsList)
                 {
-                    Debug.Write(i + ", ");
+                    double newTotal = unsortedNewTotals[j];
+                    savings = initialTotal - newTotal;
+                    c.couponNote += "\nYou are saving: $" + unsortedDiscounts[j];
+                    j++;
+                }
+                Debug.Write("Unsorted List of New Totals: ");
+                foreach (double newTotalValue in unsortedNewTotals)
+                {
+                    Debug.Write(newTotalValue + ", ");
                 }
                 Debug.WriteLine("");
-                Debug.Write("Sorted List: ");
-                foreach (double i in sortedCouponList)
+
+                Debug.Write("Unsorted List of Discounts: ");
+                foreach(double discountValue in unsortedDiscounts)
                 {
-                    Debug.Write(i + ", ");
+                    Debug.Write(discountValue + ", ");
+                }
+                Debug.WriteLine("");
+                Debug.Write("Sorted List of Discounts: ");
+                foreach (double discountValue in sortedDiscounts)
+                {
+                    Debug.Write(discountValue + ", ");
                 }
                 Debug.WriteLine("");
 
                 Debug.WriteLine("");
-                for(int i = 0; i < unsortedCouponList.Count; i++)
+                for(int i = 0; i < unsortedDiscounts.Count; i++)
                 {
-                    if(sortedCouponList[sortedCouponList.Count - 1] == unsortedCouponList[i]){
+                   
+                    if(sortedDiscounts[sortedDiscounts.Count - 1] == unsortedDiscounts[i]){
                         defaultCouponIndex = i;
                         break;
                     }
                 }
 
+
                 Debug.WriteLine("This is the coupon index that will save you the most money: " + defaultCouponIndex);
-                updateTotals(unsortedCouponList[defaultCouponIndex]);
-                coupon_list.ItemsSource = couponsList;
+                //if(unsortedDiscounts[defaultCouponIndex]!= 0)
+                //{
+                    couponsList[defaultCouponIndex].image = "CouponIconOrange.png";
+                    coupon_list.ItemsSource = couponsList;
+                    updateTotals(unsortedDiscounts[defaultCouponIndex], couponData.result[defaultCouponIndex].discount_shipping);
+                //}
+                //else
+                //{
+                //    coupon_list.ItemsSource = couponsList;
+                //    updateTotals(0, 0);
+                //}
+                //couponsList[defaultCouponIndex].image = "CouponIconOrange.png";
+                //coupon_list.ItemsSource = couponsList;
             }
         }
 
         void TapGestureRecognizer_Tapped(System.Object sender, System.EventArgs e)
         {
-            if (sender is Image imgbtn)
+
+
+
+            var element = (StackLayout)sender;
+            var selectedElement = Int32.Parse(element.ClassId);
+            if(selectedElement != defaultCouponIndex)
             {
-                if(imgbtn.Effects.Count != 0)
-                {
-                    if (imgbtn.Effects[0] is TintImageEffect tint)
-                    {
-                        imgbtn.Effects.RemoveAt(0);
-                        if (tint.TintColor.Equals(Color.Black))
-                        {
-                            tint.TintColor = Constants.SecondaryColor;
-                            int couponNum = Int32.Parse(imgbtn.ClassId);
-                            updateTotals(unsortedCouponList[couponNum]);
-                        }
-                        else
-                        {
-                            tint.TintColor = Color.Black;
-                        }
-                        imgbtn.Effects.Insert(0, tint);
-                    }
-                }
-            }            
+                couponsList[defaultCouponIndex].image = "CouponIcon.png";
+                couponsList[defaultCouponIndex].update();
+                couponsList[selectedElement].image = "CouponIconOrange.png";
+                couponsList[selectedElement].update();
+                defaultCouponIndex = selectedElement;
+                updateTotals(unsortedDiscounts[defaultCouponIndex], couponData.result[defaultCouponIndex].discount_shipping);
+            }
+            // if you select the coupon that is already selected do nothing else change... Use the defalt index and run it with this new position
+            Debug.WriteLine("This is the index of the coupon you have selected: " + selectedElement);
+
+            //updateTotals(unsortedDiscounts[couponNum], 0);
         }
 
-        public void updateTotals(double discount)
+        public void updateTotals(double discount, double discount_delivery_fee)
         {
             subtotal = 0.0;
             total_qty = 0;
@@ -302,19 +402,19 @@ namespace ServingFresh.Views
             SubTotal.Text = "$ " + subtotal.ToString("N2");
             //discount = subtotal * .1;
             Discount.Text = "-$ " + discount.ToString("N2");
-            DeliveryFee.Text = "$ " + delivery_fee.ToString("N2");
-            taxes = subtotal * 0.085;
+            DeliveryFee.Text = "$ " + (delivery_fee - discount_delivery_fee).ToString("N2");
+            taxes = subtotal * (0.085 * 0);
             Taxes.Text = "$ " + taxes.ToString("N2");
             if(DriverTip.Text == null)
             {
-                total = subtotal - discount + delivery_fee + taxes + service_fee; 
+                total = subtotal - discount + (delivery_fee - discount_delivery_fee) + taxes + service_fee; 
             }
             else
             {
-                total = subtotal - discount + delivery_fee + taxes + service_fee + Double.Parse(DriverTip.Text);
+                total = subtotal - discount + (delivery_fee - discount_delivery_fee) + taxes + service_fee + Double.Parse(DriverTip.Text);
             }
 
-            GrandTotal.Text = "$ " + total.ToString("N2") ;
+            GrandTotal.Text = "$ " + total.ToString("N2");
 
             CartTotal.Text = total_qty.ToString();
         }
@@ -337,6 +437,21 @@ namespace ServingFresh.Views
         public double GetDeliveryFee()
         {
             return Constant.deliveryFee;
+        }
+
+        public double GetTaxes()
+        {
+            return taxes;
+        }
+
+        public double GetServiceFee()
+        {
+            return Constant.serviceFee;
+        }
+
+        public double GetTotal()
+        {
+            return total;
         }
 
         public void TestDateFormat(object sender, EventArgs e)
@@ -473,12 +588,21 @@ namespace ServingFresh.Views
                     ClearCardInfo();
 
                     var purchaseString = JsonConvert.SerializeObject(purchaseObject);
-                    System.Diagnostics.Debug.WriteLine(purchaseString);
+                    System.Diagnostics.Debug.WriteLine("Purchase: " + purchaseString);
                     var purchaseMessage = new StringContent(purchaseString, Encoding.UTF8, "application/json");
                     var client = new HttpClient();
 
+                    CouponObject coupon = new CouponObject();
+                    coupon.coupon_uid = couponData.result[defaultCouponIndex].coupon_uid;
+
+                    var couponSerialized = JsonConvert.SerializeObject(coupon);
+                    System.Diagnostics.Debug.WriteLine("Coupon to update: " + couponSerialized);
+                    var couponContent = new StringContent(couponSerialized, Encoding.UTF8, "application/json");
+
                     var RDSResponse = await client.PostAsync(Constant.PurchaseUrl, purchaseMessage);
-                    System.Diagnostics.Debug.WriteLine(RDSResponse.IsSuccessStatusCode);
+                    var RDSCouponResponse = await client.PostAsync(Constant.UpdateCouponUrl, couponContent);
+                    Debug.WriteLine("Order was written to DB: " + RDSResponse.IsSuccessStatusCode);
+                    Debug.WriteLine("Coupon was succesfully updated (subtract)" + RDSCouponResponse);
                     if (RDSResponse.IsSuccessStatusCode)
                     {
                         var RDSResponseContent = await RDSResponse.Content.ReadAsStringAsync();
@@ -487,6 +611,10 @@ namespace ServingFresh.Views
                         cartItems.Clear();
                         total = 00.00;
                         total_qty = 0;
+                    }
+                    if(RDSCouponResponse.IsSuccessStatusCode && RDSResponse.IsSuccessStatusCode)
+                    {
+                        await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
                     }
                 }
                 else
@@ -562,58 +690,201 @@ namespace ServingFresh.Views
 
         public void GetNewDefaltCoupon()
         {
-            unsortedCouponList.Clear();
-            sortedCouponList.Clear();
-            double currentSubtotal = GetSubTotal();
+            unsortedNewTotals.Clear();
+            unsortedDiscounts.Clear();
+            sortedDiscounts.Clear();
+            couponsList.Clear();
+
+            double initialSubTotal = GetSubTotal();
+            double initialDeliveryFee = GetDeliveryFee();
+            double initialServiceFee = GetServiceFee();
+            double initialTaxes = GetTaxes();
+            double initialTotal = initialSubTotal + initialDeliveryFee + initialServiceFee + initialTaxes;
             int placement = 0;
+
             foreach (Models.Coupon c in couponData.result)
             {
-                double percentDiscount = 0;
-                double amountDiscount = 0;
-                double deliveryFeeDiscount = 0;
-                double maxPercentAmount = 0;
-                double maxDiscount = 0;
 
-                percentDiscount = currentSubtotal * (c.discount_percent / 100);
-                amountDiscount = c.discount_amount;
-                deliveryFeeDiscount = c.discount_shipping;
+                double discount = 0;
+                double newTotal = 0;
 
-                maxPercentAmount = Math.Max(percentDiscount, amountDiscount);
-                maxDiscount = Math.Max(maxPercentAmount, deliveryFeeDiscount);
+                var coupons = new couponItem();
 
-                Debug.WriteLine("You save: " + maxDiscount);
-                unsortedCouponList.Add(maxDiscount);
-                sortedCouponList.Add(maxDiscount);
+                coupons.image = "CouponIcon.png";
+                coupons.couponNote = c.notes;
+                coupons.index = placement.ToString();
+                couponsList.Add(coupons);
+
+                //if(c.threshold > initialSubTotal)
+                //{
+                if (initialSubTotal > c.discount_amount)
+                {
+                    // Apply full coupon: % discount, $ discount, $ shipping
+                    if (c.discount_amount == 0 && c.discount_amount == 0)
+                    {
+                        discount = 0;
+                    }
+                    else
+                    {
+                        discount = (initialSubTotal - c.discount_amount) * (1.0 - (c.discount_percent / 100.0));
+                    }
+
+                    if (initialSubTotal > discount)
+                    {
+                        newTotal = initialSubTotal - discount + initialServiceFee + (initialDeliveryFee - c.discount_shipping) + initialTaxes;
+                        unsortedNewTotals.Add(newTotal);
+                        unsortedDiscounts.Add(discount);
+                        sortedDiscounts.Add(discount);
+                    }
+                    else
+                    {
+                        discount = initialSubTotal;
+                        newTotal = initialSubTotal - discount + initialServiceFee + (initialDeliveryFee - c.discount_shipping) + initialTaxes;
+                        unsortedNewTotals.Add(newTotal);
+                        unsortedDiscounts.Add(discount);
+                        sortedDiscounts.Add(discount);
+
+                    }
+                }
+                else
+                {
+                    // Partly apply coupon: % discount and $ shipping
+                    discount = (initialSubTotal - 0) * (1.0 - (c.discount_percent / 100.0));
+                    if (c.discount_amount == 0)
+                    {
+                        discount = 0;
+                    }
+                    else
+                    {
+                        discount = discount = (initialSubTotal - 0) * (1.0 - (c.discount_percent / 100.0));
+                    }
+                    if (initialSubTotal > discount)
+                    {
+                        newTotal = initialSubTotal - discount + initialServiceFee + (initialDeliveryFee - c.discount_shipping) + initialTaxes;
+                        unsortedNewTotals.Add(newTotal);
+                        unsortedDiscounts.Add(discount);
+                        sortedDiscounts.Add(discount);
+                    }
+                    else
+                    {
+                        discount = initialSubTotal;
+                        newTotal = initialSubTotal - discount + initialServiceFee + (initialDeliveryFee - c.discount_shipping) + initialTaxes;
+                        unsortedNewTotals.Add(newTotal);
+                        unsortedDiscounts.Add(discount);
+                        sortedDiscounts.Add(discount);
+                    }
+                }
+
+                //}
+                //else // You are not eligible for this coupon. Thus you save $0.
+                //{
                 placement++;
             }
 
-            sortedCouponList.Sort();
-
-            Debug.Write("Unsorted List: ");
-            foreach (double i in unsortedCouponList)
+            sortedDiscounts.Sort();
+            int j = 0;
+            foreach (couponItem c in couponsList)
             {
-                Debug.Write(i + ", ");
+                double newTotal = unsortedNewTotals[j];
+                savings = initialTotal - newTotal;
+                c.couponNote += "\nYou are saving: $" + unsortedDiscounts[j];
+                j++;
+            }
+            Debug.Write("Unsorted List of New Totals: ");
+            foreach (double newTotalValue in unsortedNewTotals)
+            {
+                Debug.Write(newTotalValue + ", ");
             }
             Debug.WriteLine("");
-            Debug.Write("Sorted List: ");
-            foreach (double i in sortedCouponList)
+
+            Debug.Write("Unsorted List of Discounts: ");
+            foreach (double discountValue in unsortedDiscounts)
             {
-                Debug.Write(i + ", ");
+                Debug.Write(discountValue + ", ");
+            }
+            Debug.WriteLine("");
+            Debug.Write("Sorted List of Discounts: ");
+            foreach (double discountValue in sortedDiscounts)
+            {
+                Debug.Write(discountValue + ", ");
             }
             Debug.WriteLine("");
 
             Debug.WriteLine("");
-            for (int i = 0; i < unsortedCouponList.Count; i++)
+            for (int i = 0; i < unsortedDiscounts.Count; i++)
             {
-                if (sortedCouponList[sortedCouponList.Count - 1] == unsortedCouponList[i])
+
+                if (sortedDiscounts[sortedDiscounts.Count - 1] == unsortedDiscounts[i])
                 {
                     defaultCouponIndex = i;
                     break;
                 }
             }
 
+
             Debug.WriteLine("This is the coupon index that will save you the most money: " + defaultCouponIndex);
-            updateTotals(unsortedCouponList[defaultCouponIndex]);
+            //if (unsortedDiscounts[defaultCouponIndex] != 0)
+            //{
+                couponsList[defaultCouponIndex].image = "CouponIconOrange.png";
+                coupon_list.ItemsSource = couponsList;
+                updateTotals(unsortedDiscounts[defaultCouponIndex], couponData.result[defaultCouponIndex].discount_shipping);
+            //}
+            //else
+            //{
+            //    coupon_list.ItemsSource = couponsList;
+            //    updateTotals(0, 0);
+            //}
+
+            //double currentSubtotal = GetSubTotal();
+            //int placement = 0;
+            //foreach (Models.Coupon c in couponData.result)
+            //{
+            //    double percentDiscount = 0;
+            //    double amountDiscount = 0;
+            //    double deliveryFeeDiscount = 0;
+            //    double maxPercentAmount = 0;
+            //    double maxDiscount = 0;
+
+            //    percentDiscount = currentSubtotal * (c.discount_percent / 100);
+            //    amountDiscount = c.discount_amount;
+            //    deliveryFeeDiscount = c.discount_shipping;
+
+            //    maxPercentAmount = Math.Max(percentDiscount, amountDiscount);
+            //    maxDiscount = Math.Max(maxPercentAmount, deliveryFeeDiscount);
+
+            //    Debug.WriteLine("You save: " + maxDiscount);
+            //    unsortedDiscounts.Add(maxDiscount);
+            //    sortedDiscounts.Add(maxDiscount);
+            //    placement++;
+            //}
+
+            //sortedDiscounts.Sort();
+
+            //Debug.Write("Unsorted List: ");
+            //foreach (double i in unsortedDiscounts)
+            //{
+            //    Debug.Write(i + ", ");
+            //}
+            //Debug.WriteLine("");
+            //Debug.Write("Sorted List: ");
+            //foreach (double i in sortedDiscounts)
+            //{
+            //    Debug.Write(i + ", ");
+            //}
+            //Debug.WriteLine("");
+
+            //Debug.WriteLine("");
+            //for (int i = 0; i < unsortedDiscounts.Count; i++)
+            //{
+            //    if (sortedDiscounts[sortedDiscounts.Count - 1] == unsortedDiscounts[i])
+            //    {
+            //        defaultCouponIndex = i;
+            //        break;
+            //    }
+            //}
+
+            //Debug.WriteLine("This is the coupon index that will save you the most money: " + defaultCouponIndex);
+            //updateTotals(unsortedDiscounts[defaultCouponIndex],0);
         }
         public void openHistory(object sender, EventArgs e)
         {
@@ -632,7 +903,7 @@ namespace ServingFresh.Views
 
         void UpdateTotalAmount(System.Object sender, System.EventArgs e)
         {
-            updateTotals(unsortedCouponList[defaultCouponIndex]);
+            updateTotals(unsortedDiscounts[defaultCouponIndex],couponData.result[defaultCouponIndex].discount_shipping);
         }
 
         public void openRefund(object sender, EventArgs e)

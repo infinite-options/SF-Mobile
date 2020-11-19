@@ -174,23 +174,28 @@
                             </CollectionView>
                         </Grid>
                         <Label Text="Choose one of the eligible promos to apply" StyleClass="black" Padding="15,0,15,0"/>
-                        <ScrollView Orientation="Horizontal" HeightRequest="250" Padding="0">
+                        <ScrollView Orientation="Horizontal" HeightRequest="150" Padding="0">
                             <CollectionView x:Name="coupon_list" ItemsLayout="HorizontalList">
                                 <CollectionView.ItemTemplate >
                                     <DataTemplate>
-                                        <Frame Padding="3,0,3,0" HasShadow="False" CornerRadius="0">
-                                            <StackLayout WidthRequest="250">
-                                                <Image Source="{Binding image}" ClassId="{Binding index}">
-                                                    <Image.Effects>
-                                                        <servingfresh:TintImageEffect TintColor="Black"/>
-                                                    </Image.Effects>
-                                                    <Image.GestureRecognizers>
-                                                            <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"/>
-                                                    </Image.GestureRecognizers>
-                                                </Image>
-                                                <Label Text="{Binding couponNote}" StyleClass="h2, black" Margin="50,-150,0,0"></Label>
-                                            </StackLayout>                                                                                     
-                                        </Frame>
+                                        <StackLayout Padding="5,0,5,0" WidthRequest="250" ClassId="{Binding index}">
+                                                <Image Source="{Binding image}" >
+                                                <!--<Image.Effects>
+                                                    <servingfresh:TintImageEffect TintColor="LightGray"/>
+                                                </Image.Effects>-->
+                                                <!--<Image.GestureRecognizers>
+                                                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"/>
+                                                </Image.GestureRecognizers>-->
+                                            </Image>
+                                            <Label Text="{Binding couponNote}" TextColor="Black" HeightRequest="100" Margin="45,-100,85,0">
+                                                <!--<Label.GestureRecognizers>
+                                                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"/>
+                                                </Label.GestureRecognizers>-->
+                                            </Label>
+                                            <StackLayout.GestureRecognizers>
+                                                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"/>
+                                            </StackLayout.GestureRecognizers>
+                                        </StackLayout>
                                     </DataTemplate>
                                 </CollectionView.ItemTemplate>
                             </CollectionView>
@@ -219,8 +224,8 @@
                         <FlexLayout JustifyContent="SpaceBetween" Padding="0,10,0,10">
                             <Label Padding="15,0,0,0" Text="Driver Tip" StyleClass="p, black"/>
                             <StackLayout Orientation="Horizontal" Spacing="0" Margin="0,0,0,0">
-                                <Label  Text="$ " StyleClass="p, black"/>
-                                <local:CustomEntry HeightRequest="20" Completed="DriverTip_Completed" WidthRequest="60" Placeholder="Tip" FontSize="Small" Keyboard="Numeric" x:Name="DriverTip" StyleClass="p, black"/>
+                                <Label Text="$ " StyleClass="p, black"/>
+                                <local:CustomEntry HeightRequest="20" Completed="DriverTip_Completed" WidthRequest="60" Placeholder="0.00" FontSize="Small" Keyboard="Numeric" x:Name="DriverTip" StyleClass="p, black"/>
                             </StackLayout>
                         </FlexLayout>
                         <BoxView StyleClass="spacer"/>
@@ -243,12 +248,10 @@
             <Frame Grid.Row="5" x:Name="CardInfo">
                 <ScrollView>
                     <StackLayout>
-                       
-                            <Label  Text="Payment Information" TextColor="Black" FontAttributes="Bold" FontSize="Medium" ></Label>
-                            <Entry  Placeholder="Email Address" x:Name="cardHolderEmail"></Entry>
-                            <Entry  Placeholder="Cardholder Name" x:Name="cardHolderName"></Entry>
-                            <Entry  Placeholder="Card Number" x:Name="cardHolderNumber" MaxLength="16"></Entry>
-                           
+                            <Label Text="Payment Information" TextColor="Black" FontAttributes="Bold" FontSize="Medium" ></Label>
+                            <Entry Placeholder="Email Address" x:Name="cardHolderEmail"></Entry>
+                            <Entry Placeholder="Cardholder Name" x:Name="cardHolderName"></Entry>
+                            <Entry Placeholder="Card Number" x:Name="cardHolderNumber" MaxLength="16"></Entry>
                                 <Grid >
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"></ColumnDefinition>
@@ -275,8 +278,6 @@
                                 </Grid>
                                 <Entry Placeholder="Purchase Description" x:Name="cardDescription"></Entry>
                             </StackLayout>
-                      
-
                         <Button Text="Complete Payment" TextColor="White" FontAttributes="Bold" Clicked="CompletePaymentClick" BackgroundColor="#FF8500"></Button>
                         <Button Text="Cancel" TextColor="#FF8500" FontAttributes="Bold" BorderColor="LightGray" BorderWidth="0.5" Clicked="CancelPaymentClick"></Button>
                     </StackLayout>
