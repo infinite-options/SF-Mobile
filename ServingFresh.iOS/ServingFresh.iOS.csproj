@@ -80,6 +80,7 @@
     <Compile Include="Renderers\CustomEntryRenderer.cs" />
     <Compile Include="AppleNotificationService\NotificationService.cs" />
     <Compile Include="iOSAzureConstants.cs" />
+    <Compile Include="VersionAndBuild_iOS.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="Resources\LaunchScreen.storyboard" />

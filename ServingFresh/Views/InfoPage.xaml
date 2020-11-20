@@ -57,7 +57,8 @@
                 </Button>
             </Grid>
             <StackLayout Grid.Row="4">
- 
+                <Label HorizontalOptions="Center" x:Name="versionNumber" TextColor="Black" FontSize="Small" FontAttributes="Bold"></Label>
+                <Label HorizontalOptions="Center" x:Name="buildNumber" TextColor="Black" FontSize="Small" FontAttributes="Bold"></Label>
             </StackLayout>
             <Grid Grid.Row="5" BackgroundColor="WhiteSmoke">
                 <Grid.RowDefinitions>

@@ -32,5 +32,6 @@
     <Folder Include="LogIn\Classes\" />
     <Folder Include="Effects\" />
     <Folder Include="Notifications\" />
+    <Folder Include="Models\Interfaces\" />
   </ItemGroup>
 </Project>

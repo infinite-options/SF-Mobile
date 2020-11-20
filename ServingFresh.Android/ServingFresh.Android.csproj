@@ -119,6 +119,7 @@
     <Compile Include="Renderers\CustomEntryRenderer.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Resources\MyFirebaseMessagingService.cs" />
+    <Compile Include="VersionAndBuild_Android.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
