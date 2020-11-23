@@ -16,7 +16,7 @@
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
     <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
     <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
-    <TargetFrameworkVersion>v9.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v10.0</TargetFrameworkVersion>
     <AndroidEnableSGenConcurrent>true</AndroidEnableSGenConcurrent>
     <AndroidUseAapt2>true</AndroidUseAapt2>
     <AndroidHttpClientHandlerType>Xamarin.Android.Net.AndroidClientHandler</AndroidHttpClientHandlerType>
@@ -25,7 +25,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>portable</DebugType>
+    <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
     <DefineConstants>DEBUG;</DefineConstants>
@@ -48,7 +48,8 @@
     <AndroidSigningStorePass>1nfinitePC!</AndroidSigningStorePass>
     <AndroidSigningKeyAlias>infiniteoptionsmanifest</AndroidSigningKeyAlias>
     <AndroidSigningKeyPass>1nfinitePC!</AndroidSigningKeyPass>
-  </PropertyGroup>
+    <AndroidDexTool></AndroidDexTool>
+<RunCodeAnalysis>false</RunCodeAnalysis>  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Mono.Android" />
     <Reference Include="System" />
@@ -101,10 +102,19 @@
       <Version>1.0.0.5</Version>
     </PackageReference>
     <PackageReference Include="Xamarin.Azure.NotificationHubs.Android">
-      <Version>1.1.1</Version>
+      <Version>1.1.3</Version>
     </PackageReference>
     <PackageReference Include="Xamarin.Google.Dagger">
-      <Version>2.25.2.1</Version>
+      <Version>2.27.0</Version>
+    </PackageReference>
+    <PackageReference Include="Xamarin.Google.Android.DataTransport.TransportRuntime">
+      <Version>2.2.3</Version>
+    </PackageReference>
+    <PackageReference Include="Xamarin.Google.Android.DataTransport.TransportBackendCct">
+      <Version>2.3.0</Version>
+    </PackageReference>
+    <PackageReference Include="Xamarin.Android.Support.CustomTabs">
+      <Version>28.0.0.3</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

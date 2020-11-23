@@ -67,6 +67,7 @@
     <CodesignKey>Apple Development: Oscar Torres (HS4TL94K2Y)</CodesignKey>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
     <CodesignProvision>VS: com.servingfresh Development</CodesignProvision>
+    <MtouchLink>SdkOnly</MtouchLink>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />
@@ -150,7 +151,7 @@
       <Version>4.8.0.1687</Version>
     </PackageReference>
     <PackageReference Include="Xamarin.Azure.NotificationHubs.iOS">
-      <Version>3.1.0</Version>
+      <Version>3.1.1</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
