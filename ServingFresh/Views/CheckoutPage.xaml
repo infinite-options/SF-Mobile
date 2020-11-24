@@ -174,8 +174,8 @@
                             </CollectionView>
                         </Grid>
                         <Label Text="Choose one of the eligible promos to apply" StyleClass="black" Padding="15,0,15,0"/>
-                        <ScrollView Orientation="Horizontal" HeightRequest="150" Padding="0">
-                            <CollectionView x:Name="coupon_list" ItemsLayout="HorizontalList">
+                        <!--<ScrollView Orientation="Horizontal" HeightRequest="150" Padding="0">-->
+                            <CollectionView x:Name="coupon_list" ItemsLayout="HorizontalList" HeightRequest="150">
                                 <CollectionView.ItemTemplate >
                                     <DataTemplate>
                                         <StackLayout Padding="5,0,5,0" WidthRequest="250" ClassId="{Binding index}">
@@ -199,7 +199,7 @@
                                     </DataTemplate>
                                 </CollectionView.ItemTemplate>
                             </CollectionView>
-                        </ScrollView>
+                        <!--</ScrollView>-->
                         <BoxView StyleClass="spacer"/>
                         <FlexLayout JustifyContent="SpaceBetween" Padding="0,10,0,10">
                             <Label Padding="15,0,0,0" Text="Subtotal" StyleClass="p, black"/>
