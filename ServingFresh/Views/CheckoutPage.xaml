@@ -92,13 +92,13 @@
                         <Grid Padding="15">
                             <StackLayout Grid.Column="0">
                                 <Label Text="Delivery Address:" StyleClass="h3, primary"></Label>
-                                <Label Text="Change address" StyleClass="secondary">
+                                <!--<Label Text="Change address" StyleClass="secondary">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer
                                             Tapped="ChangeAddressClick">
                                         </TapGestureRecognizer>
                                     </Label.GestureRecognizers>
-                                </Label>
+                                </Label>-->
                             </StackLayout>
                             <StackLayout Grid.Column="1" Spacing="15">
                                 <StackLayout Spacing="0">

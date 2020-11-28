@@ -70,6 +70,7 @@
                                                   <Label Text="{Binding delivery_shortname}" StyleClass="h2, white, center"/>
                                               </Frame>
                                               <Label Text="{Binding delivery_date}" StyleClass="h2, primary, center" VerticalTextAlignment="Center" VerticalOptions="FillAndExpand"/>
+                                              <Label Text="{Binding delivery_time}" HorizontalOptions="Center" VerticalTextAlignment="Center" VerticalOptions="FillAndExpand"/>
                                           </StackLayout>
                                       </Frame>
                                   </StackLayout>
@@ -84,42 +85,13 @@
                           <Label.FormattedText>
                               <FormattedString>
                                   <Span Text="Filter by " TextColor="Black" FontAttributes="Bold" FontSize="Small"/>
-                                  <Span Text="Farmer's market" TextColor="#136D74" FontAttributes="Bold" FontSize="Small"/>
+                                  <Span Text="Farms" TextColor="#136D74" FontAttributes="Bold" FontSize="Small"/>
                               </FormattedString>
                           </Label.FormattedText>
                       </Label>
                       <!--<ScrollView Orientation="Horizontal" HeightRequest="160">-->
                           <StackLayout HeightRequest="160">
-                              <CollectionView x:Name="market_list" ItemsLayout="HorizontalList">
-                                  <CollectionView.ItemTemplate>
-                                      <DataTemplate>
-                                          <StackLayout Padding="10" WidthRequest="100">
-                                              <Frame Padding="1" CornerRadius="10" HasShadow="False" BorderColor="{Binding border_color}" HeightRequest="100" WidthRequest="100">
-                                              <Frame Padding="1" CornerRadius="10" HasShadow="False" BorderColor="{Binding border_color}">
-                                                  <Frame.GestureRecognizers>
-                                                      <TapGestureRecognizer Tapped="Change_Border_Color" CommandParameter="{Binding .}"/>
-                                                  </Frame.GestureRecognizers>
-                                                  <Image Source="{Binding business_image}" HeightRequest="100"/>
-                                              </Frame>
-                                              </Frame>
-                                              <Label Text="{Binding business_name}" StyleClass="black, center"/>
-                                          </StackLayout>
-                                      </DataTemplate>
-                                  </CollectionView.ItemTemplate>
-                              </CollectionView>
-                          </StackLayout>
-                      <!--</ScrollView>-->
-                      <BoxView StyleClass="spacer"/>
-                      <Label Margin="10">
-                          <Label.FormattedText>
-                              <FormattedString>
-                                  <Span Text="Filter by " TextColor="Black" FontAttributes="Bold" FontSize="Small"/>
-                                  <Span Text="Farm" TextColor="#136D74" FontAttributes="Bold" FontSize="Small"/>
-                              </FormattedString>
-                          </Label.FormattedText>
-                      </Label>
-                      <!--<ScrollView Orientation="Horizontal" HeightRequest="150">-->
-                          <StackLayout HeightRequest="150">
+                              <!--<CollectionView x:Name="market_list" ItemsLayout="HorizontalList">-->
                               <CollectionView x:Name="farm_list" ItemsLayout="HorizontalList">
                                   <CollectionView.ItemTemplate>
                                       <DataTemplate>
@@ -139,7 +111,37 @@
                               </CollectionView>
                           </StackLayout>
                       <!--</ScrollView>-->
-                      <BoxView StyleClass="spacer"/>
+                      <!--<BoxView StyleClass="spacer"/>
+                      <Label Margin="10">
+                          <Label.FormattedText>
+                              <FormattedString>
+                                  <Span Text="Filter by " TextColor="Black" FontAttributes="Bold" FontSize="Small"/>
+                                  <Span Text="Farm" TextColor="#136D74" FontAttributes="Bold" FontSize="Small"/>
+                              </FormattedString>
+                          </Label.FormattedText>
+                      </Label>-->
+                      <!--<ScrollView Orientation="Horizontal" HeightRequest="150">-->
+                          <!--<StackLayout HeightRequest="150">
+                              <CollectionView x:Name="farm_list" ItemsLayout="HorizontalList">
+                                  <CollectionView.ItemTemplate>
+                                      <DataTemplate>
+                                          <StackLayout Padding="10" WidthRequest="100">
+                                              <Frame Padding="1" CornerRadius="10" HasShadow="False" BorderColor="{Binding border_color}" HeightRequest="100" WidthRequest="100">
+                                              <Frame Padding="1" CornerRadius="10" HasShadow="False" BorderColor="{Binding border_color}">
+                                                  <Frame.GestureRecognizers>
+                                                      <TapGestureRecognizer Tapped="Change_Border_Color" CommandParameter="{Binding .}"/>
+                                                  </Frame.GestureRecognizers>
+                                                  <Image Source="{Binding business_image}" HeightRequest="100"/>
+                                              </Frame>
+                                              </Frame>
+                                              <Label Text="{Binding business_name}" StyleClass="black, center"/>
+                                          </StackLayout>
+                                      </DataTemplate>
+                                  </CollectionView.ItemTemplate>
+                              </CollectionView>
+                          </StackLayout>-->
+                      <!--</ScrollView>-->
+                      <!--<BoxView StyleClass="spacer"/>
                       <Label Margin="10">
                           <Label.FormattedText>
                               <FormattedString>
@@ -147,8 +149,8 @@
                                   <Span Text="Item category" TextColor="#136D74" FontAttributes="Bold" FontSize="Small"/>
                               </FormattedString>
                           </Label.FormattedText>
-                      </Label>
-                      <FlexLayout JustifyContent="SpaceBetween" Padding="15">
+                      </Label>-->
+                      <!--<FlexLayout JustifyContent="SpaceBetween" Padding="15">
                           <StackLayout>
                               <ImageButton x:Name="FruitIcon" Source="OrangeIcon" Clicked="Change_Color" BackgroundColor="Transparent" HeightRequest="75">
                                   <ImageButton.Effects>
@@ -181,7 +183,7 @@
                               </ImageButton>
                               <Label Text="Other" StyleClass="black, center"/>
                           </StackLayout>
-                      </FlexLayout>
+                      </FlexLayout>-->
                       <BoxView StyleClass="spacer"/>
                     </StackLayout>
                 </ScrollView>
