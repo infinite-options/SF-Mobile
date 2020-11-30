@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using Xamarin.Forms;
 using ServingFresh.Effects;
 using ServingFresh.Config;
+using System.Diagnostics;
 
 namespace ServingFresh.Views
 {
@@ -65,13 +66,14 @@ namespace ServingFresh.Views
         public IDictionary<string, ItemPurchased> order = new Dictionary<string, ItemPurchased>();
         public int totalCount = 0;
         //ServingFreshBusinessItems data = new ServingFreshBusinessItems();
-
+        public List<string> uids = null;
         public ItemsPage(List<string> types, List<string> b_uids, string day)
         {
             InitializeComponent();
             try
             {
-                SetInitialFilters(types);
+                //SetInitialFilters(types);
+                uids = b_uids;
                 _ = GetData(types, b_uids);
                 titlePage.Text = day;
                 itemList.ItemsSource = datagrid;
@@ -452,28 +454,66 @@ namespace ServingFresh.Views
 
         void Change_Color(Object sender, EventArgs e)
         {
+            List<string> t = new List<string>();
             if (sender is ImageButton imgbtn)
             {
-
                 if (imgbtn.Effects[0] is TintImageEffect tint)
                 {
                     imgbtn.Effects.RemoveAt(0);
                     if (tint.TintColor.Equals(Color.White))
                     {
                         tint.TintColor = Constants.SecondaryColor;
+                        var im = (ImageButton)sender;
+                        im.ClassId = "T";
                     }
                     else
                     {
                         tint.TintColor = Color.White;
+                        var im = (ImageButton)sender;
+                        im.ClassId = "F";
                     }
                     imgbtn.Effects.Insert(0, tint);
                 }
             }
+
+            if(fruit.ClassId == "T")
+            {
+                t.Add("fruit");
+            }
+            if(vegetable.ClassId == "T")
+            {
+                t.Add("vegetable");
+            }
+            if(dessert.ClassId == "T")
+            {
+                t.Add("dessert");
+            }
+            if(other.ClassId == "T")
+            {
+                t.Add("other");
+            }
+
+            if(fruit.ClassId == "F" && vegetable.ClassId == "F" && dessert.ClassId == "F" && other.ClassId == "F")
+            {
+                t.Add("fruit");
+                t.Add("vegetable");
+                t.Add("dessert");
+                t.Add("other");
+               
+            }
+
+            foreach(string ty in t)
+            {
+                Debug.WriteLine(ty);
+            }
+            Debug.WriteLine("");
+            Debug.WriteLine("");
+            _ = GetData(t, uids);
         }
 
         void CheckOutClickBusinessPage(System.Object sender, System.EventArgs e)
         {
-            Application.Current.MainPage = new CheckoutPage(order);
+            Application.Current.MainPage = new CheckoutPage(order, titlePage.Text);
         }
 
         void DeliveryDaysClick(System.Object sender, System.EventArgs e)
@@ -483,7 +523,7 @@ namespace ServingFresh.Views
 
         void OrdersClick(System.Object sender, System.EventArgs e)
         {
-            Application.Current.MainPage = new CheckoutPage(order);
+            Application.Current.MainPage = new CheckoutPage(order, titlePage.Text);
         }
 
         void InfoClick(System.Object sender, System.EventArgs e)

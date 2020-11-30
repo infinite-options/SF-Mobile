@@ -25,6 +25,7 @@ namespace ServingFresh.Views
             public Color border_color { get; set; }
         }
 
+
         BusinessCard unselectedBusiness(Business b)
         {
             return new BusinessCard()
@@ -103,6 +104,7 @@ namespace ServingFresh.Views
         List<BusinessCard> businesses = new List<BusinessCard>();
         List<BusinessCard> business = new List<BusinessCard>();
         public ServingFreshBusiness data = new ServingFreshBusiness();
+
 
         public SelectionPage()
         {
@@ -313,6 +315,7 @@ namespace ServingFresh.Views
                     }
 
                     GetDays();
+
                     farm_list.ItemsSource = businesses;
                 }
                 else
@@ -449,6 +452,7 @@ namespace ServingFresh.Views
                     z_biz_id = bc.business_uid
                 }));
                 farm_list.ItemsSource = business;
+                
                 List<ScheduleInfo> bussinesSchedule = new List<ScheduleInfo>();
                 foreach(string day in bc.list_delivery_days.Keys)
                 {

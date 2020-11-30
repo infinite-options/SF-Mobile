@@ -410,8 +410,8 @@ namespace ServingFresh.Views
                             await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
                         }
                     }
-                    await DisplayAlert("Token", Preferences.Get("Token", string.Empty), "OK") ;
-                    //Application.Current.MainPage = new SelectionPage();
+                    //await DisplayAlert("Token", Preferences.Get("Token", string.Empty), "OK") ;
+                    Application.Current.MainPage = new SelectionPage();
                 }
             }
             else

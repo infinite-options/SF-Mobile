@@ -27,13 +27,15 @@
                     <Entry
                         x:Name="userEmailAddress"
                         Placeholder="Email address"
-                        HorizontalTextAlignment="Center">
+                        HorizontalTextAlignment="Center"
+                        Keyboard="Email">
                     </Entry>
                     <Entry
                         x:Name="userPassword"
                         Placeholder="Password"
                         IsPassword="True"
-                        HorizontalTextAlignment="Center">
+                        HorizontalTextAlignment="Center"
+                        Keyboard="Email">
                     </Entry>
                     <Button
                         x:Name="logInButton"

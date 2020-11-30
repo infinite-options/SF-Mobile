@@ -121,6 +121,7 @@ namespace ServingFresh.Views
         // Coupons Lists
         private CouponResponse couponData = null;
         private List<double> unsortedNewTotals = new List<double>();
+        private List<double> unsortedThresholds = new List<double>();
         private List<double> unsortedDiscounts = new List<double>();
         private List<double> sortedDiscounts = new List<double>();
         private int defaultCouponIndex = 0;
@@ -176,9 +177,10 @@ namespace ServingFresh.Views
             FullName.Text = purchaseObject.delivery_first_name + " " + purchaseObject.delivery_last_name;
             PhoneNumber.Text = purchaseObject.delivery_phone_num;
             EmailAddress.Text = purchaseObject.delivery_email;
-
-            deliveryDate.Text = Application.Current.Properties.ContainsKey("delivery_date") ? (string)Application.Current.Properties["delivery_date"] : "";
-            deliveryTime.Text = Application.Current.Properties.ContainsKey("delivery_time") ? (string)Application.Current.Properties["delivery_time"] : "";
+            deliveryDate.Text = day +", ";
+            deliveryDate.Text += Application.Current.Properties.ContainsKey("delivery_date") ? (string)Application.Current.Properties["delivery_date"] : "";
+            deliveryTime.Text = "Between ";
+            deliveryTime.Text += Application.Current.Properties.ContainsKey("delivery_time") ? (string)Application.Current.Properties["delivery_time"] : "";
 
             CartItems.ItemsSource = cartItems;
             CartItems.HeightRequest = 56 * cartItems.Count;
@@ -266,7 +268,7 @@ namespace ServingFresh.Views
                         c.discount_shipping = 0;
                         newTotal = initialSubTotal - discount + initialServiceFee + (initialDeliveryFee - c.discount_shipping) + initialTaxes;
                     }
-
+                    unsortedThresholds.Add((double)c.threshold);
                     unsortedNewTotals.Add(newTotal);
                     unsortedDiscounts.Add(discount + c.discount_shipping);
                     sortedDiscounts.Add(discount + c.discount_shipping);
@@ -281,7 +283,16 @@ namespace ServingFresh.Views
                 {
                     double newTotal = unsortedNewTotals[j];
                     savings = initialTotal - newTotal;
-                    c.couponNote += "\nYou are saving: $" + savings;
+                    if(savings != 0)
+                    {
+                        c.image = "CouponIconOrange.png";
+                        c.couponNote += "\nYou are saving: $" + savings;
+                    }
+                    else
+                    {
+                        c.couponNote += "\nBuy $" + (unsortedThresholds[j] - initialSubTotal) +" more produce to be eligible" ;
+                    }
+                    
                     j++;
                 }
 
@@ -319,7 +330,7 @@ namespace ServingFresh.Views
 
                 Debug.WriteLine("This is the coupon index that will save you the most money: " + defaultCouponIndex);
  
-                couponsList[defaultCouponIndex].image = "CouponIconOrange.png";
+                couponsList[defaultCouponIndex].image = "CouponIconGreen.png";
                 coupon_list.ItemsSource = couponsList;
                 updateTotals(unsortedDiscounts[defaultCouponIndex] - couponData.result[defaultCouponIndex].discount_shipping, couponData.result[defaultCouponIndex].discount_shipping);
             }
@@ -327,24 +338,15 @@ namespace ServingFresh.Views
 
         void TapGestureRecognizer_Tapped(System.Object sender, System.EventArgs e)
         {
-
-
-
             var element = (StackLayout)sender;
             var selectedElement = Int32.Parse(element.ClassId);
-            if(selectedElement != defaultCouponIndex)
+            Debug.WriteLine(couponsList[selectedElement].image);
+            if(couponsList[selectedElement].image == "CouponIconOrange.png")
             {
-                if (Device.RuntimePlatform == Device.Android)
-                {
-                    couponsList[defaultCouponIndex].image = "CouponIconGray.png";
-                }
-                else
-                {
-                    couponsList[defaultCouponIndex].image = "CouponIcon.png";
-                }
+                couponsList[defaultCouponIndex].image = "CouponIconOrange.png";
                 // couponsList[defaultCouponIndex].image = "CouponIconGray.png";
                 couponsList[defaultCouponIndex].update();
-                couponsList[selectedElement].image = "CouponIconOrange.png";
+                couponsList[selectedElement].image = "CouponIconGreen.png";
                 couponsList[selectedElement].update();
                 defaultCouponIndex = selectedElement;
                 updateTotals(unsortedDiscounts[defaultCouponIndex] - couponData.result[defaultCouponIndex].discount_shipping, couponData.result[defaultCouponIndex].discount_shipping);
@@ -367,6 +369,7 @@ namespace ServingFresh.Views
             }
 
             SubTotal.Text = "$ " + subtotal.ToString("N2");
+            this.discount = discount;
             Discount.Text = "-$ " + discount.ToString("N2");
             DeliveryFee.Text = "$ " + (delivery_fee - discount_delivery_fee).ToString("N2");
             taxes = subtotal * (0.085 * 0);
@@ -378,6 +381,11 @@ namespace ServingFresh.Views
             }
             else
             {
+                if(DriverTip.Text == null || DriverTip == null || DriverTip.Text.Length == 0)
+                {
+                    DriverTip.Text = "0.00";
+                }
+                Debug.WriteLine("Driver Tip: " + DriverTip.Text);
                 total = subtotal - discount + (delivery_fee - discount_delivery_fee) + taxes + service_fee + Double.Parse(DriverTip.Text);
             }
 
@@ -433,6 +441,7 @@ namespace ServingFresh.Views
         }
         public void checkoutAsync(object sender, EventArgs e)
         {
+           
             cardHolderEmail.Text = purchaseObject.delivery_email;
             cardHolderName.Text = purchaseObject.delivery_first_name + " " + purchaseObject.delivery_last_name;
             cardHolderAddress.Text = purchaseObject.delivery_address;
@@ -440,12 +449,12 @@ namespace ServingFresh.Views
             cardState.Text = purchaseObject.delivery_state;
             cardCity.Text = purchaseObject.delivery_city;
             cardZip.Text = purchaseObject.delivery_zip;
+            cardDescription.Text = "None";
 
             cardframe.Height = this.Height / 2;
-
-
+            
             string dateTime = DateTime.Parse((string)Application.Current.Properties["delivery_date"]).ToString("yyyy-MM-dd");
-
+            Debug.WriteLine("Date Time of Stripe: " + dateTime);
             purchaseObject.cc_num = "";
             purchaseObject.cc_exp_date = "";
             purchaseObject.cc_cvv = "";
@@ -453,8 +462,8 @@ namespace ServingFresh.Views
             purchaseObject.charge_id = "";
             purchaseObject.payment_type = ((Button)sender).Text == "Checkout with Paypal" ? "PAYPAL" : "STRIPE";
             purchaseObject.items = GetOrder(cartItems);
-            purchaseObject.start_delivery_date = dateTime + " " + (string)Application.Current.Properties["delivery_start_time"];
-            purchaseObject.pay_coupon_id = "";
+            purchaseObject.start_delivery_date = dateTime;
+            purchaseObject.pay_coupon_id = couponData.result[defaultCouponIndex].coupon_uid;
             purchaseObject.amount_due = total.ToString("N2");
             purchaseObject.amount_discount = discount.ToString("N2");
             purchaseObject.amount_paid = total.ToString("N2");
@@ -486,8 +495,83 @@ namespace ServingFresh.Views
             cardframe.Height = 0;
             PayViaStripe();
         }
+        void PayViaPayPal(System.Object sender, System.EventArgs e)
+        {
+            
+            string dateTime = DateTime.Parse((string)Application.Current.Properties["delivery_date"]).ToString("yyyy-MM-dd");
+            Debug.WriteLine("Date Time of Paypal: " + dateTime);
+            purchaseObject.cc_num = "";
+            purchaseObject.cc_exp_date = "";
+            purchaseObject.cc_cvv = "";
+            purchaseObject.cc_zip = "";
+            purchaseObject.charge_id = "";
+            purchaseObject.payment_type = ((Button)sender).Text == "Checkout with Paypal" ? "PAYPAL" : "STRIPE";
+            purchaseObject.items = GetOrder(cartItems);
+            purchaseObject.start_delivery_date = dateTime;
+            purchaseObject.pay_coupon_id = couponData.result[defaultCouponIndex].coupon_uid;
+            purchaseObject.amount_due = total.ToString("N2");
+            purchaseObject.amount_discount = discount.ToString("N2");
+            purchaseObject.amount_paid = total.ToString("N2");
+            purchaseObject.info_is_Addon = "FALSE";
+            Paypal();
+        }
 
-        async public void PayViaStripe()
+        public async void Paypal()
+        {
+            var purchaseString = JsonConvert.SerializeObject(purchaseObject);
+            System.Diagnostics.Debug.WriteLine("Purchase: " + purchaseString);
+            var purchaseMessage = new StringContent(purchaseString, Encoding.UTF8, "application/json");
+            var client = new HttpClient();
+
+            CouponObject coupon = new CouponObject();
+            coupon.coupon_uid = couponData.result[defaultCouponIndex].coupon_uid;
+
+            var couponSerialized = JsonConvert.SerializeObject(coupon);
+            System.Diagnostics.Debug.WriteLine("Coupon to update: " + couponSerialized);
+            var couponContent = new StringContent(couponSerialized, Encoding.UTF8, "application/json");
+
+            var RDSResponse = await client.PostAsync(Constant.PurchaseUrl, purchaseMessage);
+            var RDSCouponResponse = await client.PostAsync(Constant.UpdateCouponUrl, couponContent);
+            Debug.WriteLine("Order was written to DB: " + RDSResponse.IsSuccessStatusCode);
+            Debug.WriteLine("Coupon was succesfully updated (subtract)" + RDSCouponResponse.IsSuccessStatusCode);
+            var re = await RDSResponse.Content.ReadAsStringAsync();
+            Debug.WriteLine(re);
+
+            if (RDSResponse.IsSuccessStatusCode)
+            {
+               // var RDSResponseContent = await RDSResponse.Content.ReadAsStringAsync();
+                //System.Diagnostics.Debug.WriteLine(RDSResponseContent);
+
+                cartItems.Clear();
+                updateTotals(0, 0);
+                total = 00.00;
+                total_qty = 0;
+            }
+            if (RDSCouponResponse.IsSuccessStatusCode && RDSResponse.IsSuccessStatusCode)
+            {
+                string toFind1 = "pay_purchase_id";
+                string toFind2 = "payment_time_stamp";
+                int start = re.IndexOf(toFind1) + toFind1.Length;
+                int end = re.IndexOf(toFind2, start); //Start after the index of 'my' since 'is' appears twice
+                string string2 = re.Substring(start, end - start);
+                int s = 0;
+                foreach(char a in string2.ToCharArray())
+                {
+                    if(a == '\'')
+                    {
+                        break;
+                    }
+                    s++;
+                }
+                Debug.WriteLine("Start Index: " + s);
+                Debug.WriteLine("pucharse ID: "+  string2.Substring(s+1, 10));
+                string purchaseID = string2.Substring(s + 1, 10);
+                await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
+                Device.OpenUri(new System.Uri("https://servingnow.me/payment/" + purchaseID + "/" + purchaseObject.amount_due));
+            }
+        }
+
+        async void PayViaStripe()
         {
             try
             {
@@ -575,6 +659,7 @@ namespace ServingFresh.Views
                         System.Diagnostics.Debug.WriteLine(RDSResponseContent);
 
                         cartItems.Clear();
+                        updateTotals(0, 0);
                         total = 00.00;
                         total_qty = 0;
                     }
@@ -728,7 +813,15 @@ namespace ServingFresh.Views
             {
                 double newTotal = unsortedNewTotals[j];
                 savings = initialTotal - newTotal;
-                c.couponNote += "\nYou are saving: $" + savings;
+                if (savings != 0)
+                {
+                    c.image = "CouponIconOrange.png";
+                    c.couponNote += "\nYou are saving: $" + savings;
+                }
+                else
+                {
+                    c.couponNote += "\nBuy $" + (unsortedThresholds[j] - initialSubTotal) + " more produce to be eligible";
+                }
                 j++;
             }
             Debug.Write("Unsorted List of New Totals: ");
@@ -764,7 +857,7 @@ namespace ServingFresh.Views
 
             Debug.WriteLine("This is the coupon index that will save you the most money: " + defaultCouponIndex);
 
-            couponsList[defaultCouponIndex].image = "CouponIconOrange.png";
+            couponsList[defaultCouponIndex].image = "CouponIconGreen.png";
             coupon_list.ItemsSource = couponsList;
             updateTotals(unsortedDiscounts[defaultCouponIndex] - couponData.result[defaultCouponIndex].discount_shipping, couponData.result[defaultCouponIndex].discount_shipping);
         }
@@ -785,7 +878,10 @@ namespace ServingFresh.Views
 
         void UpdateTotalAmount(System.Object sender, System.EventArgs e)
         {
-            updateTotals(unsortedDiscounts[defaultCouponIndex],couponData.result[defaultCouponIndex].discount_shipping);
+            if(total != 0)
+            {
+                updateTotals(unsortedDiscounts[defaultCouponIndex], couponData.result[defaultCouponIndex].discount_shipping);
+            }
         }
 
         public void openRefund(object sender, EventArgs e)
@@ -988,7 +1084,6 @@ namespace ServingFresh.Views
         {
             contactframe.Height = this.Height / 2;
         }
-
 
         void ChangeContactInfoCancelClick(System.Object sender, System.EventArgs e)
         {

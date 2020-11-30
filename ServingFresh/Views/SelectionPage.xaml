@@ -79,8 +79,8 @@
                       </CollectionView>
                   </StackLayout>
               <!--</ScrollView>-->
-              <ScrollView VerticalOptions="FillAndExpand" BackgroundColor="White">
-                  <StackLayout>
+              <!--<ScrollView VerticalOptions="FillAndExpand" BackgroundColor="White">-->
+                  <StackLayout BackgroundColor="White">
                       <Label Margin="10">
                           <Label.FormattedText>
                               <FormattedString>
@@ -90,26 +90,67 @@
                           </Label.FormattedText>
                       </Label>
                       <!--<ScrollView Orientation="Horizontal" HeightRequest="160">-->
-                          <StackLayout HeightRequest="160">
-                              <!--<CollectionView x:Name="market_list" ItemsLayout="HorizontalList">-->
-                              <CollectionView x:Name="farm_list" ItemsLayout="HorizontalList">
-                                  <CollectionView.ItemTemplate>
-                                      <DataTemplate>
-                                          <StackLayout Padding="10" WidthRequest="100">
-                                              <Frame Padding="1" CornerRadius="10" HasShadow="False" BorderColor="{Binding border_color}" HeightRequest="100" WidthRequest="100">
-                                              <Frame Padding="1" CornerRadius="10" HasShadow="False" BorderColor="{Binding border_color}">
-                                                  <Frame.GestureRecognizers>
-                                                      <TapGestureRecognizer Tapped="Change_Border_Color" CommandParameter="{Binding .}"/>
-                                                  </Frame.GestureRecognizers>
-                                                  <Image Source="{Binding business_image}" HeightRequest="100"/>
-                                              </Frame>
-                                              </Frame>
-                                              <Label Text="{Binding business_name}" StyleClass="black, center"/>
-                                          </StackLayout>
-                                      </DataTemplate>
-                                  </CollectionView.ItemTemplate>
-                              </CollectionView>
-                          </StackLayout>
+                      <!--<ListView x:Name="farm_list" CachingStrategy="RetainElement" RowHeight="150">
+                        <ListView.ItemTemplate >
+                            <DataTemplate>
+                                <ViewCell>
+                                    <StackLayout Padding="10" WidthRequest="100">
+                                        <Frame Padding="1" CornerRadius="10" HasShadow="False" BorderColor="{Binding border_color}" HeightRequest="100" WidthRequest="100">
+                                        <Frame Padding="1" CornerRadius="10" HasShadow="False" BorderColor="{Binding border_color}">
+                                            <Frame.GestureRecognizers>
+                                                <TapGestureRecognizer Tapped="Change_Border_Color" CommandParameter="{Binding .}"/>
+                                            </Frame.GestureRecognizers>
+                                            <Image Source="{Binding business_image}" HeightRequest="100"/>
+                                        </Frame>
+                                        </Frame>
+                                        <Label Text="{Binding business_name}" StyleClass="black, center"/>
+                                    </StackLayout>
+                                </ViewCell>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                      </ListView>-->
+
+                       <CollectionView x:Name="farm_list" >
+                            <CollectionView.ItemsLayout>
+                                <GridItemsLayout Orientation="Vertical" Span="3" />               
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <StackLayout Padding="10" WidthRequest="100">
+                                        <Frame Padding="1" CornerRadius="10" HasShadow="False" BorderColor="{Binding border_color}" HeightRequest="100" WidthRequest="100">
+                                        <Frame Padding="1" CornerRadius="10" HasShadow="False" BorderColor="{Binding border_color}">
+                                            <Frame.GestureRecognizers>
+                                                <TapGestureRecognizer Tapped="Change_Border_Color" CommandParameter="{Binding .}"/>
+                                            </Frame.GestureRecognizers>
+                                            <Image Source="{Binding business_image}" HeightRequest="100"/>
+                                        </Frame>
+                                        </Frame>
+                                        <Label Text="{Binding business_name}" StyleClass="black, center"/>
+                                    </StackLayout>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+
+                        <!--<StackLayout HeightRequest="160">-->
+                            <!--<CollectionView x:Name="market_list" ItemsLayout="HorizontalList">-->
+                            <!--<CollectionView x:Name="farm_list" ItemsLayout="HorizontalList">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackLayout Padding="10" WidthRequest="100">
+                                            <Frame Padding="1" CornerRadius="10" HasShadow="False" BorderColor="{Binding border_color}" HeightRequest="100" WidthRequest="100">
+                                            <Frame Padding="1" CornerRadius="10" HasShadow="False" BorderColor="{Binding border_color}">
+                                                <Frame.GestureRecognizers>
+                                                    <TapGestureRecognizer Tapped="Change_Border_Color" CommandParameter="{Binding .}"/>
+                                                </Frame.GestureRecognizers>
+                                                <Image Source="{Binding business_image}" HeightRequest="100"/>
+                                            </Frame>
+                                            </Frame>
+                                            <Label Text="{Binding business_name}" StyleClass="black, center"/>
+                                        </StackLayout>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>-->
+                      <!--</StackLayout>-->
                       <!--</ScrollView>-->
                       <!--<BoxView StyleClass="spacer"/>
                       <Label Margin="10">
@@ -186,7 +227,7 @@
                       </FlexLayout>-->
                       <BoxView StyleClass="spacer"/>
                     </StackLayout>
-                </ScrollView>
+                <!--</ScrollView>-->
             </StackLayout>
             <Grid Grid.Row="4" BackgroundColor="WhiteSmoke">
                 <Grid.RowDefinitions>

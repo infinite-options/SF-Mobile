@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Net.Http;
 using Newtonsoft.Json;
 using ServingFresh.Config;
@@ -98,21 +99,29 @@ namespace ServingFresh.Views
             string email = (string)Application.Current.Properties["user_email"];
             var client = new HttpClient();
             var response = await client.GetAsync(Constant.GetHistoryUrl + email);
-            string result = response.Content.ReadAsStringAsync().Result;
-            Console.WriteLine(result);
-            var data = JsonConvert.DeserializeObject<HistoryResponse>(result);
-            foreach (HistoryObject ho in data.result)
+            string result = await response.Content.ReadAsStringAsync();
+            Debug.WriteLine(result);
+            try
             {
-                var items = JsonConvert.DeserializeObject<ObservableCollection<HistoryItemObject>>(ho.items);
-                historyList.Add(new HistoryDisplayObject()
-                {
-                    items = items,
-                    itemsHeight = 55 * items.Count,
-                    purchase_date = ho.purchase_date,
-                    purchase_id = "Order #" + ho.purchase_uid,
-                    amount_due = "$" + ho.amount_due.ToString("N2")
-                });
+                var data = JsonConvert.DeserializeObject<HistoryResponse>(result);
+                //foreach (HistoryObject ho in data.result)
+                //{
+                //    var items = JsonConvert.DeserializeObject<ObservableCollection<HistoryItemObject>>(ho.items);
+                //    historyList.Add(new HistoryDisplayObject()
+                //    {
+                //        items = items,
+                //        itemsHeight = 55 * items.Count,
+                //        purchase_date = ho.purchase_date,
+                //        purchase_id = "Order #" + ho.purchase_uid,
+                //        amount_due = "$" + ho.amount_due.ToString("N2")
+                //    });
+                //}
             }
+            catch (Exception history)
+            {
+                Debug.WriteLine(history.Message);
+            }
+
             HistoryList.ItemsSource = historyList;
         }
         public void openCheckout(object sender, EventArgs e)

@@ -56,7 +56,7 @@
             <BoxView Grid.Row="2" HeightRequest="1" BackgroundColor="Black"></BoxView>
             <FlexLayout Grid.Row="3" JustifyContent="SpaceBetween" Padding="15" BackgroundColor="#136D74">
                 <StackLayout Spacing="0">
-                    <ImageButton x:Name="fruit" Source="OrangeIcon" Clicked="Change_Color" StyleClass="imgbtn">
+                    <ImageButton x:Name="fruit" Source="OrangeIcon" Clicked="Change_Color" StyleClass="imgbtn" ClassId="F">
                         <ImageButton.Effects>
                             <servingfresh:TintImageEffect TintColor="White"/>
                         </ImageButton.Effects>
@@ -64,7 +64,7 @@
                     <Label Text="Fruits" StyleClass="white, center"/>
                 </StackLayout>
                 <StackLayout Spacing="0">
-                    <ImageButton x:Name="vegetable" Source="VegIcon" Clicked="Change_Color" StyleClass="imgbtn">
+                    <ImageButton x:Name="vegetable" Source="VegIcon" Clicked="Change_Color" StyleClass="imgbtn" ClassId="F">
                         <ImageButton.Effects>
                             <servingfresh:TintImageEffect TintColor="White"/>
                         </ImageButton.Effects>
@@ -72,7 +72,7 @@
                     <Label Text="Vegetables" StyleClass="white, center"/>
                 </StackLayout>
                 <StackLayout Spacing="0">
-                    <ImageButton x:Name="dessert" Source="Donut_Icon" Clicked="Change_Color" StyleClass="imgbtn">
+                    <ImageButton x:Name="dessert" Source="Donut_Icon" Clicked="Change_Color" StyleClass="imgbtn" ClassId="F">
                         <ImageButton.Effects>
                             <servingfresh:TintImageEffect TintColor="White"/>
                         </ImageButton.Effects>
@@ -80,7 +80,7 @@
                     <Label Text="Desserts" StyleClass="white, center"/>
                 </StackLayout>
                 <StackLayout Spacing="0">
-                    <ImageButton x:Name="other" Source="Bread_Icon" Clicked="Change_Color" StyleClass="imgbtn">
+                    <ImageButton x:Name="other" Source="Bread_Icon" Clicked="Change_Color" StyleClass="imgbtn" ClassId="F">
                         <ImageButton.Effects>
                             <servingfresh:TintImageEffect TintColor="White"/>
                         </ImageButton.Effects>

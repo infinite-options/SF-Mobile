@@ -17,9 +17,9 @@ namespace ServingFresh
         public App()
         {
             InitializeComponent();
-            Application.Current.Properties.Clear();
-            SecureStorage.RemoveAll();
-            Preferences.Clear();
+            //Application.Current.Properties.Clear();
+            //SecureStorage.RemoveAll();
+            //Preferences.Clear();
 
             if (Application.Current.Properties.ContainsKey("user_id"))
             {
