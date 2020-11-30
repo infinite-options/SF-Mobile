@@ -15718,37 +15718,40 @@ namespace ServingFresh.Droid
 			public const int OrangeIcon = 2131165363;
 			
 			// aapt resource value: 0x7F0700B4
-			public const int RefundIcon = 2131165364;
+			public const int refund = 2131165364;
 			
 			// aapt resource value: 0x7F0700B5
-			public const int roundedbg = 2131165365;
+			public const int RefundIcon = 2131165365;
 			
 			// aapt resource value: 0x7F0700B6
-			public const int roundedbgdark = 2131165366;
+			public const int roundedbg = 2131165366;
 			
 			// aapt resource value: 0x7F0700B7
-			public const int servingFreshIcon = 2131165367;
+			public const int roundedbgdark = 2131165367;
 			
 			// aapt resource value: 0x7F0700B8
-			public const int signUpIcon = 2131165368;
+			public const int servingFreshIcon = 2131165368;
 			
 			// aapt resource value: 0x7F0700B9
-			public const int test_custom_background = 2131165369;
+			public const int signUpIcon = 2131165369;
 			
 			// aapt resource value: 0x7F0700BA
-			public const int tooltip_frame_dark = 2131165370;
+			public const int test_custom_background = 2131165370;
 			
 			// aapt resource value: 0x7F0700BB
-			public const int tooltip_frame_light = 2131165371;
+			public const int tooltip_frame_dark = 2131165371;
 			
 			// aapt resource value: 0x7F0700BC
-			public const int UserIcon = 2131165372;
+			public const int tooltip_frame_light = 2131165372;
 			
 			// aapt resource value: 0x7F0700BD
-			public const int VegIcon = 2131165373;
+			public const int UserIcon = 2131165373;
 			
 			// aapt resource value: 0x7F0700BE
-			public const int welcomeBackground = 2131165374;
+			public const int VegIcon = 2131165374;
+			
+			// aapt resource value: 0x7F0700BF
+			public const int welcomeBackground = 2131165375;
 			
 			static Drawable()
 			{

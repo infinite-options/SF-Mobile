@@ -880,7 +880,11 @@ namespace ServingFresh.Views
         {
             if(total != 0)
             {
-                updateTotals(unsortedDiscounts[defaultCouponIndex], couponData.result[defaultCouponIndex].discount_shipping);
+                updateTotals(unsortedDiscounts[defaultCouponIndex] - couponData.result[defaultCouponIndex].discount_shipping, couponData.result[defaultCouponIndex].discount_shipping);
+            }
+            else
+            {
+                updateTotals(0, 0);
             }
         }
 

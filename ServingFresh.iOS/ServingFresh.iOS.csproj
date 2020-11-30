@@ -171,6 +171,7 @@
     <BundleResource Include="Resources\signUpIcon.png" />
     <BundleResource Include="Resources\CouponIconOrange.png" />
     <BundleResource Include="Resources\CouponIconGreen.png" />
+    <BundleResource Include="Resources\refund.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AppleSignIn\" />

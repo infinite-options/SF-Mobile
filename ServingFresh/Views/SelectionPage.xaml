@@ -54,9 +54,9 @@
                     HorizontalOptions="End"/>
             </Grid>
             <BoxView Grid.Row="2" BackgroundColor="Black"></BoxView>
-            <StackLayout Grid.Row="3" Padding="0">
+            <StackLayout Grid.Row="3" Padding="0" BackgroundColor="White">
               <!--<ScrollView Orientation="Horizontal" HeightRequest="120" MinimumHeightRequest="120" BackgroundColor="#136D74">-->
-                  <StackLayout HeightRequest="120" MinimumHeightRequest="120">
+                  <StackLayout HeightRequest="120" MinimumHeightRequest="120" BackgroundColor="#136D74">
                       <CollectionView x:Name="delivery_list" ItemsLayout="HorizontalList">
                           <CollectionView.ItemTemplate>
                               <DataTemplate>
@@ -225,7 +225,7 @@
                               <Label Text="Other" StyleClass="black, center"/>
                           </StackLayout>
                       </FlexLayout>-->
-                      <BoxView StyleClass="spacer"/>
+                      <!--<BoxView StyleClass="spacer"/>-->
                     </StackLayout>
                 <!--</ScrollView>-->
             </StackLayout>

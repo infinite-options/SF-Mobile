@@ -17,7 +17,9 @@ namespace ServingFresh.Views
         public RefundPage()
         {
             InitializeComponent();
-            refundItemImage.Source = "CartIcon";
+            refundItemImage.Source = "refund.png";
+            refundItemImage.Scale = 0.7;
+            CartTotal.Text = CheckoutPage.total_qty.ToString();
             refundEmail.Text = (string)Application.Current.Properties["user_email"];
         }
 
@@ -36,7 +38,7 @@ namespace ServingFresh.Views
                     var path = photo.Path;
                     photoStream = photo.GetStream();
                     refundItemImage.Source = ImageSource.FromStream(() => { return photo.GetStream(); });
-
+                    refundItemImage.Scale = 1;
                 }
             }
             catch
@@ -56,7 +58,7 @@ namespace ServingFresh.Views
                 {
                     photoStream = photo.GetStream();
                     refundItemImage.Source = ImageSource.FromStream(() => { return photo.GetStream(); });
-
+                    refundItemImage.Scale = 1;
                 }
             }
             catch

@@ -43,6 +43,15 @@
                         <servingfresh:TintImageEffect TintColor="White"/>
                     </ImageButton.Effects>
                 </ImageButton>
+                <Label
+                    Grid.Column="2"
+                    x:Name="CartTotal"
+                    StyleClass="secondary"
+                    FontAttributes="Bold"
+                    TranslationX="-14"
+                    TranslationY="-12"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"/>
             </Grid>
             <BoxView Grid.Row="2" HeightRequest="1" BackgroundColor="Black"></BoxView>
             <Grid
@@ -73,7 +82,10 @@
             <StackLayout Grid.Row="4">
                 <ScrollView>
                     <StackLayout Padding="10,0,10,0">
-                        <Image x:Name="refundItemImage" HeightRequest="300" BackgroundColor="LightGray"/>
+                        <Frame HeightRequest="300" BackgroundColor="White">
+                            <Image x:Name="refundItemImage" BackgroundColor="White"/>
+                        </Frame>
+                        
                         <Button Text="Take Photo" StyleClass="btn, secondary-outline" Clicked="TakePictureClick"/>
                         <Button Text="Choose a Photo from Gallery" StyleClass="btn, secondary-outline" Clicked="ChoosePictureFromGalleryClick"/>
                         <StackLayout Padding="15,0" Spacing="15">

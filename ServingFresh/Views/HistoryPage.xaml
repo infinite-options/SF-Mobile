@@ -43,6 +43,15 @@
                         <servingfresh:TintImageEffect TintColor="White"/>
                     </ImageButton.Effects>
                 </ImageButton>
+                <Label
+                    Grid.Column="2"
+                    x:Name="CartTotal"
+                    StyleClass="secondary"
+                    FontAttributes="Bold"
+                    TranslationX="-14"
+                    TranslationY="-12"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"/>
             </Grid>
             <BoxView Grid.Row="2" HeightRequest="1" BackgroundColor="Black"></BoxView>
             <Grid
@@ -71,8 +80,8 @@
                 </Label>
             </Grid>
             <StackLayout Grid.Row="4">
-                <ScrollView>
-                    <StackLayout Spacing="15">
+                <!--<ScrollView>-->
+                   <!-- <StackLayout Spacing="15">-->
                         <CollectionView x:Name="HistoryList" Footer="">
                             <CollectionView.ItemTemplate>
                                 <DataTemplate>
@@ -114,8 +123,8 @@
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
                         </CollectionView>
-                    </StackLayout>
-                </ScrollView>
+                    <!--</StackLayout>-->
+                <!--</ScrollView>-->
             </StackLayout>
             <Grid Grid.Row="5" BackgroundColor="WhiteSmoke">
                 <Grid.RowDefinitions>
