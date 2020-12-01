@@ -126,6 +126,8 @@ namespace ServingFresh.Views
         private List<double> sortedDiscounts = new List<double>();
         private int defaultCouponIndex = 0;
         double savings = 0;
+        public string deliveryDay = "";
+        public IDictionary<string, ItemPurchased> orderCopy = null;
 
         public CheckoutPage(IDictionary<string, ItemPurchased> order = null, string day = "")
         {
@@ -146,6 +148,7 @@ namespace ServingFresh.Views
                         business_uid = order[key].pur_business_uid
                     });
                 }
+                orderCopy = order;
             }
             purchaseObject = new PurchaseDataObject()
             {
@@ -177,6 +180,7 @@ namespace ServingFresh.Views
             FullName.Text = purchaseObject.delivery_first_name + " " + purchaseObject.delivery_last_name;
             PhoneNumber.Text = purchaseObject.delivery_phone_num;
             EmailAddress.Text = purchaseObject.delivery_email;
+            deliveryDay = day;
             deliveryDate.Text = day +", ";
             deliveryDate.Text += Application.Current.Properties.ContainsKey("delivery_date") ? (string)Application.Current.Properties["delivery_date"] : "";
             deliveryTime.Text = "Between ";
@@ -336,6 +340,11 @@ namespace ServingFresh.Views
             }
         }
 
+        void CartClick(System.Object sender, System.EventArgs e)
+        {
+            // Application.Current.MainPage = new ItemsPage(orderCopy, deliveryDay);
+        }
+
         void TapGestureRecognizer_Tapped(System.Object sender, System.EventArgs e)
         {
             var element = (StackLayout)sender;
@@ -428,16 +437,18 @@ namespace ServingFresh.Views
             return total;
         }
 
-        public void TestDateFormat(object sender, EventArgs e)
+        public async void AddItems(object sender, EventArgs e)
         {
-            var now = DateTime.Now;
-            Console.WriteLine(now);
-            Console.WriteLine(now.Year.ToString("D4") + "-" +
-                              now.Month.ToString("D2") + "-" +
-                              now.Day.ToString("D2") + " " +
-                              now.Hour.ToString("D2") + ":" +
-                              now.Minute.ToString("D2") + ":" +
-                              now.Second.ToString("D2"));
+            
+            Application.Current.MainPage = new ItemsPage(orderCopy, deliveryDay);
+            //var now = DateTime.Now;
+            //Console.WriteLine(now);
+            //Console.WriteLine(now.Year.ToString("D4") + "-" +
+            //                  now.Month.ToString("D2") + "-" +
+            //                  now.Day.ToString("D2") + " " +
+            //                  now.Hour.ToString("D2") + ":" +
+            //                  now.Minute.ToString("D2") + ":" +
+            //                  now.Second.ToString("D2"));
         }
         public void checkoutAsync(object sender, EventArgs e)
         {

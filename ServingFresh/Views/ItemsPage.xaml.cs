@@ -67,6 +67,10 @@ namespace ServingFresh.Views
         public int totalCount = 0;
         //ServingFreshBusinessItems data = new ServingFreshBusinessItems();
         public List<string> uids = null;
+
+        private static List<string> uidsCopy = null;
+        private static List<string> typesCopy = null;
+        
         public ItemsPage(List<string> types, List<string> b_uids, string day)
         {
             InitializeComponent();
@@ -74,6 +78,8 @@ namespace ServingFresh.Views
             {
                 //SetInitialFilters(types);
                 uids = b_uids;
+                uidsCopy = uids;
+                typesCopy = types;
                 _ = GetData(types, b_uids);
                 titlePage.Text = day;
                 itemList.ItemsSource = datagrid;
@@ -82,6 +88,37 @@ namespace ServingFresh.Views
             {
                 System.Diagnostics.Debug.WriteLine(ex.Message);
             }
+        }
+
+        public ItemsPage(IDictionary<string, ItemPurchased> orderCopy ,string day)
+        {
+            Debug.WriteLine("You are coming from the checkout page");
+            InitializeComponent();
+            try
+            {
+                //SetInitialFilters(types);
+                
+                
+                _ = GetData(typesCopy, uidsCopy);
+                titlePage.Text = day;
+                itemList.ItemsSource = datagrid;
+                CartTotal.Text = orderCopy.Count.ToString();
+                order = orderCopy;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
+            }
+            // This are the types and business uids
+            foreach (string a in typesCopy)
+            {
+                Debug.WriteLine(a);
+            }
+            foreach (string b in uidsCopy)
+            {
+                Debug.WriteLine(b);
+            }
+
         }
 
         void SetInitialFilters(List<string> types)

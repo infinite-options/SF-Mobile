@@ -130,7 +130,7 @@
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
                         </CollectionView>
-
+                      
                         <!--<StackLayout HeightRequest="160">-->
                             <!--<CollectionView x:Name="market_list" ItemsLayout="HorizontalList">-->
                             <!--<CollectionView x:Name="farm_list" ItemsLayout="HorizontalList">
