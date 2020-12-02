@@ -94,6 +94,7 @@ namespace ServingFresh.Views
         {
             Debug.WriteLine("You are coming from the checkout page");
             InitializeComponent();
+            
             try
             {
                 //SetInitialFilters(types);
@@ -185,7 +186,7 @@ namespace ServingFresh.Views
                     {
                         this.datagrid.Add(new ItemsModel()
                         {
-                            height = this.Width / 2 + 25,
+                            height = this.Width / 2 - 10,
                             width = this.Width / 2 - 25,
                             imageSourceLeft = "",
                             quantityLeft = 0,
@@ -210,7 +211,7 @@ namespace ServingFresh.Views
                         {
                             this.datagrid.Add(new ItemsModel()
                             {
-                                height = this.Width / 2 + 25,
+                                height = this.Width / 2 - 10,
                                 width = this.Width / 2 - 25,
                                 imageSourceLeft = data.result[j].item_photo,
                                 item_uidLeft = data.result[j].item_uid,
@@ -241,7 +242,7 @@ namespace ServingFresh.Views
                         {
                             this.datagrid.Add(new ItemsModel()
                             {
-                                height = this.Width / 2 + 25,
+                                height = this.Width / 2 - 10,
                                 width = this.Width / 2 - 25,
                                 imageSourceLeft = data.result[j].item_photo,
                                 item_uidLeft = data.result[j].item_uid,
@@ -267,7 +268,7 @@ namespace ServingFresh.Views
                         }
                         this.datagrid.Add(new ItemsModel()
                         {
-                            height = this.Width / 2 + 25,
+                            height = this.Width / 2 - 10,
                             width = this.Width / 2 - 25,
                             imageSourceLeft = data.result[j].item_photo,
                             item_uidLeft = data.result[j].item_uid,
@@ -550,6 +551,7 @@ namespace ServingFresh.Views
 
         void CheckOutClickBusinessPage(System.Object sender, System.EventArgs e)
         {
+            
             Application.Current.MainPage = new CheckoutPage(order, titlePage.Text);
         }
 

@@ -453,10 +453,9 @@ namespace ServingFresh.Views
                 }));
                 farm_list.ItemsSource = business;
                 
-                List<ScheduleInfo> bussinesSchedule = new List<ScheduleInfo>();
+                List<ScheduleInfo> businesSchedule = new List<ScheduleInfo>();
                 foreach(string day in bc.list_delivery_days.Keys)
                 {
-
                     List<string> times = (List<string>)bc.list_delivery_days[day];
                     foreach (string t in times)
                     {
@@ -464,12 +463,32 @@ namespace ServingFresh.Views
                         {
                             if(day.ToUpper() == i.delivery_dayofweek.ToUpper() && t == i.delivery_time)
                             {
-                                bussinesSchedule.Add(i);
+                                businesSchedule.Add(i);
                             }
                         }
                     }
                 }
-                delivery_list.ItemsSource = bussinesSchedule;
+                List<ScheduleInfo> businessScheduleUnordered= new List<ScheduleInfo>();
+                int k = 0;
+                for(int j = schedule.Count - 1; j >= 0; j--)
+                {
+                    for(int y = k; y < businesSchedule.Count; y++)
+                    {
+                        if (schedule[j].delivery_dayofweek.ToUpper() == businesSchedule[y].delivery_dayofweek.ToUpper())
+                        {
+                            businessScheduleUnordered.Add(schedule[j]);
+                            k = y;
+                            break;
+                        }
+                    }
+                }
+                List<ScheduleInfo> businessScheduleOrdered = new List<ScheduleInfo>();
+                for(int j = businessScheduleUnordered.Count - 1; j >= 0; j--)
+                {
+                    businessScheduleOrdered.Add(businessScheduleUnordered[j]);
+                }
+                
+                delivery_list.ItemsSource = businessScheduleOrdered;
             }
             else
             {
