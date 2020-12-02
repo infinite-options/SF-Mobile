@@ -103,7 +103,7 @@ namespace ServingFresh.Views
             {
                 //SetInitialFilters(types);
 
-                _ = GetData(typesCopy, uidsCopy);
+                _ = GetDataCheckout(typesCopy, uidsCopy, orderCopy);
                 uids = uidsCopy;
                 titlePage.Text = day;
 
@@ -170,6 +170,178 @@ namespace ServingFresh.Views
                         tint.TintColor = Constants.SecondaryColor;
                     }
                 }
+            }
+        }
+
+
+        private async Task GetDataCheckout(List<string> types, List<string> b_uids, IDictionary<string, ItemPurchased> orderCopy)
+        {
+            try
+            {
+
+
+                GetItemPost post = new GetItemPost();
+                post.type = types;
+                post.ids = b_uids;
+
+                var client = new HttpClient();
+                var getItemsString = JsonConvert.SerializeObject(post);
+                var getItemsStringMessage = new StringContent(getItemsString, Encoding.UTF8, "application/json");
+                var request = new HttpRequestMessage();
+                request.Method = HttpMethod.Post;
+                request.Content = getItemsStringMessage;
+
+                var httpResponse = await client.PostAsync(Constant.GetItemsUrl, getItemsStringMessage);
+                var r = await httpResponse.Content.ReadAsStreamAsync();
+                StreamReader sr = new StreamReader(r);
+                JsonReader reader = new JsonTextReader(sr);
+
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    data = serializer.Deserialize<ServingFreshBusinessItems>(reader);
+
+                    this.datagrid.Clear();
+                    int n = data.result.Count;
+                    int j = 0;
+                    if (n == 0)
+                    {
+                        this.datagrid.Add(new ItemsModel()
+                        {
+                            height = this.Width / 2 - 10,
+                            width = this.Width / 2 - 25,
+                            imageSourceLeft = "",
+                            quantityLeft = 0,
+                            itemNameLeft = "",
+                            itemPriceLeft = "$ " + "",
+                            isItemLeftVisiable = false,
+                            isItemLeftEnable = false,
+                            quantityL = 0,
+
+                            imageSourceRight = "",
+                            quantityRight = 0,
+                            itemNameRight = "",
+                            itemPriceRight = "$ " + "",
+                            isItemRightVisiable = false,
+                            isItemRightEnable = false,
+                            quantityR = 0
+                        });
+                    }
+                    if (isAmountItemsEven(n))
+                    {
+                        for (int i = 0; i < n / 2; i++)
+                        {
+                            this.datagrid.Add(new ItemsModel()
+                            {
+                                height = this.Width / 2 - 10,
+                                width = this.Width / 2 - 25,
+                                imageSourceLeft = data.result[j].item_photo,
+                                item_uidLeft = data.result[j].item_uid,
+                                itm_business_uidLeft = data.result[j].itm_business_uid,
+                                quantityLeft = 0,
+                                itemNameLeft = data.result[j].item_name,
+                                itemPriceLeft = "$ " + data.result[j].item_price.ToString(),
+                                isItemLeftVisiable = true,
+                                isItemLeftEnable = true,
+                                quantityL = 0,
+
+                                imageSourceRight = data.result[j + 1].item_photo,
+                                item_uidRight = data.result[j + 1].item_uid,
+                                itm_business_uidRight = data.result[j + 1].itm_business_uid,
+                                quantityRight = 0,
+                                itemNameRight = data.result[j + 1].item_name,
+                                itemPriceRight = "$ " + data.result[j + 1].item_price.ToString(),
+                                isItemRightVisiable = true,
+                                isItemRightEnable = true,
+                                quantityR = 0
+                            });
+                            j = j + 2;
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < n / 2; i++)
+                        {
+                            this.datagrid.Add(new ItemsModel()
+                            {
+                                height = this.Width / 2 - 10,
+                                width = this.Width / 2 - 25,
+                                imageSourceLeft = data.result[j].item_photo,
+                                item_uidLeft = data.result[j].item_uid,
+                                itm_business_uidLeft = data.result[j].itm_business_uid,
+                                quantityLeft = 0,
+                                itemNameLeft = data.result[j].item_name,
+                                itemPriceLeft = "$ " + data.result[j].item_price.ToString(),
+                                isItemLeftVisiable = true,
+                                isItemLeftEnable = true,
+                                quantityL = 0,
+
+                                imageSourceRight = data.result[j + 1].item_photo,
+                                item_uidRight = data.result[j + 1].item_uid,
+                                itm_business_uidRight = data.result[j + 1].itm_business_uid,
+                                quantityRight = 0,
+                                itemNameRight = data.result[j + 1].item_name,
+                                itemPriceRight = "$ " + data.result[j + 1].item_price.ToString(),
+                                isItemRightVisiable = true,
+                                isItemRightEnable = true,
+                                quantityR = 0
+                            });
+                            j = j + 2;
+                        }
+                        this.datagrid.Add(new ItemsModel()
+                        {
+                            height = this.Width / 2 - 10,
+                            width = this.Width / 2 - 25,
+                            imageSourceLeft = data.result[j].item_photo,
+                            item_uidLeft = data.result[j].item_uid,
+                            itm_business_uidLeft = data.result[j].itm_business_uid,
+                            quantityLeft = 0,
+                            itemNameLeft = data.result[j].item_name,
+                            itemPriceLeft = "$ " + data.result[j].item_price.ToString(),
+                            isItemLeftVisiable = true,
+                            isItemLeftEnable = true,
+                            quantityL = 0,
+
+                            imageSourceRight = "",
+                            quantityRight = 0,
+                            itemNameRight = "",
+                            itemPriceRight = "$ " + "",
+                            isItemRightVisiable = false,
+                            isItemRightEnable = false,
+                            quantityR = 0
+                        });
+                    }
+                }
+                foreach (string key in orderCopy.Keys)
+                {
+                    totalCount += orderCopy[key].item_quantity;
+                    foreach (ItemsModel a in datagrid)
+                    {
+                        //Debug.WriteLine(orderCopy[key].item_name);
+                        //Debug.WriteLine(a.itemNameLeft);
+                        if (orderCopy[key].item_name == a.itemNameLeft)
+                        {
+                            Debug.WriteLine(orderCopy[key].item_name);
+                            a.quantityLeft = orderCopy[key].item_quantity;
+                            break;
+                        }
+                        else if( orderCopy[key].item_name == a.itemNameRight)
+                        {
+                            Debug.WriteLine(orderCopy[key].item_name);
+                            a.quantityRight = orderCopy[key].item_quantity;
+                            break;
+                        }
+                    }
+                }
+                itemList.ItemsSource = this.datagrid;
+                order = orderCopy;
+                
+                
+                CartTotal.Text = totalCount.ToString();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(ex.Message);
             }
         }
 
@@ -312,7 +484,27 @@ namespace ServingFresh.Views
                     }
                 }
 
-                Debug.WriteLine(this.datagrid.Count);
+                foreach (string key in order.Keys)
+                {
+                    
+                    foreach (ItemsModel a in datagrid)
+                    {
+                        //Debug.WriteLine(orderCopy[key].item_name);
+                        //Debug.WriteLine(a.itemNameLeft);
+                        if (order[key].item_name == a.itemNameLeft)
+                        {
+                            Debug.WriteLine(order[key].item_name);
+                            a.quantityLeft = order[key].item_quantity;
+                            break;
+                        }
+                        else if (order[key].item_name == a.itemNameRight)
+                        {
+                            Debug.WriteLine(order[key].item_name);
+                            a.quantityRight = order[key].item_quantity;
+                            break;
+                        }
+                    }
+                }
             }
             catch(Exception ex)
             {

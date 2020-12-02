@@ -45,13 +45,12 @@
                     VerticalOptions="Center"
                     HeightRequest="40"
                     Source="CartIcon"
-                    BackgroundColor="Transparent">
+                    BackgroundColor="Transparent"
+                    Clicked="CartClick">
                     <ImageButton.Effects>
                         <servingfresh:TintImageEffect TintColor="White"/>
                     </ImageButton.Effects>
-                    <ImageButton.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="CartClick"></TapGestureRecognizer>
-                    </ImageButton.GestureRecognizers>
+                    
                 </ImageButton>
                 <Label
                     Grid.Column="2"

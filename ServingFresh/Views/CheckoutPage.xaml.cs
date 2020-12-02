@@ -42,6 +42,8 @@ namespace ServingFresh.Views
             PropertyChanged(this, new PropertyChangedEventArgs("qty"));
             PropertyChanged(this, new PropertyChangedEventArgs("total_price"));
         }
+
+
     }
 
   
@@ -128,12 +130,18 @@ namespace ServingFresh.Views
         double savings = 0;
         public string deliveryDay = "";
         public IDictionary<string, ItemPurchased> orderCopy = new Dictionary<string,ItemPurchased>();
+        public string cartEmpty = "";
 
         public CheckoutPage(IDictionary<string, ItemPurchased> order = null, string day = "")
         {
             InitializeComponent();
             GetAvailiableCoupons();
             InitializeMap();
+            if(day == "")
+            {
+                order = null;
+                cartItems.Clear();
+            }
             if (order != null)
             {
                 cartItems.Clear();
@@ -149,8 +157,9 @@ namespace ServingFresh.Views
                     });
                     orderCopy.Add(key, order[key]);
                 }
-               
+
             }
+
             purchaseObject = new PurchaseDataObject()
             {
                 pur_customer_uid = Application.Current.Properties.ContainsKey("user_id") ? (string)Application.Current.Properties["user_id"] : "",
@@ -181,11 +190,21 @@ namespace ServingFresh.Views
             FullName.Text = purchaseObject.delivery_first_name + " " + purchaseObject.delivery_last_name;
             PhoneNumber.Text = purchaseObject.delivery_phone_num;
             EmailAddress.Text = purchaseObject.delivery_email;
-            deliveryDay = day;
-            deliveryDate.Text = day +", ";
-            deliveryDate.Text += Application.Current.Properties.ContainsKey("delivery_date") ? (string)Application.Current.Properties["delivery_date"] : "";
-            deliveryTime.Text = "Between ";
-            deliveryTime.Text += Application.Current.Properties.ContainsKey("delivery_time") ? (string)Application.Current.Properties["delivery_time"] : "";
+            if(day != "")
+            {
+                deliveryDay = day;
+                deliveryDate.Text = day + ", ";
+                deliveryDate.Text += Application.Current.Properties.ContainsKey("delivery_date") ? (string)Application.Current.Properties["delivery_date"] : "";
+                deliveryTime.Text = "Between ";
+                deliveryTime.Text += Application.Current.Properties.ContainsKey("delivery_time") ? (string)Application.Current.Properties["delivery_time"] : "";
+            }
+            else
+            {
+                cartEmpty = "EMPTY";
+                deliveryDate.Text = "";
+                deliveryTime.Text = "";
+            }
+            
 
             CartItems.ItemsSource = cartItems;
             CartItems.HeightRequest = 56 * cartItems.Count;
@@ -343,7 +362,25 @@ namespace ServingFresh.Views
 
         void CartClick(System.Object sender, System.EventArgs e)
         {
-            // Application.Current.MainPage = new ItemsPage(orderCopy, deliveryDay);
+            if(cartEmpty != "EMPTY")
+            {
+                foreach (ItemObject i in cartItems)
+                {
+                    foreach (string key in orderCopy.Keys)
+                    {
+                        if (orderCopy[key].item_name == i.name)
+                        {
+                            orderCopy[key].item_quantity = i.qty;
+                        }
+                    }
+                }
+                Application.Current.MainPage = new ItemsPage(orderCopy, deliveryDay);
+            }
+            else
+            {
+                Application.Current.MainPage = new SelectionPage();
+            }
+            
         }
 
         void TapGestureRecognizer_Tapped(System.Object sender, System.EventArgs e)
@@ -440,17 +477,26 @@ namespace ServingFresh.Views
 
         public async void AddItems(object sender, EventArgs e)
         {
-            
-            Application.Current.MainPage = new ItemsPage(orderCopy, deliveryDay);
-            //var now = DateTime.Now;
-            //Console.WriteLine(now);
-            //Console.WriteLine(now.Year.ToString("D4") + "-" +
-            //                  now.Month.ToString("D2") + "-" +
-            //                  now.Day.ToString("D2") + " " +
-            //                  now.Hour.ToString("D2") + ":" +
-            //                  now.Minute.ToString("D2") + ":" +
-            //                  now.Second.ToString("D2"));
+            if (cartEmpty != "EMPTY")
+            {
+                foreach (ItemObject i in cartItems)
+                {
+                    foreach (string key in orderCopy.Keys)
+                    {
+                        if (orderCopy[key].item_name == i.name)
+                        {
+                            orderCopy[key].item_quantity = i.qty;
+                        }
+                    }
+                }
+                Application.Current.MainPage = new ItemsPage(orderCopy, deliveryDay);
+            }
+            else
+            {
+                Application.Current.MainPage = new SelectionPage();
+            }
         }
+
         public void checkoutAsync(object sender, EventArgs e)
         {
            
