@@ -127,7 +127,7 @@ namespace ServingFresh.Views
         private int defaultCouponIndex = 0;
         double savings = 0;
         public string deliveryDay = "";
-        public IDictionary<string, ItemPurchased> orderCopy = null;
+        public IDictionary<string, ItemPurchased> orderCopy = new Dictionary<string,ItemPurchased>();
 
         public CheckoutPage(IDictionary<string, ItemPurchased> order = null, string day = "")
         {
@@ -147,8 +147,9 @@ namespace ServingFresh.Views
                         item_uid = order[key].item_uid,
                         business_uid = order[key].pur_business_uid
                     });
+                    orderCopy.Add(key, order[key]);
                 }
-                orderCopy = order;
+               
             }
             purchaseObject = new PurchaseDataObject()
             {
@@ -289,7 +290,7 @@ namespace ServingFresh.Views
                     savings = initialTotal - newTotal;
                     if(savings != 0)
                     {
-                        c.image = "CouponIconOrange.png";
+                        c.image = "CouponIconGreen.png";
                         c.couponNote += "\nYou are saving: $" + savings;
                     }
                     else
@@ -334,7 +335,7 @@ namespace ServingFresh.Views
 
                 Debug.WriteLine("This is the coupon index that will save you the most money: " + defaultCouponIndex);
  
-                couponsList[defaultCouponIndex].image = "CouponIconGreen.png";
+                couponsList[defaultCouponIndex].image = "CouponIconOrange.png";
                 coupon_list.ItemsSource = couponsList;
                 updateTotals(unsortedDiscounts[defaultCouponIndex] - couponData.result[defaultCouponIndex].discount_shipping, couponData.result[defaultCouponIndex].discount_shipping);
             }
@@ -350,12 +351,12 @@ namespace ServingFresh.Views
             var element = (StackLayout)sender;
             var selectedElement = Int32.Parse(element.ClassId);
             Debug.WriteLine(couponsList[selectedElement].image);
-            if(couponsList[selectedElement].image == "CouponIconOrange.png")
+            if(couponsList[selectedElement].image == "CouponIconGreen.png")
             {
-                couponsList[defaultCouponIndex].image = "CouponIconOrange.png";
+                couponsList[defaultCouponIndex].image = "CouponIconGreen.png";
                 // couponsList[defaultCouponIndex].image = "CouponIconGray.png";
                 couponsList[defaultCouponIndex].update();
-                couponsList[selectedElement].image = "CouponIconGreen.png";
+                couponsList[selectedElement].image = "CouponIconOrange.png";
                 couponsList[selectedElement].update();
                 defaultCouponIndex = selectedElement;
                 updateTotals(unsortedDiscounts[defaultCouponIndex] - couponData.result[defaultCouponIndex].discount_shipping, couponData.result[defaultCouponIndex].discount_shipping);
@@ -462,7 +463,8 @@ namespace ServingFresh.Views
             cardZip.Text = purchaseObject.delivery_zip;
             cardDescription.Text = "None";
 
-            cardframe.Height = this.Height / 2;
+            cardframe.Height = this.Height ;
+            options.Height = 0;
             
             string dateTime = DateTime.Parse((string)Application.Current.Properties["delivery_date"]).ToString("yyyy-MM-dd");
             Debug.WriteLine("Date Time of Stripe: " + dateTime);
@@ -504,6 +506,7 @@ namespace ServingFresh.Views
         void CompletePaymentClick(System.Object sender, System.EventArgs e)
         {
             cardframe.Height = 0;
+            options.Height = 65;
             PayViaStripe();
         }
         void PayViaPayPal(System.Object sender, System.EventArgs e)
@@ -725,6 +728,7 @@ namespace ServingFresh.Views
         void CancelPaymentClick(System.Object sender, System.EventArgs e)
         {
             cardframe.Height = 0;
+            options.Height = 65;
         }
         public void increase_qty(object sender, EventArgs e)
         {
@@ -826,7 +830,7 @@ namespace ServingFresh.Views
                 savings = initialTotal - newTotal;
                 if (savings != 0)
                 {
-                    c.image = "CouponIconOrange.png";
+                    c.image = "CouponIconGreen.png";
                     c.couponNote += "\nYou are saving: $" + savings;
                 }
                 else
@@ -868,7 +872,7 @@ namespace ServingFresh.Views
 
             Debug.WriteLine("This is the coupon index that will save you the most money: " + defaultCouponIndex);
 
-            couponsList[defaultCouponIndex].image = "CouponIconGreen.png";
+            couponsList[defaultCouponIndex].image = "CouponIconOrange.png";
             coupon_list.ItemsSource = couponsList;
             updateTotals(unsortedDiscounts[defaultCouponIndex] - couponData.result[defaultCouponIndex].discount_shipping, couponData.result[defaultCouponIndex].discount_shipping);
         }

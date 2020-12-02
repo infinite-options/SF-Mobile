@@ -12,7 +12,7 @@
                 <RowDefinition Height="35"></RowDefinition>
                 <RowDefinition Height="95"></RowDefinition>
                 <RowDefinition Height="1"></RowDefinition>
-                <RowDefinition Height="65"></RowDefinition>
+                <RowDefinition x:Name="options" Height="65"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
                 <RowDefinition x:Name="cardframe" Height="0" ></RowDefinition>
                 <RowDefinition x:Name="addresframe" Height="0" ></RowDefinition>
@@ -192,7 +192,7 @@
                                                         <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"/>
                                                 </Image.GestureRecognizers>-->
                                             </Image>
-                                            <Label Text="{Binding couponNote}" TextColor="Black" HeightRequest="100" Margin="45,-100,85,0">
+                                            <Label Text="{Binding couponNote}" TextColor="Black" FontAttributes="Bold" HeightRequest="100" Margin="45,-100,85,0">
                                                 <!--<Label.GestureRecognizers>
                                                         <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"/>
                                                 </Label.GestureRecognizers>-->

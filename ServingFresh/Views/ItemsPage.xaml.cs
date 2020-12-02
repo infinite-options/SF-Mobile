@@ -70,9 +70,11 @@ namespace ServingFresh.Views
 
         private static List<string> uidsCopy = null;
         private static List<string> typesCopy = null;
-        
+        private Dictionary<string,ItemPurchased> purchase = new Dictionary<string, ItemPurchased>();
+
         public ItemsPage(List<string> types, List<string> b_uids, string day)
         {
+            Debug.WriteLine("Should not print");
             InitializeComponent();
             try
             {
@@ -82,6 +84,8 @@ namespace ServingFresh.Views
                 typesCopy = types;
                 _ = GetData(types, b_uids);
                 titlePage.Text = day;
+
+
                 itemList.ItemsSource = datagrid;
                 CartTotal.Text = totalCount.ToString();
             }catch(Exception ex)
@@ -98,28 +102,45 @@ namespace ServingFresh.Views
             try
             {
                 //SetInitialFilters(types);
-                
-                
+
                 _ = GetData(typesCopy, uidsCopy);
+                uids = uidsCopy;
                 titlePage.Text = day;
-                itemList.ItemsSource = datagrid;
-                CartTotal.Text = orderCopy.Count.ToString();
-                order = orderCopy;
+
+                foreach (string key in orderCopy.Keys)
+                {
+                    Debug.WriteLine(orderCopy[key].item_name);
+                    foreach (ItemsModel a in datagrid)
+                    {
+                        //Debug.WriteLine(orderCopy[key].item_name);
+                        Debug.WriteLine(a.itemNameLeft);
+                        //if (orderCopy[key].item_name == a.itemNameLeft)
+                        //{
+                        //    Debug.WriteLine(orderCopy[key].item_name);
+                        //    a.quantityLeft = orderCopy[key].item_quantity;
+                        //    break;
+                        //}
+                    }
+                }
+
+                // itemList.ItemsSource = this.datagrid;
+                //Debug.WriteLine(this.datagrid.Count);
+                //CartTotal.Text = orderCopy.Count.ToString();
+                //order = orderCopy;
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine(ex.Message);
             }
             // This are the types and business uids
-            foreach (string a in typesCopy)
-            {
-                Debug.WriteLine(a);
-            }
-            foreach (string b in uidsCopy)
-            {
-                Debug.WriteLine(b);
-            }
-
+            //foreach (string a in typesCopy)
+            //{
+            //    Debug.WriteLine(a);
+            //}
+            //foreach (string b in uidsCopy)
+            //{
+            //    Debug.WriteLine(b);
+            //}
         }
 
         void SetInitialFilters(List<string> types)
@@ -290,7 +311,10 @@ namespace ServingFresh.Views
                         });
                     }
                 }
-            }catch(Exception ex)
+
+                Debug.WriteLine(this.datagrid.Count);
+            }
+            catch(Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine(ex.Message);
             }
@@ -551,18 +575,35 @@ namespace ServingFresh.Views
 
         void CheckOutClickBusinessPage(System.Object sender, System.EventArgs e)
         {
-            
-            Application.Current.MainPage = new CheckoutPage(order, titlePage.Text);
+            purchase = new Dictionary<string, ItemPurchased>();
+            foreach (string item in order.Keys)
+            {
+                if(order[item].item_quantity != 0)
+                {
+                    purchase.Add(item, order[item]);
+                }
+            }
+           
+            Application.Current.MainPage = new CheckoutPage(purchase, titlePage.Text);
         }
 
         void DeliveryDaysClick(System.Object sender, System.EventArgs e)
         {
+
             Application.Current.MainPage = new SelectionPage();
         }
 
         void OrdersClick(System.Object sender, System.EventArgs e)
         {
-            Application.Current.MainPage = new CheckoutPage(order, titlePage.Text);
+            purchase = new Dictionary<string, ItemPurchased>();
+            foreach (string item in order.Keys)
+            {
+                if (order[item].item_quantity != 0)
+                {
+                    purchase.Add(item, order[item]);
+                }
+            }
+            Application.Current.MainPage = new CheckoutPage(purchase, titlePage.Text);
         }
 
         void InfoClick(System.Object sender, System.EventArgs e)

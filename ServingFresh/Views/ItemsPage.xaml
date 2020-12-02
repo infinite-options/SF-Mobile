@@ -92,7 +92,7 @@
                 <CollectionView x:Name="itemList"  BackgroundColor="White" SelectionMode="None">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Grid HorizontalOptions="Center" Padding="15,10,5,0" BackgroundColor="White">
+                            <Grid HorizontalOptions="Center" Padding="15,10,5,0" BackgroundColor="White" ColumnSpacing="10">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="{Binding height}"></RowDefinition>
                                 </Grid.RowDefinitions>
@@ -182,7 +182,7 @@
                                              </Grid.RowDefinitions>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*"></ColumnDefinition>
-                                                <ColumnDefinition Width="50"></ColumnDefinition>
+                                                <ColumnDefinition Width="45"></ColumnDefinition>
                                             </Grid.ColumnDefinitions>
                                             <BoxView  Grid.Row="0" Grid.Column="0"></BoxView>
                                             <BoxView  Grid.Row="0" Grid.Column="1"></BoxView>
