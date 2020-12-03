@@ -154,22 +154,60 @@
                                     <DataTemplate>
                                         <StackLayout>
                                             <Grid Padding="15">
-                                                <Label Text="{Binding name}" Grid.Column="0" Grid.ColumnSpan="3" StyleClass="p, black"/>
-                                                <FlexLayout JustifyContent="SpaceBetween" Grid.Column="3" VerticalOptions="Center" >
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="50"></RowDefinition>
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <Label Grid.Row="0" Grid.Column="0" Text="{Binding name}" HorizontalOptions="Start" StyleClass="p, black"/>
+                                                <Grid Grid.Row="0" Grid.Column="1" >
+                                                     <Grid.RowDefinitions>
+                                                    <RowDefinition Height="50"></RowDefinition>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Grid Grid.Row="0" Grid.Column="0">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="50"></RowDefinition>
+                                                        </Grid.RowDefinitions>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="10"></ColumnDefinition>
+                                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                                            <ColumnDefinition Width="10"></ColumnDefinition>
+                                                        </Grid.ColumnDefinitions>
+                                                         <Label Grid.Row="0" Grid.Column="0" Text="_" FontSize="Medium" Padding="0,-7,0,0" HorizontalOptions="Start" FontAttributes="Bold" WidthRequest="30" StyleClass="p, secondary">
+                                                            <Label.GestureRecognizers>
+                                                                <TapGestureRecognizer Tapped="decrease_qty" CommandParameter="{Binding .}"/>
+                                                            </Label.GestureRecognizers>
+                                                        </Label>
+                                                    <!--"{Binding qty}"-->
+                                                    <Label Grid.Row="0" Grid.Column="1"  Text="{Binding qty}" HorizontalOptions="Center" StyleClass="p, secondary"/>
+                                                    <Label Grid.Row="0" Grid.Column="2"  Text="+" HorizontalOptions="End" FontSize="Medium" FontAttributes="Bold" WidthRequest="30"  StyleClass="p, secondary">
+                                                        <Label.GestureRecognizers>
+                                                            <TapGestureRecognizer Tapped="increase_qty" CommandParameter="{Binding .}"/>
+                                                        </Label.GestureRecognizers>
+                                                    </Label>
+                                                    </Grid>
+                                                    <Label Grid.Row="0" Grid.Column="1" Padding="0,5,10,0" StyleClass="p, black" HorizontalTextAlignment="End" Text="{Binding total_price}"/>
+                                                </Grid>
+                                                <!--<FlexLayout JustifyContent="SpaceBetween" Grid.Column="3" VerticalOptions="Center" >
                                                     <Label Text="_" FontSize="Medium" Padding="0,-7,0,0" HorizontalTextAlignment="Center" FontAttributes="Bold" WidthRequest="30" StyleClass="p, secondary">
                                                         <Label.GestureRecognizers>
                                                             <TapGestureRecognizer Tapped="decrease_qty" CommandParameter="{Binding .}"/>
                                                         </Label.GestureRecognizers>
                                                     </Label>
-                                                    <!--"{Binding qty}"-->
+                                                    "{Binding qty}"
                                                     <Label Text="{Binding qty}" VerticalTextAlignment="Center" StyleClass="p, secondary"/>
                                                     <Label Text="+" HorizontalTextAlignment="Center" FontSize="Medium" FontAttributes="Bold" WidthRequest="30"  StyleClass="p, secondary">
                                                         <Label.GestureRecognizers>
                                                             <TapGestureRecognizer Tapped="increase_qty" CommandParameter="{Binding .}"/>
                                                         </Label.GestureRecognizers>
                                                     </Label>
-                                                </FlexLayout>
-                                                <Label Padding="0,5,10,0" StyleClass="p, black" Grid.Column="4" HorizontalTextAlignment="End" Text="{Binding total_price}"/>
+                                                </FlexLayout>-->
                                             </Grid>
                                             <BoxView StyleClass="spacer"/>
                                         </StackLayout>
@@ -177,7 +215,8 @@
                                 </CollectionView.ItemTemplate>
                             </CollectionView>
                         </Grid>
-                        <Label Text="Choose one of the eligible promos to apply" StyleClass="black" Padding="15,0,15,0"/>
+                        <BoxView StyleClass="spacer"/>
+                        <Label Text="Choose one of the eligible promos to apply" FontAttributes="Bold" FontSize="15" StyleClass="black" Padding="15,0,15,0"/>
                         <!--<ScrollView Orientation="Horizontal" HeightRequest="150" Padding="0">-->
                             <CollectionView x:Name="coupon_list" ItemsLayout="HorizontalList" HeightRequest="150">
                                 <CollectionView.ItemTemplate >

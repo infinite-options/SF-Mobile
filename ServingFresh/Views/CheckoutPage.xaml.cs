@@ -745,7 +745,7 @@ namespace ServingFresh.Views
                     if (RDSResponse.IsSuccessStatusCode)
                     {
                         var RDSResponseContent = await RDSResponse.Content.ReadAsStringAsync();
-                        System.Diagnostics.Debug.WriteLine(RDSResponseContent);
+                        //System.Diagnostics.Debug.WriteLine(RDSResponseContent);
 
                         cartItems.Clear();
                         updateTotals(0, 0);
