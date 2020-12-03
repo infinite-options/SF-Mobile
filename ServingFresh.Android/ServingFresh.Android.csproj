@@ -173,10 +173,6 @@
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>
-    <AndroidResource Include="Resources\drawable\welcomeBackground.png">
-      <SubType></SubType>
-      <Generator></Generator>
-    </AndroidResource>
     <AndroidResource Include="Resources\drawable\servingFreshIcon.png">
       <SubType></SubType>
       <Generator></Generator>
@@ -238,6 +234,10 @@
       <Generator></Generator>
     </AndroidResource>
     <AndroidResource Include="Resources\drawable\refund.png">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\drawable\welcomeBackground.png">
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>

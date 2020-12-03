@@ -162,7 +162,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <BundleResource Include="Resources\welcomeBackground.png" />
     <BundleResource Include="Resources\servingFreshIcon.png" />
     <BundleResource Include="Resources\facebookIcon.png" />
     <BundleResource Include="Resources\googleIcon.png" />
@@ -172,6 +171,7 @@
     <BundleResource Include="Resources\CouponIconOrange.png" />
     <BundleResource Include="Resources\CouponIconGreen.png" />
     <BundleResource Include="Resources\refund.png" />
+    <BundleResource Include="Resources\welcomeBackground.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AppleSignIn\" />

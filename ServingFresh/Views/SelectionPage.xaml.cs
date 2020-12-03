@@ -227,7 +227,7 @@ namespace ServingFresh.Views
             var response = await client.GetAsync(Constant.ZoneUrl + userLong + "," + userLat);
             var result = await response.Content.ReadAsStringAsync();
 
-            Debug.WriteLine(result);
+            Debug.WriteLine("List of farms: " + result);
 
             if (response.IsSuccessStatusCode)
             {

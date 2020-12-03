@@ -149,13 +149,13 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-                            <CollectionView x:Name="CartItems" Footer="">
+                            <CollectionView x:Name="CartItems">
                                 <CollectionView.ItemTemplate>
                                     <DataTemplate>
                                         <StackLayout>
-                                            <Grid Padding="15">
+                                            <Grid Padding="15,0,15,0">
                                                 <Grid.RowDefinitions>
-                                                    <RowDefinition Height="50"></RowDefinition>
+                                                    <RowDefinition Height="*"></RowDefinition>
                                                 </Grid.RowDefinitions>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="*"></ColumnDefinition>
@@ -222,7 +222,7 @@
                                 <CollectionView.ItemTemplate >
                                     <DataTemplate>
                                         <StackLayout Padding="5,0,5,0" WidthRequest="250" ClassId="{Binding index}">
-                                                <Image Source="{Binding image}" >
+                                            <Image Source="{Binding image}" >
                                                 <!--<Image.Effects>
                                                     <servingfresh:TintImageEffect TintColor="LightGray"/>
                                                 </Image.Effects>-->
@@ -230,11 +230,14 @@
                                                         <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"/>
                                                 </Image.GestureRecognizers>-->
                                             </Image>
-                                            <Label Text="{Binding couponNote}" TextColor="Black" FontAttributes="Bold" HeightRequest="100" Margin="45,-100,85,0">
-                                                <!--<Label.GestureRecognizers>
-                                                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"/>
-                                                </Label.GestureRecognizers>-->
-                                            </Label>
+                                            <Grid Margin="30,-120,50,0" HeightRequest="100">
+                                                <StackLayout>
+                                                    <Label Grid.Row="0" Grid.Column="0" Text="{Binding couponNote}" TextColor="Black" FontAttributes="Bold"  ></Label>
+                                                    <Label Grid.Row="1" Grid.Column="0" Text="{Binding thresholdNote}" TextColor="Black"   ></Label>
+                                                    <Label Grid.Row="2" Grid.Column="0" Text="{Binding expNote}" TextColor="Black"    ></Label>
+                                                    <Label Grid.Row="3" Grid.Column="0" Text="{Binding savingsNote}" TextColor="Black"   ></Label>
+                                                </StackLayout>
+                                            </Grid>
                                             <StackLayout.GestureRecognizers>
                                                         <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"/>
                                             </StackLayout.GestureRecognizers>

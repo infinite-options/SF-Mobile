@@ -96,6 +96,9 @@ namespace ServingFresh.Views
             public string index { get; set; }
             public double saving { get; set; }
             public double disc { get; set; }
+            public string thresholdNote { get; set; }
+            public string expNote { get; set; }
+            public string savingsNote { get; set; }
 
             public void update()
             {
@@ -270,6 +273,8 @@ namespace ServingFresh.Views
                     }
 
                     coupons.couponNote = c.notes;
+                    coupons.expNote = "Expires: "+ DateTime.Parse(c.expire_date).ToString("MM/dd/yyyy");
+
                     coupons.index = placement.ToString();
                     couponsList.Add(coupons);
 
@@ -317,11 +322,13 @@ namespace ServingFresh.Views
                     if(savings != 0)
                     {
                         c.image = "CouponIconGreen.png";
-                        c.couponNote += "\nYou are saving: $" + savings;
+                        c.thresholdNote = "No minimum purchase";
+                        c.savingsNote = "You saved: $" + savings.ToString("N2");
                     }
                     else
                     {
-                        c.couponNote += "\nBuy $" + (unsortedThresholds[j] - initialSubTotal) +" more produce to be eligible" ;
+                        c.thresholdNote = "$" + (unsortedThresholds[j]).ToString("N2") + " minimum purchase";
+                        c.savingsNote = "Spend $" + (unsortedThresholds[j] - initialSubTotal).ToString("N2") + " more to use";
                     }
                     
                     j++;
@@ -360,8 +367,10 @@ namespace ServingFresh.Views
                 }
 
                 Debug.WriteLine("This is the coupon index that will save you the most money: " + defaultCouponIndex);
- 
-                couponsList[defaultCouponIndex].image = "CouponIconOrange.png";
+                if(couponsList[defaultCouponIndex].savingsNote != "")
+                {
+                    couponsList[defaultCouponIndex].image = "CouponIconOrange.png";
+                }
 
                 ObservableCollection<couponItem> displayCoupons = new ObservableCollection<couponItem>();
                 ObservableCollection<couponItem> couponsListCopy = new ObservableCollection<couponItem>();
@@ -541,7 +550,24 @@ namespace ServingFresh.Views
             options.Height = 0;
             
             string dateTime = DateTime.Parse((string)Application.Current.Properties["delivery_date"]).ToString("yyyy-MM-dd");
-            Debug.WriteLine("Date Time of Stripe: " + dateTime);
+            string t = (string)Application.Current.Properties["delivery_time"];
+            string startTime = "";
+            foreach(char a in t.ToCharArray())
+            {
+                if(a != '-')
+                {
+                    startTime += a;
+                }
+                else { break; }
+            }
+            var timeStamp = new DateTime();
+
+            if (startTime != "")
+            {
+                timeStamp = DateTime.Parse(startTime.Trim());
+            }
+          
+            
             purchaseObject.cc_num = "";
             purchaseObject.cc_exp_date = "";
             purchaseObject.cc_cvv = "";
@@ -549,7 +575,7 @@ namespace ServingFresh.Views
             purchaseObject.charge_id = "";
             purchaseObject.payment_type = ((Button)sender).Text == "Checkout with Paypal" ? "PAYPAL" : "STRIPE";
             purchaseObject.items = GetOrder(cartItems);
-            purchaseObject.start_delivery_date = dateTime;
+            purchaseObject.start_delivery_date = dateTime +" "+ timeStamp.ToString("HH:mm:ss");
             purchaseObject.pay_coupon_id = couponData.result[defaultCouponIndex].coupon_uid;
             purchaseObject.amount_due = total.ToString("N2");
             purchaseObject.amount_discount = discount.ToString("N2");
@@ -862,6 +888,7 @@ namespace ServingFresh.Views
                 }
 
                 coupons.couponNote = c.notes;
+                coupons.expNote = "Expires: " + DateTime.Parse(c.expire_date).ToString("MM/dd/yyyy");
                 coupons.index = placement.ToString();
                 couponsList.Add(coupons);
 
@@ -907,12 +934,15 @@ namespace ServingFresh.Views
                 if (savings != 0)
                 {
                     c.image = "CouponIconGreen.png";
-                    c.couponNote += "\nYou are saving: $" + savings;
+                    c.thresholdNote = "No minimum purchase";
+                    c.savingsNote = "You saved: $" + savings.ToString("N2");
                 }
                 else
                 {
-                    c.couponNote += "\nBuy $" + (unsortedThresholds[j] - initialSubTotal) + " more produce to be eligible";
+                    c.thresholdNote = "$" + (unsortedThresholds[j]).ToString("N2") + " minimum purchase";
+                    c.savingsNote = "Spend $" + (unsortedThresholds[j] - initialSubTotal).ToString("N2") + " more to use";
                 }
+
                 j++;
             }
             Debug.Write("Unsorted List of New Totals: ");
@@ -948,8 +978,10 @@ namespace ServingFresh.Views
 
             Debug.WriteLine("This is the coupon index that will save you the most money: " + defaultCouponIndex);
 
-            couponsList[defaultCouponIndex].image = "CouponIconOrange.png";
-
+            if (couponsList[defaultCouponIndex].savingsNote != "")
+            {
+                couponsList[defaultCouponIndex].image = "CouponIconOrange.png";
+            }
 
             ObservableCollection<couponItem> displayCoupons = new ObservableCollection<couponItem>();
             ObservableCollection<couponItem> couponsListCopy = new ObservableCollection<couponItem>();
