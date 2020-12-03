@@ -94,6 +94,8 @@ namespace ServingFresh.Views
             public string image { get; set; }
             public string couponNote { get; set; }
             public string index { get; set; }
+            public double saving { get; set; }
+            public double disc { get; set; }
 
             public void update()
             {
@@ -137,10 +139,14 @@ namespace ServingFresh.Views
             InitializeComponent();
             GetAvailiableCoupons();
             InitializeMap();
-            if(day == "")
+            if((string)Application.Current.Properties["day"] == "")
             {
                 order = null;
                 cartItems.Clear();
+            }
+            else
+            {
+                day = (string)Application.Current.Properties["day"];
             }
             if (order != null)
             {
@@ -295,6 +301,7 @@ namespace ServingFresh.Views
                     unsortedThresholds.Add((double)c.threshold);
                     unsortedNewTotals.Add(newTotal);
                     unsortedDiscounts.Add(discount + c.discount_shipping);
+                    coupons.disc = discount + c.discount_shipping;
                     sortedDiscounts.Add(discount + c.discount_shipping);
 
                     placement++;
@@ -355,7 +362,28 @@ namespace ServingFresh.Views
                 Debug.WriteLine("This is the coupon index that will save you the most money: " + defaultCouponIndex);
  
                 couponsList[defaultCouponIndex].image = "CouponIconOrange.png";
-                coupon_list.ItemsSource = couponsList;
+
+                ObservableCollection<couponItem> displayCoupons = new ObservableCollection<couponItem>();
+                ObservableCollection<couponItem> couponsListCopy = new ObservableCollection<couponItem>();
+                foreach(couponItem b in couponsList)
+                {
+                    couponsListCopy.Add(b);
+                }
+
+                for (int i = sortedDiscounts.Count -1; i >=0; i--)
+                {
+                    foreach(couponItem a in couponsListCopy)
+                    {
+                        if(a.disc == sortedDiscounts[i])
+                        {
+                            displayCoupons.Add(a);
+                            couponsListCopy.Remove(a);
+                            break;
+                        }
+                    }
+                }
+
+                coupon_list.ItemsSource = displayCoupons;
                 updateTotals(unsortedDiscounts[defaultCouponIndex] - couponData.result[defaultCouponIndex].discount_shipping, couponData.result[defaultCouponIndex].discount_shipping);
             }
         }
@@ -609,6 +637,7 @@ namespace ServingFresh.Views
             }
             if (RDSCouponResponse.IsSuccessStatusCode && RDSResponse.IsSuccessStatusCode)
             {
+                Application.Current.Properties["day"] = "";
                 string toFind1 = "pay_purchase_id";
                 string toFind2 = "payment_time_stamp";
                 int start = re.IndexOf(toFind1) + toFind1.Length;
@@ -725,6 +754,7 @@ namespace ServingFresh.Views
                     }
                     if(RDSCouponResponse.IsSuccessStatusCode && RDSResponse.IsSuccessStatusCode)
                     {
+                        Application.Current.Properties["day"] = "";
                         await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
                     }
                 }
@@ -864,7 +894,7 @@ namespace ServingFresh.Views
                 unsortedNewTotals.Add(newTotal);
                 unsortedDiscounts.Add(discount + c.discount_shipping);
                 sortedDiscounts.Add(discount + c.discount_shipping);
-
+                coupons.disc = discount + c.discount_shipping;
                 placement++;
             }
 
@@ -919,7 +949,30 @@ namespace ServingFresh.Views
             Debug.WriteLine("This is the coupon index that will save you the most money: " + defaultCouponIndex);
 
             couponsList[defaultCouponIndex].image = "CouponIconOrange.png";
-            coupon_list.ItemsSource = couponsList;
+
+
+            ObservableCollection<couponItem> displayCoupons = new ObservableCollection<couponItem>();
+            ObservableCollection<couponItem> couponsListCopy = new ObservableCollection<couponItem>();
+            foreach (couponItem b in couponsList)
+            {
+                couponsListCopy.Add(b);
+            }
+
+            for (int i = sortedDiscounts.Count - 1; i >= 0; i--)
+            {
+                foreach (couponItem a in couponsListCopy)
+                {
+                    if (a.disc == sortedDiscounts[i])
+                    {
+                        displayCoupons.Add(a);
+                        couponsListCopy.Remove(a);
+                        break;
+                    }
+                }
+            }
+
+            coupon_list.ItemsSource = displayCoupons;
+            
             updateTotals(unsortedDiscounts[defaultCouponIndex] - couponData.result[defaultCouponIndex].discount_shipping, couponData.result[defaultCouponIndex].discount_shipping);
         }
         public void openHistory(object sender, EventArgs e)

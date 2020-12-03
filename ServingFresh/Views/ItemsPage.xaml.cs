@@ -775,7 +775,7 @@ namespace ServingFresh.Views
                     purchase.Add(item, order[item]);
                 }
             }
-           
+            Application.Current.Properties["day"] = titlePage.Text;
             Application.Current.MainPage = new CheckoutPage(purchase, titlePage.Text);
         }
 
@@ -795,6 +795,7 @@ namespace ServingFresh.Views
                     purchase.Add(item, order[item]);
                 }
             }
+            Application.Current.Properties["day"] = titlePage.Text;
             Application.Current.MainPage = new CheckoutPage(purchase, titlePage.Text);
         }
 

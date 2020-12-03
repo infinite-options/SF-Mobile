@@ -111,6 +111,7 @@ namespace ServingFresh.Views
             InitializeComponent();
             Init();
             GetBusinesses();
+            Application.Current.Properties["day"] = "";
             CartTotal.Text = CheckoutPage.total_qty.ToString();
         }
 
