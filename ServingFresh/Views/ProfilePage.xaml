@@ -66,14 +66,16 @@
                     x:Name="userEmailAddress"
                     Placeholder="Email Address">
                 </Entry>
-                <Entry
+                <StackLayout x:Name="passwordCredentials">
+                    <Entry
                     x:Name="userPassword"
                     Placeholder="Enter Password">
-                </Entry>
-                <Entry
-                    x:Name="userConfirmPassword"
-                    Placeholder="Confirm Password">
-                </Entry>
+                    </Entry>
+                    <Entry
+                        x:Name="userConfirmPassword"
+                        Placeholder="Confirm Password">
+                    </Entry>
+                </StackLayout>
                 <Grid>
                     <customentry:CustomEntry Placeholder="Push Notification" IsReadOnly="True" Margin="7,0,0,0" ></customentry:CustomEntry>
                     <Switch HorizontalOptions="End" Grid.Column="1" IsToggled="True"></Switch>

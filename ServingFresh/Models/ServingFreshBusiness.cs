@@ -103,6 +103,7 @@ namespace ServingFresh.Models
 
     public class Business
     {
+        public string zone { get; set; }
         public int z_id { get; set; }
         public string z_biz_id { get; set; }
         public string business_name { get; set; }

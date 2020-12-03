@@ -111,6 +111,23 @@ namespace ServingFresh.Views
             public string coupon_uid { get; set; }
         }
 
+        public class Fee
+        {
+            public double service_fee { get; set; }
+            public double tax_rate { get; set; }
+            public double delivery_fee { get; set; }
+            public string delivery_time { get; set; }
+        }
+
+        public class ZoneFees
+        {
+            public string message { get; set; }
+            public int code { get; set; }
+            public Fee result { get; set; }
+            public string sql { get; set; }
+        }
+
+
         public PurchaseDataObject purchaseObject;
         public static ObservableCollection<ItemObject> cartItems = new ObservableCollection<ItemObject>();
         public static ObservableCollection<couponItem> couponsList = new ObservableCollection<couponItem>();
@@ -140,6 +157,11 @@ namespace ServingFresh.Views
         public CheckoutPage(IDictionary<string, ItemPurchased> order = null, string day = "")
         {
             InitializeComponent();
+            if(day != "")
+            {
+                GetFees(day);
+            }
+            
             GetAvailiableCoupons();
             InitializeMap();
             if((string)Application.Current.Properties["day"] == "")
@@ -166,7 +188,6 @@ namespace ServingFresh.Views
                     });
                     orderCopy.Add(key, order[key]);
                 }
-
             }
 
             purchaseObject = new PurchaseDataObject()
@@ -218,9 +239,9 @@ namespace ServingFresh.Views
             CartItems.ItemsSource = cartItems;
             CartItems.HeightRequest = 56 * cartItems.Count;
 
-            delivery_fee = Constant.deliveryFee;
-            service_fee = Constant.serviceFee;
-            ServiceFee.Text = "$ " + service_fee.ToString("N2");
+            //delivery_fee = Constant.deliveryFee;
+            //service_fee = Constant.serviceFee;
+            
         }
 
         public void InitializeMap()
@@ -229,6 +250,31 @@ namespace ServingFresh.Views
             Position point = new Position(37.334789, -121.888138);
             var mapSpan = new MapSpan(point, 5, 5);
             map.MoveToRegion(mapSpan);
+        }
+
+        public async void GetFees(string day)
+        {
+            var client = new HttpClient();
+            var zone = (string)Application.Current.Properties["zone"];
+            if(zone != "")
+            {
+                Debug.WriteLine("Fees from Zone: " + zone);
+
+                var RDSResponse = await client.GetAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/get_Fee_Tax/" + zone + "," + day);
+                var content = await RDSResponse.Content.ReadAsStringAsync();
+                if (RDSResponse.IsSuccessStatusCode)
+                {
+                    var data = JsonConvert.DeserializeObject<ZoneFees>(content);
+                    Constant.deliveryFee = data.result.delivery_fee;
+                    Constant.serviceFee = data.result.service_fee;
+                    Constant.tax_rate = data.result.tax_rate;
+                    delivery_fee = Constant.deliveryFee;
+                    service_fee = Constant.serviceFee;
+                }
+                ServiceFee.Text = "$ " + service_fee.ToString("N2");
+                DeliveryFee.Text = "$ " + delivery_fee.ToString("N2");
+                GetAvailiableCoupons();
+            }
         }
 
         public async void GetAvailiableCoupons()
@@ -433,10 +479,12 @@ namespace ServingFresh.Views
                 couponsList[selectedElement].image = "CouponIconOrange.png";
                 couponsList[selectedElement].update();
                 defaultCouponIndex = selectedElement;
+                Debug.WriteLine("This is the index of the coupon you have selected: " + selectedElement);
+                Debug.WriteLine("This is the index of the coupon you have shipping: " + couponData.result[defaultCouponIndex].discount_shipping);
                 updateTotals(unsortedDiscounts[defaultCouponIndex] - couponData.result[defaultCouponIndex].discount_shipping, couponData.result[defaultCouponIndex].discount_shipping);
             }
             // if you select the coupon that is already selected do nothing else change... Use the defalt index and run it with this new position
-            Debug.WriteLine("This is the index of the coupon you have selected: " + selectedElement);
+            //Debug.WriteLine("This is the index of the coupon you have selected: " + selectedElement);
 
             //updateTotals(unsortedDiscounts[couponNum], 0);
         }
@@ -456,7 +504,7 @@ namespace ServingFresh.Views
             this.discount = discount;
             Discount.Text = "-$ " + discount.ToString("N2");
             DeliveryFee.Text = "$ " + (delivery_fee - discount_delivery_fee).ToString("N2");
-            taxes = subtotal * (0.085 * 0);
+            taxes = subtotal * (Constant.tax_rate);
             Taxes.Text = "$ " + taxes.ToString("N2");
 
             if(DriverTip.Text == null)
@@ -664,25 +712,25 @@ namespace ServingFresh.Views
             if (RDSCouponResponse.IsSuccessStatusCode && RDSResponse.IsSuccessStatusCode)
             {
                 Application.Current.Properties["day"] = "";
-                string toFind1 = "pay_purchase_id";
-                string toFind2 = "payment_time_stamp";
-                int start = re.IndexOf(toFind1) + toFind1.Length;
-                int end = re.IndexOf(toFind2, start); //Start after the index of 'my' since 'is' appears twice
-                string string2 = re.Substring(start, end - start);
-                int s = 0;
-                foreach(char a in string2.ToCharArray())
-                {
-                    if(a == '\'')
-                    {
-                        break;
-                    }
-                    s++;
-                }
-                Debug.WriteLine("Start Index: " + s);
-                Debug.WriteLine("pucharse ID: "+  string2.Substring(s+1, 10));
-                string purchaseID = string2.Substring(s + 1, 10);
+                //string toFind1 = "pay_purchase_id";
+                //string toFind2 = "payment_time_stamp";
+                //int start = re.IndexOf(toFind1) + toFind1.Length;
+                //int end = re.IndexOf(toFind2, start); //Start after the index of 'my' since 'is' appears twice
+                //string string2 = re.Substring(start, end - start);
+                //int s = 0;
+                //foreach(char a in string2.ToCharArray())
+                //{
+                //    if(a == '\'')
+                //    {
+                //        break;
+                //    }
+                //    s++;
+                //}
+                //Debug.WriteLine("Start Index: " + s);
+                //Debug.WriteLine("pucharse ID: "+  string2.Substring(s+1, 10));
+                //string purchaseID = string2.Substring(s + 1, 10);
                 await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
-                Device.OpenUri(new System.Uri("https://servingnow.me/payment/" + purchaseID + "/" + purchaseObject.amount_due));
+                Device.OpenUri(new System.Uri("https://servingnow.me/payment/" + "400-000188" + "/" + purchaseObject.amount_due));
             }
         }
 

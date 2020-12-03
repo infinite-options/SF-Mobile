@@ -229,13 +229,18 @@ namespace ServingFresh.Views
 
             Debug.WriteLine("List of farms: " + result);
 
+            Application.Current.Properties["zone"] = "";
+                
             if (response.IsSuccessStatusCode)
             {
 
                 data = JsonConvert.DeserializeObject<ServingFreshBusiness>(result);
-                if (result.Contains("280"))
+
+                if (result.Contains("280") && data.result.Count != 0)
                 {
                     // Parse it
+                    Application.Current.Properties["zone"] = data.result[0].zone;
+                    Debug.WriteLine("Zone to save: " + Application.Current.Properties["zone"]);
                     Debug.WriteLine("Parsing Data");
                     deliveryDays.Clear();
                     businessList.Clear();

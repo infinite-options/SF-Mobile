@@ -122,7 +122,7 @@
                                             <Frame.GestureRecognizers>
                                                 <TapGestureRecognizer Tapped="Change_Border_Color" CommandParameter="{Binding .}"/>
                                             </Frame.GestureRecognizers>
-                                            <Image Source="{Binding business_image}" HeightRequest="100"/>
+                                            <Image Source="{Binding business_image}" HeightRequest="100" Aspect="Fill"/>
                                         </Frame>
                                         </Frame>
                                         <Label Text="{Binding business_name}" StyleClass="black, center"/>
