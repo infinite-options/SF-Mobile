@@ -9,8 +9,10 @@ using System.Xml.Linq;
 using Newtonsoft.Json;
 using ServingFresh.Config;
 using ServingFresh.Models;
+using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Maps;
+using Switch = Xamarin.Forms.Switch;
 
 namespace ServingFresh.Views
 {
@@ -33,6 +35,25 @@ namespace ServingFresh.Views
             public string guid { get; set; }
         }
 
+        public class UpdatePassword
+        {
+            public string customer_email { get; set; }
+            public string password { get; set; }
+            public string customer_uid { get; set; }
+        }
+
+        //{
+        //"uid" : "100-000003",
+        //"guid" : "22",
+        //"notification": "TRUE"
+        //}
+        public class UpdateNotification
+        {
+            public string uid { get; set; }
+            public string guid { get; set; }
+            public string notification { get; set; }
+        }
+
         public UpdateProfile profile = new UpdateProfile();
         
         private bool isAddressValidated;
@@ -44,17 +65,10 @@ namespace ServingFresh.Views
             userEmailAddress.Text = (string)Application.Current.Properties["user_email"];
             userFirstName.Text = (string)Application.Current.Properties["user_first_name"];
             userLastName.Text = (string)Application.Current.Properties["user_last_name"];
-            if((string)Application.Current.Properties["platform"] == "DIRECT")
-            {
-                passwordCredentials.HeightRequest = 80;
-                userPassword.Text = "*******";
-                userConfirmPassword.Text = "*******";
-            }
-            else
+            if((string)Application.Current.Properties["platform"] != "DIRECT")
             {
                 passwordCredentials.HeightRequest = 0;
-            }
-            
+            }  
             userAddress.Text = (string)Application.Current.Properties["user_address"];
             userUnitNumber.Text = (string)Application.Current.Properties["user_unit"];
             userCity.Text = (string)Application.Current.Properties["user_city"];
@@ -384,6 +398,70 @@ namespace ServingFresh.Views
             Application.Current.Properties.Remove("user_longitude");
             Application.Current.Properties.Remove("user_delivery_instructions");
             
+        }
+
+        async void UpdatePasswordClick(System.Object sender, System.EventArgs e)
+        {
+            if(userPassword.Text == userConfirmPassword.Text)
+            {
+                var updateClient = new HttpClient();
+                var changePassword = new UpdatePassword();
+                changePassword.customer_email = userEmailAddress.Text;
+                changePassword.password = userPassword.Text;
+                changePassword.customer_uid = (string)Application.Current.Properties["user_id"];
+
+                var p = JsonConvert.SerializeObject(changePassword);
+                var content = new StringContent(p, Encoding.UTF8, "application/json");
+
+                System.Diagnostics.Debug.WriteLine("Sign up JSON Object: " + p);
+
+                var RDSResponse = await updateClient.PostAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/update_email_password", content);
+                if (RDSResponse.IsSuccessStatusCode)
+                {
+                    await DisplayAlert("Awesome!","Your password has been updated","OK");
+                }
+                else
+                {
+                    await DisplayAlert("Ooops", "Our system is down. Can't process this request at the moment", "OK");
+                }
+            }
+            else
+            {
+                await DisplayAlert("Ooops","Your new password does not match.","OK");
+            }
+
+        }
+
+        async void Switch_Toggled(System.Object sender, Xamarin.Forms.ToggledEventArgs e)
+        {
+            var notification = (Switch)sender;
+            Debug.WriteLine(notification.IsToggled);
+
+            var updateNotification = new UpdateNotification();
+            updateNotification.uid = (string)Application.Current.Properties["user_id"];
+            updateNotification.guid = Preferences.Get("guid", "");
+            updateNotification.notification = notification.IsToggled.ToString().ToUpper();
+
+
+            var updateClient = new HttpClient();
+
+
+            var p = JsonConvert.SerializeObject(updateNotification);
+            var content = new StringContent(p, Encoding.UTF8, "application/json");
+
+            System.Diagnostics.Debug.WriteLine("Sign up JSON Object: " + p);
+            
+            var RDSResponse = await updateClient.PostAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/update_guid_notification/customer,update", content);
+            var r = await RDSResponse.Content.ReadAsStringAsync();
+            Debug.WriteLine("Response: " + r);
+            if (RDSResponse.IsSuccessStatusCode)
+            {
+                await DisplayAlert("Awesome!", "You updated your notification setting", "OK");
+            }
+            else
+            {
+                await DisplayAlert("Ooops", "Our system is down. Can't process this request at the moment", "OK");
+            }
         }
     }
 }

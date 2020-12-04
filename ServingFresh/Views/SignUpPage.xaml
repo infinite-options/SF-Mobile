@@ -6,18 +6,43 @@
     xmlns:servingfresh="clr-namespace:ServingFresh.Models"
     x:Class="ServingFresh.Views.SignUpPage">
     <ContentPage.Content>
-                <StackLayout Padding="0,0,0,0">
-            <Label
-                HeightRequest="136"
-                HorizontalTextAlignment="Center"
-                VerticalTextAlignment="Center"
-                Text="Sign Up"
-                TextColor="White"
-                FontSize="34"
-                FontAttributes="Bold"
-                BackgroundColor="#136D74">
-
-            </Label>
+        <StackLayout Padding="0,0,0,0">
+            <Grid BackgroundColor="#136D74">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="136"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="100"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Label
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    HeightRequest="50"
+                    HorizontalTextAlignment="Center"
+                    VerticalTextAlignment="Center"
+                    Text="Back"
+                    TextColor="White"
+                    FontSize="Default"
+                    FontAttributes="Bold">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"></TapGestureRecognizer>
+                    </Label.GestureRecognizers>
+                </Label>
+                <Label
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    HeightRequest="136"
+                    HorizontalTextAlignment="Center"
+                    VerticalTextAlignment="Center"
+                    Text="Sign Up"
+                    TextColor="White"
+                    FontSize="34"
+                    FontAttributes="Bold"
+                    BackgroundColor="#136D74">
+                </Label>
+            </Grid>
             <ScrollView>
                 <StackLayout
                     Margin="10,10,10,0">
@@ -77,7 +102,7 @@
                             Placeholder="Zipcode">
                         </Entry>
                     </Grid>
-                    <Entry x:Name="userDeliveryInstructions" Placeholder="Delivery instructions"></Entry>
+                    <Entry x:Name="userDeliveryInstructions" Placeholder="Delivery instructions" IsEnabled="False"></Entry>
                     <Frame HasShadow="False" BackgroundColor="Gray" Padding="0" HeightRequest="200">
                         <maps:Map
                             x:Name="map"

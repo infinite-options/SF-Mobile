@@ -64,21 +64,36 @@
                 Margin="10,10,10,0">
                 <Entry
                     x:Name="userEmailAddress"
-                    Placeholder="Email Address">
+                    Placeholder="Email Address"
+                    >
                 </Entry>
                 <StackLayout x:Name="passwordCredentials">
                     <Entry
                     x:Name="userPassword"
-                    Placeholder="Enter Password">
+                    Placeholder="Enter New Password"
+                    Keyboard="Default"
+                    >
                     </Entry>
                     <Entry
                         x:Name="userConfirmPassword"
-                        Placeholder="Confirm Password">
+                        Placeholder="Confirm New Password"
+                        Keyboard="Default"
+                        >
                     </Entry>
+                    <Button
+                        Text="Update Password"
+                        TextColor="#FF8500"
+                        CornerRadius="5"
+                        BorderColor="LightGray"
+                        BorderWidth="1"
+                        HeightRequest="40"
+                        BackgroundColor="White"
+                        Clicked="UpdatePasswordClick">
+                    </Button>
                 </StackLayout>
                 <Grid>
                     <customentry:CustomEntry Placeholder="Push Notification" IsReadOnly="True" Margin="7,0,0,0" ></customentry:CustomEntry>
-                    <Switch HorizontalOptions="End" Grid.Column="1" IsToggled="True"></Switch>
+                    <Switch HorizontalOptions="End" Grid.Column="1" Toggled="Switch_Toggled"></Switch>
                 </Grid>
                 <Entry
                     x:Name="userFirstName"

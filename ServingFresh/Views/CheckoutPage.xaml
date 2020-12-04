@@ -285,7 +285,7 @@
                             <Label Padding="0,0,30,0" x:Name="GrandTotal" StyleClass="p, black"/>
                         </FlexLayout>
                         <StackLayout Spacing="0">
-                            <Button Text="Checkout with Paypal" Clicked="PayViaPayPal" StyleClass="btn, secondary-outline"/>
+                            <!--<Button Text="Checkout with Paypal" Clicked="PayViaPayPal" StyleClass="btn, secondary-outline"/>-->
                             <Button Text="Checkout with Stripe" Clicked="checkoutAsync" StyleClass="btn, secondary-outline"/>
                         </StackLayout>
                     </StackLayout>

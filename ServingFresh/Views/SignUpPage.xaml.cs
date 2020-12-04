@@ -470,5 +470,10 @@ namespace ServingFresh.Views
             //    //Preferences.Clear();
             //}
         }
+
+        void TapGestureRecognizer_Tapped(System.Object sender, System.EventArgs e)
+        {
+            Application.Current.MainPage = new LogInPage();
+        }
     }
 }
