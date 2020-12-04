@@ -225,6 +225,7 @@ namespace ServingFresh.Views
 
             var client = new HttpClient();
             var response = await client.GetAsync(Constant.ZoneUrl + userLong + "," + userLat);
+            Debug.WriteLine(Constant.ZoneUrl + userLong + "," + userLat);
             var result = await response.Content.ReadAsStringAsync();
 
             Debug.WriteLine("List of farms: " + result);
@@ -460,6 +461,7 @@ namespace ServingFresh.Views
                 farm_list.ItemsSource = business;
                 
                 List<ScheduleInfo> businesSchedule = new List<ScheduleInfo>();
+                List<DateTime> unsortedSchedule = new List<DateTime>();
                 foreach(string day in bc.list_delivery_days.Keys)
                 {
                     List<string> times = (List<string>)bc.list_delivery_days[day];
@@ -470,77 +472,53 @@ namespace ServingFresh.Views
                             if(day.ToUpper() == i.delivery_dayofweek.ToUpper() && t == i.delivery_time)
                             {
                                 businesSchedule.Add(i);
+                                var d = DateTime.Parse(i.delivery_date).ToString("yyyy-MM-dd");
+                                var stringTime = i.delivery_time;
+                                var stringStartTime = "";
+                                foreach(char a in stringTime.ToCharArray())
+                                {
+                                    if(a != '-')
+                                    {
+                                        stringStartTime += a;
+                                    }
+                                    else
+                                    {
+                                        break;
+                                    }
+                                }
+                                var dayTime = d + " " + stringStartTime.Trim();
+
+                                unsortedSchedule.Add(DateTime.Parse(dayTime));
                             }
                         }
                     }
                 }
-                List<ScheduleInfo> businessScheduleUnordered= new List<ScheduleInfo>();
-                int k = 0;
-                for(int j = schedule.Count - 1; j >= 0; j--)
+
+                List<ScheduleInfo> sortedBusinessSchedule = new List<ScheduleInfo>();
+                unsortedSchedule.Sort();
+                foreach(DateTime a in unsortedSchedule)
                 {
-                    for(int y = k; y < businesSchedule.Count; y++)
+                    Debug.WriteLine(a.ToString("MMM d"));
+                    for (int b = 0; b < businesSchedule.Count; b++)
                     {
-                        if (schedule[j].delivery_dayofweek.ToUpper() == businesSchedule[y].delivery_dayofweek.ToUpper())
+                        if (a.ToString("MMM d") == businesSchedule[b].delivery_date)
                         {
-                            businessScheduleUnordered.Add(schedule[j]);
-                            k = y;
-                            break;
+                            ScheduleInfo addInfo = businesSchedule[b];
+                            sortedBusinessSchedule.Add(addInfo);
+                            businesSchedule.RemoveAt(b);
                         }
                     }
                 }
-                List<ScheduleInfo> businessScheduleOrdered = new List<ScheduleInfo>();
-                for(int j = businessScheduleUnordered.Count - 1; j >= 0; j--)
-                {
-                    businessScheduleOrdered.Add(businessScheduleUnordered[j]);
-                }
-                
-                delivery_list.ItemsSource = businessScheduleOrdered;
+
+                delivery_list.ItemsSource = sortedBusinessSchedule;
             }
             else
             {
                 farm_list.ItemsSource = businesses;
                 delivery_list.ItemsSource = schedule;
             }
-                //    if (bc.business_type == "Farmers Market")
-                //    {
-                //        selected_market_id = bc.business_uid;
-                //        FarmersMarkets.Clear();
-                //        foreach (Business b in AllFarmersMarkets)
-                //        {
-                //            if (b.business_uid == bc.business_uid)
-                //            {
-                //                FarmersMarkets.Add(selectedBusiness(b));
-                //            }
-                //        }
-                //        ResetFarms();
-                //    }
-                //    else
-                //    {
-                //        selected_farm_id = bc.business_uid;
-                //        Farms.Clear();
-                //        foreach (Business b in AllFarms)
-                //        {
-                //            if (b.business_uid == bc.business_uid) Farms.Add(selectedBusiness(b));
-                //        }
-                //        ResetFarmersMarkets();
-                //    }
-                //}
-                //else
-                //{
-                //    if (bc.business_type == "Farmers Market")
-                //    {
-                //        selected_market_id = "";
-                //    }
-                //    else
-                //    {
-                //        selected_farm_id = "";
-                //    }
-                //    ResetFarms();
-                //    ResetFarmersMarkets();
-                //}
-                //ResetDays();
-                //Update_Item_Types();
-            }
+
+        }
 
         void CheckOutClickDeliveryDaysPage(System.Object sender, System.EventArgs e)
         {

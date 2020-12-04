@@ -29,6 +29,7 @@ namespace ServingFresh.Views
             public string item_desc { get; set; }
             public object item_unit { get; set; }
             public double item_price { get; set; }
+            public double business_price { get; set; }
             public string item_sizes { get; set; }
             public string favorite { get; set; }
             public string item_photo { get; set; }
@@ -179,7 +180,6 @@ namespace ServingFresh.Views
             try
             {
 
-
                 GetItemPost post = new GetItemPost();
                 post.type = types;
                 post.ids = b_uids;
@@ -200,6 +200,49 @@ namespace ServingFresh.Views
                 {
                     JsonSerializer serializer = new JsonSerializer();
                     data = serializer.Deserialize<ServingFreshBusinessItems>(reader);
+
+                    List<Items> listUniqueItems = new List<Items>();
+
+                    Dictionary<string, Items> uniqueItems = new Dictionary<string, Items>();
+                    foreach (Items a in data.result)
+                    {
+                        string key = a.item_name + a.item_desc + a.item_price;
+                        if (!uniqueItems.ContainsKey(key))
+                        {
+                            uniqueItems.Add(key, a);
+                        }
+                        else
+                        {
+                            var savedItem = uniqueItems[key];
+                            
+                            if (savedItem.item_price != a.item_price)
+                            {
+                                var priceSelected = Math.Min(savedItem.business_price, a.business_price);
+                                savedItem.item_price = priceSelected;
+                                uniqueItems[key] = savedItem;
+                            }
+                            else
+                            {
+                                List<DateTime> creationDates = new List<DateTime>();
+                                creationDates.Add(DateTime.Parse(savedItem.created_at));
+                                creationDates.Add(DateTime.Parse(a.created_at));
+                                var itemToSave = a;
+                                //a.created_at == creationDates[0].ToString("yyyy-MM-dd HH:mm:ss")
+                                if (a.created_at == creationDates[0].ToString("yyyy-MM-dd"))
+                                {
+                                    savedItem = a;
+                                }
+                                uniqueItems[key] = savedItem;
+                            }
+                        }
+                    }
+
+                    foreach (string key in uniqueItems.Keys)
+                    {
+                        listUniqueItems.Add(uniqueItems[key]);
+                    }
+
+                    data.result = listUniqueItems;
 
                     this.datagrid.Clear();
                     int n = data.result.Count;
@@ -364,6 +407,8 @@ namespace ServingFresh.Views
 
                 var httpResponse = await client.PostAsync(Constant.GetItemsUrl, getItemsStringMessage);
                 var r = await httpResponse.Content.ReadAsStreamAsync();
+                //var da = await httpResponse.Content.ReadAsStringAsync();
+                //Debug.WriteLine("PURCHASE: " + da);
                 StreamReader sr = new StreamReader(r);
                 JsonReader reader = new JsonTextReader(sr);
 
@@ -371,6 +416,47 @@ namespace ServingFresh.Views
                 {
                     JsonSerializer serializer = new JsonSerializer();
                     data = serializer.Deserialize<ServingFreshBusinessItems>(reader);
+                    
+                    List<Items> listUniqueItems = new List<Items>();
+                    Dictionary<string, Items> uniqueItems = new Dictionary<string, Items>();
+                    foreach(Items a in data.result)
+                    {
+                        string key = a.item_name + a.item_desc + a.item_price;
+                        if (!uniqueItems.ContainsKey(key))
+                        {
+                            uniqueItems.Add(key, a);
+                        }
+                        else
+                        {
+                            var savedItem = uniqueItems[key];
+                            
+                            if(savedItem.item_price != a.item_price){
+                                var priceSelected = Math.Min(savedItem.business_price, a.business_price);
+                                savedItem.item_price = priceSelected;
+                                uniqueItems[key] = savedItem;
+                            }
+                            else
+                            {
+                                List<DateTime> creationDates = new List<DateTime>();
+                                creationDates.Add(DateTime.Parse(savedItem.created_at));
+                                creationDates.Add(DateTime.Parse(a.created_at));
+                                var itemToSave = a;
+                                //a.created_at == creationDates[0].ToString("yyyy-MM-dd HH:mm:ss")
+                                if (a.created_at == creationDates[0].ToString("yyyy-MM-dd"))
+                                {
+                                    savedItem = a;
+                                }
+                                uniqueItems[key] = savedItem;
+                            }
+                        }
+                    }
+
+                    foreach (string key in uniqueItems.Keys)
+                    {
+                        listUniqueItems.Add(uniqueItems[key]);
+                    }
+
+                    data.result = listUniqueItems;
 
                     this.datagrid.Clear();
                     int n = data.result.Count;

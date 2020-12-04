@@ -34,12 +34,13 @@ namespace ServingFresh.Views
         }
 
         public UpdateProfile profile = new UpdateProfile();
+        
         private bool isAddressValidated;
 
         public ProfilePage()
         {
             InitializeComponent();
-
+            InitializeProfile();
             userEmailAddress.Text = (string)Application.Current.Properties["user_email"];
             userFirstName.Text = (string)Application.Current.Properties["user_first_name"];
             userLastName.Text = (string)Application.Current.Properties["user_last_name"];
@@ -72,6 +73,22 @@ namespace ServingFresh.Views
 
             map.MoveToRegion(mapSpan);
             map.Pins.Add(address);
+        }
+
+        void InitializeProfile()
+        {
+            profile.customer_first_name = userFirstName.Text;
+            profile.customer_last_name = userLastName.Text;
+            profile.customer_email = userEmailAddress.Text;
+            profile.customer_address = userAddress.Text;
+            profile.customer_unit = userUnitNumber.Text ;
+            profile.customer_city = userCity.Text;
+            profile.customer_state = userState.Text;
+            profile.customer_zip = userZipcode.Text;
+            profile.customer_phone_num = userPhoneNumber.Text;
+            profile.customer_lat = Application.Current.Properties["user_latitude"].ToString();
+            profile.customer_long = Application.Current.Properties["user_longitude"].ToString();
+            profile.customer_uid = Application.Current.Properties["user_id"].ToString();
         }
 
         void DeliveryDaysClick(System.Object sender, System.EventArgs e)
@@ -223,12 +240,12 @@ namespace ServingFresh.Views
             }
             if (latitude == "0" || longitude == "0")
             {
-                await DisplayAlert("We couldn't find your address", "Please check for errors.", "Ok");
+                await DisplayAlert("We couldn't find your address", "Please check for errors.", "OK");
             }
             else
             {
                 isAddressValidated = true;
-                await DisplayAlert("We validated your address", "You can continue", "OK");
+                await DisplayAlert("We validated your address", "Press 'OK' to continue", "OK");
                 await Application.Current.SavePropertiesAsync();
 
                 // calling zone
@@ -257,13 +274,17 @@ namespace ServingFresh.Views
                     }
                     else
                     {
-                        update = await DisplayAlert("Oops", "No businesses available for this address", "Save", "Don't Save");
+                        update = await DisplayAlert("Oh No", "We don't currently delivery to your new addrees. Are you sure you want to save this address?", "Save", "Don't Save");
                     }
 
                     if (update)
                     {
                         var updateClient = new HttpClient();
                         profile.customer_uid = (string)Application.Current.Properties["user_id"];
+                        profile.customer_first_name = userFirstName.Text;
+                        profile.customer_last_name = userLastName.Text;
+                        profile.customer_email = userEmailAddress.Text;
+                        profile.customer_phone_num = userPhoneNumber.Text;
                         var p = JsonConvert.SerializeObject(profile);
                         var content = new StringContent(p, Encoding.UTF8, "application/json");
 

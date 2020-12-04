@@ -124,7 +124,7 @@
                     </maps:Map>
                 </Frame>
                 <Button
-                    Text="Save Changes"
+                    Text="Validate Address"
                     TextColor="#FF8500"
                     CornerRadius="5"
                     BorderColor="LightGray"
