@@ -23,7 +23,8 @@
                     Margin="10,10,10,0">
                     <Entry
                         x:Name="userEmailAddress"
-                        Placeholder="Email Address">
+                        Placeholder="Email Address"
+                        Keyboard="Email">
                     </Entry>
                     <Grid>
                         <servingfresh:CustomEntry Placeholder="Push Notification" IsReadOnly="True" Margin="7,0,0,0"></servingfresh:CustomEntry>
@@ -39,7 +40,9 @@
                     </Entry>
                     <Entry
                         x:Name="userPhoneNumber"
-                        Placeholder="Phone number">
+                        Placeholder="Phone number"
+                        Keyboard="Numeric"
+                        MaxLength="10">
                     </Entry>
                     <Entry
                         x:Name="userAddress"

@@ -62,6 +62,7 @@ namespace ServingFresh.Views
         {
             InitializeComponent();
             InitializeProfile();
+
             userEmailAddress.Text = (string)Application.Current.Properties["user_email"];
             userFirstName.Text = (string)Application.Current.Properties["user_first_name"];
             userLastName.Text = (string)Application.Current.Properties["user_last_name"];
@@ -422,14 +423,13 @@ namespace ServingFresh.Views
                 }
                 else
                 {
-                    await DisplayAlert("Ooops", "Our system is down. Can't process this request at the moment", "OK");
+                    await DisplayAlert("Ooops", "Our system is down. We can't process this request at the moment", "OK");
                 }
             }
             else
             {
-                await DisplayAlert("Ooops","Your new password does not match.","OK");
+                await DisplayAlert("Ooops","Your new passwords do not match.","OK");
             }
-
         }
 
         async void Switch_Toggled(System.Object sender, Xamarin.Forms.ToggledEventArgs e)
@@ -439,7 +439,7 @@ namespace ServingFresh.Views
 
             var updateNotification = new UpdateNotification();
             updateNotification.uid = (string)Application.Current.Properties["user_id"];
-            updateNotification.guid = Preferences.Get("guid", "");
+            updateNotification.guid = (string)Application.Current.Properties["guid"];
             updateNotification.notification = notification.IsToggled.ToString().ToUpper();
 
 
@@ -456,11 +456,11 @@ namespace ServingFresh.Views
             Debug.WriteLine("Response: " + r);
             if (RDSResponse.IsSuccessStatusCode)
             {
-                await DisplayAlert("Awesome!", "You updated your notification setting", "OK");
+                await DisplayAlert("Awesome!", "We've updated your notification settings", "OK");
             }
             else
             {
-                await DisplayAlert("Ooops", "Our system is down. Can't process this request at the moment", "OK");
+                await DisplayAlert("Ooops", "Our system is down. We can't process this request at the moment", "OK");
             }
         }
     }

@@ -48,7 +48,8 @@
                     Margin="10,10,10,0">
                     <Entry
                         x:Name="userEmailAddress"
-                        Placeholder="Email Address">
+                        Placeholder="Email Address"
+                        Keyboard="Email">
                     </Entry>
                     <Entry
                         x:Name="userConfirmEmailAddress"
@@ -75,7 +76,9 @@
                     </Entry>
                     <Entry
                         x:Name="userPhoneNumber"
-                        Placeholder="Phone number">
+                        Placeholder="Phone number"
+                        MaxLength="10"
+                        Keyboard="Numeric">
                     </Entry>
                     <Entry
                         x:Name="userAddress"

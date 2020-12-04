@@ -414,6 +414,7 @@ namespace ServingFresh.Views
                             NotificationPost notificationPost = new NotificationPost();
 
                             notificationPost.uid = (string)Application.Current.Properties["user_id"];
+                            Application.Current.Properties["guid"] = deviceId.Substring(5);
                             notificationPost.guid = deviceId.Substring(5);
                             notificationPost.notification = "TRUE";
 

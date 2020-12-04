@@ -65,7 +65,7 @@
                 <Entry
                     x:Name="userEmailAddress"
                     Placeholder="Email Address"
-                    >
+                    IsEnabled="False">
                 </Entry>
                 <StackLayout x:Name="passwordCredentials">
                     <Entry
@@ -93,7 +93,7 @@
                 </StackLayout>
                 <Grid>
                     <customentry:CustomEntry Placeholder="Push Notification" IsReadOnly="True" Margin="7,0,0,0" ></customentry:CustomEntry>
-                    <Switch HorizontalOptions="End" Grid.Column="1" Toggled="Switch_Toggled"></Switch>
+                    <Switch x:Name="notificationButton" HorizontalOptions="End" Grid.Column="1" Toggled="Switch_Toggled"></Switch>
                 </Grid>
                 <Entry
                     x:Name="userFirstName"
@@ -105,7 +105,8 @@
                 </Entry>
                 <Entry
                     x:Name="userPhoneNumber"
-                    Placeholder="Phone number">
+                    Placeholder="Phone number"
+                    MaxLength="10">
                 </Entry>
                 <Entry
                     x:Name="userAddress"

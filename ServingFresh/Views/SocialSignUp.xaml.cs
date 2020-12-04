@@ -390,6 +390,7 @@ namespace ServingFresh.Views
 
                         notificationPost.uid = (string)Application.Current.Properties["user_id"];
                         notificationPost.guid = deviceId.Substring(5);
+                        Application.Current.Properties["guid"] = deviceId.Substring(5);
                         notificationPost.notification = "TRUE";
 
                         var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);

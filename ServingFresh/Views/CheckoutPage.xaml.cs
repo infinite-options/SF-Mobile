@@ -42,8 +42,6 @@ namespace ServingFresh.Views
             PropertyChanged(this, new PropertyChangedEventArgs("qty"));
             PropertyChanged(this, new PropertyChangedEventArgs("total_price"));
         }
-
-
     }
 
   
