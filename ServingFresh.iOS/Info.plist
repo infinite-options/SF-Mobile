@@ -20,7 +20,7 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>MinimumOSVersion</key>
-	<string>8.0</string>
+	<string>13.0</string>
 	<key>CFBundleDisplayName</key>
 	<string>Serving Fresh</string>
 	<key>UILaunchStoryboardName</key>
@@ -61,9 +61,9 @@
 	<string>This app needs access to the photo gallery so that you can select a photo of the damaged product.</string>
 	<key>UIUserInterfaceStyle</key>
 	<string>Light</string>
-	<key>CFBundleVersion</key>
-	<string>19</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We utilize Google, Facebook and Apple authentication.  Authentication using these social platforms provides ease of access and account security.  As part of the authentication process we receive your first name, last name, social ID and email address.  In the case of Google we also receive your profile image and location. All of this information is used exclusively by the app to pre-populate text fields and enhance the user experience.  Your information is never sold or released by Serving Fresh or it&apos;s parent company Infinite Options.  Please contact us at info@infiniteoptions.com if you have any questions or concerns.</string>
+	<key>CFBundleVersion</key>
+	<string>20</string>
 </dict>
 </plist>

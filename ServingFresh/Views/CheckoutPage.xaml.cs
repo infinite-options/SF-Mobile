@@ -17,6 +17,7 @@ using static ServingFresh.Views.ItemsPage;
 using Application = Xamarin.Forms.Application;
 using Stripe;
 using ServingFresh.Effects;
+using Xamarin.Essentials;
 
 namespace ServingFresh.Views
 {
@@ -125,6 +126,11 @@ namespace ServingFresh.Views
             public string sql { get; set; }
         }
 
+        public class Credentials
+        {
+            public string key { get;set; }
+        }
+
 
         public PurchaseDataObject purchaseObject;
         public static ObservableCollection<ItemObject> cartItems = new ObservableCollection<ItemObject>();
@@ -151,7 +157,7 @@ namespace ServingFresh.Views
         public string deliveryDay = "";
         public IDictionary<string, ItemPurchased> orderCopy = new Dictionary<string,ItemPurchased>();
         public string cartEmpty = "";
-
+        
         public CheckoutPage(IDictionary<string, ItemPurchased> order = null, string day = "")
         {
             InitializeComponent();
@@ -558,7 +564,7 @@ namespace ServingFresh.Views
             return total;
         }
 
-        public async void AddItems(object sender, EventArgs e)
+        public void AddItems(object sender, EventArgs e)
         {
             if (cartEmpty != "EMPTY")
             {
@@ -592,7 +598,16 @@ namespace ServingFresh.Views
             cardZip.Text = purchaseObject.delivery_zip;
             cardDescription.Text = "None";
 
-            cardframe.Height = this.Height ;
+            if(Device.RuntimePlatform == Device.Android)
+            {
+                cardframe.Height = this.Height - 136;
+            }
+            else
+            {
+                cardframe.Height = this.Height;
+
+            }
+           
             options.Height = 0;
             
             string dateTime = DateTime.Parse((string)Application.Current.Properties["delivery_date"]).ToString("yyyy-MM-dd");
@@ -728,7 +743,7 @@ namespace ServingFresh.Views
                 //Debug.WriteLine("pucharse ID: "+  string2.Substring(s+1, 10));
                 //string purchaseID = string2.Substring(s + 1, 10);
                 await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
-                Device.OpenUri(new System.Uri("https://servingnow.me/payment/" + "400-000188" + "/" + purchaseObject.amount_due));
+                _ = Launcher.OpenAsync(new System.Uri("https://servingnow.me/payment/" + "400-000188" + "/" + purchaseObject.amount_due));
             }
         }
 
@@ -736,105 +751,143 @@ namespace ServingFresh.Views
         {
             try
             {
-                StripeConfiguration.ApiKey = Constant.StipeKey;
+                var c = new HttpClient();
+                var stripe = new Credentials();
+                stripe.key = Constant.TestPK;
 
-                string CardNo = cardHolderNumber.Text.Trim();
-                string expMonth = cardExpMonth.Text.Trim();
-                string expYear = cardExpYear.Text.Trim();
-                string cardCvv = cardCVV.Text.Trim();
-
-                // Step 1: Create Card
-                TokenCardOptions stripeOption = new TokenCardOptions();
-                stripeOption.Number = CardNo;
-                stripeOption.ExpMonth = Convert.ToInt64(expMonth);
-                stripeOption.ExpYear = Convert.ToInt64(expYear);
-                stripeOption.Cvc = cardCvv;
-
-                // Step 2: Assign card to token object
-                TokenCreateOptions stripeCard = new TokenCreateOptions();
-                stripeCard.Card = stripeOption;
-
-                TokenService service = new TokenService();
-                Token newToken = service.Create(stripeCard);
-
-                // Step 3: Assign the token to the soruce 
-                var option = new SourceCreateOptions();
-                option.Type = SourceType.Card;
-                option.Currency = "usd";
-                option.Token = newToken.Id;
-
-                var sourceService = new SourceService();
-                Source source = sourceService.Create(option);
-
-                // Step 4: Create customer
-                CustomerCreateOptions customer = new CustomerCreateOptions();
-                customer.Name = cardHolderName.Text.Trim();
-                customer.Email = cardHolderEmail.Text.ToLower().Trim();
-                customer.Description = cardDescription.Text.Trim();
-                if(cardHolderUnit.Text == null)
+                var stripeObj = JsonConvert.SerializeObject(stripe);
+                System.Diagnostics.Debug.WriteLine("key to send JSON: " + stripeObj);
+                var stripeContent = new StringContent(stripeObj, Encoding.UTF8, "application/json");
+                var RDSResponse = await c.PostAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/Stripe_Payment_key_checker", stripeContent);
+                var content = await RDSResponse.Content.ReadAsStringAsync();
+                Debug.WriteLine("Response from key: " + content);
+                
+                if (RDSResponse.IsSuccessStatusCode)
                 {
-                    cardHolderUnit.Text = "";
-                }
-                customer.Address = new AddressOptions { City = cardCity.Text.Trim(), Country = Constant.Contry, Line1 = cardHolderAddress.Text.Trim(), Line2 = cardHolderUnit.Text.Trim(), PostalCode = cardZip.Text.Trim(), State = cardState.Text.Trim() };
-
-                var customerService = new CustomerService();
-                var cust = customerService.Create(customer);
-
-                // Step 5: Charge option
-                var chargeOption = new ChargeCreateOptions();
-                chargeOption.Amount =(long)RemoveDecimalFromTotalAmount(total.ToString("N2"));
-                chargeOption.Currency = "usd";
-                chargeOption.ReceiptEmail = cardHolderEmail.Text.ToLower().Trim();
-                chargeOption.Customer = cust.Id;
-                chargeOption.Source = source.Id;
-                chargeOption.Description = cardDescription.Text.Trim();
-
-                // Step 6: charge the customer
-                var chargeService = new ChargeService();
-                Charge charge = chargeService.Create(chargeOption);
-                if (charge.Status == "succeeded")
-                {
-                    // Successful Payment
-                    await DisplayAlert("Congratulations", "Payment was succesfull. We appreciate your business", "OK");
-                    ClearCardInfo();
-
-                    var purchaseString = JsonConvert.SerializeObject(purchaseObject);
-                    System.Diagnostics.Debug.WriteLine("Purchase: " + purchaseString);
-                    var purchaseMessage = new StringContent(purchaseString, Encoding.UTF8, "application/json");
-                    var client = new HttpClient();
-
-                    CouponObject coupon = new CouponObject();
-                    coupon.coupon_uid = couponData.result[defaultCouponIndex].coupon_uid;
-
-                    var couponSerialized = JsonConvert.SerializeObject(coupon);
-                    System.Diagnostics.Debug.WriteLine("Coupon to update: " + couponSerialized);
-                    var couponContent = new StringContent(couponSerialized, Encoding.UTF8, "application/json");
-
-                    var RDSResponse = await client.PostAsync(Constant.PurchaseUrl, purchaseMessage);
-                    var RDSCouponResponse = await client.PostAsync(Constant.UpdateCouponUrl, couponContent);
-                    Debug.WriteLine("Order was written to DB: " + RDSResponse.IsSuccessStatusCode);
-                    Debug.WriteLine("Coupon was succesfully updated (subtract)" + RDSCouponResponse);
-                    if (RDSResponse.IsSuccessStatusCode)
+                    if(content != "200")
                     {
-                        var RDSResponseContent = await RDSResponse.Content.ReadAsStringAsync();
-                        //System.Diagnostics.Debug.WriteLine(RDSResponseContent);
+                        string SK = "";
+                        string contentTrim = content.Trim();
+                        Debug.WriteLine("S1: " + contentTrim.Substring(1, contentTrim.Length - 2));
+                        string s1 = contentTrim.Substring(1, contentTrim.Length - 2);
+                        if (s1 == "Test")
+                        {
 
-                        cartItems.Clear();
-                        updateTotals(0, 0);
-                        total = 00.00;
-                        total_qty = 0;
-                    }
-                    if(RDSCouponResponse.IsSuccessStatusCode && RDSResponse.IsSuccessStatusCode)
-                    {
-                        Application.Current.Properties["day"] = "";
-                        await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
+                            SK = Constant.TestSK;
+                        }
+                        else
+                        {
+                            SK = Constant.LiveSK;
+                        }
+                        Debug.WriteLine("SK" + SK);
+                        StripeConfiguration.ApiKey = SK;
+
+                        string CardNo = cardHolderNumber.Text.Trim();
+                        string expMonth = cardExpMonth.Text.Trim();
+                        string expYear = cardExpYear.Text.Trim();
+                        string cardCvv = cardCVV.Text.Trim();
+
+                        // Step 1: Create Card
+                        TokenCardOptions stripeOption = new TokenCardOptions();
+                        stripeOption.Number = CardNo;
+                        stripeOption.ExpMonth = Convert.ToInt64(expMonth);
+                        stripeOption.ExpYear = Convert.ToInt64(expYear);
+                        stripeOption.Cvc = cardCvv;
+
+                        // Step 2: Assign card to token object
+                        TokenCreateOptions stripeCard = new TokenCreateOptions();
+                        stripeCard.Card = stripeOption;
+
+                        TokenService service = new TokenService();
+                        Token newToken = service.Create(stripeCard);
+
+                        // Step 3: Assign the token to the soruce 
+                        var option = new SourceCreateOptions();
+                        option.Type = SourceType.Card;
+                        option.Currency = "usd";
+                        option.Token = newToken.Id;
+
+                        var sourceService = new SourceService();
+                        Source source = sourceService.Create(option);
+
+                        // Step 4: Create customer
+                        CustomerCreateOptions customer = new CustomerCreateOptions();
+                        customer.Name = cardHolderName.Text.Trim();
+                        customer.Email = cardHolderEmail.Text.ToLower().Trim();
+                        customer.Description = cardDescription.Text.Trim();
+                        if (cardHolderUnit.Text == null)
+                        {
+                            cardHolderUnit.Text = "";
+                        }
+                        customer.Address = new AddressOptions { City = cardCity.Text.Trim(), Country = Constant.Contry, Line1 = cardHolderAddress.Text.Trim(), Line2 = cardHolderUnit.Text.Trim(), PostalCode = cardZip.Text.Trim(), State = cardState.Text.Trim() };
+
+                        var customerService = new CustomerService();
+                        var cust = customerService.Create(customer);
+
+                        // Step 5: Charge option
+                        var chargeOption = new ChargeCreateOptions();
+                        chargeOption.Amount = (long)RemoveDecimalFromTotalAmount(total.ToString("N2"));
+                        chargeOption.Currency = "usd";
+                        chargeOption.ReceiptEmail = cardHolderEmail.Text.ToLower().Trim();
+                        chargeOption.Customer = cust.Id;
+                        chargeOption.Source = source.Id;
+                        chargeOption.Description = cardDescription.Text.Trim();
+
+                        // Step 6: charge the customer
+                        var chargeService = new ChargeService();
+                        Charge charge = chargeService.Create(chargeOption);
+                        if (charge.Status == "succeeded")
+                        {
+                            // Successful Payment
+                            await DisplayAlert("Congratulations", "Payment was succesfull. We appreciate your business", "OK");
+                            ClearCardInfo();
+
+                            var purchaseString = JsonConvert.SerializeObject(purchaseObject);
+                            System.Diagnostics.Debug.WriteLine("Purchase: " + purchaseString);
+                            var purchaseMessage = new StringContent(purchaseString, Encoding.UTF8, "application/json");
+                            var client = new HttpClient();
+
+                            CouponObject coupon = new CouponObject();
+                            coupon.coupon_uid = couponData.result[defaultCouponIndex].coupon_uid;
+
+                            var couponSerialized = JsonConvert.SerializeObject(coupon);
+                            System.Diagnostics.Debug.WriteLine("Coupon to update: " + couponSerialized);
+                            var couponContent = new StringContent(couponSerialized, Encoding.UTF8, "application/json");
+
+                            var Response = await client.PostAsync(Constant.PurchaseUrl, purchaseMessage);
+                            //var RDSCouponResponse = await client.PostAsync(Constant.UpdateCouponUrl, couponContent);
+                            Debug.WriteLine("Order was written to DB: " + Response.IsSuccessStatusCode);
+                            //Debug.WriteLine("Coupon was succesfully updated (subtract)" + RDSCouponResponse);
+                            if (Response.IsSuccessStatusCode)
+                            {
+                                var RDSResponseContent = await Response.Content.ReadAsStringAsync();
+                                //System.Diagnostics.Debug.WriteLine(RDSResponseContent);
+
+                                cartItems.Clear();
+                                updateTotals(0, 0);
+                                total = 00.00;
+                                total_qty = 0;
+                                Application.Current.Properties["day"] = "";
+                                await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
+                            }
+                            //if (RDSCouponResponse.IsSuccessStatusCode && Response.IsSuccessStatusCode)
+                            //{
+                            //    Application.Current.Properties["day"] = "";
+                            //    await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
+                            //}
+                        }
+                        else
+                        {
+                            // Fail
+                            await DisplayAlert("Ooops", "Payment was not succesfull. Please try again", "OK");
+                        }
                     }
                 }
                 else
                 {
-                    // Fail
-                    await DisplayAlert("Ooops", "Payment was not succesfull. Please try again", "OK");
+                    await DisplayAlert("","","");
                 }
+
             }catch(Exception ex)
             {
                  await DisplayAlert("Alert!", ex.Message, "OK");

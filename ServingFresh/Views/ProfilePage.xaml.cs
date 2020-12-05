@@ -195,7 +195,7 @@ namespace ServingFresh.Views
                  )
              );
             var url = "http://production.shippingapis.com/ShippingAPI.dll?API=Verify&XML=" + requestDoc;
-            Console.WriteLine(url);
+            //Console.WriteLine(url);
             var client = new WebClient();
             var response = client.DownloadString(url);
 

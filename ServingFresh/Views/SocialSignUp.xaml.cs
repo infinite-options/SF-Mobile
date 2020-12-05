@@ -366,23 +366,23 @@ namespace ServingFresh.Views
 
                     _ = Application.Current.SavePropertiesAsync();
 
-                    EmailVerificationObject user = new EmailVerificationObject();
+                    //EmailVerificationObject user = new EmailVerificationObject();
 
-                    user.email = socialSignUp.email;
+                    //user.email = socialSignUp.email;
 
-                    var userSerializedObject = JsonConvert.SerializeObject(user);
-                    var userContent = new StringContent(userSerializedObject, Encoding.UTF8, "application/json");
+                    //var userSerializedObject = JsonConvert.SerializeObject(user);
+                    //var userContent = new StringContent(userSerializedObject, Encoding.UTF8, "application/json");
 
-                    Debug.WriteLine("Email Verification JSON Object to send: " + userSerializedObject);
+                    //Debug.WriteLine("Email Verification JSON Object to send: " + userSerializedObject);
 
-                    var response = await client.PostAsync(Constant.EmailVerificationUrl, userContent);
+                    //var response = await client.PostAsync(Constant.EmailVerificationUrl, userContent);
 
-                    Debug.WriteLine("Status code: " + response.IsSuccessStatusCode);
+                    //Debug.WriteLine("Status code: " + response.IsSuccessStatusCode);
 
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        await DisplayAlert("Ooops!", "We weren't able to send you a verification link to your email.", "OK");
-                    }
+                    //if (!response.IsSuccessStatusCode)
+                    //{
+                    //    await DisplayAlert("Ooops!", "We weren't able to send you a verification link to your email.", "OK");
+                    //}
 
                     if (deviceId != null)
                     {

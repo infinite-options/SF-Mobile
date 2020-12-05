@@ -49,7 +49,9 @@
     <AndroidSigningKeyAlias>infiniteoptionsmanifest</AndroidSigningKeyAlias>
     <AndroidSigningKeyPass>1nfinitePC!</AndroidSigningKeyPass>
     <AndroidDexTool></AndroidDexTool>
-<RunCodeAnalysis>false</RunCodeAnalysis>  </PropertyGroup>
+<RunCodeAnalysis>false</RunCodeAnalysis>  <AndroidLinkMode>None</AndroidLinkMode>
+<AndroidSupportedAbis>armeabi-v7a;arm64-v8a;x86_64;x86</AndroidSupportedAbis>
+</PropertyGroup>
   <ItemGroup>
     <Reference Include="Mono.Android" />
     <Reference Include="System" />
@@ -87,7 +89,7 @@
       <Version>1.0.8</Version>
     </PackageReference>
     <PackageReference Include="Xamarin.Firebase.Messaging">
-      <Version>120.1.7</Version>
+      <Version>120.2.4</Version>
     </PackageReference>
     <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData">
       <Version>2.2.0.3</Version>
@@ -238,6 +240,26 @@
       <Generator></Generator>
     </AndroidResource>
     <AndroidResource Include="Resources\drawable\welcomeBackground.png">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\mipmap-hdpi\icon2.png">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\mipmap-mdpi\icon2.png">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\mipmap-xhdpi\icon2.png">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\mipmap-xxhdpi\icon2.png">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\mipmap-xxxhdpi\icon2.png">
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>

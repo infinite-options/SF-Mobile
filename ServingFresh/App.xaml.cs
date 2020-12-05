@@ -96,7 +96,7 @@ namespace ServingFresh
                             //Logout;
                             SecureStorage.Remove(AppleUserIdKey);
                             Preferences.Set(LoggedInKey, false);
-                            MainPage = new HomePage();
+                            MainPage = new LogInPage();
                             break;
                     }
                 }
