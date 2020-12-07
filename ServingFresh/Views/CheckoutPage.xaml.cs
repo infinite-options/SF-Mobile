@@ -19,6 +19,12 @@ using Stripe;
 using ServingFresh.Effects;
 using Xamarin.Essentials;
 
+using PayPalCheckoutSdk.Core;
+using PayPalCheckoutSdk.Orders;
+using PayPalHttp;
+
+using System.Threading.Tasks;
+
 namespace ServingFresh.Views
 {
     public class ItemObject : INotifyPropertyChanged
@@ -43,6 +49,10 @@ namespace ServingFresh.Views
             PropertyChanged(this, new PropertyChangedEventArgs("qty"));
             PropertyChanged(this, new PropertyChangedEventArgs("total_price"));
         }
+
+       
+
+
     }
 
   
@@ -157,11 +167,15 @@ namespace ServingFresh.Views
         public string deliveryDay = "";
         public IDictionary<string, ItemPurchased> orderCopy = new Dictionary<string,ItemPurchased>();
         public string cartEmpty = "";
-        
+
+        // Paypal credentials
+       
+
         public CheckoutPage(IDictionary<string, ItemPurchased> order = null, string day = "")
         {
             InitializeComponent();
-            if(day != "")
+            
+            if (day != "")
             {
                 GetFees(day);
             }
@@ -248,6 +262,8 @@ namespace ServingFresh.Views
             
         }
 
+
+
         public void InitializeMap()
         {
             map.MapType = MapType.Street;
@@ -258,7 +274,7 @@ namespace ServingFresh.Views
 
         public async void GetFees(string day)
         {
-            var client = new HttpClient();
+            var client = new System.Net.Http.HttpClient();
             var zone = (string)Application.Current.Properties["zone"];
             if(zone != "")
             {
@@ -283,7 +299,7 @@ namespace ServingFresh.Views
 
         public async void GetAvailiableCoupons()
         {
-            var client = new HttpClient();
+            var client = new System.Net.Http.HttpClient();
             var email = (string)Application.Current.Properties["user_email"];
             var RDSResponse = await client.GetAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/available_Coupons/" + email);
             if (RDSResponse.IsSuccessStatusCode)
@@ -670,9 +686,10 @@ namespace ServingFresh.Views
             options.Height = 65;
             PayViaStripe();
         }
-        void PayViaPayPal(System.Object sender, System.EventArgs e)
+        public string OrderId = "";
+        async void PayViaPayPal(System.Object sender, System.EventArgs e)
         {
-            
+
             string dateTime = DateTime.Parse((string)Application.Current.Properties["delivery_date"]).ToString("yyyy-MM-dd");
             Debug.WriteLine("Date Time of Paypal: " + dateTime);
             purchaseObject.cc_num = "";
@@ -688,7 +705,64 @@ namespace ServingFresh.Views
             purchaseObject.amount_discount = discount.ToString("N2");
             purchaseObject.amount_paid = total.ToString("N2");
             purchaseObject.info_is_Addon = "FALSE";
-            Paypal();
+            //Paypal();
+
+            // Step 1
+            // Create a request to pay with PayPal using PayPal client
+
+            paypalframe.Height = this.Height - 65;
+            webViewPage.HeightRequest = this.Height - 65;
+            options.Height = 0;
+            var response = await createOrder(purchaseObject.amount_due);
+            var content = response.Result<PayPalCheckoutSdk.Orders.Order>();
+            PayPalCheckoutSdk.Orders.Order result = response.Result<PayPalCheckoutSdk.Orders.Order>();
+
+            Console.WriteLine("Status: {0}", result.Status);
+            Console.WriteLine("Order Id: {0}", result.Id);
+            Console.WriteLine("Intent: {0}", result.CheckoutPaymentIntent);
+            Console.WriteLine("Links:");
+            foreach (LinkDescription link in result.Links)
+            {
+                Console.WriteLine("\t{0}: {1}\tCall Type: {2}", link.Rel, link.Href, link.Method);
+                if(link.Rel == "approve")
+                {
+                    webViewPage.Source = link.Href;
+                }
+            }
+            
+            webViewPage.Navigated += WebViewPage_Navigated;
+           
+            
+            OrderId = result.Id;
+        }
+
+
+
+        private void WebViewPage_Navigated(object sender, WebNavigatedEventArgs e)
+        {
+            var source = webViewPage.Source as UrlWebViewSource;
+            Debug.WriteLine("Source From WebView: " + source.Url);
+            if (source.Url == "https://servingfresh.me/")
+            {
+                paypalframe.Height = 0;
+                options.Height = 65;
+                Debug.WriteLine("We got to serving fresh");
+                var cancel = captureOrder(OrderId).IsCanceled;
+                var completed = captureOrder(OrderId).IsCompleted;
+                
+            }
+        }
+
+
+
+        public static PayPalHttp.HttpClient client()
+        {
+            // Creating a sandbox environment
+            PayPalEnvironment environment = new SandboxEnvironment(clientId, secret);
+
+            // Creating a client for the environment
+            PayPalHttpClient payPalClient = new PayPalHttpClient(environment);
+            return payPalClient;
         }
 
         public async void Paypal()
@@ -696,7 +770,7 @@ namespace ServingFresh.Views
             var purchaseString = JsonConvert.SerializeObject(purchaseObject);
             System.Diagnostics.Debug.WriteLine("Purchase: " + purchaseString);
             var purchaseMessage = new StringContent(purchaseString, Encoding.UTF8, "application/json");
-            var client = new HttpClient();
+            var client = new System.Net.Http.HttpClient();
 
             CouponObject coupon = new CouponObject();
             coupon.coupon_uid = couponData.result[defaultCouponIndex].coupon_uid;
@@ -751,7 +825,7 @@ namespace ServingFresh.Views
         {
             try
             {
-                var c = new HttpClient();
+                var c = new System.Net.Http.HttpClient();
                 var stripe = new Credentials();
                 stripe.key = Constant.TestPK;
 
@@ -799,7 +873,7 @@ namespace ServingFresh.Views
                         stripeCard.Card = stripeOption;
 
                         TokenService service = new TokenService();
-                        Token newToken = service.Create(stripeCard);
+                        Stripe.Token newToken = service.Create(stripeCard);
 
                         // Step 3: Assign the token to the soruce 
                         var option = new SourceCreateOptions();
@@ -845,7 +919,7 @@ namespace ServingFresh.Views
                             var purchaseString = JsonConvert.SerializeObject(purchaseObject);
                             System.Diagnostics.Debug.WriteLine("Purchase: " + purchaseString);
                             var purchaseMessage = new StringContent(purchaseString, Encoding.UTF8, "application/json");
-                            var client = new HttpClient();
+                            var client = new System.Net.Http.HttpClient();
 
                             CouponObject coupon = new CouponObject();
                             coupon.coupon_uid = couponData.result[defaultCouponIndex].coupon_uid;
@@ -931,6 +1005,7 @@ namespace ServingFresh.Views
             cardframe.Height = 0;
             options.Height = 65;
         }
+
         public void increase_qty(object sender, EventArgs e)
         {
             Label l = (Label)sender;
@@ -1106,6 +1181,7 @@ namespace ServingFresh.Views
             
             updateTotals(unsortedDiscounts[defaultCouponIndex] - couponData.result[defaultCouponIndex].discount_shipping, couponData.result[defaultCouponIndex].discount_shipping);
         }
+
         public void openHistory(object sender, EventArgs e)
         {
             Application.Current.MainPage = new HistoryPage();
@@ -1137,6 +1213,7 @@ namespace ServingFresh.Views
         {
             Application.Current.MainPage = new RefundPage();
         }
+
         void DeliveryDaysClick(System.Object sender, System.EventArgs e)
         {
             Application.Current.MainPage = new SelectionPage();
@@ -1385,6 +1462,123 @@ namespace ServingFresh.Views
             newUserLastName.Text = "";
             newUserPhoneNum.Text = "";
             newUserEmailAddress.Text = "";
+        }
+
+        public async static Task<HttpResponse> createOrder(string amount)
+        {
+            HttpResponse response;
+            // Construct a request object and set desired parameters
+            // Here, OrdersCreateRequest() creates a POST request to /v2/checkout/orders
+            var order = new OrderRequest()
+            {
+                CheckoutPaymentIntent = "CAPTURE",
+                PurchaseUnits = new List<PurchaseUnitRequest>()
+                {
+                    new PurchaseUnitRequest()
+                    {
+                        AmountWithBreakdown = new AmountWithBreakdown()
+                        {
+                            CurrencyCode = "USD",
+                            Value = amount
+                        }
+                    }
+                },
+                ApplicationContext = new ApplicationContext()
+                {
+                    ReturnUrl = "https://servingfresh.me",
+                    CancelUrl = "https://servingfresh.me"
+                }
+            };
+
+
+            // Call API with your client and get a response for your call
+            var request = new OrdersCreateRequest();
+            request.Prefer("return=representation");
+            request.RequestBody(order);
+            response = await client().Execute(request);
+            return response;
+        }
+
+        void Button_Clicked(System.Object sender, System.EventArgs e)
+        {
+            var source = webViewPage.Source as UrlWebViewSource;
+            Debug.WriteLine("Source From WebView: " + source.Url);
+            captureOrder(OrderId);
+        }
+
+        public async Task<HttpResponse> captureOrder(string id)
+        {
+            // Construct a request object and set desired parameters
+            // Replace ORDER-ID with the approved order id from create order
+            Debug.WriteLine("id: " + id);
+            var request = new OrdersCaptureRequest(id);
+            request.RequestBody(new OrderActionRequest());
+            
+            HttpResponse response = await client().Execute(request);
+            var statusCode = response.StatusCode;
+            string code = statusCode.ToString();
+            Debug.WriteLine("StatusCode: " + code);
+            PayPalCheckoutSdk.Orders.Order result = response.Result<PayPalCheckoutSdk.Orders.Order>();
+            Debug.WriteLine("Status: " +  result.Status);
+            Debug.WriteLine("Capture Id: "+  result.Id);
+            Debug.WriteLine("id: " + id);
+            
+            if(result.Status == "COMPLETED")
+            {
+                Debug.WriteLine("WRITE DATA TO DATA BASE");
+                // Successful Payment
+                await DisplayAlert("Congratulations", "Payment was succesfull. We appreciate your business", "OK");
+                ClearCardInfo();
+
+                var purchaseString = JsonConvert.SerializeObject(purchaseObject);
+                System.Diagnostics.Debug.WriteLine("Purchase: " + purchaseString);
+                var purchaseMessage = new StringContent(purchaseString, Encoding.UTF8, "application/json");
+                var client = new System.Net.Http.HttpClient();
+
+                CouponObject coupon = new CouponObject();
+                coupon.coupon_uid = couponData.result[defaultCouponIndex].coupon_uid;
+
+                var couponSerialized = JsonConvert.SerializeObject(coupon);
+                System.Diagnostics.Debug.WriteLine("Coupon to update: " + couponSerialized);
+                var couponContent = new StringContent(couponSerialized, Encoding.UTF8, "application/json");
+
+                var Response = await client.PostAsync(Constant.PurchaseUrl, purchaseMessage);
+                //var RDSCouponResponse = await client.PostAsync(Constant.UpdateCouponUrl, couponContent);
+                Debug.WriteLine("Order was written to DB: " + Response.IsSuccessStatusCode);
+                //Debug.WriteLine("Coupon was succesfully updated (subtract)" + RDSCouponResponse);
+                if (Response.IsSuccessStatusCode)
+                {
+                    var RDSResponseContent = await Response.Content.ReadAsStringAsync();
+                    //System.Diagnostics.Debug.WriteLine(RDSResponseContent);
+
+                    cartItems.Clear();
+                    updateTotals(0, 0);
+                    total = 00.00;
+                    total_qty = 0;
+                    Application.Current.Properties["day"] = "";
+                    await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
+                }
+            }
+            else
+            {
+                await DisplayAlert("Ooops", "You payment was cancel or not sucessful. Please try again", "OK");
+            }
+
+            return response;
+        }
+
+        void TapGestureRecognizer_Tapped_1(System.Object sender, System.EventArgs e)
+        {
+            //string source = webViewPage.Source;
+          
+            //Debug.WriteLine("Source From WebView: " + source);
+        }
+
+        void TapGestureRecognizer_Tapped_2(System.Object sender, System.EventArgs e)
+        {
+            string source = webViewPage.Source.ToString();
+            
+            Debug.WriteLine("Source From WebView: " + source);
         }
     }
 }

@@ -20,6 +20,8 @@
     <PackageReference Include="Stripe.net" Version="39.29.0" />
     <PackageReference Include="Xam.Plugin.Media" Version="5.0.1" />
     <PackageReference Include="Acr.UserDialogs" Version="7.1.0.468" />
+    <PackageReference Include="PayPalCheckoutSdk" Version="1.0.3" />
+    <PackageReference Include="PayPalHttp" Version="1.0.0" />
   </ItemGroup>
   <!--<PackageReference Include="Stripe.net" Version="39.22.0" />-->
 
