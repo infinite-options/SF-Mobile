@@ -89,7 +89,7 @@
                                         <StackLayout Padding="15">
                                             <FlexLayout JustifyContent="SpaceBetween">
                                                 <Label Text="Order Completed" StyleClass="h2, primary" VerticalTextAlignment="Center"/>
-                                                <Button Text="Rate Order" StyleClass="btn, primary"/>
+                                                <Button Text="Rate Order" StyleClass="btn, primary" Clicked="Button_Clicked"/>
                                             </FlexLayout>
                                             <Label Text="{Binding purchase_date}" StyleClass="black"/>
                                             <Label Text="{Binding purchase_id}" StyleClass="black"/>
@@ -115,8 +115,8 @@
                                             <Label Text="{Binding amount_due}" StyleClass="p, black"/>
                                         </FlexLayout>
                                         <Grid Padding="15">
-                                            <Button Grid.Column="0" Text="View Receipt" StyleClass="btn, primary" Margin="20,0"/>
-                                            <Button Grid.Column="1" Text="Get Help" StyleClass="btn, primary" Margin="20,0"/>
+                                            <Button Grid.Column="0" Text="View Receipt" StyleClass="btn, primary" Margin="20,0" Clicked="Button_Clicked"/>
+                                            <Button Grid.Column="1" Text="Get Help" StyleClass="btn, primary" Margin="20,0" Clicked="Button_Clicked"/>
                                         </Grid>
                                         <BoxView HeightRequest="5" BackgroundColor="LightGray"/>
                                     </StackLayout>

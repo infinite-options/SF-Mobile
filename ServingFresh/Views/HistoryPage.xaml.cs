@@ -209,5 +209,10 @@ namespace ServingFresh.Views
         {
             Application.Current.MainPage = new ProfilePage();
         }
+
+        async void Button_Clicked(System.Object sender, System.EventArgs e)
+        {
+            await DisplayAlert("", "Additional feature coming soon", "Thanks");
+        }
     }
 }

@@ -46,7 +46,7 @@ namespace ServingFresh.iOS
             LoadApplication(new App());
 
             base.FinishedLaunching(app, options);
-
+            // "#FF8500"
             UINavigationBar.Appearance.TintColor = Color.FromHex("#FFFFFF").ToUIColor();
 
             //UIView statusBar = UIApplication.SharedApplication.ValueForKey(new NSString("statusBar")) as UIView;
@@ -57,7 +57,8 @@ namespace ServingFresh.iOS
             //}
 
             // Color of the selected tab icon:
-            UITabBar.Appearance.SelectedImageTintColor = Color.FromHex("#a0050f").ToUIColor();
+            //UITabBar.Appearance.SelectedImageTintColor = Color.FromHex("#a0050f").ToUIColor();
+            UITabBar.Appearance.SelectedImageTintColor = Color.FromHex("#FF8500").ToUIColor();
 
             // Color of the tabbar background:
             //UITabBar.Appearance.BarTintColor = UIColor.FromRGB(247, 247, 247);
@@ -66,7 +67,8 @@ namespace ServingFresh.iOS
             UITabBarItem.Appearance.SetTitleTextAttributes(
                 new UITextAttributes()
                 {
-                    TextColor = Color.FromHex("#a0050f").ToUIColor()
+                    //TextColor = Color.FromHex("#a0050f").ToUIColor()
+                    TextColor = Color.FromHex("#FF8500").ToUIColor()
                 },
                 UIControlState.Selected);
 
@@ -77,8 +79,11 @@ namespace ServingFresh.iOS
                     TextColor = Color.FromHex("#000000").ToUIColor()
                 },
                 UIControlState.Normal);
-            UIView.AppearanceWhenContainedIn(typeof(UIAlertView)).TintColor = Color.FromHex("#a0050f").ToUIColor();
-            UIView.AppearanceWhenContainedIn(typeof(UIAlertController)).TintColor = Color.FromHex("#a0050f").ToUIColor();
+            //UIView.AppearanceWhenContainedIn(typeof(UIAlertView)).TintColor = Color.FromHex("#a0050f").ToUIColor();
+            UIView.AppearanceWhenContainedIn(typeof(UIAlertView)).TintColor = Color.FromHex("#FF8500").ToUIColor();
+
+            //UIView.AppearanceWhenContainedIn(typeof(UIAlertController)).TintColor = Color.FromHex("#a0050f").ToUIColor();
+            UIView.AppearanceWhenContainedIn(typeof(UIAlertController)).TintColor = Color.FromHex("#FF8500").ToUIColor();
 
             if (UIDevice.CurrentDevice.CheckSystemVersion(10, 0))
             {

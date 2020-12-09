@@ -53,7 +53,8 @@
                     TextColor="White"
                     FontAttributes="Bold"
                     BackgroundColor="#136D74"
-                    CornerRadius="0">
+                    CornerRadius="0"
+                    Clicked="Button_Clicked">
                 </Button>
             </Grid>
             <StackLayout Grid.Row="4">

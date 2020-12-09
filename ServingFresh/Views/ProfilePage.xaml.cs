@@ -476,5 +476,10 @@ namespace ServingFresh.Views
                 await DisplayAlert("Ooops", "Our system is down. We can't process this request at the moment", "OK");
             }
         }
+
+        async void Button_Clicked(System.Object sender, System.EventArgs e)
+        {
+            await DisplayAlert("", "Additional feature coming soon", "Thanks");
+        }
     }
 }
