@@ -300,6 +300,7 @@ namespace ServingFresh.Views
                         profile.customer_last_name = userLastName.Text;
                         profile.customer_email = userEmailAddress.Text;
                         profile.customer_phone_num = userPhoneNumber.Text;
+
                         var p = JsonConvert.SerializeObject(profile);
                         var content = new StringContent(p, Encoding.UTF8, "application/json");
 
@@ -313,7 +314,19 @@ namespace ServingFresh.Views
                         Debug.WriteLine("Write to database from profile: " + RDSResponse.IsSuccessStatusCode);
                         if (RDSResponse.IsSuccessStatusCode)
                         {
+                            // Update user information:
+                            Application.Current.Properties["user_first_name"] = userFirstName.Text;     // 1
+                            Application.Current.Properties["user_last_name"] = userLastName.Text;       // 2
+                            Application.Current.Properties["user_phone_num"] = userPhoneNumber.Text;    // 3
+                            Application.Current.Properties["user_address"] = userAddress.Text;          // 4
+                            Application.Current.Properties["user_unit"] = userUnitNumber.Text;          // 5
+                            Application.Current.Properties["user_city"] = userCity.Text;                // 6
+                            Application.Current.Properties["user_state"] = userState.Text;              // 7
+                            Application.Current.Properties["user_zip_code"] = userZipcode.Text;         // 8
+                            Application.Current.Properties["user_latitude"] = userLat;                  // 9
+                            Application.Current.Properties["user_longitude"] = userLong;                // 10
                             await DisplayAlert("Awesome!", "We have save your changes!", "OK");
+                            Application.Current.MainPage = new SelectionPage();
                         }
                     }
                 }

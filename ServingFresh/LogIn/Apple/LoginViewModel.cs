@@ -9,7 +9,8 @@ using ServingFresh.Views;
 using Newtonsoft.Json;
 using Xamarin.Essentials;
 using Xamarin.Forms;
-
+using ServingFresh.Models;
+using System.Diagnostics;
 
 namespace ServingFresh.LogIn.Apple
 {
@@ -24,10 +25,17 @@ namespace ServingFresh.LogIn.Apple
         public event EventHandler AppleError = delegate { };
 
         IAppleSignInService appleSignInService = null;
+        private string deviceId;
+
         public LoginViewModel()
         {
             appleSignInService = DependencyService.Get<IAppleSignInService>();
             SignInWithAppleCommand = new Command(OnAppleSignInRequest);
+            if (Device.RuntimePlatform == Device.iOS)
+            {
+                deviceId = Preferences.Get("guid", null);
+                if (deviceId != null) { Debug.WriteLine("This is the iOS GUID from Direct Sign Up: " + deviceId); }
+            }
         }
 
         public async void OnAppleSignInRequest()
@@ -144,6 +152,34 @@ namespace ServingFresh.LogIn.Apple
                                 Application.Current.Properties["user_longitude"] = AppleUserData.result[0].customer_long;
 
                                 _ = Application.Current.SavePropertiesAsync();
+
+                                if (deviceId != null)
+                                {
+                                    NotificationPost notificationPost = new NotificationPost();
+
+                                    notificationPost.uid = (string)Application.Current.Properties["user_id"];
+                                    notificationPost.guid = deviceId.Substring(5);
+                                    Application.Current.Properties["guid"] = deviceId.Substring(5);
+                                    notificationPost.notification = "TRUE";
+
+                                    var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
+                                    Debug.WriteLine("Notification JSON Object to send: " + notificationSerializedObject);
+
+                                    var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
+
+                                    var clientResponse = await client.PostAsync(Constant.NotificationsUrl, notificationContent);
+
+                                    Debug.WriteLine("Status code: " + clientResponse.IsSuccessStatusCode);
+
+                                    if (clientResponse.IsSuccessStatusCode)
+                                    {
+                                        System.Diagnostics.Debug.WriteLine("We have post the guid to the database");
+                                    }
+                                    else
+                                    {
+                                        await Application.Current.MainPage.DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
+                                    }
+                                }
                                 Application.Current.MainPage = new SelectionPage();
                             }
                             else

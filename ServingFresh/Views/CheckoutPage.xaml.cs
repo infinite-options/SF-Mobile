@@ -169,12 +169,13 @@ namespace ServingFresh.Views
         public string cartEmpty = "";
 
         // Paypal credentials
-       
+        static String clientId = "";
+        static String secret = "";
 
         public CheckoutPage(IDictionary<string, ItemPurchased> order = null, string day = "")
         {
             InitializeComponent();
-            
+            GetPayPalCredentials();
             if (day != "")
             {
                 GetFees(day);
@@ -257,9 +258,14 @@ namespace ServingFresh.Views
             CartItems.ItemsSource = cartItems;
             CartItems.HeightRequest = 56 * cartItems.Count;
 
-            //delivery_fee = Constant.deliveryFee;
-            //service_fee = Constant.serviceFee;
-            
+            if(day == "")
+            {
+                delivery_fee = Constant.deliveryFee;
+                service_fee = Constant.serviceFee;
+                ServiceFee.Text = "$ " + service_fee.ToString("N2");
+                DeliveryFee.Text = "$ " + delivery_fee.ToString("N2");
+            }
+           
         }
 
 
@@ -291,6 +297,10 @@ namespace ServingFresh.Views
                     delivery_fee = Constant.deliveryFee;
                     service_fee = Constant.serviceFee;
                 }
+
+                Debug.WriteLine("Delivery Fee: " + delivery_fee);
+                Debug.WriteLine("Service Fee: " + service_fee);
+
                 ServiceFee.Text = "$ " + service_fee.ToString("N2");
                 DeliveryFee.Text = "$ " + delivery_fee.ToString("N2");
                 GetAvailiableCoupons();
@@ -523,13 +533,29 @@ namespace ServingFresh.Views
             SubTotal.Text = "$ " + subtotal.ToString("N2");
             this.discount = discount;
             Discount.Text = "-$ " + discount.ToString("N2");
-            DeliveryFee.Text = "$ " + (delivery_fee - discount_delivery_fee).ToString("N2");
+            
+            if((delivery_fee - discount_delivery_fee <= 0))
+            {
+                DeliveryFee.Text = "$ " + (0.00).ToString("N2");
+            }
+            else
+            {
+                DeliveryFee.Text = "$ " + (delivery_fee - discount_delivery_fee).ToString("N2");
+            }
+            
             taxes = subtotal * (Constant.tax_rate);
             Taxes.Text = "$ " + taxes.ToString("N2");
 
-            if(DriverTip.Text == null)
+            if (DriverTip.Text == null)
             {
-                total = subtotal - discount + (delivery_fee - discount_delivery_fee) + taxes + service_fee; 
+                if ((delivery_fee - discount_delivery_fee <= 0))
+                {
+                    total = subtotal - discount + (0.00) + taxes + service_fee;
+                }
+                else
+                {
+                    total = subtotal - discount + (delivery_fee - discount_delivery_fee) + taxes + service_fee;
+                }
             }
             else
             {
@@ -538,7 +564,15 @@ namespace ServingFresh.Views
                     DriverTip.Text = "0.00";
                 }
                 Debug.WriteLine("Driver Tip: " + DriverTip.Text);
-                total = subtotal - discount + (delivery_fee - discount_delivery_fee) + taxes + service_fee + Double.Parse(DriverTip.Text);
+                if ((delivery_fee - discount_delivery_fee <= 0))
+                {
+                    total = subtotal - discount + (0.00) + taxes + service_fee + Double.Parse(DriverTip.Text);
+                }
+                else
+                {
+                    total = subtotal - discount + (delivery_fee - discount_delivery_fee) + taxes + service_fee + Double.Parse(DriverTip.Text);
+                }
+                
             }
 
             GrandTotal.Text = "$ " + total.ToString("N2");
@@ -602,8 +636,10 @@ namespace ServingFresh.Views
             }
         }
 
-        public void checkoutAsync(object sender, EventArgs e)
+        public async void checkoutAsync(object sender, EventArgs e)
         {
+            if (total > 0 && cartEmpty != "EMPTY")
+            {
            
             cardHolderEmail.Text = purchaseObject.delivery_email;
             cardHolderName.Text = purchaseObject.delivery_first_name + " " + purchaseObject.delivery_last_name;
@@ -621,7 +657,6 @@ namespace ServingFresh.Views
             else
             {
                 cardframe.Height = this.Height;
-
             }
            
             options.Height = 0;
@@ -661,6 +696,11 @@ namespace ServingFresh.Views
 
             var purchaseString = JsonConvert.SerializeObject(purchaseObject);
             System.Diagnostics.Debug.WriteLine(purchaseString);
+            }
+            else
+            {
+                await DisplayAlert("Oops", "Your total is zero or your shopping cart is empty. Please select a delivery day and add items to your cart!", "Thank you");
+            }
         }
 
         public ObservableCollection<PurchasedItem> GetOrder(ObservableCollection<ItemObject> list)
@@ -680,60 +720,73 @@ namespace ServingFresh.Views
             return purchasedOrder;
         }
         
-        void CompletePaymentClick(System.Object sender, System.EventArgs e)
+        async void CompletePaymentClick(System.Object sender, System.EventArgs e)
         {
-            cardframe.Height = 0;
-            options.Height = 65;
-            PayViaStripe();
+            
+                cardframe.Height = 0;
+                options.Height = 65;
+                PayViaStripe();
+            
+           
         }
         public string OrderId = "";
         async void PayViaPayPal(System.Object sender, System.EventArgs e)
         {
 
-            string dateTime = DateTime.Parse((string)Application.Current.Properties["delivery_date"]).ToString("yyyy-MM-dd");
-            Debug.WriteLine("Date Time of Paypal: " + dateTime);
-            purchaseObject.cc_num = "";
-            purchaseObject.cc_exp_date = "";
-            purchaseObject.cc_cvv = "";
-            purchaseObject.cc_zip = "";
-            purchaseObject.charge_id = "";
-            purchaseObject.payment_type = ((Button)sender).Text == "Checkout with Paypal" ? "PAYPAL" : "STRIPE";
-            purchaseObject.items = GetOrder(cartItems);
-            purchaseObject.start_delivery_date = dateTime;
-            purchaseObject.pay_coupon_id = couponData.result[defaultCouponIndex].coupon_uid;
-            purchaseObject.amount_due = total.ToString("N2");
-            purchaseObject.amount_discount = discount.ToString("N2");
-            purchaseObject.amount_paid = total.ToString("N2");
-            purchaseObject.info_is_Addon = "FALSE";
-            //Paypal();
-
-            // Step 1
-            // Create a request to pay with PayPal using PayPal client
-
-            paypalframe.Height = this.Height - 65;
-            webViewPage.HeightRequest = this.Height - 65;
-            options.Height = 0;
-            var response = await createOrder(purchaseObject.amount_due);
-            var content = response.Result<PayPalCheckoutSdk.Orders.Order>();
-            PayPalCheckoutSdk.Orders.Order result = response.Result<PayPalCheckoutSdk.Orders.Order>();
-
-            Console.WriteLine("Status: {0}", result.Status);
-            Console.WriteLine("Order Id: {0}", result.Id);
-            Console.WriteLine("Intent: {0}", result.CheckoutPaymentIntent);
-            Console.WriteLine("Links:");
-            foreach (LinkDescription link in result.Links)
+            if (total > 0 && cartEmpty != "EMPTY")
             {
-                Console.WriteLine("\t{0}: {1}\tCall Type: {2}", link.Rel, link.Href, link.Method);
-                if(link.Rel == "approve")
+
+
+                string dateTime = DateTime.Parse((string)Application.Current.Properties["delivery_date"]).ToString("yyyy-MM-dd");
+                Debug.WriteLine("Date Time of Paypal: " + dateTime);
+                purchaseObject.cc_num = "";
+                purchaseObject.cc_exp_date = "";
+                purchaseObject.cc_cvv = "";
+                purchaseObject.cc_zip = "";
+                purchaseObject.charge_id = "";
+                purchaseObject.payment_type = ((Button)sender).Text == "Checkout with Paypal" ? "PAYPAL" : "STRIPE";
+                purchaseObject.items = GetOrder(cartItems);
+                purchaseObject.start_delivery_date = dateTime;
+                purchaseObject.pay_coupon_id = couponData.result[defaultCouponIndex].coupon_uid;
+                purchaseObject.amount_due = total.ToString("N2");
+                purchaseObject.amount_discount = discount.ToString("N2");
+                purchaseObject.amount_paid = total.ToString("N2");
+                purchaseObject.info_is_Addon = "FALSE";
+                //Paypal();
+
+                // Step 1
+                // Create a request to pay with PayPal using PayPal client
+
+                paypalframe.Height = this.Height - 65;
+                webViewPage.HeightRequest = this.Height - 65;
+                options.Height = 0;
+
+                var response = await createOrder(purchaseObject.amount_due);
+                var content = response.Result<PayPalCheckoutSdk.Orders.Order>();
+                PayPalCheckoutSdk.Orders.Order result = response.Result<PayPalCheckoutSdk.Orders.Order>();
+
+                Console.WriteLine("Status: {0}", result.Status);
+                Console.WriteLine("Order Id: {0}", result.Id);
+                Console.WriteLine("Intent: {0}", result.CheckoutPaymentIntent);
+                Console.WriteLine("Links:");
+                foreach (LinkDescription link in result.Links)
                 {
-                    webViewPage.Source = link.Href;
+                    Console.WriteLine("\t{0}: {1}\tCall Type: {2}", link.Rel, link.Href, link.Method);
+                    if (link.Rel == "approve")
+                    {
+                        webViewPage.Source = link.Href;
+                    }
                 }
+
+                webViewPage.Navigated += WebViewPage_Navigated;
+
+
+                OrderId = result.Id;
             }
-            
-            webViewPage.Navigated += WebViewPage_Navigated;
-           
-            
-            OrderId = result.Id;
+            else
+            {
+                await DisplayAlert("Oops", "Your total is zero or your shopping cart is empty. Please select a delivery day and add items to your cart!", "Thank you");
+            }
         }
 
 
@@ -747,17 +800,57 @@ namespace ServingFresh.Views
                 paypalframe.Height = 0;
                 options.Height = 65;
                 Debug.WriteLine("We got to serving fresh");
-                var cancel = captureOrder(OrderId).IsCanceled;
-                var completed = captureOrder(OrderId).IsCompleted;
-                
+                _ = captureOrder(OrderId);
             }
         }
 
+        public async void GetPayPalCredentials()
+        {
+            var c = new System.Net.Http.HttpClient();
+            var paypal = new Credentials();
+            paypal.key = Constant.LiveClientId;
+
+            var stripeObj = JsonConvert.SerializeObject(paypal);
+            System.Diagnostics.Debug.WriteLine("key to send JSON: " + stripeObj);
+            var stripeContent = new StringContent(stripeObj, Encoding.UTF8, "application/json");
+            var RDSResponse = await c.PostAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/Paypal_Payment_key_checker", stripeContent);
+            var content = await RDSResponse.Content.ReadAsStringAsync();
+            Debug.WriteLine("Response key from paypal :" + content);
+
+            if (RDSResponse.IsSuccessStatusCode)
+            {
+                if (content.Contains("Test"))
+                {
+                    clientId = Constant.TestClientId;
+                    secret = Constant.TestSecret;
+                    //Debug.WriteLine("Test key: " + clientId);
+                    //Debug.WriteLine("Test Secret: " + secret);
+                }
+                else if (content.Contains("Live"))
+                {
+                    clientId = Constant.LiveClientId;
+                    secret = Constant.LiveSecret;
+                    //Debug.WriteLine("Live key: " + clientId);
+                    //Debug.WriteLine("Live Secret: " + secret);
+                }
+                else
+                {
+                    Debug.WriteLine("Invalid entry");
+                }
+            }
+            else
+            {
+                await DisplayAlert("Oops", "We can't not process your request at this moment.", "OK");
+            }
+        }
 
 
         public static PayPalHttp.HttpClient client()
         {
             // Creating a sandbox environment
+
+           
+
             PayPalEnvironment environment = new SandboxEnvironment(clientId, secret);
 
             // Creating a client for the environment
@@ -825,9 +918,12 @@ namespace ServingFresh.Views
         {
             try
             {
+
+
+
                 var c = new System.Net.Http.HttpClient();
                 var stripe = new Credentials();
-                stripe.key = Constant.TestPK;
+                stripe.key = Constant.LivePK;
 
                 var stripeObj = JsonConvert.SerializeObject(stripe);
                 System.Diagnostics.Debug.WriteLine("key to send JSON: " + stripeObj);
@@ -835,10 +931,10 @@ namespace ServingFresh.Views
                 var RDSResponse = await c.PostAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/Stripe_Payment_key_checker", stripeContent);
                 var content = await RDSResponse.Content.ReadAsStringAsync();
                 Debug.WriteLine("Response from key: " + content);
-                
+
                 if (RDSResponse.IsSuccessStatusCode)
                 {
-                    if(content != "200")
+                    if (content != "200")
                     {
                         string SK = "";
                         string contentTrim = content.Trim();
@@ -853,7 +949,7 @@ namespace ServingFresh.Views
                         {
                             SK = Constant.LiveSK;
                         }
-                        Debug.WriteLine("SK" + SK);
+                        //Debug.WriteLine("SK" + SK);
                         StripeConfiguration.ApiKey = SK;
 
                         string CardNo = cardHolderNumber.Text.Trim();
@@ -942,6 +1038,8 @@ namespace ServingFresh.Views
                                 total = 00.00;
                                 total_qty = 0;
                                 Application.Current.Properties["day"] = "";
+                                cartEmpty = "EMPTY";
+                                cartHeight.Height = 0;
                                 await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
                             }
                             //if (RDSCouponResponse.IsSuccessStatusCode && Response.IsSuccessStatusCode)
@@ -957,12 +1055,8 @@ namespace ServingFresh.Views
                         }
                     }
                 }
-                else
-                {
-                    await DisplayAlert("","","");
-                }
-
-            }catch(Exception ex)
+            }
+            catch(Exception ex)
             {
                  await DisplayAlert("Alert!", ex.Message, "OK");
             }
@@ -1556,6 +1650,8 @@ namespace ServingFresh.Views
                     total = 00.00;
                     total_qty = 0;
                     Application.Current.Properties["day"] = "";
+                    cartEmpty = "EMPTY";
+                    cartHeight.Height = 0;
                     await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
                 }
             }

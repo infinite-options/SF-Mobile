@@ -14,6 +14,7 @@ using Xamarin.Essentials;
 using ServingFresh.LogIn.Apple;
 using ServingFresh.Notifications;
 using System.Diagnostics;
+using ServingFresh.Models;
 
 namespace ServingFresh.Views
 {
@@ -22,6 +23,7 @@ namespace ServingFresh.Views
         public event EventHandler SignIn;
         public bool createAccount = false;
         INotifications appleNotification = DependencyService.Get<INotifications>();
+        private string deviceId;
 
         public LogInPage()
         {
@@ -38,6 +40,17 @@ namespace ServingFresh.Views
             {
                 InitializedAppleLogin();
                 appleNotification.IsNotifications();
+            }
+
+            if (Device.RuntimePlatform == Device.iOS)
+            {
+                deviceId = Preferences.Get("guid", null);
+                if (deviceId != null) { Debug.WriteLine("This is the iOS GUID from Log in: " + deviceId); }
+            }
+            else
+            {
+                deviceId = Preferences.Get("guid", null);
+                if (deviceId != null) { Debug.WriteLine("This is the Android GUID from Log in " + deviceId); }
             }
         }
 
@@ -118,6 +131,48 @@ namespace ServingFresh.Views
                                 Application.Current.Properties["user_delivery_instructions"] = "";
 
                                 _ = Application.Current.SavePropertiesAsync();
+
+                                if (Device.RuntimePlatform == Device.iOS)
+                                {
+                                    deviceId = Preferences.Get("guid", null);
+                                    if (deviceId != null) { Debug.WriteLine("This is the iOS GUID from Log in: " + deviceId); }
+                                }
+                                else
+                                {
+                                    deviceId = Preferences.Get("guid", null);
+                                    if (deviceId != null) { Debug.WriteLine("This is the Android GUID from Log in " + deviceId); }
+                                }
+
+                                if (deviceId != null)
+                                {
+                                    NotificationPost notificationPost = new NotificationPost();
+
+                                    notificationPost.uid = (string)Application.Current.Properties["user_id"];
+                                    notificationPost.guid = deviceId.Substring(5);
+                                    Application.Current.Properties["guid"] = deviceId.Substring(5);
+                                    notificationPost.notification = "TRUE";
+
+                                    var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
+                                    Debug.WriteLine("Notification JSON Object to send: " + notificationSerializedObject);
+
+                                    var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
+
+                                    var clientResponse = await client.PostAsync(Constant.NotificationsUrl, notificationContent);
+
+                                    Debug.WriteLine("Status code: " + clientResponse.IsSuccessStatusCode);
+
+                                    if (clientResponse.IsSuccessStatusCode)
+                                    {
+                                        System.Diagnostics.Debug.WriteLine("We have post the guid to the database");
+                                    }
+                                    else
+                                    {
+                                        await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
+                                    }
+                                }
+
+
+
                                 Application.Current.MainPage = new SelectionPage();
                             }catch (Exception ex){
 
@@ -381,6 +436,46 @@ namespace ServingFresh.Views
                                     Application.Current.Properties["user_longitude"] = FacebookUserData.result[0].customer_long;
 
                                     _ = Application.Current.SavePropertiesAsync();
+
+                                    if (Device.RuntimePlatform == Device.iOS)
+                                    {
+                                        deviceId = Preferences.Get("guid", null);
+                                        if (deviceId != null) { Debug.WriteLine("This is the iOS GUID from Log in: " + deviceId); }
+                                    }
+                                    else
+                                    {
+                                        deviceId = Preferences.Get("guid", null);
+                                        if (deviceId != null) { Debug.WriteLine("This is the Android GUID from Log in " + deviceId); }
+                                    }
+                                    
+                                    if (deviceId != null)
+                                    {
+                                        NotificationPost notificationPost = new NotificationPost();
+
+                                        notificationPost.uid = (string)Application.Current.Properties["user_id"];
+                                        notificationPost.guid = deviceId.Substring(5);
+                                        Application.Current.Properties["guid"] = deviceId.Substring(5);
+                                        notificationPost.notification = "TRUE";
+
+                                        var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
+                                        Debug.WriteLine("Notification JSON Object to send: " + notificationSerializedObject);
+
+                                        var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
+
+                                        var clientResponse = await client.PostAsync(Constant.NotificationsUrl, notificationContent);
+
+                                        Debug.WriteLine("Status code: " + clientResponse.IsSuccessStatusCode);
+
+                                        if (clientResponse.IsSuccessStatusCode)
+                                        {
+                                            System.Diagnostics.Debug.WriteLine("We have post the guid to the database");
+                                        }
+                                        else
+                                        {
+                                            await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
+                                        }
+                                    }
+
                                     Application.Current.MainPage = new SelectionPage();
                                 }
                                 else
@@ -575,6 +670,46 @@ namespace ServingFresh.Views
                                         Application.Current.Properties["user_longitude"] = GoogleUserData.result[0].customer_long;
 
                                         _ = Application.Current.SavePropertiesAsync();
+
+                                        if (Device.RuntimePlatform == Device.iOS)
+                                        {
+                                            deviceId = Preferences.Get("guid", null);
+                                            if (deviceId != null) { Debug.WriteLine("This is the iOS GUID from Log in: " + deviceId); }
+                                        }
+                                        else
+                                        {
+                                            deviceId = Preferences.Get("guid", null);
+                                            if (deviceId != null) { Debug.WriteLine("This is the Android GUID from Log in " + deviceId); }
+                                        }
+
+                                        if (deviceId != null)
+                                        {
+                                            NotificationPost notificationPost = new NotificationPost();
+
+                                            notificationPost.uid = (string)Application.Current.Properties["user_id"];
+                                            notificationPost.guid = deviceId.Substring(5);
+                                            Application.Current.Properties["guid"] = deviceId.Substring(5);
+                                            notificationPost.notification = "TRUE";
+
+                                            var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
+                                            Debug.WriteLine("Notification JSON Object to send: " + notificationSerializedObject);
+
+                                            var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
+
+                                            var clientResponse = await client.PostAsync(Constant.NotificationsUrl, notificationContent);
+
+                                            Debug.WriteLine("Status code: " + clientResponse.IsSuccessStatusCode);
+
+                                            if (clientResponse.IsSuccessStatusCode)
+                                            {
+                                                System.Diagnostics.Debug.WriteLine("We have post the guid to the database");
+                                            }
+                                            else
+                                            {
+                                                await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
+                                            }
+                                        }
+
                                         Application.Current.MainPage = new SelectionPage();
                                     }
                                     else
