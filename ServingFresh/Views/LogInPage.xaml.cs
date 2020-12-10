@@ -774,9 +774,10 @@ namespace ServingFresh.Views
             await DisplayAlert("Error", "We weren't able to set an account for you", "OK");
         }
 
-        void ProceedAsGuestClick(System.Object sender, System.EventArgs e)
+        async void ProceedAsGuestClick(System.Object sender, System.EventArgs e)
         {
-            Application.Current.MainPage = new GuestPage();
+            //Application.Current.MainPage = new GuestPage();
+            await DisplayAlert("", "Additional feature coming soon", "Thanks");
         }
 
         void SignUpClick(System.Object sender, System.EventArgs e)

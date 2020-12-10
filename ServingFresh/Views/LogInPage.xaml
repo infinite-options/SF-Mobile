@@ -87,7 +87,7 @@
                             Source="asGuestIcon.png"
                             BackgroundColor="Transparent"
                             Clicked="ProceedAsGuestClick"
-                            IsEnabled="False">
+                            >
                         </ImageButton>
                         <ImageButton
                             Grid.Row="1"

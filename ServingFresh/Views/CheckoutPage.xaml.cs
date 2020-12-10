@@ -50,7 +50,8 @@ namespace ServingFresh.Views
             PropertyChanged(this, new PropertyChangedEventArgs("total_price"));
         }
 
-       
+        public string img { get; set; }
+        public string description { get; set; }
 
 
     }
@@ -203,7 +204,9 @@ namespace ServingFresh.Views
                         name = order[key].item_name,
                         price = order[key].item_price,
                         item_uid = order[key].item_uid,
-                        business_uid = order[key].pur_business_uid
+                        business_uid = order[key].pur_business_uid,
+                        img = order[key].img,
+                        description = order[key].description,
                     });
                     orderCopy.Add(key, order[key]);
                 }
@@ -714,8 +717,10 @@ namespace ServingFresh.Views
                     qty = i.qty.ToString(),
                     name = i.name,
                     price = i.price.ToString(),
-                    itm_business_uid = i.business_uid
-                }) ;
+                    itm_business_uid = i.business_uid,
+                    img = i.img,
+                    description = i.description,
+                });
             }
             return purchasedOrder;
         }
