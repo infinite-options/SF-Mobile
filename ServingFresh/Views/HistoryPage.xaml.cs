@@ -154,9 +154,9 @@ namespace ServingFresh.Views
         }
         public async void LoadHistory()
         {
-            string email = (string)Application.Current.Properties["user_email"];
+            string userId = (string)Application.Current.Properties["user_id"];
             var client = new HttpClient();
-            var response = await client.GetAsync(Constant.GetHistoryUrl + email);
+            var response = await client.GetAsync(Constant.GetHistoryUrl + userId);
             string result = await response.Content.ReadAsStringAsync();
             Debug.WriteLine(result);
             try

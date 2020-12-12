@@ -68,6 +68,7 @@
                             </maps:Map>
                         </Frame>
                         <Button
+                            x:Name="validateAddressButton"
                             Text="Validate Address"
                             TextColor="#FF8500"
                             FontAttributes="Bold"
@@ -90,7 +91,7 @@
                             Clicked="ProceedAsGuestClick">
                         </Button>
                         <Button
-                            Text="Enter email and password Sign Up"
+                            Text="Enter email and password to Sign Up"
                             TextColor="White"
                             FontAttributes="Bold"
                             CornerRadius="5"

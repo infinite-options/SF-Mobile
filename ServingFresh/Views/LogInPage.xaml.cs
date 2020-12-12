@@ -776,8 +776,30 @@ namespace ServingFresh.Views
 
         async void ProceedAsGuestClick(System.Object sender, System.EventArgs e)
         {
+            Application.Current.Properties["user_latitude"] = "0";
+            Application.Current.Properties["user_longitude"] = "0";
+
+            List<string> types = new List<string>();
+            List<string> businessId = new List<string>();
+
+            types.Add("fruit");
+            types.Add("vegetable");
+            types.Add("dessert");
+            types.Add("other");
+
+            businessId.Add("200-000017");
+            businessId.Add("200-000018");
+            businessId.Add("200-000019");
+
+            var weekDay = DateTime.Now.DayOfWeek.ToString();
+            Application.Current.Properties["user"] = "GUEST";
+            
+            
+            ItemsPage businessItemPage = new ItemsPage(types, businessId, weekDay);
+            Application.Current.MainPage = businessItemPage;
             //Application.Current.MainPage = new GuestPage();
-            await DisplayAlert("", "Additional feature coming soon", "Thanks");
+
+            //await DisplayAlert("", "Additional feature coming soon", "Thanks");
         }
 
         void SignUpClick(System.Object sender, System.EventArgs e)

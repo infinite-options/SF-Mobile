@@ -13,6 +13,7 @@ using Xamarin.Forms;
 using ServingFresh.Effects;
 using ServingFresh.Config;
 using System.Diagnostics;
+using Xamarin.Essentials;
 
 namespace ServingFresh.Views
 {
@@ -689,15 +690,64 @@ namespace ServingFresh.Views
 
         void SubtractItemLeft(System.Object sender, System.EventArgs e)
         {
-            var button = (Button)sender;
-            var itemModelObject = (ItemsModel)button.CommandParameter;
-            ItemPurchased itemSelected = new ItemPurchased();
-            if (itemModelObject != null)
+            if (Application.Current.Properties.ContainsKey("user"))
             {
-                if (itemModelObject.quantityL != 0)
+                Debug.WriteLine("USER TYPE LEFT SUB: " + Application.Current.Properties["user"]);
+                SendGuestToAddressValidation();
+            }
+            else
+            {
+                var button = (Button)sender;
+                var itemModelObject = (ItemsModel)button.CommandParameter;
+                ItemPurchased itemSelected = new ItemPurchased();
+                if (itemModelObject != null)
                 {
-                    itemModelObject.quantityL -= 1;
-                    totalCount -= 1;
+                    if (itemModelObject.quantityL != 0)
+                    {
+                        itemModelObject.quantityL -= 1;
+                        totalCount -= 1;
+                        CartTotal.Text = totalCount.ToString();
+                        if (order != null)
+                        {
+                            if (order.ContainsKey(itemModelObject.itemNameLeft))
+                            {
+                                var itemToUpdate = order[itemModelObject.itemNameLeft];
+                                itemToUpdate.item_quantity = itemModelObject.quantityL;
+                                order[itemModelObject.itemNameLeft] = itemToUpdate;
+                            }
+                            else
+                            {
+                                itemSelected.pur_business_uid = itemModelObject.itm_business_uidLeft;
+                                itemSelected.item_uid = itemModelObject.item_uidLeft;
+                                itemSelected.item_name = itemModelObject.itemNameLeft;
+                                itemSelected.item_quantity = itemModelObject.quantityL;
+                                itemSelected.item_price = Convert.ToDouble(itemModelObject.itemPriceLeft.Substring(1).Trim());
+                                itemSelected.img = itemModelObject.imageSourceLeft;
+                                itemSelected.description = itemModelObject.item_descLeft;
+                                order.Add(itemModelObject.itemNameLeft, itemSelected);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        void AddItemLeft(System.Object sender, System.EventArgs e)
+        {
+            if (Application.Current.Properties.ContainsKey("user"))
+            {
+                Debug.WriteLine("USER TYPE LEFT ADD: " + Application.Current.Properties["user"]);
+                SendGuestToAddressValidation();
+            }
+            else
+            {
+                var button = (Button)sender;
+                var itemModelObject = (ItemsModel)button.CommandParameter;
+                ItemPurchased itemSelected = new ItemPurchased();
+                if (itemModelObject != null)
+                {
+                    itemModelObject.quantityL += 1;
+                    totalCount += 1;
                     CartTotal.Text = totalCount.ToString();
                     if (order != null)
                     {
@@ -723,50 +773,63 @@ namespace ServingFresh.Views
             }
         }
 
-        void AddItemLeft(System.Object sender, System.EventArgs e)
+        void SubtractItemRight(System.Object sender, System.EventArgs e)
         {
-            var button = (Button)sender;
-            var itemModelObject = (ItemsModel)button.CommandParameter;
-            ItemPurchased itemSelected = new ItemPurchased();
-            if (itemModelObject != null)
+            if (Application.Current.Properties.ContainsKey("user"))
             {
-                itemModelObject.quantityL += 1;
-                totalCount += 1;
-                CartTotal.Text = totalCount.ToString();
-                if (order != null)
+                Debug.WriteLine("USER TYPE RIGHT SUB: " + Application.Current.Properties["user"]);
+                SendGuestToAddressValidation();
+            }
+            else
+            {
+                var button = (Button)sender;
+                var itemModelObject = (ItemsModel)button.CommandParameter;
+                ItemPurchased itemSelected = new ItemPurchased();
+                if (itemModelObject != null)
                 {
-                    if (order.ContainsKey(itemModelObject.itemNameLeft))
+                    if (itemModelObject.quantityR != 0)
                     {
-                        var itemToUpdate = order[itemModelObject.itemNameLeft];
-                        itemToUpdate.item_quantity = itemModelObject.quantityL;
-                        order[itemModelObject.itemNameLeft] = itemToUpdate;
-                    }
-                    else
-                    {
-                        itemSelected.pur_business_uid = itemModelObject.itm_business_uidLeft;
-                        itemSelected.item_uid = itemModelObject.item_uidLeft;
-                        itemSelected.item_name = itemModelObject.itemNameLeft;
-                        itemSelected.item_quantity = itemModelObject.quantityL;
-                        itemSelected.item_price = Convert.ToDouble(itemModelObject.itemPriceLeft.Substring(1).Trim());
-                        itemSelected.img = itemModelObject.imageSourceLeft;
-                        itemSelected.description = itemModelObject.item_descLeft;
-                        order.Add(itemModelObject.itemNameLeft, itemSelected);
+                        itemModelObject.quantityR -= 1;
+                        totalCount -= 1;
+                        CartTotal.Text = totalCount.ToString();
+                        if (order.ContainsKey(itemModelObject.itemNameRight))
+                        {
+                            var itemToUpdate = order[itemModelObject.itemNameRight];
+                            itemToUpdate.item_quantity = itemModelObject.quantityR;
+                            order[itemModelObject.itemNameRight] = itemToUpdate;
+                        }
+                        else
+                        {
+                            itemSelected.pur_business_uid = itemModelObject.itm_business_uidRight;
+                            itemSelected.item_uid = itemModelObject.item_uidRight;
+                            itemSelected.item_name = itemModelObject.itemNameRight;
+                            itemSelected.item_quantity = itemModelObject.quantityR;
+                            itemSelected.item_price = Convert.ToDouble(itemModelObject.itemPriceRight.Substring(1).Trim());
+                            itemSelected.img = itemModelObject.imageSourceRight;
+                            itemSelected.description = itemModelObject.item_descRight;
+                            order.Add(itemModelObject.itemNameRight, itemSelected);
+                        }
                     }
                 }
             }
         }
 
-        void SubtractItemRight(System.Object sender, System.EventArgs e)
+        void AddItemRight(System.Object sender, System.EventArgs e)
         {
-            var button = (Button)sender;
-            var itemModelObject = (ItemsModel)button.CommandParameter;
-            ItemPurchased itemSelected = new ItemPurchased();
-            if (itemModelObject != null)
+            if (Application.Current.Properties.ContainsKey("user"))
             {
-                if (itemModelObject.quantityR != 0)
+                Debug.WriteLine("USER TYPE RIGHT ADD: " + Application.Current.Properties["user"]);
+                SendGuestToAddressValidation();
+            }
+            else
+            {
+                var button = (Button)sender;
+                var itemModelObject = (ItemsModel)button.CommandParameter;
+                ItemPurchased itemSelected = new ItemPurchased();
+                if (itemModelObject != null)
                 {
-                    itemModelObject.quantityR -= 1;
-                    totalCount -= 1;
+                    itemModelObject.quantityR += 1;
+                    totalCount += 1;
                     CartTotal.Text = totalCount.ToString();
                     if (order.ContainsKey(itemModelObject.itemNameRight))
                     {
@@ -785,36 +848,6 @@ namespace ServingFresh.Views
                         itemSelected.description = itemModelObject.item_descRight;
                         order.Add(itemModelObject.itemNameRight, itemSelected);
                     }
-                }
-            }
-        }
-
-        void AddItemRight(System.Object sender, System.EventArgs e)
-        {
-            var button = (Button)sender;
-            var itemModelObject = (ItemsModel)button.CommandParameter;
-            ItemPurchased itemSelected = new ItemPurchased();
-            if (itemModelObject != null)
-            {
-                itemModelObject.quantityR += 1;
-                totalCount += 1;
-                CartTotal.Text = totalCount.ToString();
-                if (order.ContainsKey(itemModelObject.itemNameRight))
-                {
-                    var itemToUpdate = order[itemModelObject.itemNameRight];
-                    itemToUpdate.item_quantity = itemModelObject.quantityR;
-                    order[itemModelObject.itemNameRight] = itemToUpdate;
-                }
-                else
-                {
-                    itemSelected.pur_business_uid = itemModelObject.itm_business_uidRight;
-                    itemSelected.item_uid = itemModelObject.item_uidRight;
-                    itemSelected.item_name = itemModelObject.itemNameRight;
-                    itemSelected.item_quantity = itemModelObject.quantityR;
-                    itemSelected.item_price = Convert.ToDouble(itemModelObject.itemPriceRight.Substring(1).Trim());
-                    itemSelected.img = itemModelObject.imageSourceRight;
-                    itemSelected.description = itemModelObject.item_descRight;
-                    order.Add(itemModelObject.itemNameRight, itemSelected);
                 }
             }
         }
@@ -880,46 +913,98 @@ namespace ServingFresh.Views
 
         void CheckOutClickBusinessPage(System.Object sender, System.EventArgs e)
         {
-            purchase = new Dictionary<string, ItemPurchased>();
-            foreach (string item in order.Keys)
+            if (Application.Current.Properties.ContainsKey("user"))
             {
-                if(order[item].item_quantity != 0)
-                {
-                    purchase.Add(item, order[item]);
-                }
+                Debug.WriteLine("USER TYPE @CHECKOUT: " + Application.Current.Properties["user"]);
+                SendGuestToAddressValidation();
             }
-            Application.Current.Properties["day"] = titlePage.Text;
-            Application.Current.MainPage = new CheckoutPage(purchase, titlePage.Text);
+            else
+            {
+                purchase = new Dictionary<string, ItemPurchased>();
+                foreach (string item in order.Keys)
+                {
+                    if (order[item].item_quantity != 0)
+                    {
+                        purchase.Add(item, order[item]);
+                    }
+                }
+                Application.Current.Properties["day"] = titlePage.Text;
+                Application.Current.MainPage = new CheckoutPage(purchase, titlePage.Text);
+            }
         }
 
         void DeliveryDaysClick(System.Object sender, System.EventArgs e)
         {
-
-            Application.Current.MainPage = new SelectionPage();
+            if (Application.Current.Properties.ContainsKey("user"))
+            {
+                Debug.WriteLine("USER TYPE @DELIVERY: " + Application.Current.Properties["user"]);
+                SendGuestToAddressValidation();
+            }
+            else
+            {
+                Application.Current.MainPage = new SelectionPage();
+            }
         }
 
         void OrdersClick(System.Object sender, System.EventArgs e)
         {
-            purchase = new Dictionary<string, ItemPurchased>();
-            foreach (string item in order.Keys)
+            if (Application.Current.Properties.ContainsKey("user"))
             {
-                if (order[item].item_quantity != 0)
-                {
-                    purchase.Add(item, order[item]);
-                }
+                Debug.WriteLine("USER TYPE @ORDERS: " + Application.Current.Properties["user"]);
+                SendGuestToAddressValidation();
             }
-            Application.Current.Properties["day"] = titlePage.Text;
-            Application.Current.MainPage = new CheckoutPage(purchase, titlePage.Text);
+            else
+            {
+                purchase = new Dictionary<string, ItemPurchased>();
+                foreach (string item in order.Keys)
+                {
+                    if (order[item].item_quantity != 0)
+                    {
+                        purchase.Add(item, order[item]);
+                    }
+                }
+                Application.Current.Properties["day"] = titlePage.Text;
+                Application.Current.MainPage = new CheckoutPage(purchase, titlePage.Text);
+            }
         }
 
         void InfoClick(System.Object sender, System.EventArgs e)
         {
-            Application.Current.MainPage = new InfoPage();
+            if (Application.Current.Properties.ContainsKey("user"))
+            {
+                Debug.WriteLine("USER TYPE @INFO: " + Application.Current.Properties["user"]);
+                SendGuestToAddressValidation();
+            }
+            else
+            {
+                Application.Current.MainPage = new InfoPage();
+            }
         }
 
         void ProfileClick(System.Object sender, System.EventArgs e)
         {
-            Application.Current.MainPage = new ProfilePage();
+            if (Application.Current.Properties.ContainsKey("user"))
+            {
+                Debug.WriteLine("USER TYPE @PROFILE: " + Application.Current.Properties["user"]);
+                SendGuestToAddressValidation();
+            }
+            else
+            {
+                Application.Current.MainPage = new ProfilePage();
+            }
+        }
+
+        async void SendGuestToAddressValidation()
+        {
+           var result = await DisplayAlert("Congratulations!","It looks like you are interested in our products! Press continue to validate your address to display the businesses that delivery to your location","Continue","Cancel");
+            if (result)
+            {
+                Application.Current.MainPage = new GuestPage();
+            }
+            else
+            {
+                Application.Current.MainPage = new LogInPage();
+            }
         }
     }
 }

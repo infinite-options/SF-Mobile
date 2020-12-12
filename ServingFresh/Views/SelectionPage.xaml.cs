@@ -98,13 +98,14 @@ namespace ServingFresh.Views
 
         List<DeliveriesModel> deliveryScheduleUnfiltered = new List<DeliveriesModel>();
         List<Delivery> deliveryScheduleFiltered = new List<Delivery>();
-        List<ScheduleInfo> schedule = new List<ScheduleInfo>();
+        public List<ScheduleInfo> schedule = new List<ScheduleInfo>();
 
         List<string> businessList = new List<string>();
         List<BusinessCard> businesses = new List<BusinessCard>();
         List<BusinessCard> business = new List<BusinessCard>();
         public ServingFreshBusiness data = new ServingFreshBusiness();
 
+        public  List<ScheduleInfo> copy = new List<ScheduleInfo>();
 
         public SelectionPage()
         {
@@ -115,7 +116,7 @@ namespace ServingFresh.Views
             CartTotal.Text = CheckoutPage.total_qty.ToString();
         }
 
-        void Init()
+        public void Init()
         {
             BackgroundColor = Constants.PrimaryColor;
             //delivery_list.ItemsSource = Deliveries;
@@ -123,7 +124,7 @@ namespace ServingFresh.Views
             //farm_list.ItemsSource = Farms;
         }
 
-        void GetDays()
+        public void GetDays()
         {
             deliveryScheduleUnfiltered.Clear();
             deliveryScheduleFiltered.Clear();
@@ -213,14 +214,14 @@ namespace ServingFresh.Views
             //}
         }
  
-        async void GetBusinesses()
+        public async void GetBusinesses()
         {
             string userLat = (string)Application.Current.Properties["user_latitude"];
             string userLong = (string)Application.Current.Properties["user_longitude"];
             if (userLat == "0" && userLong == "0")
             {
-                userLong = "-121.924799";
-                userLat = "37.364027";
+                userLong = "-121.8866517";
+                userLat = "37.2270928";
             }
 
             var client = new HttpClient();

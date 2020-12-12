@@ -205,6 +205,7 @@ namespace ServingFresh.Views
             {
                 isAddressValidated = true;
                 await DisplayAlert("We validated your address", "You can continue", "OK");
+                validateAddressButton.Text = "Address Validated -> Continue";
                 await Application.Current.SavePropertiesAsync();
             }
         }
@@ -271,13 +272,13 @@ namespace ServingFresh.Views
                         DateTime today = DateTime.Now;
                         DateTime expDate = today.AddDays(Constant.days);
 
-                        Application.Current.Properties["user_id"] = RDSData.result.customer_uid;
-                        Application.Current.Properties["time_stamp"] = expDate;
-                        Application.Current.Properties["platform"] = "";
-                        Application.Current.Properties["user_email"] = signUpGuest.email;
-                        Application.Current.Properties["user_first_name"] = signUpGuest.first_name;
-                        Application.Current.Properties["user_last_name"] = signUpGuest.last_name;
-                        Application.Current.Properties["user_phone_num"] = signUpGuest.phone_number;
+                        //Application.Current.Properties["user_id"] = RDSData.result.customer_uid;
+                        //Application.Current.Properties["time_stamp"] = expDate;
+                        //Application.Current.Properties["platform"] = "";
+                        //Application.Current.Properties["user_email"] = signUpGuest.email;
+                        //Application.Current.Properties["user_first_name"] = signUpGuest.first_name;
+                        //Application.Current.Properties["user_last_name"] = signUpGuest.last_name;
+                        //Application.Current.Properties["user_phone_num"] = signUpGuest.phone_number;
                         Application.Current.Properties["user_address"] = signUpGuest.address;
                         Application.Current.Properties["user_unit"] = signUpGuest.unit;
                         Application.Current.Properties["user_city"] = signUpGuest.city;
