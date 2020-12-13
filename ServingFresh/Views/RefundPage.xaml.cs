@@ -158,7 +158,10 @@ namespace ServingFresh.Views
 
         public void openHistory(object sender, EventArgs e)
         {
-            Application.Current.MainPage = new HistoryPage();
+            if (!Application.Current.Properties.ContainsKey("enable"))
+            {
+                Application.Current.MainPage = new HistoryPage();
+            }
         }
 
         void DeliveryDaysClick(System.Object sender, System.EventArgs e)
@@ -173,12 +176,20 @@ namespace ServingFresh.Views
 
         void InfoClick(System.Object sender, System.EventArgs e)
         {
-            Application.Current.MainPage = new InfoPage();
+            if (!Application.Current.Properties.ContainsKey("enable"))
+            {
+                Application.Current.MainPage = new InfoPage();
+            }
+            
         }
 
         void ProfileClick(System.Object sender, System.EventArgs e)
         {
-            Application.Current.MainPage = new ProfilePage();
+            if (!Application.Current.Properties.ContainsKey("enable"))
+            {
+                Application.Current.MainPage = new ProfilePage();
+            }
+            
         }
     }
 }

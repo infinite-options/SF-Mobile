@@ -181,94 +181,192 @@ namespace ServingFresh.Views
             {
                 GetFees(day);
             }
-            
-            GetAvailiableCoupons();
-            InitializeMap();
-            if((string)Application.Current.Properties["day"] == "")
+
+            if (Application.Current.Properties.ContainsKey("enable"))
             {
-                order = null;
-                cartItems.Clear();
+                Debug.WriteLine("GUEST TRACK: " + Application.Current.Properties["user"]);
+                GetAvailiableCoupons();
+                //coupon_list.HeightRequest = 0;
+                //couponsLabel.IsVisible = false;
+                //couponSpace.IsVisible = false;
+                addInfo.Text = "Add Contact Info";
+                contactframe.Height = 500;
+                InitializeMap();
+                if ((string)Application.Current.Properties["day"] == "")
+                {
+                    order = null;
+                    cartItems.Clear();
+                }
+                else
+                {
+                    day = (string)Application.Current.Properties["day"];
+                }
+                if (order != null)
+                {
+                    cartItems.Clear();
+                    foreach (string key in order.Keys)
+                    {
+                        cartItems.Add(new ItemObject()
+                        {
+                            qty = order[key].item_quantity,
+                            name = order[key].item_name,
+                            price = order[key].item_price,
+                            item_uid = order[key].item_uid,
+                            business_uid = order[key].pur_business_uid,
+                            img = order[key].img,
+                            description = order[key].description,
+                        });
+                        orderCopy.Add(key, order[key]);
+                    }
+                }
+
+                purchaseObject = new PurchaseDataObject()
+                {
+                    pur_customer_uid = "GUEST",
+                    pur_business_uid = "",
+                    items = GetOrder(cartItems),
+                    order_instructions = "",
+
+                    delivery_instructions = Application.Current.Properties.ContainsKey("user_delivery_instructions") ? (string)Application.Current.Properties["user_delivery_instructions"] : "",
+
+                    order_type = "meal",
+                    delivery_first_name = "",
+                    delivery_last_name = "",
+                    delivery_phone_num = "",
+                    delivery_email = "",
+                    delivery_address = (string)Application.Current.Properties["user_address"],
+                    delivery_unit = (string)Application.Current.Properties["user_unit"],
+                    delivery_city = (string)Application.Current.Properties["user_city"],
+                    delivery_state = (string)Application.Current.Properties["user_state"],
+                    delivery_zip = (string)Application.Current.Properties["user_zip_code"],
+                    delivery_latitude = (string)Application.Current.Properties["user_latitude"],
+                    delivery_longitude = (string)Application.Current.Properties["user_longitude"],
+                    purchase_notes = "purchase_notes"
+
+                };
+
+                DeliveryAddress1.Text = purchaseObject.delivery_address;
+                DeliveryAddress2.Text = purchaseObject.delivery_city + ", " + purchaseObject.delivery_state + ", " + purchaseObject.delivery_zip;
+                FullName.Text = purchaseObject.delivery_first_name + " " + purchaseObject.delivery_last_name;
+                PhoneNumber.Text = purchaseObject.delivery_phone_num;
+                EmailAddress.Text = purchaseObject.delivery_email;
+                if (day != "")
+                {
+                    deliveryDay = day;
+                    deliveryDate.Text = day + ", ";
+                    deliveryDate.Text += Application.Current.Properties.ContainsKey("delivery_date") ? (string)Application.Current.Properties["delivery_date"] : "";
+                    deliveryTime.Text = "Between ";
+                    deliveryTime.Text += Application.Current.Properties.ContainsKey("delivery_time") ? (string)Application.Current.Properties["delivery_time"] : "";
+                }
+                else
+                {
+                    cartEmpty = "EMPTY";
+                    deliveryDate.Text = "";
+                    deliveryTime.Text = "";
+                }
+
+
+                CartItems.ItemsSource = cartItems;
+                CartItems.HeightRequest = 56 * cartItems.Count;
+
+                if (day == "")
+                {
+                    delivery_fee = Constant.deliveryFee;
+                    service_fee = Constant.serviceFee;
+                    ServiceFee.Text = "$ " + service_fee.ToString("N2");
+                    DeliveryFee.Text = "$ " + delivery_fee.ToString("N2");
+                }
+               
             }
             else
             {
-                day = (string)Application.Current.Properties["day"];
-            }
-            if (order != null)
-            {
-                cartItems.Clear();
-                foreach (string key in order.Keys)
+                GetAvailiableCoupons();
+                InitializeMap();
+                if ((string)Application.Current.Properties["day"] == "")
                 {
-                    cartItems.Add(new ItemObject()
+                    order = null;
+                    cartItems.Clear();
+                }
+                else
+                {
+                    day = (string)Application.Current.Properties["day"];
+                }
+                if (order != null)
+                {
+                    cartItems.Clear();
+                    foreach (string key in order.Keys)
                     {
-                        qty = order[key].item_quantity,
-                        name = order[key].item_name,
-                        price = order[key].item_price,
-                        item_uid = order[key].item_uid,
-                        business_uid = order[key].pur_business_uid,
-                        img = order[key].img,
-                        description = order[key].description,
-                    });
-                    orderCopy.Add(key, order[key]);
+                        cartItems.Add(new ItemObject()
+                        {
+                            qty = order[key].item_quantity,
+                            name = order[key].item_name,
+                            price = order[key].item_price,
+                            item_uid = order[key].item_uid,
+                            business_uid = order[key].pur_business_uid,
+                            img = order[key].img,
+                            description = order[key].description,
+                        });
+                        orderCopy.Add(key, order[key]);
+                    }
+                }
+
+                purchaseObject = new PurchaseDataObject()
+                {
+                    pur_customer_uid = Application.Current.Properties.ContainsKey("user_id") ? (string)Application.Current.Properties["user_id"] : "",
+                    pur_business_uid = "",
+                    items = GetOrder(cartItems),
+                    order_instructions = "",
+
+                    delivery_instructions = Application.Current.Properties.ContainsKey("user_delivery_instructions") ? (string)Application.Current.Properties["user_delivery_instructions"] : "",
+
+                    order_type = "meal",
+                    delivery_first_name = (string)Application.Current.Properties["user_first_name"],
+                    delivery_last_name = (string)Application.Current.Properties["user_last_name"],
+                    delivery_phone_num = (string)Application.Current.Properties["user_phone_num"],
+                    delivery_email = (string)Application.Current.Properties["user_email"],
+                    delivery_address = (string)Application.Current.Properties["user_address"],
+                    delivery_unit = (string)Application.Current.Properties["user_unit"],
+                    delivery_city = (string)Application.Current.Properties["user_city"],
+                    delivery_state = (string)Application.Current.Properties["user_state"],
+                    delivery_zip = (string)Application.Current.Properties["user_zip_code"],
+                    delivery_latitude = (string)Application.Current.Properties["user_latitude"],
+                    delivery_longitude = (string)Application.Current.Properties["user_longitude"],
+                    purchase_notes = "purchase_notes"
+
+                };
+
+                DeliveryAddress1.Text = purchaseObject.delivery_address;
+                DeliveryAddress2.Text = purchaseObject.delivery_city + ", " + purchaseObject.delivery_state + ", " + purchaseObject.delivery_zip;
+                FullName.Text = purchaseObject.delivery_first_name + " " + purchaseObject.delivery_last_name;
+                PhoneNumber.Text = purchaseObject.delivery_phone_num;
+                EmailAddress.Text = purchaseObject.delivery_email;
+                if (day != "")
+                {
+                    deliveryDay = day;
+                    deliveryDate.Text = day + ", ";
+                    deliveryDate.Text += Application.Current.Properties.ContainsKey("delivery_date") ? (string)Application.Current.Properties["delivery_date"] : "";
+                    deliveryTime.Text = "Between ";
+                    deliveryTime.Text += Application.Current.Properties.ContainsKey("delivery_time") ? (string)Application.Current.Properties["delivery_time"] : "";
+                }
+                else
+                {
+                    cartEmpty = "EMPTY";
+                    deliveryDate.Text = "";
+                    deliveryTime.Text = "";
+                }
+
+
+                CartItems.ItemsSource = cartItems;
+                CartItems.HeightRequest = 56 * cartItems.Count;
+
+                if (day == "")
+                {
+                    delivery_fee = Constant.deliveryFee;
+                    service_fee = Constant.serviceFee;
+                    ServiceFee.Text = "$ " + service_fee.ToString("N2");
+                    DeliveryFee.Text = "$ " + delivery_fee.ToString("N2");
                 }
             }
-
-            purchaseObject = new PurchaseDataObject()
-            {
-                pur_customer_uid = Application.Current.Properties.ContainsKey("user_id") ? (string)Application.Current.Properties["user_id"] : "",
-                pur_business_uid = "",
-                items = GetOrder(cartItems),
-                order_instructions = "",
-                
-                delivery_instructions = Application.Current.Properties.ContainsKey("user_delivery_instructions") ? (string)Application.Current.Properties["user_delivery_instructions"] : "",
-                
-                order_type = "meal",
-                delivery_first_name = (string)Application.Current.Properties["user_first_name"],
-                delivery_last_name = (string)Application.Current.Properties["user_last_name"],
-                delivery_phone_num = (string)Application.Current.Properties["user_phone_num"],
-                delivery_email = (string)Application.Current.Properties["user_email"],
-                delivery_address = (string)Application.Current.Properties["user_address"],
-                delivery_unit = (string)Application.Current.Properties["user_unit"],
-                delivery_city = (string)Application.Current.Properties["user_city"],
-                delivery_state = (string)Application.Current.Properties["user_state"],
-                delivery_zip = (string)Application.Current.Properties["user_zip_code"],
-                delivery_latitude = (string)Application.Current.Properties["user_latitude"],
-                delivery_longitude = (string)Application.Current.Properties["user_longitude"],
-                purchase_notes = "purchase_notes"
-
-            };
-
-            DeliveryAddress1.Text = purchaseObject.delivery_address;
-            DeliveryAddress2.Text = purchaseObject.delivery_city + ", " + purchaseObject.delivery_state + ", " + purchaseObject.delivery_zip;
-            FullName.Text = purchaseObject.delivery_first_name + " " + purchaseObject.delivery_last_name;
-            PhoneNumber.Text = purchaseObject.delivery_phone_num;
-            EmailAddress.Text = purchaseObject.delivery_email;
-            if(day != "")
-            {
-                deliveryDay = day;
-                deliveryDate.Text = day + ", ";
-                deliveryDate.Text += Application.Current.Properties.ContainsKey("delivery_date") ? (string)Application.Current.Properties["delivery_date"] : "";
-                deliveryTime.Text = "Between ";
-                deliveryTime.Text += Application.Current.Properties.ContainsKey("delivery_time") ? (string)Application.Current.Properties["delivery_time"] : "";
-            }
-            else
-            {
-                cartEmpty = "EMPTY";
-                deliveryDate.Text = "";
-                deliveryTime.Text = "";
-            }
-            
-
-            CartItems.ItemsSource = cartItems;
-            CartItems.HeightRequest = 56 * cartItems.Count;
-
-            if(day == "")
-            {
-                delivery_fee = Constant.deliveryFee;
-                service_fee = Constant.serviceFee;
-                ServiceFee.Text = "$ " + service_fee.ToString("N2");
-                DeliveryFee.Text = "$ " + delivery_fee.ToString("N2");
-            }
-           
         }
 
 
@@ -306,7 +404,10 @@ namespace ServingFresh.Views
 
                 ServiceFee.Text = "$ " + service_fee.ToString("N2");
                 DeliveryFee.Text = "$ " + delivery_fee.ToString("N2");
-                GetAvailiableCoupons();
+                if (!Application.Current.Properties.ContainsKey("enable"))
+                {
+                    GetAvailiableCoupons();
+                }
             }
         }
 
@@ -314,7 +415,16 @@ namespace ServingFresh.Views
         {
             var client = new System.Net.Http.HttpClient();
             var email = (string)Application.Current.Properties["user_email"];
-            var RDSResponse = await client.GetAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/available_Coupons/" + email);
+            var RDSResponse = new HttpResponseMessage();
+            if (!Application.Current.Properties.ContainsKey("enable"))
+            {
+                RDSResponse = await client.GetAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/available_Coupons/" + email);
+            }
+            else
+            {
+                RDSResponse = await client.GetAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/available_Coupons/guest");
+            }
+            
             if (RDSResponse.IsSuccessStatusCode)
             {
                 var result = await RDSResponse.Content.ReadAsStringAsync();
@@ -496,7 +606,6 @@ namespace ServingFresh.Views
             {
                 Application.Current.MainPage = new SelectionPage();
             }
-            
         }
 
         void TapGestureRecognizer_Tapped(System.Object sender, System.EventArgs e)
@@ -691,7 +800,15 @@ namespace ServingFresh.Views
             purchaseObject.payment_type = ((Button)sender).Text == "Checkout with Paypal" ? "PAYPAL" : "STRIPE";
             purchaseObject.items = GetOrder(cartItems);
             purchaseObject.start_delivery_date = dateTime +" "+ timeStamp.ToString("HH:mm:ss");
-            purchaseObject.pay_coupon_id = couponData.result[defaultCouponIndex].coupon_uid;
+            if (!Application.Current.Properties.ContainsKey("enable"))
+            {
+                purchaseObject.pay_coupon_id = couponData.result[defaultCouponIndex].coupon_uid;
+            }
+            else
+            {
+                purchaseObject.pay_coupon_id = "";
+            }
+           
             purchaseObject.amount_due = total.ToString("N2");
             purchaseObject.amount_discount = discount.ToString("N2");
             purchaseObject.amount_paid = total.ToString("N2");
@@ -752,7 +869,15 @@ namespace ServingFresh.Views
                 purchaseObject.payment_type = ((Button)sender).Text == "Checkout with Paypal" ? "PAYPAL" : "STRIPE";
                 purchaseObject.items = GetOrder(cartItems);
                 purchaseObject.start_delivery_date = dateTime;
-                purchaseObject.pay_coupon_id = couponData.result[defaultCouponIndex].coupon_uid;
+                if (!Application.Current.Properties.ContainsKey("enable"))
+                {
+                    purchaseObject.pay_coupon_id = couponData.result[defaultCouponIndex].coupon_uid;
+                }
+                else
+                {
+                    purchaseObject.pay_coupon_id = "";
+                }
+               
                 purchaseObject.amount_due = total.ToString("N2");
                 purchaseObject.amount_discount = discount.ToString("N2");
                 purchaseObject.amount_paid = total.ToString("N2");
@@ -863,61 +988,61 @@ namespace ServingFresh.Views
             return payPalClient;
         }
 
-        public async void Paypal()
-        {
-            var purchaseString = JsonConvert.SerializeObject(purchaseObject);
-            System.Diagnostics.Debug.WriteLine("Purchase: " + purchaseString);
-            var purchaseMessage = new StringContent(purchaseString, Encoding.UTF8, "application/json");
-            var client = new System.Net.Http.HttpClient();
+        //public async void Paypal()
+        //{
+        //    var purchaseString = JsonConvert.SerializeObject(purchaseObject);
+        //    System.Diagnostics.Debug.WriteLine("Purchase: " + purchaseString);
+        //    var purchaseMessage = new StringContent(purchaseString, Encoding.UTF8, "application/json");
+        //    var client = new System.Net.Http.HttpClient();
 
-            CouponObject coupon = new CouponObject();
-            coupon.coupon_uid = couponData.result[defaultCouponIndex].coupon_uid;
+        //    CouponObject coupon = new CouponObject();
+        //    coupon.coupon_uid = couponData.result[defaultCouponIndex].coupon_uid;
 
-            var couponSerialized = JsonConvert.SerializeObject(coupon);
-            System.Diagnostics.Debug.WriteLine("Coupon to update: " + couponSerialized);
-            var couponContent = new StringContent(couponSerialized, Encoding.UTF8, "application/json");
+        //    var couponSerialized = JsonConvert.SerializeObject(coupon);
+        //    System.Diagnostics.Debug.WriteLine("Coupon to update: " + couponSerialized);
+        //    var couponContent = new StringContent(couponSerialized, Encoding.UTF8, "application/json");
 
-            var RDSResponse = await client.PostAsync(Constant.PurchaseUrl, purchaseMessage);
-            var RDSCouponResponse = await client.PostAsync(Constant.UpdateCouponUrl, couponContent);
-            Debug.WriteLine("Order was written to DB: " + RDSResponse.IsSuccessStatusCode);
-            Debug.WriteLine("Coupon was succesfully updated (subtract)" + RDSCouponResponse.IsSuccessStatusCode);
-            var re = await RDSResponse.Content.ReadAsStringAsync();
-            Debug.WriteLine(re);
+        //    var RDSResponse = await client.PostAsync(Constant.PurchaseUrl, purchaseMessage);
+        //    var RDSCouponResponse = await client.PostAsync(Constant.UpdateCouponUrl, couponContent);
+        //    Debug.WriteLine("Order was written to DB: " + RDSResponse.IsSuccessStatusCode);
+        //    Debug.WriteLine("Coupon was succesfully updated (subtract)" + RDSCouponResponse.IsSuccessStatusCode);
+        //    var re = await RDSResponse.Content.ReadAsStringAsync();
+        //    Debug.WriteLine(re);
 
-            if (RDSResponse.IsSuccessStatusCode)
-            {
-               // var RDSResponseContent = await RDSResponse.Content.ReadAsStringAsync();
-                //System.Diagnostics.Debug.WriteLine(RDSResponseContent);
+        //    if (RDSResponse.IsSuccessStatusCode)
+        //    {
+        //       // var RDSResponseContent = await RDSResponse.Content.ReadAsStringAsync();
+        //        //System.Diagnostics.Debug.WriteLine(RDSResponseContent);
 
-                cartItems.Clear();
-                updateTotals(0, 0);
-                total = 00.00;
-                total_qty = 0;
-            }
-            if (RDSCouponResponse.IsSuccessStatusCode && RDSResponse.IsSuccessStatusCode)
-            {
-                Application.Current.Properties["day"] = "";
-                //string toFind1 = "pay_purchase_id";
-                //string toFind2 = "payment_time_stamp";
-                //int start = re.IndexOf(toFind1) + toFind1.Length;
-                //int end = re.IndexOf(toFind2, start); //Start after the index of 'my' since 'is' appears twice
-                //string string2 = re.Substring(start, end - start);
-                //int s = 0;
-                //foreach(char a in string2.ToCharArray())
-                //{
-                //    if(a == '\'')
-                //    {
-                //        break;
-                //    }
-                //    s++;
-                //}
-                //Debug.WriteLine("Start Index: " + s);
-                //Debug.WriteLine("pucharse ID: "+  string2.Substring(s+1, 10));
-                //string purchaseID = string2.Substring(s + 1, 10);
-                await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
-                _ = Launcher.OpenAsync(new System.Uri("https://servingnow.me/payment/" + "400-000188" + "/" + purchaseObject.amount_due));
-            }
-        }
+        //        cartItems.Clear();
+        //        updateTotals(0, 0);
+        //        total = 00.00;
+        //        total_qty = 0;
+        //    }
+        //    if (RDSCouponResponse.IsSuccessStatusCode && RDSResponse.IsSuccessStatusCode)
+        //    {
+        //        Application.Current.Properties["day"] = "";
+        //        //string toFind1 = "pay_purchase_id";
+        //        //string toFind2 = "payment_time_stamp";
+        //        //int start = re.IndexOf(toFind1) + toFind1.Length;
+        //        //int end = re.IndexOf(toFind2, start); //Start after the index of 'my' since 'is' appears twice
+        //        //string string2 = re.Substring(start, end - start);
+        //        //int s = 0;
+        //        //foreach(char a in string2.ToCharArray())
+        //        //{
+        //        //    if(a == '\'')
+        //        //    {
+        //        //        break;
+        //        //    }
+        //        //    s++;
+        //        //}
+        //        //Debug.WriteLine("Start Index: " + s);
+        //        //Debug.WriteLine("pucharse ID: "+  string2.Substring(s+1, 10));
+        //        //string purchaseID = string2.Substring(s + 1, 10);
+        //        await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
+        //        _ = Launcher.OpenAsync(new System.Uri("https://servingnow.me/payment/" + "400-000188" + "/" + purchaseObject.amount_due));
+        //    }
+        //}
 
         async void PayViaStripe()
         {
@@ -1022,12 +1147,12 @@ namespace ServingFresh.Views
                             var purchaseMessage = new StringContent(purchaseString, Encoding.UTF8, "application/json");
                             var client = new System.Net.Http.HttpClient();
 
-                            CouponObject coupon = new CouponObject();
-                            coupon.coupon_uid = couponData.result[defaultCouponIndex].coupon_uid;
+                            //CouponObject coupon = new CouponObject();
+                            //coupon.coupon_uid = couponData.result[defaultCouponIndex].coupon_uid;
 
-                            var couponSerialized = JsonConvert.SerializeObject(coupon);
-                            System.Diagnostics.Debug.WriteLine("Coupon to update: " + couponSerialized);
-                            var couponContent = new StringContent(couponSerialized, Encoding.UTF8, "application/json");
+                            //var couponSerialized = JsonConvert.SerializeObject(coupon);
+                            //System.Diagnostics.Debug.WriteLine("Coupon to update: " + couponSerialized);
+                            //var couponContent = new StringContent(couponSerialized, Encoding.UTF8, "application/json");
 
                             var Response = await client.PostAsync(Constant.PurchaseUrl, purchaseMessage);
                             //var RDSCouponResponse = await client.PostAsync(Constant.UpdateCouponUrl, couponContent);
@@ -1045,7 +1170,49 @@ namespace ServingFresh.Views
                                 Application.Current.Properties["day"] = "";
                                 cartEmpty = "EMPTY";
                                 cartHeight.Height = 0;
-                                await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
+                                if (!Application.Current.Properties.ContainsKey("enable"))
+                                {
+                                    await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
+                                }
+                                else
+                                {
+                                    Application.Current.Properties.Remove("user");
+                                    Application.Current.Properties.Remove("enable");
+                                    var firstName = (string)Application.Current.Properties["user_first_name"];
+                                    var lastName = (string)Application.Current.Properties["user_last_name"];
+                                    var email = (string)Application.Current.Properties["user_email"];
+                                    var phone = (string)Application.Current.Properties["user_phone_num"];
+                                    var address = (string)Application.Current.Properties["user_address"];
+                                    var unit = (string)Application.Current.Properties["user_unit"];
+                                    var city = (string)Application.Current.Properties["user_city"];
+                                    var zipcode = (string)Application.Current.Properties["user_zip_code"];
+                                    var state = (string)Application.Current.Properties["user_state"];
+                                    var lat = (string)Application.Current.Properties["user_latitude"];
+                                    var longitude = (string)Application.Current.Properties["user_longitude"];
+
+                                    Application.Current.MainPage = new SignUpPage(firstName, lastName, phone, email, address, unit, city, state, zipcode, "guest", lat, longitude);
+                                    //var result = await DisplayAlert("", "You are one step away from having an acount and gaining access to additional coupons and promotions. Press 'Continue' to Sign Up or 'Cancel' to return to home page", "Continue", "Cancel");
+                                    //if (result)
+                                    //{
+                                    //    var firstName = (string)Application.Current.Properties["user_first_name"];
+                                    //    var lastName = (string)Application.Current.Properties["user_last_name"];
+                                    //    var email = (string)Application.Current.Properties["user_email"];
+                                    //    var phone = (string)Application.Current.Properties["user_phone_num"];
+                                    //    var address = (string)Application.Current.Properties["user_address"];
+                                    //    var unit = (string)Application.Current.Properties["user_unit"];
+                                    //    var city = (string)Application.Current.Properties["user_city"];
+                                    //    var zipcode = (string)Application.Current.Properties["user_zip_code"];
+                                    //    var state = (string)Application.Current.Properties["user_state"];
+                                    //    var lat = (string)Application.Current.Properties["user_latitude"];
+                                    //    var longitude = (string)Application.Current.Properties["user_longitude"];
+                                        
+                                    //    Application.Current.MainPage = new SignUpPage(firstName, lastName, phone, email, address, unit, city, state, zipcode, "guest",lat, longitude);
+                                    //}
+                                    //else
+                                    //{
+                                    //    Application.Current.MainPage = new LogInPage();
+                                    //}
+                                }
                             }
                             //if (RDSCouponResponse.IsSuccessStatusCode && Response.IsSuccessStatusCode)
                             //{
@@ -1113,7 +1280,9 @@ namespace ServingFresh.Views
             if (item != null)
             {
                 item.increase_qty();
-                GetNewDefaltCoupon();
+                
+                    GetNewDefaltCoupon();
+                
             }
         }
 
@@ -1125,7 +1294,10 @@ namespace ServingFresh.Views
             if (item != null)
             {
                 item.decrease_qty();
-                GetNewDefaltCoupon();
+                
+                    GetNewDefaltCoupon();
+                
+                
             }
         }
 
@@ -1283,7 +1455,10 @@ namespace ServingFresh.Views
 
         public void openHistory(object sender, EventArgs e)
         {
-            Application.Current.MainPage = new HistoryPage();
+            if (!Application.Current.Properties.ContainsKey("enable"))
+            {
+                Application.Current.MainPage = new HistoryPage();
+            }
         }
 
         public void ChangeAddressClick(System.Object sender, System.EventArgs e)
@@ -1298,14 +1473,16 @@ namespace ServingFresh.Views
 
         void UpdateTotalAmount(System.Object sender, System.EventArgs e)
         {
-            if(total != 0)
-            {
-                updateTotals(unsortedDiscounts[defaultCouponIndex] - couponData.result[defaultCouponIndex].discount_shipping, couponData.result[defaultCouponIndex].discount_shipping);
-            }
-            else
-            {
-                updateTotals(0, 0);
-            }
+           
+                if (total != 0)
+                {
+                    updateTotals(unsortedDiscounts[defaultCouponIndex] - couponData.result[defaultCouponIndex].discount_shipping, couponData.result[defaultCouponIndex].discount_shipping);
+                }
+                else
+                {
+                    updateTotals(0, 0);
+                }
+         
         }
 
         public void openRefund(object sender, EventArgs e)
@@ -1325,12 +1502,19 @@ namespace ServingFresh.Views
 
         void InfoClick(System.Object sender, System.EventArgs e)
         {
-            Application.Current.MainPage = new InfoPage();
+            if (!Application.Current.Properties.ContainsKey("enable"))
+            {
+                Application.Current.MainPage = new InfoPage();
+            }
         }
 
         void ProfileClick(System.Object sender, System.EventArgs e)
         {
-            Application.Current.MainPage = new ProfilePage();
+            if (!Application.Current.Properties.ContainsKey("enable"))
+            {
+                Application.Current.MainPage = new ProfilePage();
+            }
+            
         }
 
         public async void ValidateAddressClick(System.Object sender, System.EventArgs e)
@@ -1528,21 +1712,25 @@ namespace ServingFresh.Views
             if (newUserFirstName.Text != null)
             {
                 Application.Current.Properties["user_first_name"] = newUserFirstName.Text.Trim();
+                purchaseObject.delivery_first_name = newUserFirstName.Text.Trim();
             }
 
             if (newUserLastName.Text != null)
             {
                 Application.Current.Properties["user_last_name"] = newUserLastName.Text.Trim();
+                purchaseObject.delivery_last_name = newUserLastName.Text.Trim();
             }
 
             if (newUserPhoneNum.Text != null)
             {
                 Application.Current.Properties["user_phone_num"] = newUserPhoneNum.Text.Trim();
+                purchaseObject.delivery_phone_num = newUserPhoneNum.Text.Trim();
             }
 
             if (newUserEmailAddress.Text != null)
             {
                 Application.Current.Properties["user_email"] = newUserEmailAddress.Text.Trim();
+                purchaseObject.delivery_email = newUserEmailAddress.Text.Trim(); 
             }
 
             string firstName = (string)Application.Current.Properties["user_first_name"];
@@ -1634,12 +1822,12 @@ namespace ServingFresh.Views
                 var purchaseMessage = new StringContent(purchaseString, Encoding.UTF8, "application/json");
                 var client = new System.Net.Http.HttpClient();
 
-                CouponObject coupon = new CouponObject();
-                coupon.coupon_uid = couponData.result[defaultCouponIndex].coupon_uid;
+                //CouponObject coupon = new CouponObject();
+                //coupon.coupon_uid = couponData.result[defaultCouponIndex].coupon_uid;
 
-                var couponSerialized = JsonConvert.SerializeObject(coupon);
-                System.Diagnostics.Debug.WriteLine("Coupon to update: " + couponSerialized);
-                var couponContent = new StringContent(couponSerialized, Encoding.UTF8, "application/json");
+                //var couponSerialized = JsonConvert.SerializeObject(coupon);
+                //System.Diagnostics.Debug.WriteLine("Coupon to update: " + couponSerialized);
+                //var couponContent = new StringContent(couponSerialized, Encoding.UTF8, "application/json");
 
                 var Response = await client.PostAsync(Constant.PurchaseUrl, purchaseMessage);
                 //var RDSCouponResponse = await client.PostAsync(Constant.UpdateCouponUrl, couponContent);
@@ -1657,7 +1845,51 @@ namespace ServingFresh.Views
                     Application.Current.Properties["day"] = "";
                     cartEmpty = "EMPTY";
                     cartHeight.Height = 0;
-                    await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
+                    if (!Application.Current.Properties.ContainsKey("enable"))
+                    {
+                        await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
+                    }
+                    else
+                    {
+                        Application.Current.Properties.Remove("user");
+                        Application.Current.Properties.Remove("enable");
+
+                        var firstName = (string)Application.Current.Properties["user_first_name"];
+                        var lastName = (string)Application.Current.Properties["user_last_name"];
+                        var email = (string)Application.Current.Properties["user_email"];
+                        var phone = (string)Application.Current.Properties["user_phone_num"];
+                        var address = (string)Application.Current.Properties["user_address"];
+                        var unit = (string)Application.Current.Properties["user_unit"];
+                        var city = (string)Application.Current.Properties["user_city"];
+                        var zipcode = (string)Application.Current.Properties["user_zip_code"];
+                        var state = (string)Application.Current.Properties["user_state"];
+                        var lat = (string)Application.Current.Properties["user_latitude"];
+                        var longitude = (string)Application.Current.Properties["user_longitude"];
+
+                        Application.Current.MainPage = new SignUpPage(firstName, lastName, phone, email, address, unit, city, state, zipcode, "guest", lat, longitude);
+
+                        //var resultGuest = await DisplayAlert("", "You are one step away from having an acount and gaining access to additional coupons and promotions. Press 'Continue' to Sign Up or 'Cancel' to return to home page", "Continue", "Cancel");
+                        //if (resultGuest)
+                        //{
+                        //    var firstName = (string)Application.Current.Properties["user_first_name"];
+                        //    var lastName = (string)Application.Current.Properties["user_last_name"];
+                        //    var email = (string)Application.Current.Properties["user_email"];
+                        //    var phone = (string)Application.Current.Properties["user_phone_num"];
+                        //    var address = (string)Application.Current.Properties["user_address"];
+                        //    var unit = (string)Application.Current.Properties["user_unit"];
+                        //    var city = (string)Application.Current.Properties["user_city"];
+                        //    var zipcode = (string)Application.Current.Properties["user_zip_code"];
+                        //    var state = (string)Application.Current.Properties["user_state"];
+                        //    var lat = (string)Application.Current.Properties["user_latitude"];
+                        //    var longitude = (string)Application.Current.Properties["user_longitude"];
+
+                        //    Application.Current.MainPage = new SignUpPage(firstName, lastName, phone, email, address, unit, city, state, zipcode, "guest", lat, longitude);
+                        //}
+                        //else
+                        //{
+                        //    Application.Current.MainPage = new LogInPage();
+                        //}
+                    }
                 }
             }
             else

@@ -110,6 +110,11 @@ namespace ServingFresh.Views
         public SelectionPage()
         {
             InitializeComponent();
+            if (Application.Current.Properties.ContainsKey("user"))
+            {
+                Application.Current.Properties.Remove("user");
+                Application.Current.Properties["enable"] = true;
+            }
             Init();
             GetBusinesses();
             Application.Current.Properties["day"] = "";

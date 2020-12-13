@@ -323,101 +323,109 @@ namespace ServingFresh.Views
 
         async void SignUpNewUser(System.Object sender, System.EventArgs e)
         {
-            if (isAddessValidated)
+            try
             {
-                var client = new HttpClient();
-                var socialSignUpSerializedObject = JsonConvert.SerializeObject(socialSignUp);
-                var content = new StringContent(socialSignUpSerializedObject, Encoding.UTF8, "application/json");
 
-                Debug.WriteLine("Social Sign up JSON Object to send: " + socialSignUpSerializedObject);
 
-                //var handler = new HttpClientHandler();
-                //handler.AllowAutoRedirect = true;
-
-                var RDSResponse = await client.PostAsync(Constant.SignUpUrl, content);
-
-                Debug.WriteLine("Status code: " + RDSResponse.IsSuccessStatusCode);
-
-                var RDSMessage = await RDSResponse.Content.ReadAsStringAsync();
-
-                Debug.WriteLine("Message returned: " + RDSMessage);
-
-                if (RDSResponse.IsSuccessStatusCode)
+                if (isAddessValidated)
                 {
-                    var RDSData = JsonConvert.DeserializeObject<SignUpResponse>(RDSMessage);
-                    DateTime today = DateTime.Now;
-                    DateTime expDate = today.AddDays(Constant.days);
+                    var client = new HttpClient();
+                    var socialSignUpSerializedObject = JsonConvert.SerializeObject(socialSignUp);
+                    var content = new StringContent(socialSignUpSerializedObject, Encoding.UTF8, "application/json");
 
-                    Application.Current.Properties["user_id"] = RDSData.result.customer_uid;
-                    Application.Current.Properties["time_stamp"] = expDate;
-                    Application.Current.Properties["platform"] = socialSignUp.social;
-                    Application.Current.Properties["user_email"] = socialSignUp.email;
-                    Application.Current.Properties["user_first_name"] = socialSignUp.first_name;
-                    Application.Current.Properties["user_last_name"] = socialSignUp.last_name;
-                    Application.Current.Properties["user_phone_num"] = socialSignUp.phone_number;
-                    Application.Current.Properties["user_address"] = socialSignUp.address;
-                    Application.Current.Properties["user_unit"] = socialSignUp.unit;
-                    Application.Current.Properties["user_city"] = socialSignUp.city;
-                    Application.Current.Properties["user_state"] = socialSignUp.state;
-                    Application.Current.Properties["user_zip_code"] = socialSignUp.zip_code;
-                    Application.Current.Properties["user_latitude"] = socialSignUp.latitude;
-                    Application.Current.Properties["user_longitude"] = socialSignUp.longitude;
-                    Application.Current.Properties["user_delivery_instructions"] = userDeliveryInstructions.Text;
+                    Debug.WriteLine("Social Sign up JSON Object to send: " + socialSignUpSerializedObject);
 
-                    _ = Application.Current.SavePropertiesAsync();
+                    //var handler = new HttpClientHandler();
+                    //handler.AllowAutoRedirect = true;
 
-                    //EmailVerificationObject user = new EmailVerificationObject();
+                    var RDSResponse = await client.PostAsync(Constant.SignUpUrl, content);
 
-                    //user.email = socialSignUp.email;
+                    Debug.WriteLine("Status code: " + RDSResponse.IsSuccessStatusCode);
 
-                    //var userSerializedObject = JsonConvert.SerializeObject(user);
-                    //var userContent = new StringContent(userSerializedObject, Encoding.UTF8, "application/json");
+                    var RDSMessage = await RDSResponse.Content.ReadAsStringAsync();
 
-                    //Debug.WriteLine("Email Verification JSON Object to send: " + userSerializedObject);
+                    Debug.WriteLine("Message returned: " + RDSMessage);
 
-                    //var response = await client.PostAsync(Constant.EmailVerificationUrl, userContent);
-
-                    //Debug.WriteLine("Status code: " + response.IsSuccessStatusCode);
-
-                    //if (!response.IsSuccessStatusCode)
-                    //{
-                    //    await DisplayAlert("Ooops!", "We weren't able to send you a verification link to your email.", "OK");
-                    //}
-
-                    if (deviceId != null)
+                    if (RDSResponse.IsSuccessStatusCode)
                     {
-                        NotificationPost notificationPost = new NotificationPost();
+                        var RDSData = JsonConvert.DeserializeObject<SignUpResponse>(RDSMessage);
+                        DateTime today = DateTime.Now;
+                        DateTime expDate = today.AddDays(Constant.days);
 
-                        notificationPost.uid = (string)Application.Current.Properties["user_id"];
-                        notificationPost.guid = deviceId.Substring(5);
-                        Application.Current.Properties["guid"] = deviceId.Substring(5);
-                        notificationPost.notification = "TRUE";
+                        Application.Current.Properties["user_id"] = RDSData.result.customer_uid;
+                        Application.Current.Properties["time_stamp"] = expDate;
+                        Application.Current.Properties["platform"] = socialSignUp.social;
+                        Application.Current.Properties["user_email"] = socialSignUp.email;
+                        Application.Current.Properties["user_first_name"] = socialSignUp.first_name;
+                        Application.Current.Properties["user_last_name"] = socialSignUp.last_name;
+                        Application.Current.Properties["user_phone_num"] = socialSignUp.phone_number;
+                        Application.Current.Properties["user_address"] = socialSignUp.address;
+                        Application.Current.Properties["user_unit"] = socialSignUp.unit;
+                        Application.Current.Properties["user_city"] = socialSignUp.city;
+                        Application.Current.Properties["user_state"] = socialSignUp.state;
+                        Application.Current.Properties["user_zip_code"] = socialSignUp.zip_code;
+                        Application.Current.Properties["user_latitude"] = socialSignUp.latitude;
+                        Application.Current.Properties["user_longitude"] = socialSignUp.longitude;
+                        Application.Current.Properties["user_delivery_instructions"] = userDeliveryInstructions.Text;
 
-                        var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
-                        Debug.WriteLine("Notification JSON Object to send: " + notificationSerializedObject);
-                        
-                        var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
+                        _ = Application.Current.SavePropertiesAsync();
 
-                        var clientResponse = await client.PostAsync(Constant.NotificationsUrl, notificationContent);
+                        //EmailVerificationObject user = new EmailVerificationObject();
 
-                        Debug.WriteLine("Status code: " + clientResponse.IsSuccessStatusCode);
+                        //user.email = socialSignUp.email;
 
-                        if (clientResponse.IsSuccessStatusCode)
+                        //var userSerializedObject = JsonConvert.SerializeObject(user);
+                        //var userContent = new StringContent(userSerializedObject, Encoding.UTF8, "application/json");
+
+                        //Debug.WriteLine("Email Verification JSON Object to send: " + userSerializedObject);
+
+                        //var response = await client.PostAsync(Constant.EmailVerificationUrl, userContent);
+
+                        //Debug.WriteLine("Status code: " + response.IsSuccessStatusCode);
+
+                        //if (!response.IsSuccessStatusCode)
+                        //{
+                        //    await DisplayAlert("Ooops!", "We weren't able to send you a verification link to your email.", "OK");
+                        //}
+
+                        if (deviceId != null)
                         {
-                            System.Diagnostics.Debug.WriteLine("We have post the guid to the database");
+                            NotificationPost notificationPost = new NotificationPost();
+
+                            notificationPost.uid = (string)Application.Current.Properties["user_id"];
+                            notificationPost.guid = deviceId.Substring(5);
+                            Application.Current.Properties["guid"] = deviceId.Substring(5);
+                            notificationPost.notification = "TRUE";
+
+                            var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
+                            Debug.WriteLine("Notification JSON Object to send: " + notificationSerializedObject);
+
+                            var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
+
+                            var clientResponse = await client.PostAsync(Constant.NotificationsUrl, notificationContent);
+
+                            Debug.WriteLine("Status code: " + clientResponse.IsSuccessStatusCode);
+
+                            if (clientResponse.IsSuccessStatusCode)
+                            {
+                                System.Diagnostics.Debug.WriteLine("We have post the guid to the database");
+                            }
+                            else
+                            {
+                                await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
+                            }
                         }
-                        else
-                        {
-                            await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
-                        }
+                        //await DisplayAlert("Token", Preferences.Get("Token", string.Empty), "OK") ;
+                        Application.Current.MainPage = new SelectionPage();
                     }
-                    //await DisplayAlert("Token", Preferences.Get("Token", string.Empty), "OK") ;
-                    Application.Current.MainPage = new SelectionPage();
                 }
-            }
-            else
+                else
+                {
+                    await DisplayAlert("Message", "We weren't able to sign you up", "OK");
+                }
+            }catch( Exception socialSignUp)
             {
-                await DisplayAlert("Message", "We weren't able to sign you up", "OK");
+                Debug.WriteLine("Something went wrong here");
             }
         }
     }

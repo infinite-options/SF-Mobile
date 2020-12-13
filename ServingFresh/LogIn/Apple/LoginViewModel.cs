@@ -11,9 +11,27 @@ using Xamarin.Essentials;
 using Xamarin.Forms;
 using ServingFresh.Models;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace ServingFresh.LogIn.Apple
 {
+    public class Info
+    {
+        public string customer_email { get; set; }
+    }
+
+    public class AppleUser
+    {
+        public string message { get; set; }
+        public int code { get; set; }
+        public IList<Info> result { get; set; }
+        public string sql { get; set; }
+    }
+
+    public class AppleEmail
+    {
+        public string social_id {get;set;}
+    }
     public class LoginViewModel
     {
         public static string apple_token = null;
@@ -40,33 +58,69 @@ namespace ServingFresh.LogIn.Apple
 
         public async void OnAppleSignInRequest()
         {
-            var account = await appleSignInService.SignInAsync();
-            if (account != null)
+            try
             {
-                Preferences.Set(App.LoggedInKey, true);
-                await SecureStorage.SetAsync(App.AppleUserIdKey, account.UserId);
-
-                if (account.Token == null) { account.Token = ""; }
-                if (account.Email != null)
+                var account = await appleSignInService.SignInAsync();
+                if (account != null)
                 {
+                    Preferences.Set(App.LoggedInKey, true);
+                    await SecureStorage.SetAsync(App.AppleUserIdKey, account.UserId);                    
+
+                    if (account.Token == null) { account.Token = ""; }
+                    if (account.Email != null)
+                    {
+                        if (Application.Current.Properties.ContainsKey(account.UserId.ToString()))
+                        {
+                            //Application.Current.Properties[account.UserId.ToString()] = account.Email;
+                            Debug.WriteLine((string)Application.Current.Properties[account.UserId.ToString()]);
+                        }
+                        else
+                        {
+                            Application.Current.Properties[account.UserId.ToString()] = account.Email;
+                        }
+                    }
+                    if (account.Email == null) { account.Email = ""; }
+                    if (account.Name == null) { account.Name = ""; }
+
                     if (Application.Current.Properties.ContainsKey(account.UserId.ToString()))
                     {
-                        Application.Current.Properties[account.UserId.ToString()] = account.Email;
+                        AppleUserProfileAsync(account.UserId, account.Token, (string)Application.Current.Properties[account.UserId.ToString()], account.Name);
                     }
                     else
                     {
-                        Application.Current.Properties[account.UserId.ToString()] = account.Email;
+                        var client = new HttpClient();
+                        var getAppleEmail = new AppleEmail();
+                        getAppleEmail.social_id = account.UserId;
+
+                        var socialLogInPostSerialized = JsonConvert.SerializeObject(getAppleEmail);
+
+                        System.Diagnostics.Debug.WriteLine(socialLogInPostSerialized);
+
+                        var postContent = new StringContent(socialLogInPostSerialized, Encoding.UTF8, "application/json");
+                        var RDSResponse = await client.PostAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/AppleEmail", postContent);
+                        var responseContent = await RDSResponse.Content.ReadAsStringAsync();
+
+                        System.Diagnostics.Debug.WriteLine(responseContent);
+                        if (RDSResponse.IsSuccessStatusCode)
+                        {
+                            var data = JsonConvert.DeserializeObject<AppleUser>(responseContent);
+                            Application.Current.Properties[account.UserId.ToString()] = data.result[0].customer_email;
+                            AppleUserProfileAsync(account.UserId, account.Token, (string)Application.Current.Properties[account.UserId.ToString()], account.Name);
+                        }
+                        else
+                        {
+                            await Application.Current.MainPage.DisplayAlert("Ooops", "Our system is not working. We can't process your request at this moment", "OK");
+                        }
                     }
                 }
-                if (account.Email == null) { account.Email = ""; }
-                if (account.Name == null) { account.Name = ""; }
-
-                System.Diagnostics.Debug.WriteLine((string)Application.Current.Properties[account.UserId.ToString()]);
-                AppleUserProfileAsync(account.UserId, account.Token, (string)Application.Current.Properties[account.UserId.ToString()], account.Name);
+                else
+                {
+                    AppleError?.Invoke(this, default(EventArgs));
+                }
             }
-            else
+            catch(Exception apple)
             {
-                AppleError?.Invoke(this, default(EventArgs));
+                await Application.Current.MainPage.DisplayAlert("Error", apple.Message, "OK");
             }
         }
 

@@ -928,6 +928,10 @@ namespace ServingFresh.Views
                         purchase.Add(item, order[item]);
                     }
                 }
+                if (Application.Current.Properties.ContainsKey("enable"))
+                {
+                    Application.Current.Properties["user"] = "GUEST";
+                }
                 Application.Current.Properties["day"] = titlePage.Text;
                 Application.Current.MainPage = new CheckoutPage(purchase, titlePage.Text);
             }
@@ -963,6 +967,12 @@ namespace ServingFresh.Views
                         purchase.Add(item, order[item]);
                     }
                 }
+
+                if (Application.Current.Properties.ContainsKey("enable"))
+                {
+                    Application.Current.Properties["user"] = "GUEST";
+                }
+
                 Application.Current.Properties["day"] = titlePage.Text;
                 Application.Current.MainPage = new CheckoutPage(purchase, titlePage.Text);
             }
@@ -996,7 +1006,7 @@ namespace ServingFresh.Views
 
         async void SendGuestToAddressValidation()
         {
-           var result = await DisplayAlert("Congratulations!","It looks like you are interested in our products! Press continue to validate your address to display the businesses that delivery to your location","Continue","Cancel");
+           var result = await DisplayAlert("Awesome!","It looks like you are interested in Serving Fresh! Let's start by verifing you are in our delivery area.\nPress 'Continue' to enter your address or 'Cancel' to return to the home page.","Continue","Cancel");
             if (result)
             {
                 Application.Current.MainPage = new GuestPage();

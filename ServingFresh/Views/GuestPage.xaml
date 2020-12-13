@@ -79,7 +79,7 @@
                             BackgroundColor="White"
                             Clicked="ValidateAddressClick">
                         </Button>
-                        <Button
+                        <!--<Button
                             Text="Proceed"
                             TextColor="#FF8500"
                             FontAttributes="Bold"
@@ -89,7 +89,7 @@
                             HeightRequest="40"
                             BackgroundColor="White"
                             Clicked="ProceedAsGuestClick">
-                        </Button>
+                        </Button>-->
                         <Button
                             Text="Enter email and password to Sign Up"
                             TextColor="White"

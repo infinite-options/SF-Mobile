@@ -115,7 +115,7 @@
                         <BoxView StyleClass="spacer"/>
                         <Grid Padding="15">
                             <StackLayout Grid.Column="0">
-                                <Label Text="Contact info:" StyleClass="h3, primary"></Label>
+                                <Label Text="Delivery Contact:" StyleClass="h3, primary"></Label>
                                 <Label Text="Change contact info" StyleClass="secondary">
                                     <Label.GestureRecognizers>
                                         <TapGestureRecognizer
@@ -216,8 +216,8 @@
                                 </CollectionView.ItemTemplate>
                             </CollectionView>
                         </Grid>
-                        <BoxView StyleClass="spacer"/>
-                        <Label Text="Choose one of the eligible promos to apply" FontAttributes="Bold" FontSize="15" StyleClass="black" Padding="15,0,15,0"/>
+                        <BoxView x:Name="couponSpace" StyleClass="spacer"/>
+                        <Label x:Name="couponsLabel" Text="Choose one of the eligible promos to apply" FontAttributes="Bold" FontSize="15" StyleClass="black" Padding="15,0,15,0"/>
                         <!--<ScrollView Orientation="Horizontal" HeightRequest="150" Padding="0">-->
                             <CollectionView x:Name="coupon_list" ItemsLayout="HorizontalList" HeightRequest="150">
                                 <CollectionView.ItemTemplate >
@@ -375,10 +375,10 @@
             <Frame Grid.Row="7" x:Name="ContactInfo">
                 <ScrollView>
                     <StackLayout>
-                        <Label Grid.Row="0" Grid.Column="0" Text="Change Contact Info" TextColor="Black" FontAttributes="Bold" FontSize="Medium" Padding="0,0,0,10"></Label>
+                        <Label Grid.Row="0" Grid.Column="0" x:Name="addInfo" Text="Delivery Contact Info" TextColor="Black" FontAttributes="Bold" FontSize="Medium" Padding="0,0,0,10"></Label>
                         <Entry x:Name="newUserFirstName" Placeholder="First name"></Entry>
                         <Entry x:Name="newUserLastName" Placeholder="Last name"></Entry>
-                        <Entry x:Name="newUserPhoneNum" Placeholder="Phone number"></Entry>
+                        <Entry x:Name="newUserPhoneNum" Placeholder="Phone number" MaxLength="10"></Entry>
                         <Entry x:Name="newUserEmailAddress" Placeholder="Email Address"></Entry>
                         <Button Text="Save Address" TextColor="#FF8500" FontAttributes="Bold" BorderColor="#FF8500" BorderWidth="0.5" Clicked="SaveChangesClick"></Button>
                         <Button Text="Cancel" TextColor="#FF8500" FontAttributes="Bold" BorderColor="#FF8500" BorderWidth="0.5" Clicked="ChangeContactInfoCancelClick"></Button>
