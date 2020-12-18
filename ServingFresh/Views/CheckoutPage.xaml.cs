@@ -169,9 +169,12 @@ namespace ServingFresh.Views
         public IDictionary<string, ItemPurchased> orderCopy = new Dictionary<string,ItemPurchased>();
         public string cartEmpty = "";
 
-        // Paypal credentials
-        static String clientId = "";
-        static String secret = "";
+        // PAYPAL CREDENTIALS
+        // =========================
+        static string clientId = "";
+        static string secret = "";
+        static string mode = "";
+        // =========================
 
         public CheckoutPage(IDictionary<string, ItemPurchased> order = null, string day = "")
         {
@@ -887,8 +890,11 @@ namespace ServingFresh.Views
                 // Step 1
                 // Create a request to pay with PayPal using PayPal client
 
-                paypalframe.Height = this.Height - 65;
-                webViewPage.HeightRequest = this.Height - 65;
+                var point = 200 / this.Height;
+                var factor = 200 * point;
+
+                paypalframe.Height = this.Height -136;
+                webViewPage.HeightRequest = this.Height -136;
                 options.Height = 0;
 
                 var response = await createOrder(purchaseObject.amount_due);
@@ -941,7 +947,7 @@ namespace ServingFresh.Views
             paypal.key = Constant.LiveClientId;
 
             var stripeObj = JsonConvert.SerializeObject(paypal);
-            System.Diagnostics.Debug.WriteLine("key to send JSON: " + stripeObj);
+            Debug.WriteLine("key to send JSON: " + stripeObj);
             var stripeContent = new StringContent(stripeObj, Encoding.UTF8, "application/json");
             var RDSResponse = await c.PostAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/Paypal_Payment_key_checker", stripeContent);
             var content = await RDSResponse.Content.ReadAsStringAsync();
@@ -951,22 +957,23 @@ namespace ServingFresh.Views
             {
                 if (content.Contains("Test"))
                 {
+                    mode = "TEST";
                     clientId = Constant.TestClientId;
                     secret = Constant.TestSecret;
-                    //Debug.WriteLine("Test key: " + clientId);
-                    //Debug.WriteLine("Test Secret: " + secret);
                 }
                 else if (content.Contains("Live"))
                 {
+                    mode = "LIVE";
                     clientId = Constant.LiveClientId;
                     secret = Constant.LiveSecret;
-                    //Debug.WriteLine("Live key: " + clientId);
-                    //Debug.WriteLine("Live Secret: " + secret);
                 }
                 else
                 {
-                    Debug.WriteLine("Invalid entry");
+                    Debug.WriteLine("INVALID ENTRY");
                 }
+                Debug.WriteLine("MODE            : " + mode);
+                Debug.WriteLine("PAYPAL CLIENT ID: " + clientId);
+                Debug.WriteLine("PAYPAL SECRET   : " + secret);
             }
             else
             {
@@ -977,86 +984,32 @@ namespace ServingFresh.Views
 
         public static PayPalHttp.HttpClient client()
         {
-            // Creating a sandbox environment
-
-           
-
-            PayPalEnvironment environment = new SandboxEnvironment(clientId, secret);
-
-            // Creating a client for the environment
-            PayPalHttpClient payPalClient = new PayPalHttpClient(environment);
-            return payPalClient;
+            if(mode == "TEST")
+            {
+                Debug.WriteLine("PAYPAL TEST ENVIROMENT");
+                PayPalEnvironment environment = new SandboxEnvironment(clientId, secret);
+                PayPalHttpClient payPalClient = new PayPalHttpClient(environment);
+                return payPalClient;
+            }else if (mode == "LIVE")
+            {
+                Debug.WriteLine("PAYPAL LIVE ENVIROMENT");
+                PayPalEnvironment environment = new LiveEnvironment(clientId, secret);
+                PayPalHttpClient payPalClient = new PayPalHttpClient(environment);
+                return payPalClient;
+            }
+            return null;
         }
-
-        //public async void Paypal()
-        //{
-        //    var purchaseString = JsonConvert.SerializeObject(purchaseObject);
-        //    System.Diagnostics.Debug.WriteLine("Purchase: " + purchaseString);
-        //    var purchaseMessage = new StringContent(purchaseString, Encoding.UTF8, "application/json");
-        //    var client = new System.Net.Http.HttpClient();
-
-        //    CouponObject coupon = new CouponObject();
-        //    coupon.coupon_uid = couponData.result[defaultCouponIndex].coupon_uid;
-
-        //    var couponSerialized = JsonConvert.SerializeObject(coupon);
-        //    System.Diagnostics.Debug.WriteLine("Coupon to update: " + couponSerialized);
-        //    var couponContent = new StringContent(couponSerialized, Encoding.UTF8, "application/json");
-
-        //    var RDSResponse = await client.PostAsync(Constant.PurchaseUrl, purchaseMessage);
-        //    var RDSCouponResponse = await client.PostAsync(Constant.UpdateCouponUrl, couponContent);
-        //    Debug.WriteLine("Order was written to DB: " + RDSResponse.IsSuccessStatusCode);
-        //    Debug.WriteLine("Coupon was succesfully updated (subtract)" + RDSCouponResponse.IsSuccessStatusCode);
-        //    var re = await RDSResponse.Content.ReadAsStringAsync();
-        //    Debug.WriteLine(re);
-
-        //    if (RDSResponse.IsSuccessStatusCode)
-        //    {
-        //       // var RDSResponseContent = await RDSResponse.Content.ReadAsStringAsync();
-        //        //System.Diagnostics.Debug.WriteLine(RDSResponseContent);
-
-        //        cartItems.Clear();
-        //        updateTotals(0, 0);
-        //        total = 00.00;
-        //        total_qty = 0;
-        //    }
-        //    if (RDSCouponResponse.IsSuccessStatusCode && RDSResponse.IsSuccessStatusCode)
-        //    {
-        //        Application.Current.Properties["day"] = "";
-        //        //string toFind1 = "pay_purchase_id";
-        //        //string toFind2 = "payment_time_stamp";
-        //        //int start = re.IndexOf(toFind1) + toFind1.Length;
-        //        //int end = re.IndexOf(toFind2, start); //Start after the index of 'my' since 'is' appears twice
-        //        //string string2 = re.Substring(start, end - start);
-        //        //int s = 0;
-        //        //foreach(char a in string2.ToCharArray())
-        //        //{
-        //        //    if(a == '\'')
-        //        //    {
-        //        //        break;
-        //        //    }
-        //        //    s++;
-        //        //}
-        //        //Debug.WriteLine("Start Index: " + s);
-        //        //Debug.WriteLine("pucharse ID: "+  string2.Substring(s+1, 10));
-        //        //string purchaseID = string2.Substring(s + 1, 10);
-        //        await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
-        //        _ = Launcher.OpenAsync(new System.Uri("https://servingnow.me/payment/" + "400-000188" + "/" + purchaseObject.amount_due));
-        //    }
-        //}
 
         async void PayViaStripe()
         {
             try
             {
-
-
-
                 var c = new System.Net.Http.HttpClient();
                 var stripe = new Credentials();
                 stripe.key = Constant.LivePK;
 
                 var stripeObj = JsonConvert.SerializeObject(stripe);
-                System.Diagnostics.Debug.WriteLine("key to send JSON: " + stripeObj);
+                Debug.WriteLine("key to send JSON: " + stripeObj);
                 var stripeContent = new StringContent(stripeObj, Encoding.UTF8, "application/json");
                 var RDSResponse = await c.PostAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/Stripe_Payment_key_checker", stripeContent);
                 var content = await RDSResponse.Content.ReadAsStringAsync();
@@ -1146,22 +1099,13 @@ namespace ServingFresh.Views
                             System.Diagnostics.Debug.WriteLine("Purchase: " + purchaseString);
                             var purchaseMessage = new StringContent(purchaseString, Encoding.UTF8, "application/json");
                             var client = new System.Net.Http.HttpClient();
-
-                            //CouponObject coupon = new CouponObject();
-                            //coupon.coupon_uid = couponData.result[defaultCouponIndex].coupon_uid;
-
-                            //var couponSerialized = JsonConvert.SerializeObject(coupon);
-                            //System.Diagnostics.Debug.WriteLine("Coupon to update: " + couponSerialized);
-                            //var couponContent = new StringContent(couponSerialized, Encoding.UTF8, "application/json");
-
                             var Response = await client.PostAsync(Constant.PurchaseUrl, purchaseMessage);
-                            //var RDSCouponResponse = await client.PostAsync(Constant.UpdateCouponUrl, couponContent);
+
                             Debug.WriteLine("Order was written to DB: " + Response.IsSuccessStatusCode);
                             //Debug.WriteLine("Coupon was succesfully updated (subtract)" + RDSCouponResponse);
                             if (Response.IsSuccessStatusCode)
                             {
                                 var RDSResponseContent = await Response.Content.ReadAsStringAsync();
-                                //System.Diagnostics.Debug.WriteLine(RDSResponseContent);
 
                                 cartItems.Clear();
                                 updateTotals(0, 0);
@@ -1191,34 +1135,8 @@ namespace ServingFresh.Views
                                     var longitude = (string)Application.Current.Properties["user_longitude"];
 
                                     Application.Current.MainPage = new SignUpPage(firstName, lastName, phone, email, address, unit, city, state, zipcode, "guest", lat, longitude);
-                                    //var result = await DisplayAlert("", "You are one step away from having an acount and gaining access to additional coupons and promotions. Press 'Continue' to Sign Up or 'Cancel' to return to home page", "Continue", "Cancel");
-                                    //if (result)
-                                    //{
-                                    //    var firstName = (string)Application.Current.Properties["user_first_name"];
-                                    //    var lastName = (string)Application.Current.Properties["user_last_name"];
-                                    //    var email = (string)Application.Current.Properties["user_email"];
-                                    //    var phone = (string)Application.Current.Properties["user_phone_num"];
-                                    //    var address = (string)Application.Current.Properties["user_address"];
-                                    //    var unit = (string)Application.Current.Properties["user_unit"];
-                                    //    var city = (string)Application.Current.Properties["user_city"];
-                                    //    var zipcode = (string)Application.Current.Properties["user_zip_code"];
-                                    //    var state = (string)Application.Current.Properties["user_state"];
-                                    //    var lat = (string)Application.Current.Properties["user_latitude"];
-                                    //    var longitude = (string)Application.Current.Properties["user_longitude"];
-                                        
-                                    //    Application.Current.MainPage = new SignUpPage(firstName, lastName, phone, email, address, unit, city, state, zipcode, "guest",lat, longitude);
-                                    //}
-                                    //else
-                                    //{
-                                    //    Application.Current.MainPage = new LogInPage();
-                                    //}
                                 }
                             }
-                            //if (RDSCouponResponse.IsSuccessStatusCode && Response.IsSuccessStatusCode)
-                            //{
-                            //    Application.Current.Properties["day"] = "";
-                            //    await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
-                            //}
                         }
                         else
                         {
@@ -1867,28 +1785,6 @@ namespace ServingFresh.Views
                         var longitude = (string)Application.Current.Properties["user_longitude"];
 
                         Application.Current.MainPage = new SignUpPage(firstName, lastName, phone, email, address, unit, city, state, zipcode, "guest", lat, longitude);
-
-                        //var resultGuest = await DisplayAlert("", "You are one step away from having an acount and gaining access to additional coupons and promotions. Press 'Continue' to Sign Up or 'Cancel' to return to home page", "Continue", "Cancel");
-                        //if (resultGuest)
-                        //{
-                        //    var firstName = (string)Application.Current.Properties["user_first_name"];
-                        //    var lastName = (string)Application.Current.Properties["user_last_name"];
-                        //    var email = (string)Application.Current.Properties["user_email"];
-                        //    var phone = (string)Application.Current.Properties["user_phone_num"];
-                        //    var address = (string)Application.Current.Properties["user_address"];
-                        //    var unit = (string)Application.Current.Properties["user_unit"];
-                        //    var city = (string)Application.Current.Properties["user_city"];
-                        //    var zipcode = (string)Application.Current.Properties["user_zip_code"];
-                        //    var state = (string)Application.Current.Properties["user_state"];
-                        //    var lat = (string)Application.Current.Properties["user_latitude"];
-                        //    var longitude = (string)Application.Current.Properties["user_longitude"];
-
-                        //    Application.Current.MainPage = new SignUpPage(firstName, lastName, phone, email, address, unit, city, state, zipcode, "guest", lat, longitude);
-                        //}
-                        //else
-                        //{
-                        //    Application.Current.MainPage = new LogInPage();
-                        //}
                     }
                 }
             }

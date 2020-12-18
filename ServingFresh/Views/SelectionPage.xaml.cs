@@ -194,6 +194,61 @@ namespace ServingFresh.Views
                     business_uids = ids,
                 });
             }
+            
+
+            if(schedule.Count != 0)
+            {
+                Debug.WriteLine("DELIVERY CHECK POINT");
+                var firstElement = schedule[0];
+                var dateE1 = firstElement.delivery_date;
+                var timeE1 = "";
+
+                foreach(char a in firstElement.delivery_time.ToCharArray())
+                {
+                    if(a != '-')
+                    {
+                        timeE1 += a;
+                    }
+                }
+                timeE1.Trim().ToUpper();
+                Debug.WriteLine("DELIVERY DATE                      : " + dateE1);
+                Debug.WriteLine("DELIVERY TIME                      : " + timeE1);
+                var timeStampDate = DateTime.Parse(dateE1);
+                var timeStampTime = DateTime.Parse(timeE1);
+
+                Debug.WriteLine("DELIVERY TIME AS DATETIME TYPE DATE: " + timeStampDate);
+                Debug.WriteLine("DELIVERY TIME AS DATETIME TYPE TIME: " + timeStampTime);
+                var timeStampString = timeStampDate.ToString("MM/dd/yyyy") + " " + timeStampTime.ToString("HH:mm:ss");
+                var timeStampE1 = DateTime.Parse(timeStampString);
+                Debug.WriteLine("DELIVERY TIME AS DATETIME TYPE     : " + timeStampE1);
+                var targetDate = timeStampE1.AddDays(-1).ToString("MM/dd/yyyy");
+                var targetTime = DateTime.Parse("01:00 PM").ToString("HH:mm:ss");
+                var targetTimeString = targetDate + " " + targetTime;
+                var targetTimeStamp = DateTime.Parse(targetTimeString);
+                Debug.WriteLine("TARGET TIME AS DATETIME TYPE       : " + targetTimeStamp);
+                
+                var currentTime = DateTime.Now;
+                Debug.WriteLine("CURRENT TIME AS DATETIME TYPE      : " + currentTime);
+                if(currentTime < targetTimeStamp)
+                {
+
+                }
+                else
+                {
+                    if(schedule.Count == 1)
+                    {
+                        firstElement.delivery_date = timeStampE1.AddDays(7).ToString("MMM dd");
+                        schedule[0] = firstElement;
+                    }
+                    else
+                    {
+                        var lastElement = firstElement;
+                        schedule.RemoveAt(0);
+                        lastElement.delivery_date = timeStampE1.AddDays(7).ToString("MMM dd");
+                        schedule.Add(lastElement);
+                    }
+                }
+            }
             delivery_list.ItemsSource = schedule;
         }
 
@@ -512,6 +567,61 @@ namespace ServingFresh.Views
                             ScheduleInfo addInfo = businesSchedule[b];
                             sortedBusinessSchedule.Add(addInfo);
                             businesSchedule.RemoveAt(b);
+                        }
+                    }
+                }
+
+
+                if (sortedBusinessSchedule.Count != 0)
+                {
+                    Debug.WriteLine("DELIVERY CHECK POINT");
+                    var firstElement = sortedBusinessSchedule[0];
+                    var dateE1 = firstElement.delivery_date;
+                    var timeE1 = "";
+
+                    foreach (char a in firstElement.delivery_time.ToCharArray())
+                    {
+                        if (a != '-')
+                        {
+                            timeE1 += a;
+                        }
+                    }
+                    timeE1.Trim().ToUpper();
+                    Debug.WriteLine("DELIVERY DATE                      : " + dateE1);
+                    Debug.WriteLine("DELIVERY TIME                      : " + timeE1);
+                    var timeStampDate = DateTime.Parse(dateE1);
+                    var timeStampTime = DateTime.Parse(timeE1);
+
+                    Debug.WriteLine("DELIVERY TIME AS DATETIME TYPE DATE: " + timeStampDate);
+                    Debug.WriteLine("DELIVERY TIME AS DATETIME TYPE TIME: " + timeStampTime);
+                    var timeStampString = timeStampDate.ToString("MM/dd/yyyy") + " " + timeStampTime.ToString("HH:mm:ss");
+                    var timeStampE1 = DateTime.Parse(timeStampString);
+                    Debug.WriteLine("DELIVERY TIME AS DATETIME TYPE     : " + timeStampE1);
+                    var targetDate = timeStampE1.AddDays(-1).ToString("MM/dd/yyyy");
+                    var targetTime = DateTime.Parse("01:00 PM").ToString("HH:mm:ss");
+                    var targetTimeString = targetDate + " " + targetTime;
+                    var targetTimeStamp = DateTime.Parse(targetTimeString);
+                    Debug.WriteLine("TARGET TIME AS DATETIME TYPE       : " + targetTimeStamp);
+
+                    var currentTime = DateTime.Now;
+                    Debug.WriteLine("CURRENT TIME AS DATETIME TYPE      : " + currentTime);
+                    if (currentTime < targetTimeStamp)
+                    {
+
+                    }
+                    else
+                    {
+                        if (sortedBusinessSchedule.Count == 1)
+                        {
+                            firstElement.delivery_date = timeStampE1.AddDays(7).ToString("MMM dd");
+                            sortedBusinessSchedule[0] = firstElement;
+                        }
+                        else
+                        {
+                            var lastElement = firstElement;
+                            sortedBusinessSchedule.RemoveAt(0);
+                            lastElement.delivery_date = timeStampE1.AddDays(7).ToString("MMM dd");
+                            sortedBusinessSchedule.Add(lastElement);
                         }
                     }
                 }
