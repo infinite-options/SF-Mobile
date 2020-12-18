@@ -15,6 +15,7 @@ namespace ServingFresh.Models
         public int quantityLeft { get; set; }
         public string itemNameLeft { get; set; }
         public string itemPriceLeft { get; set; }
+        public string itemPriceLeftUnit { get; set; }
         public bool isItemLeftVisiable { get; set; }
         public bool isItemLeftEnable { get; set; }
         // Additional
@@ -26,6 +27,7 @@ namespace ServingFresh.Models
         public int quantityRight { get; set; }
         public string itemNameRight { get; set; }
         public string itemPriceRight { get; set; }
+        public string itemPriceRightUnit { get; set; }
         public bool isItemRightVisiable { get; set; }
         public bool isItemRightEnable { get; set; }
         // Additional

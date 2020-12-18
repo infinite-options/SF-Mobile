@@ -158,7 +158,7 @@ namespace ServingFresh.Views
 
         public void openHistory(object sender, EventArgs e)
         {
-            if (!Application.Current.Properties.ContainsKey("enable"))
+            if (!(bool)Application.Current.Properties["guest"])
             {
                 Application.Current.MainPage = new HistoryPage();
             }
@@ -176,7 +176,7 @@ namespace ServingFresh.Views
 
         void InfoClick(System.Object sender, System.EventArgs e)
         {
-            if (!Application.Current.Properties.ContainsKey("enable"))
+            if (!(bool)Application.Current.Properties["guest"])
             {
                 Application.Current.MainPage = new InfoPage();
             }
@@ -185,7 +185,7 @@ namespace ServingFresh.Views
 
         void ProfileClick(System.Object sender, System.EventArgs e)
         {
-            if (!Application.Current.Properties.ContainsKey("enable"))
+            if (!(bool)Application.Current.Properties["guest"])
             {
                 Application.Current.MainPage = new ProfilePage();
             }

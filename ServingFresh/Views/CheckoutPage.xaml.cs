@@ -105,6 +105,7 @@ namespace ServingFresh.Views
             public string couponNote { get; set; }
             public string index { get; set; }
             public double saving { get; set; }
+            public double threshold { get; set; }
             public double disc { get; set; }
             public string thresholdNote { get; set; }
             public string expNote { get; set; }
@@ -185,9 +186,9 @@ namespace ServingFresh.Views
                 GetFees(day);
             }
 
-            if (Application.Current.Properties.ContainsKey("enable"))
+            if ((bool)Application.Current.Properties["guest"])
             {
-                Debug.WriteLine("GUEST TRACK: " + Application.Current.Properties["user"]);
+                
                 GetAvailiableCoupons();
                 //coupon_list.HeightRequest = 0;
                 //couponsLabel.IsVisible = false;
@@ -407,10 +408,10 @@ namespace ServingFresh.Views
 
                 ServiceFee.Text = "$ " + service_fee.ToString("N2");
                 DeliveryFee.Text = "$ " + delivery_fee.ToString("N2");
-                if (!Application.Current.Properties.ContainsKey("enable"))
-                {
-                    GetAvailiableCoupons();
-                }
+                //if (!Application.Current.Properties.ContainsKey("enable"))
+                //{
+                //    GetAvailiableCoupons();
+                //}
             }
         }
 
@@ -419,7 +420,7 @@ namespace ServingFresh.Views
             var client = new System.Net.Http.HttpClient();
             var email = (string)Application.Current.Properties["user_email"];
             var RDSResponse = new HttpResponseMessage();
-            if (!Application.Current.Properties.ContainsKey("enable"))
+            if (!(bool)Application.Current.Properties["guest"])
             {
                 RDSResponse = await client.GetAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/available_Coupons/" + email);
             }
@@ -468,14 +469,16 @@ namespace ServingFresh.Views
                     coupons.expNote = "Expires: "+ DateTime.Parse(c.expire_date).ToString("MM/dd/yyyy");
 
                     coupons.index = placement.ToString();
-                    couponsList.Add(coupons);
+                    //couponsList.Add(coupons);
 
                     if(c.threshold == null)
                     {
                         c.threshold = 0.0;
                     }
+                    coupons.threshold = (double)c.threshold;
+                    //couponsList.Add(coupons);
 
-                    if(initialSubTotal >= (double)c.threshold)
+                    if (initialSubTotal >= (double)c.threshold)
                     {
                         if (initialSubTotal >= c.discount_amount)
                         {
@@ -492,7 +495,7 @@ namespace ServingFresh.Views
                     else
                     {
                         discount = 0;
-                        c.discount_shipping = 0;
+                        //c.discount_shipping = 0;
                         newTotal = initialSubTotal - discount + initialServiceFee + (initialDeliveryFee - c.discount_shipping) + initialTaxes;
                     }
                     unsortedThresholds.Add((double)c.threshold);
@@ -500,7 +503,7 @@ namespace ServingFresh.Views
                     unsortedDiscounts.Add(discount + c.discount_shipping);
                     coupons.disc = discount + c.discount_shipping;
                     sortedDiscounts.Add(discount + c.discount_shipping);
-
+                    couponsList.Add(coupons);
                     placement++;
                 }
 
@@ -511,18 +514,63 @@ namespace ServingFresh.Views
                 {
                     double newTotal = unsortedNewTotals[j];
                     savings = initialTotal - newTotal;
-                    if(savings != 0)
+
+                    //if (c.threshold == 0)
+                    //{
+                    //    c.image = "CouponIconGreen.png";
+                    //    c.thresholdNote = "No minimum purchase";
+                    //    c.savingsNote = "You saved: $" + savings.ToString("N2");
+                    //}
+                    //else
+                    //{
+                    //    //if(c.threshold < initialSubTotal)
+                    //    //{
+                    //        c.thresholdNote = "$" + (unsortedThresholds[j]).ToString("N2") + " minimum purchase";
+                    //    if (c.threshold < initialSubTotal)
+                    //    {
+                    //            c.savingsNote = "Spend $" + (unsortedThresholds[j] - initialSubTotal).ToString("N2") + " more to use";
+                    //    }
+                    //    else
+                    //    {
+                    //        c.savingsNote = "You saved: $" + savings.ToString("N2");
+                    //    }
+                    //}
+
+                    if (c.threshold == 0)
                     {
                         c.image = "CouponIconGreen.png";
                         c.thresholdNote = "No minimum purchase";
-                        c.savingsNote = "You saved: $" + savings.ToString("N2");
+                        c.savingsNote = "You saved: $" + c.disc.ToString("N2");
                     }
                     else
                     {
-                        c.thresholdNote = "$" + (unsortedThresholds[j]).ToString("N2") + " minimum purchase";
-                        c.savingsNote = "Spend $" + (unsortedThresholds[j] - initialSubTotal).ToString("N2") + " more to use";
+
+                        if (c.threshold > initialSubTotal)
+                        {
+                            c.thresholdNote = "$" + (unsortedThresholds[j]).ToString("N2") + " minimum purchase";
+                            c.savingsNote = "Spend $" + (unsortedThresholds[j] - initialSubTotal).ToString("N2") + " more to use";
+                        }
+                        else
+                        {
+                            c.image = "CouponIconGreen.png";
+                            c.thresholdNote = "$" + (unsortedThresholds[j]).ToString("N2") + " minimum purchase";
+                            c.savingsNote = "You saved: $" + c.disc.ToString("N2");
+                        }
                     }
-                    
+
+
+                    //if (savings != 0)
+                    //{
+                    //    c.image = "CouponIconGreen.png";
+                    //    c.thresholdNote = "No minimum purchase";
+                    //    c.savingsNote = "You saved: $" + savings.ToString("N2");
+                    //}
+                    //else
+                    //{
+                    //    c.thresholdNote = "$" + (unsortedThresholds[j]).ToString("N2") + " minimum purchase";
+                    //    c.savingsNote = "Spend $" + (unsortedThresholds[j] - initialSubTotal).ToString("N2") + " more to use";
+                    //}
+
                     j++;
                 }
 
@@ -559,9 +607,14 @@ namespace ServingFresh.Views
                 }
 
                 Debug.WriteLine("This is the coupon index that will save you the most money: " + defaultCouponIndex);
-                if(couponsList[defaultCouponIndex].savingsNote != "")
+                if(couponsList[defaultCouponIndex].threshold <= initialSubTotal || couponsList[defaultCouponIndex].threshold == 0)
                 {
                     couponsList[defaultCouponIndex].image = "CouponIconOrange.png";
+                    updateTotals(unsortedDiscounts[defaultCouponIndex] - couponData.result[defaultCouponIndex].discount_shipping, couponData.result[defaultCouponIndex].discount_shipping);
+                }
+                else
+                {
+                    updateTotals(0, 0);
                 }
 
                 ObservableCollection<couponItem> displayCoupons = new ObservableCollection<couponItem>();
@@ -585,7 +638,7 @@ namespace ServingFresh.Views
                 }
 
                 coupon_list.ItemsSource = displayCoupons;
-                updateTotals(unsortedDiscounts[defaultCouponIndex] - couponData.result[defaultCouponIndex].discount_shipping, couponData.result[defaultCouponIndex].discount_shipping);
+                //updateTotals(unsortedDiscounts[defaultCouponIndex] - couponData.result[defaultCouponIndex].discount_shipping, couponData.result[defaultCouponIndex].discount_shipping);
             }
         }
 
@@ -1114,14 +1167,14 @@ namespace ServingFresh.Views
                                 Application.Current.Properties["day"] = "";
                                 cartEmpty = "EMPTY";
                                 cartHeight.Height = 0;
-                                if (!Application.Current.Properties.ContainsKey("enable"))
+                                if (!(bool)Application.Current.Properties["guest"])
                                 {
                                     await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
                                 }
                                 else
                                 {
-                                    Application.Current.Properties.Remove("user");
-                                    Application.Current.Properties.Remove("enable");
+                                    Application.Current.Properties["guest"] = false;
+
                                     var firstName = (string)Application.Current.Properties["user_first_name"];
                                     var lastName = (string)Application.Current.Properties["user_last_name"];
                                     var email = (string)Application.Current.Properties["user_email"];
@@ -1253,13 +1306,14 @@ namespace ServingFresh.Views
                 coupons.couponNote = c.notes;
                 coupons.expNote = "Expires: " + DateTime.Parse(c.expire_date).ToString("MM/dd/yyyy");
                 coupons.index = placement.ToString();
-                couponsList.Add(coupons);
+                // couponsList.Add(coupons);
 
                 if (c.threshold == null)
                 {
                     c.threshold = 0.0;
                 }
-
+                coupons.threshold = (double)c.threshold;
+                //couponsList.Add(coupons);
                 if (initialSubTotal >= (double)c.threshold)
                 {
                     if (initialSubTotal >= c.discount_amount)
@@ -1277,7 +1331,7 @@ namespace ServingFresh.Views
                 else
                 {
                     discount = 0;
-                    c.discount_shipping = 0;
+                    //c.discount_shipping = 0;
                     newTotal = initialSubTotal - discount + initialServiceFee + (initialDeliveryFee - c.discount_shipping) + initialTaxes;
                 }
 
@@ -1285,6 +1339,7 @@ namespace ServingFresh.Views
                 unsortedDiscounts.Add(discount + c.discount_shipping);
                 sortedDiscounts.Add(discount + c.discount_shipping);
                 coupons.disc = discount + c.discount_shipping;
+                couponsList.Add(coupons);
                 placement++;
             }
 
@@ -1294,17 +1349,60 @@ namespace ServingFresh.Views
             {
                 double newTotal = unsortedNewTotals[j];
                 savings = initialTotal - newTotal;
-                if (savings != 0)
+
+                //if (c.threshold == 0)
+                //{
+                //    c.image = "CouponIconGreen.png";
+                //    c.thresholdNote = "No minimum purchase";
+                //    c.savingsNote = "You saved: $" + savings.ToString("N2");
+                //}
+                //else
+                //{
+
+                //        c.thresholdNote = "$" + (unsortedThresholds[j]).ToString("N2") + " minimum purchase";
+                //    if (c.threshold < initialSubTotal)
+                //    {
+                //        c.savingsNote = "Spend $" + (unsortedThresholds[j] - initialSubTotal).ToString("N2") + " more to use";
+                //    }
+                //    else
+                //    {
+                //        c.savingsNote = "You saved: $" + savings.ToString("N2");
+                //    }
+                //}
+
+                if(c.threshold == 0)
                 {
                     c.image = "CouponIconGreen.png";
                     c.thresholdNote = "No minimum purchase";
-                    c.savingsNote = "You saved: $" + savings.ToString("N2");
+                    c.savingsNote = "You saved: $" + c.disc.ToString("N2");
                 }
                 else
                 {
-                    c.thresholdNote = "$" + (unsortedThresholds[j]).ToString("N2") + " minimum purchase";
-                    c.savingsNote = "Spend $" + (unsortedThresholds[j] - initialSubTotal).ToString("N2") + " more to use";
+
+                    if(c.threshold > initialSubTotal)
+                    {
+                        c.thresholdNote = "$" + (unsortedThresholds[j]).ToString("N2") + " minimum purchase";
+                        c.savingsNote = "Spend $" + (unsortedThresholds[j] - initialSubTotal).ToString("N2") + " more to use";
+                    }
+                    else
+                    {
+                        c.image = "CouponIconGreen.png";
+                        c.thresholdNote = "$" + (unsortedThresholds[j]).ToString("N2") + " minimum purchase";
+                        c.savingsNote = "You saved: $" + c.disc.ToString("N2");
+                    }
                 }
+
+                //if (savings != 0)
+                //{
+                //    c.image = "CouponIconGreen.png";
+                //    c.thresholdNote = "No minimum purchase";
+                //    c.savingsNote = "You saved: $" + savings.ToString("N2");
+                //}
+                //else
+                //{
+                //    c.thresholdNote = "$" + (unsortedThresholds[j]).ToString("N2") + " minimum purchase";
+                //    c.savingsNote = "Spend $" + (unsortedThresholds[j] - initialSubTotal).ToString("N2") + " more to use";
+                //}
 
                 j++;
             }
@@ -1341,9 +1439,19 @@ namespace ServingFresh.Views
 
             Debug.WriteLine("This is the coupon index that will save you the most money: " + defaultCouponIndex);
 
-            if (couponsList[defaultCouponIndex].savingsNote != "")
+            //if (couponsList[defaultCouponIndex].savingsNote != "")
+            //{
+            //    couponsList[defaultCouponIndex].image = "CouponIconOrange.png";
+            //}
+
+            if (couponsList[defaultCouponIndex].threshold <= initialSubTotal || couponsList[defaultCouponIndex].threshold == 0)
             {
                 couponsList[defaultCouponIndex].image = "CouponIconOrange.png";
+                updateTotals(unsortedDiscounts[defaultCouponIndex] - couponData.result[defaultCouponIndex].discount_shipping, couponData.result[defaultCouponIndex].discount_shipping);
+            }
+            else
+            {
+                updateTotals(0, 0);
             }
 
             ObservableCollection<couponItem> displayCoupons = new ObservableCollection<couponItem>();
@@ -1368,12 +1476,12 @@ namespace ServingFresh.Views
 
             coupon_list.ItemsSource = displayCoupons;
             
-            updateTotals(unsortedDiscounts[defaultCouponIndex] - couponData.result[defaultCouponIndex].discount_shipping, couponData.result[defaultCouponIndex].discount_shipping);
+            //updateTotals(unsortedDiscounts[defaultCouponIndex] - couponData.result[defaultCouponIndex].discount_shipping, couponData.result[defaultCouponIndex].discount_shipping);
         }
 
         public void openHistory(object sender, EventArgs e)
         {
-            if (!Application.Current.Properties.ContainsKey("enable"))
+            if (!(bool)Application.Current.Properties["guest"])
             {
                 Application.Current.MainPage = new HistoryPage();
             }
@@ -1392,14 +1500,27 @@ namespace ServingFresh.Views
         void UpdateTotalAmount(System.Object sender, System.EventArgs e)
         {
            
-                if (total != 0)
+            if (total != 0)
+            {
+                var initialSubTotal = GetSubTotal();
+                if (couponsList[defaultCouponIndex].threshold <= initialSubTotal || couponsList[defaultCouponIndex].threshold == 0)
                 {
+                    //couponsList[defaultCouponIndex].image = "CouponIconOrange.png";
                     updateTotals(unsortedDiscounts[defaultCouponIndex] - couponData.result[defaultCouponIndex].discount_shipping, couponData.result[defaultCouponIndex].discount_shipping);
                 }
                 else
                 {
                     updateTotals(0, 0);
                 }
+
+
+
+                //updateTotals(unsortedDiscounts[defaultCouponIndex] - couponData.result[defaultCouponIndex].discount_shipping, couponData.result[defaultCouponIndex].discount_shipping);
+            }
+            else
+            {
+                updateTotals(0, 0);
+            }
          
         }
 
@@ -1763,14 +1884,13 @@ namespace ServingFresh.Views
                     Application.Current.Properties["day"] = "";
                     cartEmpty = "EMPTY";
                     cartHeight.Height = 0;
-                    if (!Application.Current.Properties.ContainsKey("enable"))
+                    if (!(bool)Application.Current.Properties["guest"])
                     {
                         await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
                     }
                     else
                     {
-                        Application.Current.Properties.Remove("user");
-                        Application.Current.Properties.Remove("enable");
+                        Application.Current.Properties["guest"] = false;
 
                         var firstName = (string)Application.Current.Properties["user_first_name"];
                         var lastName = (string)Application.Current.Properties["user_last_name"];

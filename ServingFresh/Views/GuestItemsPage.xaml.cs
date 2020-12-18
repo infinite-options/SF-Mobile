@@ -1,24 +1,23 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
+using System.Diagnostics;
+using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using ServingFresh.Models;
-using ServingFresh.Views;
 using Newtonsoft.Json;
-using Xamarin.Forms;
-using ServingFresh.Effects;
 using ServingFresh.Config;
-using System.Diagnostics;
-using Xamarin.Essentials;
+using ServingFresh.Effects;
+using ServingFresh.Models;
+using Xamarin.Forms;
 
 namespace ServingFresh.Views
 {
-    public partial class ItemsPage : ContentPage
+    
+    public partial class GuestItemsPage : ContentPage
     {
+       
         public class Items
         {
             public string item_uid { get; set; }
@@ -75,12 +74,18 @@ namespace ServingFresh.Views
 
         private static List<string> uidsCopy = null;
         private static List<string> typesCopy = null;
-        private Dictionary<string,ItemPurchased> purchase = new Dictionary<string, ItemPurchased>();
+        private Dictionary<string, ItemPurchased> purchase = new Dictionary<string, ItemPurchased>();
 
-        public ItemsPage(List<string> types, List<string> b_uids, string day)
+        //public ItemsPage(List<string> types, List<string> b_uids, string day)
+        //{
+
+        //}
+
+        public GuestItemsPage(List<string> types, List<string> b_uids, string day)
         {
-            //Debug.WriteLine("Should not print");
             InitializeComponent();
+            //Debug.WriteLine("Should not print");
+
             try
             {
                 //SetInitialFilters(types);
@@ -93,60 +98,13 @@ namespace ServingFresh.Views
 
                 itemList.ItemsSource = datagrid;
                 CartTotal.Text = totalCount.ToString();
-            }catch(Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine(ex.Message);
-            }
-        }
-
-        public ItemsPage(IDictionary<string, ItemPurchased> orderCopy ,string day)
-        {
-            Debug.WriteLine("You are coming from the checkout page");
-            InitializeComponent();
-            
-            try
-            {
-                //SetInitialFilters(types);
-
-                _ = GetDataCheckout(typesCopy, uidsCopy, orderCopy);
-                uids = uidsCopy;
-                titlePage.Text = day;
-
-                foreach (string key in orderCopy.Keys)
-                {
-                    Debug.WriteLine(orderCopy[key].item_name);
-                    foreach (ItemsModel a in datagrid)
-                    {
-                        //Debug.WriteLine(orderCopy[key].item_name);
-                        Debug.WriteLine(a.itemNameLeft);
-                        //if (orderCopy[key].item_name == a.itemNameLeft)
-                        //{
-                        //    Debug.WriteLine(orderCopy[key].item_name);
-                        //    a.quantityLeft = orderCopy[key].item_quantity;
-                        //    break;
-                        //}
-                    }
-                }
-
-                // itemList.ItemsSource = this.datagrid;
-                //Debug.WriteLine(this.datagrid.Count);
-                //CartTotal.Text = orderCopy.Count.ToString();
-                //order = orderCopy;
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine(ex.Message);
             }
-            // This are the types and business uids
-            //foreach (string a in typesCopy)
-            //{
-            //    Debug.WriteLine(a);
-            //}
-            //foreach (string b in uidsCopy)
-            //{
-            //    Debug.WriteLine(b);
-            //}
         }
+
 
         void SetInitialFilters(List<string> types)
         {
@@ -195,7 +153,7 @@ namespace ServingFresh.Views
                 request.Method = HttpMethod.Post;
                 request.Content = getItemsStringMessage;
 
-                
+
 
                 var httpResponse = await client.PostAsync(Constant.GetItemsUrl, getItemsStringMessage);
                 var r = await httpResponse.Content.ReadAsStreamAsync();
@@ -220,7 +178,7 @@ namespace ServingFresh.Views
                         else
                         {
                             var savedItem = uniqueItems[key];
-                            
+
                             if (savedItem.item_price != a.item_price)
                             {
                                 var priceSelected = Math.Min(savedItem.business_price, a.business_price);
@@ -284,7 +242,7 @@ namespace ServingFresh.Views
                     {
                         for (int i = 0; i < n / 2; i++)
                         {
-                            
+
                             this.datagrid.Add(new ItemsModel()
                             {
                                 height = this.Width / 2 - 10,
@@ -295,7 +253,7 @@ namespace ServingFresh.Views
                                 quantityLeft = 0,
                                 itemNameLeft = data.result[j].item_name,
                                 itemPriceLeft = "$ " + data.result[j].item_price.ToString(),
-                                itemPriceLeftUnit = "$ " + data.result[j].item_price.ToString("N2") + " / "+(string)data.result[j].item_unit.ToString(),
+                                itemPriceLeftUnit = "$ " + data.result[j].item_price.ToString("N2") + " / " + (string)data.result[j].item_unit.ToString(),
                                 isItemLeftVisiable = true,
                                 isItemLeftEnable = true,
                                 quantityL = 0,
@@ -307,7 +265,7 @@ namespace ServingFresh.Views
                                 quantityRight = 0,
                                 itemNameRight = data.result[j + 1].item_name,
                                 itemPriceRight = "$ " + data.result[j + 1].item_price.ToString(),
-                                itemPriceRightUnit = "$ " + data.result[j + 1].item_price.ToString("N2") + " / "+(string)data.result[j + 1].item_unit.ToString(),
+                                itemPriceRightUnit = "$ " + data.result[j + 1].item_price.ToString("N2") + " / " + (string)data.result[j + 1].item_unit.ToString(),
                                 isItemRightVisiable = true,
                                 isItemRightEnable = true,
                                 quantityR = 0,
@@ -330,7 +288,7 @@ namespace ServingFresh.Views
                                 quantityLeft = 0,
                                 itemNameLeft = data.result[j].item_name,
                                 itemPriceLeft = "$ " + data.result[j].item_price.ToString(),
-                                itemPriceLeftUnit = "$ " + data.result[j].item_price.ToString("N2") + " / "+(string)data.result[j].item_unit.ToString(),
+                                itemPriceLeftUnit = "$ " + data.result[j].item_price.ToString("N2") + " / " + (string)data.result[j].item_unit.ToString(),
                                 isItemLeftVisiable = true,
                                 isItemLeftEnable = true,
                                 quantityL = 0,
@@ -342,7 +300,7 @@ namespace ServingFresh.Views
                                 quantityRight = 0,
                                 itemNameRight = data.result[j + 1].item_name,
                                 itemPriceRight = "$ " + data.result[j + 1].item_price.ToString(),
-                                itemPriceRightUnit = "$ " + data.result[j + 1].item_price.ToString("N2") + " / "+(string)data.result[j + 1].item_unit.ToString(),
+                                itemPriceRightUnit = "$ " + data.result[j + 1].item_price.ToString("N2") + " / " + (string)data.result[j + 1].item_unit.ToString(),
                                 isItemRightVisiable = true,
                                 isItemRightEnable = true,
                                 quantityR = 0,
@@ -360,7 +318,7 @@ namespace ServingFresh.Views
                             quantityLeft = 0,
                             itemNameLeft = data.result[j].item_name,
                             itemPriceLeft = "$ " + data.result[j].item_price.ToString(),
-                            itemPriceLeftUnit = "$ " + data.result[j].item_price.ToString("N2") + " / "+(string)data.result[j].item_unit.ToString(),
+                            itemPriceLeftUnit = "$ " + data.result[j].item_price.ToString("N2") + " / " + (string)data.result[j].item_unit.ToString(),
                             isItemLeftVisiable = true,
                             isItemLeftEnable = true,
                             quantityL = 0,
@@ -389,7 +347,7 @@ namespace ServingFresh.Views
                             a.quantityLeft = orderCopy[key].item_quantity;
                             break;
                         }
-                        else if( orderCopy[key].item_name == a.itemNameRight)
+                        else if (orderCopy[key].item_name == a.itemNameRight)
                         {
                             Debug.WriteLine(orderCopy[key].item_name);
                             a.quantityRight = orderCopy[key].item_quantity;
@@ -399,8 +357,8 @@ namespace ServingFresh.Views
                 }
                 itemList.ItemsSource = this.datagrid;
                 order = orderCopy;
-                
-                
+
+
                 CartTotal.Text = totalCount.ToString();
             }
             catch (Exception ex)
@@ -437,10 +395,10 @@ namespace ServingFresh.Views
                 {
                     JsonSerializer serializer = new JsonSerializer();
                     data = serializer.Deserialize<ServingFreshBusinessItems>(reader);
-                    
+
                     List<Items> listUniqueItems = new List<Items>();
                     Dictionary<string, Items> uniqueItems = new Dictionary<string, Items>();
-                    foreach(Items a in data.result)
+                    foreach (Items a in data.result)
                     {
                         string key = a.item_name + a.item_desc + a.item_price;
                         if (!uniqueItems.ContainsKey(key))
@@ -450,8 +408,9 @@ namespace ServingFresh.Views
                         else
                         {
                             var savedItem = uniqueItems[key];
-                            
-                            if(savedItem.item_price != a.item_price){
+
+                            if (savedItem.item_price != a.item_price)
+                            {
                                 var priceSelected = Math.Min(savedItem.business_price, a.business_price);
                                 savedItem.item_price = priceSelected;
                                 uniqueItems[key] = savedItem;
@@ -523,7 +482,7 @@ namespace ServingFresh.Views
                                 quantityLeft = 0,
                                 itemNameLeft = data.result[j].item_name,
                                 itemPriceLeft = "$ " + data.result[j].item_price.ToString(),
-                                itemPriceLeftUnit = "$ " + data.result[j].item_price.ToString("N2") + " / "+(string)data.result[j].item_unit.ToString(),
+                                itemPriceLeftUnit = "$ " + data.result[j].item_price.ToString("N2") + " / " + (string)data.result[j].item_unit.ToString(),
                                 isItemLeftVisiable = true,
                                 isItemLeftEnable = true,
                                 quantityL = 0,
@@ -537,7 +496,7 @@ namespace ServingFresh.Views
                                 quantityRight = 0,
                                 itemNameRight = data.result[j + 1].item_name,
                                 itemPriceRight = "$ " + data.result[j + 1].item_price.ToString(),
-                                itemPriceRightUnit = "$ " + data.result[j + 1].item_price.ToString("N2") + " / "+ (string)data.result[j + 1].item_unit.ToString(),
+                                itemPriceRightUnit = "$ " + data.result[j + 1].item_price.ToString("N2") + " / " + (string)data.result[j + 1].item_unit.ToString(),
                                 isItemRightVisiable = true,
                                 isItemRightEnable = true,
                                 quantityR = 0,
@@ -560,7 +519,7 @@ namespace ServingFresh.Views
                                 quantityLeft = 0,
                                 itemNameLeft = data.result[j].item_name,
                                 itemPriceLeft = "$ " + data.result[j].item_price.ToString(),
-                                itemPriceLeftUnit = "$ " + data.result[j].item_price.ToString("N2") + " / "+(string)data.result[j].item_unit.ToString(),
+                                itemPriceLeftUnit = "$ " + data.result[j].item_price.ToString("N2") + " / " + (string)data.result[j].item_unit.ToString(),
                                 isItemLeftVisiable = true,
                                 isItemLeftEnable = true,
                                 quantityL = 0,
@@ -572,7 +531,7 @@ namespace ServingFresh.Views
                                 quantityRight = 0,
                                 itemNameRight = data.result[j + 1].item_name,
                                 itemPriceRight = "$ " + data.result[j + 1].item_price.ToString(),
-                                itemPriceRightUnit = "$ " + data.result[j + 1].item_price.ToString("N2") + " / "+(string)data.result[j + 1].item_unit.ToString(),
+                                itemPriceRightUnit = "$ " + data.result[j + 1].item_price.ToString("N2") + " / " + (string)data.result[j + 1].item_unit.ToString(),
                                 isItemRightVisiable = true,
                                 isItemRightEnable = true,
                                 quantityR = 0,
@@ -590,7 +549,7 @@ namespace ServingFresh.Views
                             quantityLeft = 0,
                             itemNameLeft = data.result[j].item_name,
                             itemPriceLeft = "$ " + data.result[j].item_price.ToString(),
-                            itemPriceLeftUnit = "$ " + data.result[j].item_price.ToString("N2") + " / "+(string)data.result[j].item_unit.ToString(),
+                            itemPriceLeftUnit = "$ " + data.result[j].item_price.ToString("N2") + " / " + (string)data.result[j].item_unit.ToString(),
                             isItemLeftVisiable = true,
                             isItemLeftEnable = true,
                             quantityL = 0,
@@ -609,7 +568,7 @@ namespace ServingFresh.Views
 
                 foreach (string key in order.Keys)
                 {
-                    
+
                     foreach (ItemsModel a in datagrid)
                     {
                         //Debug.WriteLine(orderCopy[key].item_name);
@@ -629,7 +588,7 @@ namespace ServingFresh.Views
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine(ex.Message);
             }
@@ -707,7 +666,13 @@ namespace ServingFresh.Views
 
         void SubtractItemLeft(System.Object sender, System.EventArgs e)
         {
-    
+            if ((bool)Application.Current.Properties["guest"])
+            {
+                
+                SendGuestToAddressValidation();
+            }
+            else
+            {
                 var button = (Button)sender;
                 var itemModelObject = (ItemsModel)button.CommandParameter;
                 ItemPurchased itemSelected = new ItemPurchased();
@@ -740,12 +705,18 @@ namespace ServingFresh.Views
                         }
                     }
                 }
-            
+            }
         }
 
         void AddItemLeft(System.Object sender, System.EventArgs e)
         {
-          
+            if ((bool)Application.Current.Properties["guest"])
+            {
+
+                SendGuestToAddressValidation();
+            }
+            else
+            {
                 var button = (Button)sender;
                 var itemModelObject = (ItemsModel)button.CommandParameter;
                 ItemPurchased itemSelected = new ItemPurchased();
@@ -775,12 +746,18 @@ namespace ServingFresh.Views
                         }
                     }
                 }
-            
+            }
         }
 
         void SubtractItemRight(System.Object sender, System.EventArgs e)
         {
-    
+            if ((bool)Application.Current.Properties["guest"])
+            {
+
+                SendGuestToAddressValidation();
+            }
+            else
+            {
                 var button = (Button)sender;
                 var itemModelObject = (ItemsModel)button.CommandParameter;
                 ItemPurchased itemSelected = new ItemPurchased();
@@ -810,12 +787,18 @@ namespace ServingFresh.Views
                         }
                     }
                 }
-            
+            }
         }
 
         void AddItemRight(System.Object sender, System.EventArgs e)
         {
-         
+            if ((bool)Application.Current.Properties["guest"])
+            {
+
+                SendGuestToAddressValidation();
+            }
+            else
+            {
                 var button = (Button)sender;
                 var itemModelObject = (ItemsModel)button.CommandParameter;
                 ItemPurchased itemSelected = new ItemPurchased();
@@ -842,7 +825,7 @@ namespace ServingFresh.Views
                         order.Add(itemModelObject.itemNameRight, itemSelected);
                     }
                 }
-            
+            }
         }
 
         void Change_Color(Object sender, EventArgs e)
@@ -869,33 +852,33 @@ namespace ServingFresh.Views
                 }
             }
 
-            if(fruit.ClassId == "T")
+            if (fruit.ClassId == "T")
             {
                 t.Add("fruit");
             }
-            if(vegetable.ClassId == "T")
+            if (vegetable.ClassId == "T")
             {
                 t.Add("vegetable");
             }
-            if(dessert.ClassId == "T")
+            if (dessert.ClassId == "T")
             {
                 t.Add("dessert");
             }
-            if(other.ClassId == "T")
+            if (other.ClassId == "T")
             {
                 t.Add("other");
             }
 
-            if(fruit.ClassId == "F" && vegetable.ClassId == "F" && dessert.ClassId == "F" && other.ClassId == "F")
+            if (fruit.ClassId == "F" && vegetable.ClassId == "F" && dessert.ClassId == "F" && other.ClassId == "F")
             {
                 t.Add("fruit");
                 t.Add("vegetable");
                 t.Add("dessert");
                 t.Add("other");
-               
+
             }
 
-            foreach(string ty in t)
+            foreach (string ty in t)
             {
                 Debug.WriteLine(ty);
             }
@@ -906,58 +889,62 @@ namespace ServingFresh.Views
 
         void CheckOutClickBusinessPage(System.Object sender, System.EventArgs e)
         {
+            if ((bool)Application.Current.Properties["guest"])
+            {
 
-                purchase = new Dictionary<string, ItemPurchased>();
-                foreach (string item in order.Keys)
-                {
-                    if (order[item].item_quantity != 0)
-                    {
-                        purchase.Add(item, order[item]);
-                    }
-                }
-               
-                Application.Current.Properties["day"] = titlePage.Text;
-                Application.Current.MainPage = new CheckoutPage(purchase, titlePage.Text);
-            
+                SendGuestToAddressValidation();
+            }
         }
 
         void DeliveryDaysClick(System.Object sender, System.EventArgs e)
         {
-            Application.Current.MainPage = new SelectionPage();
+            if ((bool)Application.Current.Properties["guest"])
+            {
+
+                SendGuestToAddressValidation();
+            }
         }
 
         void OrdersClick(System.Object sender, System.EventArgs e)
         {
+            if ((bool)Application.Current.Properties["guest"])
+            {
 
-                purchase = new Dictionary<string, ItemPurchased>();
-                foreach (string item in order.Keys)
-                {
-                    if (order[item].item_quantity != 0)
-                    {
-                        purchase.Add(item, order[item]);
-                    }
-                }
+                SendGuestToAddressValidation();
+            }
 
-                Application.Current.Properties["day"] = titlePage.Text;
-                Application.Current.MainPage = new CheckoutPage(purchase, titlePage.Text);
-            
         }
 
         void InfoClick(System.Object sender, System.EventArgs e)
         {
-            if (!(bool)Application.Current.Properties["guest"])
+            if ((bool)Application.Current.Properties["guest"])
             {
 
-                Application.Current.MainPage = new InfoPage();
+                SendGuestToAddressValidation();
             }
+      
         }
 
         void ProfileClick(System.Object sender, System.EventArgs e)
         {
-            if (!(bool)Application.Current.Properties["guest"])
+            if ((bool)Application.Current.Properties["guest"])
             {
 
-                Application.Current.MainPage = new ProfilePage();
+                SendGuestToAddressValidation();
+            }
+ 
+        }
+
+        async void SendGuestToAddressValidation()
+        {
+            var result = await DisplayAlert("Awesome!", "It looks like you are interested in Serving Fresh! Let's start by verifing you are in our delivery area.\nPress 'Continue' to enter your address or 'Cancel' to return to the home page.", "Continue", "Cancel");
+            if (result)
+            {
+                Application.Current.MainPage = new GuestPage();
+            }
+            else
+            {
+                Application.Current.MainPage = new LogInPage();
             }
         }
     }

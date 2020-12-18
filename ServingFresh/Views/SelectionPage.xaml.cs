@@ -110,11 +110,6 @@ namespace ServingFresh.Views
         public SelectionPage()
         {
             InitializeComponent();
-            if (Application.Current.Properties.ContainsKey("user"))
-            {
-                Application.Current.Properties.Remove("user");
-                Application.Current.Properties["enable"] = true;
-            }
             Init();
             GetBusinesses();
             Application.Current.Properties["day"] = "";
@@ -648,17 +643,25 @@ namespace ServingFresh.Views
 
         void OrdersClick(System.Object sender, System.EventArgs e)
         {
+            
             Application.Current.MainPage = new CheckoutPage();
         }
 
         void InfoClick(System.Object sender, System.EventArgs e)
         {
-            Application.Current.MainPage = new InfoPage();
+            if (!(bool)Application.Current.Properties["guest"])
+            {
+                Application.Current.MainPage = new InfoPage();
+            }
+            
         }
 
         void ProfileClick(System.Object sender, System.EventArgs e)
         {
-            Application.Current.MainPage = new ProfilePage();
+            if (!(bool)Application.Current.Properties["guest"])
+            {
+                Application.Current.MainPage = new ProfilePage();
+            }
         }
     }
 }

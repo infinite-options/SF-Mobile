@@ -13,13 +13,14 @@ namespace ServingFresh
         public const string LoggedInKey = "LoggedIn";
         public const string AppleUserIdKey = "AppleUserIdKey";
         string userId;
-
+        
         public App()
         {
             InitializeComponent();
             //Application.Current.Properties.Clear();
             //SecureStorage.RemoveAll();
             //Preferences.Clear();
+            Application.Current.Properties["guest"] = false;
 
             if (Application.Current.Properties.ContainsKey("user_id"))
             {

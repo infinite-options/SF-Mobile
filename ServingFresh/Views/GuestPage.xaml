@@ -98,7 +98,20 @@
                             BorderColor="LightGray"
                             BorderWidth="1"
                             HeightRequest="40"
-                            BackgroundColor="#FF8500">
+                            BackgroundColor="#FF8500"
+                            Clicked="EnterEmailPasswordToSignUpClick">
+                        </Button>
+
+                        <Button
+                            Text="Cancel"
+                            TextColor="#FF8500"
+                            FontAttributes="Bold"
+                            CornerRadius="5"
+                            BorderColor="LightGray"
+                            BorderWidth="1"
+                            HeightRequest="40"
+                            BackgroundColor="White"
+                            Clicked="Button_Clicked">
                         </Button>
                         <Label
                             Padding="0,25,0,0"

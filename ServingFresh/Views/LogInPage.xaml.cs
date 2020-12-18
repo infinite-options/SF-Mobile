@@ -793,10 +793,10 @@ namespace ServingFresh.Views
             businessId.Add("200-000019");
 
             var weekDay = DateTime.Now.DayOfWeek.ToString();
-            Application.Current.Properties["user"] = "GUEST";
+            Application.Current.Properties["guest"] = true;
             
             
-            ItemsPage businessItemPage = new ItemsPage(types, businessId, weekDay);
+            GuestItemsPage businessItemPage = new GuestItemsPage(types, businessId, weekDay);
             Application.Current.MainPage = businessItemPage;
             //Application.Current.MainPage = new GuestPage();
 

@@ -318,5 +318,11 @@ namespace ServingFresh.Views
                 await DisplayAlert("Alert!", "We weren't able to set your information for your delivery", "OK");
             }
         }
+
+        void Button_Clicked(System.Object sender, System.EventArgs e)
+        {
+            Application.Current.Properties["guest"] = false;
+            Application.Current.MainPage = new LogInPage();
+        }
     }
 }
