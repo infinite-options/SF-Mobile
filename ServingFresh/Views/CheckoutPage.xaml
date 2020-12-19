@@ -240,7 +240,7 @@
                                                 </StackLayout>
                                             </Grid>
                                             <StackLayout.GestureRecognizers>
-                                                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"/>
+                                                        <TapGestureRecognizer Tapped="ApplyActiveCoupon"/>
                                             </StackLayout.GestureRecognizers>
                                         </StackLayout>
                                     </DataTemplate>
