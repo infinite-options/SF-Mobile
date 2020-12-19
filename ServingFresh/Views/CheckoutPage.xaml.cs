@@ -103,13 +103,15 @@ namespace ServingFresh.Views
             public event PropertyChangedEventHandler PropertyChanged = delegate { };
             public string image { get; set; }
             public string couponNote { get; set; }
-            public string index { get; set; }
-            public double saving { get; set; }
-            public double threshold { get; set; }
-            public double disc { get; set; }
             public string thresholdNote { get; set; }
             public string expNote { get; set; }
-            public string savingsNote { get; set; }
+            public string savingsOrSpendingNote { get; set; }
+            public int index { get; set; }
+            public string status { get; set; }
+            public double threshold { get; set; }
+            public double discount { get; set; }
+            public double shipping { get; set; }
+            public double totalDiscount { get; set; }
 
             public void update()
             {
@@ -435,9 +437,9 @@ namespace ServingFresh.Views
                 couponData = JsonConvert.DeserializeObject<CouponResponse>(result);
 
                 couponsList.Clear();
-                unsortedNewTotals.Clear();
-                unsortedDiscounts.Clear();
-                sortedDiscounts.Clear();
+                //unsortedNewTotals.Clear();
+                //unsortedDiscounts.Clear();
+                //sortedDiscounts.Clear();
 
                 Debug.WriteLine(result);
 
@@ -450,34 +452,42 @@ namespace ServingFresh.Views
 
                 foreach (Models.Coupon c in couponData.result)
                 {
-
+                    // IF THRESHOLD IS NULL SET IT TO ZERO, OTHERWISE INITIAL VALUE STAYS THE SAME
+                    if (c.threshold == null){c.threshold = 0.0;}
                     double discount = 0;
-                    double newTotal = 0;
+                    //double newTotal = 0;
 
-                    var coupons = new couponItem();
+                    var coupon = new couponItem();
 
+                    // INITIALLY, THE IMAGE OF EVERY COUPON IS GRAY. (PLATFORM DEPENDENT)
                     if (Device.RuntimePlatform == Device.Android)
                     {
-                        coupons.image = "CouponIconGray.png";
+                        coupon.image = "CouponIconGray.png";
                     }
                     else
                     {
-                        coupons.image = "CouponIcon.png";
+                        coupon.image = "CouponIcon.png";
                     }
 
-                    coupons.couponNote = c.notes;
-                    coupons.expNote = "Expires: "+ DateTime.Parse(c.expire_date).ToString("MM/dd/yyyy");
-
-                    coupons.index = placement.ToString();
-                    //couponsList.Add(coupons);
-
-                    if(c.threshold == null)
+                    // SET TITLE LABEL OF COUPON
+                    coupon.couponNote = c.notes;
+                    // SET THRESHOLD LABEL BASED ON THRESHOLD VALUE: 0 = NO MINIMUM PURCHASE, GREATER THAN 0 = SPEND THE AMOUNT OF THRESHOLD
+                    if((double)c.threshold == 0)
                     {
-                        c.threshold = 0.0;
+                        coupon.threshold = 0;
+                        coupon.thresholdNote = "No minimum purchase";
                     }
-                    coupons.threshold = (double)c.threshold;
-                    //couponsList.Add(coupons);
+                    else
+                    {
+                        coupon.threshold = (double)c.threshold;
+                        coupon.thresholdNote = "$" + coupon.threshold.ToString("N2") + " minimum purchase";
+                    }
 
+                    // SET EXPIRATION DATE
+                    coupon.expNote = "Expires: "+ DateTime.Parse(c.expire_date).ToString("MM/dd/yyyy");
+                    coupon.index = 0;
+                    
+                    // CALCULATING DISCOUNT, SHIPPING, AND COUPON STATUS
                     if (initialSubTotal >= (double)c.threshold)
                     {
                         if (initialSubTotal >= c.discount_amount)
@@ -490,154 +500,93 @@ namespace ServingFresh.Views
                             // Partly apply coupon: % discount and $ shipping
                             discount = initialSubTotal;
                         }
-                        newTotal = initialSubTotal - discount + initialServiceFee + (initialDeliveryFee - c.discount_shipping) + initialTaxes;
+                        //newTotal = initialSubTotal - discount + initialServiceFee + (initialDeliveryFee - c.discount_shipping) + initialTaxes;
+                        coupon.discount = discount;
+                        coupon.shipping = c.discount_shipping;
+                        coupon.status = "ACTIVE";
+                        coupon.totalDiscount = coupon.discount + coupon.shipping;
                     }
                     else
                     {
-                        discount = 0;
+                        coupon.discount = 0;
+                        coupon.shipping = 0;
+                        coupon.status = "NOT-ACTIVE";
+                        coupon.totalDiscount = coupon.discount + coupon.shipping;
+                        //discount = 0;
                         //c.discount_shipping = 0;
-                        newTotal = initialSubTotal - discount + initialServiceFee + (initialDeliveryFee - c.discount_shipping) + initialTaxes;
+                        //newTotal = initialSubTotal - discount + initialServiceFee + (initialDeliveryFee - c.discount_shipping) + initialTaxes;
                     }
-                    unsortedThresholds.Add((double)c.threshold);
-                    unsortedNewTotals.Add(newTotal);
-                    unsortedDiscounts.Add(discount + c.discount_shipping);
-                    coupons.disc = discount + c.discount_shipping;
-                    sortedDiscounts.Add(discount + c.discount_shipping);
-                    couponsList.Add(coupons);
-                    placement++;
+                    couponsList.Add(coupon);
                 }
 
-                sortedDiscounts.Sort();
+                var activeCoupons = new List<couponItem>();
+                var nonactiveCoupons = new List<couponItem>();
 
-                int j = 0;
-                foreach (couponItem c in couponsList)
+                foreach(couponItem a in couponsList)
                 {
-                    double newTotal = unsortedNewTotals[j];
-                    savings = initialTotal - newTotal;
-
-                    //if (c.threshold == 0)
-                    //{
-                    //    c.image = "CouponIconGreen.png";
-                    //    c.thresholdNote = "No minimum purchase";
-                    //    c.savingsNote = "You saved: $" + savings.ToString("N2");
-                    //}
-                    //else
-                    //{
-                    //    //if(c.threshold < initialSubTotal)
-                    //    //{
-                    //        c.thresholdNote = "$" + (unsortedThresholds[j]).ToString("N2") + " minimum purchase";
-                    //    if (c.threshold < initialSubTotal)
-                    //    {
-                    //            c.savingsNote = "Spend $" + (unsortedThresholds[j] - initialSubTotal).ToString("N2") + " more to use";
-                    //    }
-                    //    else
-                    //    {
-                    //        c.savingsNote = "You saved: $" + savings.ToString("N2");
-                    //    }
-                    //}
-
-                    if (c.threshold == 0)
+                    if(a.status == "ACTIVE")
                     {
-                        c.image = "CouponIconGreen.png";
-                        c.thresholdNote = "No minimum purchase";
-                        c.savingsNote = "You saved: $" + c.disc.ToString("N2");
+                        activeCoupons.Add(a);
                     }
                     else
                     {
-
-                        if (c.threshold > initialSubTotal)
-                        {
-                            c.thresholdNote = "$" + (unsortedThresholds[j]).ToString("N2") + " minimum purchase";
-                            c.savingsNote = "Spend $" + (unsortedThresholds[j] - initialSubTotal).ToString("N2") + " more to use";
-                        }
-                        else
-                        {
-                            c.image = "CouponIconGreen.png";
-                            c.thresholdNote = "$" + (unsortedThresholds[j]).ToString("N2") + " minimum purchase";
-                            c.savingsNote = "You saved: $" + c.disc.ToString("N2");
-                        }
-                    }
-
-
-                    //if (savings != 0)
-                    //{
-                    //    c.image = "CouponIconGreen.png";
-                    //    c.thresholdNote = "No minimum purchase";
-                    //    c.savingsNote = "You saved: $" + savings.ToString("N2");
-                    //}
-                    //else
-                    //{
-                    //    c.thresholdNote = "$" + (unsortedThresholds[j]).ToString("N2") + " minimum purchase";
-                    //    c.savingsNote = "Spend $" + (unsortedThresholds[j] - initialSubTotal).ToString("N2") + " more to use";
-                    //}
-
-                    j++;
-                }
-
-                Debug.Write("Unsorted List of New Totals: ");
-                foreach (double newTotalValue in unsortedNewTotals)
-                {
-                    Debug.Write(newTotalValue + ", ");
-                }
-                Debug.WriteLine("");
-
-                Debug.Write("Unsorted List of Discounts: ");
-                foreach(double discountValue in unsortedDiscounts)
-                {
-                    Debug.Write(discountValue + ", ");
-                }
-
-                Debug.WriteLine("");
-
-                Debug.Write("Sorted List of Discounts: ");
-                foreach (double discountValue in sortedDiscounts)
-                {
-                    Debug.Write(discountValue + ", ");
-                }
-                Debug.WriteLine("");
-
-                Debug.WriteLine("");
-                for(int i = 0; i < unsortedDiscounts.Count; i++)
-                {
-                   
-                    if(sortedDiscounts[sortedDiscounts.Count - 1] == unsortedDiscounts[i]){
-                        defaultCouponIndex = i;
-                        break;
+                        nonactiveCoupons.Add(a);
                     }
                 }
-
-                Debug.WriteLine("This is the coupon index that will save you the most money: " + defaultCouponIndex);
-                if(couponsList[defaultCouponIndex].threshold <= initialSubTotal || couponsList[defaultCouponIndex].threshold == 0)
+                // ALL COUPONS ARE NON ACTIVE
+                if(activeCoupons.Count == 0)
                 {
-                    couponsList[defaultCouponIndex].image = "CouponIconOrange.png";
-                    updateTotals(unsortedDiscounts[defaultCouponIndex] - couponData.result[defaultCouponIndex].discount_shipping, couponData.result[defaultCouponIndex].discount_shipping);
+                    // MAKE COPY OF COUPONS
+                    var copyCoupons = new List<couponItem>();
+                    var couponsSortedByThreshold = new List<couponItem>();
+                    foreach(couponItem a in couponsList)
+                    {
+                        copyCoupons.Add(a);
+                    }
+                    var couponsSortedHighestToLowest = new List<couponItem>();
+                    foreach(couponItem a in couponsList)
+                    {
+                        double inital = 0;
+                        int j = 0;
+                        for (int i = 0; i < copyCoupons.Count; i++)
+                        {
+                            if(inital <= copyCoupons[i].threshold)
+                            {
+                                j = i;
+                            }
+                        }
+                        couponsSortedHighestToLowest.Add(copyCoupons[j]);
+                        copyCoupons.RemoveAt(j);
+                    }
+
+                    //for(int i = couponsSortedHighestToLowest.Count - 1; i >= 0; i--)
+                    //{
+                    //    couponsSortedByThreshold.Add(couponsSortedHighestToLowest[i]);
+                    //}
+                    couponsList.Clear();
+                    foreach (couponItem a in couponsSortedHighestToLowest)
+                    {
+                        a.savingsOrSpendingNote = "Spend $" + (a.threshold - initialSubTotal).ToString("N2") + " more to use";
+                        couponsList.Add(a);
+                    }
+                    coupon_list.ItemsSource = couponsList;
+                    updateTotals(0, 0);
                 }
                 else
                 {
-                    updateTotals(0, 0);
+                    coupon_list.ItemsSource = couponsList;
                 }
+                
 
-                ObservableCollection<couponItem> displayCoupons = new ObservableCollection<couponItem>();
-                ObservableCollection<couponItem> couponsListCopy = new ObservableCollection<couponItem>();
-                foreach(couponItem b in couponsList)
-                {
-                    couponsListCopy.Add(b);
-                }
 
-                for (int i = sortedDiscounts.Count -1; i >=0; i--)
-                {
-                    foreach(couponItem a in couponsListCopy)
-                    {
-                        if(a.disc == sortedDiscounts[i])
-                        {
-                            displayCoupons.Add(a);
-                            couponsListCopy.Remove(a);
-                            break;
-                        }
-                    }
-                }
 
-                coupon_list.ItemsSource = displayCoupons;
+             
+
+
+         
+              
+
+                //coupon_list.ItemsSource = displayCoupons;
                 //updateTotals(unsortedDiscounts[defaultCouponIndex] - couponData.result[defaultCouponIndex].discount_shipping, couponData.result[defaultCouponIndex].discount_shipping);
             }
         }
@@ -856,7 +805,7 @@ namespace ServingFresh.Views
             purchaseObject.payment_type = ((Button)sender).Text == "Checkout with Paypal" ? "PAYPAL" : "STRIPE";
             purchaseObject.items = GetOrder(cartItems);
             purchaseObject.start_delivery_date = dateTime +" "+ timeStamp.ToString("HH:mm:ss");
-            if (!Application.Current.Properties.ContainsKey("enable"))
+            if (!(bool)Application.Current.Properties["guest"])
             {
                 purchaseObject.pay_coupon_id = couponData.result[defaultCouponIndex].coupon_uid;
             }
@@ -925,7 +874,7 @@ namespace ServingFresh.Views
                 purchaseObject.payment_type = ((Button)sender).Text == "Checkout with Paypal" ? "PAYPAL" : "STRIPE";
                 purchaseObject.items = GetOrder(cartItems);
                 purchaseObject.start_delivery_date = dateTime;
-                if (!Application.Current.Properties.ContainsKey("enable"))
+                if (!(bool)Application.Current.Properties["guest"])
                 {
                     purchaseObject.pay_coupon_id = couponData.result[defaultCouponIndex].coupon_uid;
                 }
@@ -1252,7 +1201,7 @@ namespace ServingFresh.Views
             {
                 item.increase_qty();
                 
-                    GetNewDefaltCoupon();
+                    //GetNewDefaltCoupon();
                 
             }
         }
@@ -1266,218 +1215,224 @@ namespace ServingFresh.Views
             {
                 item.decrease_qty();
                 
-                    GetNewDefaltCoupon();
+                    //GetNewDefaltCoupon();
                 
                 
             }
         }
 
-        public void GetNewDefaltCoupon()
-        {
-            unsortedNewTotals.Clear();
-            unsortedDiscounts.Clear();
-            sortedDiscounts.Clear();
-            couponsList.Clear();
 
-            double initialSubTotal = GetSubTotal();
-            double initialDeliveryFee = GetDeliveryFee();
-            double initialServiceFee = GetServiceFee();
-            double initialTaxes = GetTaxes();
-            double initialTotal = initialSubTotal + initialDeliveryFee + initialServiceFee + initialTaxes;
-            int placement = 0;
 
-            foreach (Models.Coupon c in couponData.result)
-            {
 
-                double discount = 0;
-                double newTotal = 0;
+        //public void GetNewDefaltCoupon()
+        //{
+        //    unsortedNewTotals.Clear();
+        //    unsortedDiscounts.Clear();
+        //    sortedDiscounts.Clear();
+        //    couponsList.Clear();
 
-                var coupons = new couponItem();
+        //    double initialSubTotal = GetSubTotal();
+        //    double initialDeliveryFee = GetDeliveryFee();
+        //    double initialServiceFee = GetServiceFee();
+        //    double initialTaxes = GetTaxes();
+        //    double initialTotal = initialSubTotal + initialDeliveryFee + initialServiceFee + initialTaxes;
+        //    int placement = 0;
 
-                if (Device.RuntimePlatform == Device.Android)
-                {
-                    coupons.image = "CouponIconGray.png";
-                }
-                else
-                {
-                    coupons.image = "CouponIcon.png";
-                }
+        //    foreach (Models.Coupon c in couponData.result)
+        //    {
 
-                coupons.couponNote = c.notes;
-                coupons.expNote = "Expires: " + DateTime.Parse(c.expire_date).ToString("MM/dd/yyyy");
-                coupons.index = placement.ToString();
-                // couponsList.Add(coupons);
+        //        double discount = 0;
+        //        double newTotal = 0;
 
-                if (c.threshold == null)
-                {
-                    c.threshold = 0.0;
-                }
-                coupons.threshold = (double)c.threshold;
-                //couponsList.Add(coupons);
-                if (initialSubTotal >= (double)c.threshold)
-                {
-                    if (initialSubTotal >= c.discount_amount)
-                    {
-                        // All
-                        discount = initialSubTotal - ((initialSubTotal - c.discount_amount) * (1.0 - (c.discount_percent / 100.0)));
-                    }
-                    else
-                    {
-                        // Partly apply coupon: % discount and $ shipping
-                        discount = initialSubTotal;
-                    }
-                    newTotal = initialSubTotal - discount + initialServiceFee + (initialDeliveryFee - c.discount_shipping) + initialTaxes;
-                }
-                else
-                {
-                    discount = 0;
-                    //c.discount_shipping = 0;
-                    newTotal = initialSubTotal - discount + initialServiceFee + (initialDeliveryFee - c.discount_shipping) + initialTaxes;
-                }
+        //        var coupons = new couponItem();
 
-                unsortedNewTotals.Add(newTotal);
-                unsortedDiscounts.Add(discount + c.discount_shipping);
-                sortedDiscounts.Add(discount + c.discount_shipping);
-                coupons.disc = discount + c.discount_shipping;
-                couponsList.Add(coupons);
-                placement++;
-            }
+        //        if (Device.RuntimePlatform == Device.Android)
+        //        {
+        //            coupons.image = "CouponIconGray.png";
+        //        }
+        //        else
+        //        {
+        //            coupons.image = "CouponIcon.png";
+        //        }
 
-            sortedDiscounts.Sort();
-            int j = 0;
-            foreach (couponItem c in couponsList)
-            {
-                double newTotal = unsortedNewTotals[j];
-                savings = initialTotal - newTotal;
+        //        coupons.couponNote = c.notes;
+        //        coupons.expNote = "Expires: " + DateTime.Parse(c.expire_date).ToString("MM/dd/yyyy");
+        //        coupons.index = placement.ToString();
+        //        // couponsList.Add(coupons);
 
-                //if (c.threshold == 0)
-                //{
-                //    c.image = "CouponIconGreen.png";
-                //    c.thresholdNote = "No minimum purchase";
-                //    c.savingsNote = "You saved: $" + savings.ToString("N2");
-                //}
-                //else
-                //{
+        //        if (c.threshold == null)
+        //        {
+        //            c.threshold = 0.0;
+        //        }
+        //        coupons.threshold = (double)c.threshold;
+        //        //couponsList.Add(coupons);
+        //        if (initialSubTotal >= (double)c.threshold)
+        //        {
+        //            if (initialSubTotal >= c.discount_amount)
+        //            {
+        //                // All
+        //                discount = initialSubTotal - ((initialSubTotal - c.discount_amount) * (1.0 - (c.discount_percent / 100.0)));
+        //            }
+        //            else
+        //            {
+        //                // Partly apply coupon: % discount and $ shipping
+        //                discount = initialSubTotal;
+        //            }
+        //            newTotal = initialSubTotal - discount + initialServiceFee + (initialDeliveryFee - c.discount_shipping) + initialTaxes;
+        //        }
+        //        else
+        //        {
+        //            discount = 0;
+        //            //c.discount_shipping = 0;
+        //            newTotal = initialSubTotal - discount + initialServiceFee + (initialDeliveryFee - c.discount_shipping) + initialTaxes;
+        //        }
 
-                //        c.thresholdNote = "$" + (unsortedThresholds[j]).ToString("N2") + " minimum purchase";
-                //    if (c.threshold < initialSubTotal)
-                //    {
-                //        c.savingsNote = "Spend $" + (unsortedThresholds[j] - initialSubTotal).ToString("N2") + " more to use";
-                //    }
-                //    else
-                //    {
-                //        c.savingsNote = "You saved: $" + savings.ToString("N2");
-                //    }
-                //}
+        //        unsortedNewTotals.Add(newTotal);
+        //        unsortedDiscounts.Add(discount + c.discount_shipping);
+        //        sortedDiscounts.Add(discount + c.discount_shipping);
+        //        coupons.disc = discount + c.discount_shipping;
+        //        couponsList.Add(coupons);
+        //        placement++;
+        //    }
 
-                if(c.threshold == 0)
-                {
-                    c.image = "CouponIconGreen.png";
-                    c.thresholdNote = "No minimum purchase";
-                    c.savingsNote = "You saved: $" + c.disc.ToString("N2");
-                }
-                else
-                {
+        //    sortedDiscounts.Sort();
+        //    int j = 0;
+        //    foreach (couponItem c in couponsList)
+        //    {
+        //        double newTotal = unsortedNewTotals[j];
+        //        savings = initialTotal - newTotal;
 
-                    if(c.threshold > initialSubTotal)
-                    {
-                        c.thresholdNote = "$" + (unsortedThresholds[j]).ToString("N2") + " minimum purchase";
-                        c.savingsNote = "Spend $" + (unsortedThresholds[j] - initialSubTotal).ToString("N2") + " more to use";
-                    }
-                    else
-                    {
-                        c.image = "CouponIconGreen.png";
-                        c.thresholdNote = "$" + (unsortedThresholds[j]).ToString("N2") + " minimum purchase";
-                        c.savingsNote = "You saved: $" + c.disc.ToString("N2");
-                    }
-                }
+        //        //if (c.threshold == 0)
+        //        //{
+        //        //    c.image = "CouponIconGreen.png";
+        //        //    c.thresholdNote = "No minimum purchase";
+        //        //    c.savingsNote = "You saved: $" + savings.ToString("N2");
+        //        //}
+        //        //else
+        //        //{
 
-                //if (savings != 0)
-                //{
-                //    c.image = "CouponIconGreen.png";
-                //    c.thresholdNote = "No minimum purchase";
-                //    c.savingsNote = "You saved: $" + savings.ToString("N2");
-                //}
-                //else
-                //{
-                //    c.thresholdNote = "$" + (unsortedThresholds[j]).ToString("N2") + " minimum purchase";
-                //    c.savingsNote = "Spend $" + (unsortedThresholds[j] - initialSubTotal).ToString("N2") + " more to use";
-                //}
+        //        //        c.thresholdNote = "$" + (unsortedThresholds[j]).ToString("N2") + " minimum purchase";
+        //        //    if (c.threshold < initialSubTotal)
+        //        //    {
+        //        //        c.savingsNote = "Spend $" + (unsortedThresholds[j] - initialSubTotal).ToString("N2") + " more to use";
+        //        //    }
+        //        //    else
+        //        //    {
+        //        //        c.savingsNote = "You saved: $" + savings.ToString("N2");
+        //        //    }
+        //        //}
 
-                j++;
-            }
-            Debug.Write("Unsorted List of New Totals: ");
-            foreach (double newTotalValue in unsortedNewTotals)
-            {
-                Debug.Write(newTotalValue + ", ");
-            }
-            Debug.WriteLine("");
+        //        if(c.threshold == 0)
+        //        {
+        //            c.image = "CouponIconGreen.png";
+        //            c.thresholdNote = "No minimum purchase";
+        //            c.savingsNote = "You saved: $" + c.disc.ToString("N2");
+        //        }
+        //        else
+        //        {
 
-            Debug.Write("Unsorted List of Discounts: ");
-            foreach (double discountValue in unsortedDiscounts)
-            {
-                Debug.Write(discountValue + ", ");
-            }
-            Debug.WriteLine("");
-            Debug.Write("Sorted List of Discounts: ");
-            foreach (double discountValue in sortedDiscounts)
-            {
-                Debug.Write(discountValue + ", ");
-            }
-            Debug.WriteLine("");
+        //            if(c.threshold > initialSubTotal)
+        //            {
+        //                c.thresholdNote = "$" + (unsortedThresholds[j]).ToString("N2") + " minimum purchase";
+        //                c.savingsNote = "Spend $" + (unsortedThresholds[j] - initialSubTotal).ToString("N2") + " more to use";
+        //            }
+        //            else
+        //            {
+        //                c.image = "CouponIconGreen.png";
+        //                c.thresholdNote = "$" + (unsortedThresholds[j]).ToString("N2") + " minimum purchase";
+        //                c.savingsNote = "You saved: $" + c.disc.ToString("N2");
+        //            }
+        //        }
 
-            Debug.WriteLine("");
-            for (int i = 0; i < unsortedDiscounts.Count; i++)
-            {
+        //        //if (savings != 0)
+        //        //{
+        //        //    c.image = "CouponIconGreen.png";
+        //        //    c.thresholdNote = "No minimum purchase";
+        //        //    c.savingsNote = "You saved: $" + savings.ToString("N2");
+        //        //}
+        //        //else
+        //        //{
+        //        //    c.thresholdNote = "$" + (unsortedThresholds[j]).ToString("N2") + " minimum purchase";
+        //        //    c.savingsNote = "Spend $" + (unsortedThresholds[j] - initialSubTotal).ToString("N2") + " more to use";
+        //        //}
 
-                if (sortedDiscounts[sortedDiscounts.Count - 1] == unsortedDiscounts[i])
-                {
-                    defaultCouponIndex = i;
-                    break;
-                }
-            }
+        //        j++;
+        //    }
+        //    Debug.Write("Unsorted List of New Totals: ");
+        //    foreach (double newTotalValue in unsortedNewTotals)
+        //    {
+        //        Debug.Write(newTotalValue + ", ");
+        //    }
+        //    Debug.WriteLine("");
 
-            Debug.WriteLine("This is the coupon index that will save you the most money: " + defaultCouponIndex);
+        //    Debug.Write("Unsorted List of Discounts: ");
+        //    foreach (double discountValue in unsortedDiscounts)
+        //    {
+        //        Debug.Write(discountValue + ", ");
+        //    }
+        //    Debug.WriteLine("");
+        //    Debug.Write("Sorted List of Discounts: ");
+        //    foreach (double discountValue in sortedDiscounts)
+        //    {
+        //        Debug.Write(discountValue + ", ");
+        //    }
+        //    Debug.WriteLine("");
 
-            //if (couponsList[defaultCouponIndex].savingsNote != "")
-            //{
-            //    couponsList[defaultCouponIndex].image = "CouponIconOrange.png";
-            //}
+        //    Debug.WriteLine("");
+        //    for (int i = 0; i < unsortedDiscounts.Count; i++)
+        //    {
 
-            if (couponsList[defaultCouponIndex].threshold <= initialSubTotal || couponsList[defaultCouponIndex].threshold == 0)
-            {
-                couponsList[defaultCouponIndex].image = "CouponIconOrange.png";
-                updateTotals(unsortedDiscounts[defaultCouponIndex] - couponData.result[defaultCouponIndex].discount_shipping, couponData.result[defaultCouponIndex].discount_shipping);
-            }
-            else
-            {
-                updateTotals(0, 0);
-            }
+        //        if (sortedDiscounts[sortedDiscounts.Count - 1] == unsortedDiscounts[i])
+        //        {
+        //            defaultCouponIndex = i;
+        //            break;
+        //        }
+        //    }
 
-            ObservableCollection<couponItem> displayCoupons = new ObservableCollection<couponItem>();
-            ObservableCollection<couponItem> couponsListCopy = new ObservableCollection<couponItem>();
-            foreach (couponItem b in couponsList)
-            {
-                couponsListCopy.Add(b);
-            }
+        //    Debug.WriteLine("This is the coupon index that will save you the most money: " + defaultCouponIndex);
 
-            for (int i = sortedDiscounts.Count - 1; i >= 0; i--)
-            {
-                foreach (couponItem a in couponsListCopy)
-                {
-                    if (a.disc == sortedDiscounts[i])
-                    {
-                        displayCoupons.Add(a);
-                        couponsListCopy.Remove(a);
-                        break;
-                    }
-                }
-            }
+        //    //if (couponsList[defaultCouponIndex].savingsNote != "")
+        //    //{
+        //    //    couponsList[defaultCouponIndex].image = "CouponIconOrange.png";
+        //    //}
 
-            coupon_list.ItemsSource = displayCoupons;
+        //    if (couponsList[defaultCouponIndex].threshold <= initialSubTotal || couponsList[defaultCouponIndex].threshold == 0)
+        //    {
+        //        couponsList[defaultCouponIndex].image = "CouponIconOrange.png";
+        //        updateTotals(unsortedDiscounts[defaultCouponIndex] - couponData.result[defaultCouponIndex].discount_shipping, couponData.result[defaultCouponIndex].discount_shipping);
+        //    }
+        //    else
+        //    {
+        //        updateTotals(0, 0);
+        //    }
+
+        //    ObservableCollection<couponItem> displayCoupons = new ObservableCollection<couponItem>();
+        //    ObservableCollection<couponItem> couponsListCopy = new ObservableCollection<couponItem>();
+        //    foreach (couponItem b in couponsList)
+        //    {
+        //        couponsListCopy.Add(b);
+        //    }
+
+        //    for (int i = sortedDiscounts.Count - 1; i >= 0; i--)
+        //    {
+        //        foreach (couponItem a in couponsListCopy)
+        //        {
+        //            if (a.disc == sortedDiscounts[i])
+        //            {
+        //                displayCoupons.Add(a);
+        //                couponsListCopy.Remove(a);
+        //                break;
+        //            }
+        //        }
+        //    }
+
+        //    coupon_list.ItemsSource = displayCoupons;
             
-            //updateTotals(unsortedDiscounts[defaultCouponIndex] - couponData.result[defaultCouponIndex].discount_shipping, couponData.result[defaultCouponIndex].discount_shipping);
-        }
+        //    //updateTotals(unsortedDiscounts[defaultCouponIndex] - couponData.result[defaultCouponIndex].discount_shipping, couponData.result[defaultCouponIndex].discount_shipping);
+        //}
+
+
+
 
         public void openHistory(object sender, EventArgs e)
         {

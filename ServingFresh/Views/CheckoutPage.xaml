@@ -236,7 +236,7 @@
                                                     <Label Grid.Row="0" Grid.Column="0" Text="{Binding couponNote}" TextColor="Black" FontAttributes="Bold"  ></Label>
                                                     <Label Grid.Row="1" Grid.Column="0" Text="{Binding thresholdNote}" TextColor="Black"   ></Label>
                                                     <Label Grid.Row="2" Grid.Column="0" Text="{Binding expNote}" TextColor="Black"    ></Label>
-                                                    <Label Grid.Row="3" Grid.Column="0" Text="{Binding savingsNote}" TextColor="Black"   ></Label>
+                                                    <Label Grid.Row="3" Grid.Column="0" Text="{Binding savingsOrSpendingNote}" TextColor="Black"   ></Label>
                                                 </StackLayout>
                                             </Grid>
                                             <StackLayout.GestureRecognizers>
