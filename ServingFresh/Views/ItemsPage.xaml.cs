@@ -56,6 +56,9 @@ namespace ServingFresh.Views
         public ObservableCollection<ItemsModel> datagrid = new ObservableCollection<ItemsModel>();
         ServingFreshBusinessItems data = new ServingFreshBusinessItems();
 
+        // ADDED UNIT FIELD
+        // NEW CHANGE: REMOVED DESCRIPTION FROM ITEMS SINCE THE SAMPLE NO LONGER
+        // HAD DESCRIPTION
         public class ItemPurchased
         {
             public string pur_business_uid { get; set; }
@@ -63,9 +66,10 @@ namespace ServingFresh.Views
             public string item_name { get; set; }
             public int item_quantity { get; set; }
             public double item_price { get; set; }
-            // Additional fields
+            // Additional fields 
             public string img { get; set; }
-            public string description { get; set; }
+            //public string description { get; set; }
+            public string unit { get; set; } 
         }
 
         public IDictionary<string, ItemPurchased> order = new Dictionary<string, ItemPurchased>();
@@ -264,21 +268,23 @@ namespace ServingFresh.Views
                             itemNameLeft = "",
                             itemPriceLeft = "$ " + "",
                             itemPriceLeftUnit = "",
+                            itemLeftUnit = "",
                             isItemLeftVisiable = false,
                             isItemLeftEnable = false,
                             quantityL = 0,
-                            item_descLeft = "",
+                            
 
                             imageSourceRight = "",
                             quantityRight = 0,
                             itemNameRight = "",
                             itemPriceRight = "$ " + "",
                             itemPriceRightUnit = "",
+                            itemRightUnit = "",
                             isItemRightVisiable = false,
                             isItemRightEnable = false,
                             quantityR = 0,
-                            item_descRight = ""
-                        }); ;
+                            
+                        }); 
                     }
                     if (isAmountItemsEven(n))
                     {
@@ -296,10 +302,11 @@ namespace ServingFresh.Views
                                 itemNameLeft = data.result[j].item_name,
                                 itemPriceLeft = "$ " + data.result[j].item_price.ToString(),
                                 itemPriceLeftUnit = "$ " + data.result[j].item_price.ToString("N2") + " / "+(string)data.result[j].item_unit.ToString(),
+                                itemLeftUnit = (string)data.result[j].item_unit.ToString(),
                                 isItemLeftVisiable = true,
                                 isItemLeftEnable = true,
                                 quantityL = 0,
-                                item_descLeft = data.result[j].item_desc,
+                                
 
                                 imageSourceRight = data.result[j + 1].item_photo,
                                 item_uidRight = data.result[j + 1].item_uid,
@@ -308,10 +315,11 @@ namespace ServingFresh.Views
                                 itemNameRight = data.result[j + 1].item_name,
                                 itemPriceRight = "$ " + data.result[j + 1].item_price.ToString(),
                                 itemPriceRightUnit = "$ " + data.result[j + 1].item_price.ToString("N2") + " / "+(string)data.result[j + 1].item_unit.ToString(),
+                                itemRightUnit = (string)data.result[j + 1].item_unit.ToString(),
                                 isItemRightVisiable = true,
                                 isItemRightEnable = true,
                                 quantityR = 0,
-                                item_descRight = data.result[j + 1].item_desc
+                                
                             });
                             j = j + 2;
                         }
@@ -331,10 +339,11 @@ namespace ServingFresh.Views
                                 itemNameLeft = data.result[j].item_name,
                                 itemPriceLeft = "$ " + data.result[j].item_price.ToString(),
                                 itemPriceLeftUnit = "$ " + data.result[j].item_price.ToString("N2") + " / "+(string)data.result[j].item_unit.ToString(),
+                                itemLeftUnit = (string)data.result[j].item_unit.ToString(),
                                 isItemLeftVisiable = true,
                                 isItemLeftEnable = true,
                                 quantityL = 0,
-                                item_descLeft = data.result[j].item_desc,
+                                
 
                                 imageSourceRight = data.result[j + 1].item_photo,
                                 item_uidRight = data.result[j + 1].item_uid,
@@ -343,10 +352,11 @@ namespace ServingFresh.Views
                                 itemNameRight = data.result[j + 1].item_name,
                                 itemPriceRight = "$ " + data.result[j + 1].item_price.ToString(),
                                 itemPriceRightUnit = "$ " + data.result[j + 1].item_price.ToString("N2") + " / "+(string)data.result[j + 1].item_unit.ToString(),
+                                itemRightUnit = (string)data.result[j + 1].item_unit.ToString(),
                                 isItemRightVisiable = true,
                                 isItemRightEnable = true,
                                 quantityR = 0,
-                                item_descRight = data.result[j + 1].item_desc
+                                
                             });
                             j = j + 2;
                         }
@@ -361,10 +371,11 @@ namespace ServingFresh.Views
                             itemNameLeft = data.result[j].item_name,
                             itemPriceLeft = "$ " + data.result[j].item_price.ToString(),
                             itemPriceLeftUnit = "$ " + data.result[j].item_price.ToString("N2") + " / "+(string)data.result[j].item_unit.ToString(),
+                            itemLeftUnit = (string)data.result[j].item_unit.ToString(),
                             isItemLeftVisiable = true,
                             isItemLeftEnable = true,
                             quantityL = 0,
-                            item_descLeft = data.result[j].item_desc,
+                            
 
                             imageSourceRight = "",
                             quantityRight = 0,
@@ -493,20 +504,22 @@ namespace ServingFresh.Views
                             itemNameLeft = "",
                             itemPriceLeft = "$ " + "",
                             itemPriceLeftUnit = "",
+                            itemLeftUnit = "",
                             isItemLeftVisiable = false,
                             isItemLeftEnable = false,
                             quantityL = 0,
-                            item_descLeft = "",
+                            
 
                             imageSourceRight = "",
                             quantityRight = 0,
                             itemNameRight = "",
                             itemPriceRight = "$ " + "",
                             itemPriceRightUnit = "",
+                            itemRightUnit = "",
                             isItemRightVisiable = false,
                             isItemRightEnable = false,
                             quantityR = 0,
-                            item_descRight = "",
+                            
                         });
                     }
                     if (isAmountItemsEven(n))
@@ -524,10 +537,11 @@ namespace ServingFresh.Views
                                 itemNameLeft = data.result[j].item_name,
                                 itemPriceLeft = "$ " + data.result[j].item_price.ToString(),
                                 itemPriceLeftUnit = "$ " + data.result[j].item_price.ToString("N2") + " / "+(string)data.result[j].item_unit.ToString(),
+                                itemLeftUnit = (string)data.result[j].item_unit.ToString(),
                                 isItemLeftVisiable = true,
                                 isItemLeftEnable = true,
                                 quantityL = 0,
-                                item_descLeft = data.result[j].item_desc,
+                                
 
 
 
@@ -538,10 +552,11 @@ namespace ServingFresh.Views
                                 itemNameRight = data.result[j + 1].item_name,
                                 itemPriceRight = "$ " + data.result[j + 1].item_price.ToString(),
                                 itemPriceRightUnit = "$ " + data.result[j + 1].item_price.ToString("N2") + " / "+ (string)data.result[j + 1].item_unit.ToString(),
+                                itemRightUnit = (string)data.result[j + 1].item_unit.ToString(),
                                 isItemRightVisiable = true,
                                 isItemRightEnable = true,
                                 quantityR = 0,
-                                item_descRight = data.result[j + 1].item_desc
+                                
                             });
                             j = j + 2;
                         }
@@ -561,10 +576,11 @@ namespace ServingFresh.Views
                                 itemNameLeft = data.result[j].item_name,
                                 itemPriceLeft = "$ " + data.result[j].item_price.ToString(),
                                 itemPriceLeftUnit = "$ " + data.result[j].item_price.ToString("N2") + " / "+(string)data.result[j].item_unit.ToString(),
+                                itemLeftUnit = (string)data.result[j].item_unit.ToString(),
                                 isItemLeftVisiable = true,
                                 isItemLeftEnable = true,
                                 quantityL = 0,
-                                item_descLeft = data.result[j].item_desc,
+                                
 
                                 imageSourceRight = data.result[j + 1].item_photo,
                                 item_uidRight = data.result[j + 1].item_uid,
@@ -573,10 +589,11 @@ namespace ServingFresh.Views
                                 itemNameRight = data.result[j + 1].item_name,
                                 itemPriceRight = "$ " + data.result[j + 1].item_price.ToString(),
                                 itemPriceRightUnit = "$ " + data.result[j + 1].item_price.ToString("N2") + " / "+(string)data.result[j + 1].item_unit.ToString(),
+                                itemRightUnit = (string)data.result[j + 1].item_unit.ToString(),
                                 isItemRightVisiable = true,
                                 isItemRightEnable = true,
                                 quantityR = 0,
-                                item_descRight = data.result[j + 1].item_desc
+                                
                             });
                             j = j + 2;
                         }
@@ -591,10 +608,11 @@ namespace ServingFresh.Views
                             itemNameLeft = data.result[j].item_name,
                             itemPriceLeft = "$ " + data.result[j].item_price.ToString(),
                             itemPriceLeftUnit = "$ " + data.result[j].item_price.ToString("N2") + " / "+(string)data.result[j].item_unit.ToString(),
+                            itemLeftUnit = (string)data.result[j].item_unit.ToString(),
                             isItemLeftVisiable = true,
                             isItemLeftEnable = true,
                             quantityL = 0,
-                            item_descLeft = data.result[j].item_desc,
+                            
 
                             imageSourceRight = "",
                             quantityRight = 0,
@@ -708,51 +726,15 @@ namespace ServingFresh.Views
         void SubtractItemLeft(System.Object sender, System.EventArgs e)
         {
     
-                var button = (Button)sender;
-                var itemModelObject = (ItemsModel)button.CommandParameter;
-                ItemPurchased itemSelected = new ItemPurchased();
-                if (itemModelObject != null)
+            var button = (Button)sender;
+            var itemModelObject = (ItemsModel)button.CommandParameter;
+            ItemPurchased itemSelected = new ItemPurchased();
+            if (itemModelObject != null)
+            {
+                if (itemModelObject.quantityL != 0)
                 {
-                    if (itemModelObject.quantityL != 0)
-                    {
-                        itemModelObject.quantityL -= 1;
-                        totalCount -= 1;
-                        CartTotal.Text = totalCount.ToString();
-                        if (order != null)
-                        {
-                            if (order.ContainsKey(itemModelObject.itemNameLeft))
-                            {
-                                var itemToUpdate = order[itemModelObject.itemNameLeft];
-                                itemToUpdate.item_quantity = itemModelObject.quantityL;
-                                order[itemModelObject.itemNameLeft] = itemToUpdate;
-                            }
-                            else
-                            {
-                                itemSelected.pur_business_uid = itemModelObject.itm_business_uidLeft;
-                                itemSelected.item_uid = itemModelObject.item_uidLeft;
-                                itemSelected.item_name = itemModelObject.itemNameLeft;
-                                itemSelected.item_quantity = itemModelObject.quantityL;
-                                itemSelected.item_price = Convert.ToDouble(itemModelObject.itemPriceLeft.Substring(1).Trim());
-                                itemSelected.img = itemModelObject.imageSourceLeft;
-                                itemSelected.description = itemModelObject.item_descLeft;
-                                order.Add(itemModelObject.itemNameLeft, itemSelected);
-                            }
-                        }
-                    }
-                }
-            
-        }
-
-        void AddItemLeft(System.Object sender, System.EventArgs e)
-        {
-          
-                var button = (Button)sender;
-                var itemModelObject = (ItemsModel)button.CommandParameter;
-                ItemPurchased itemSelected = new ItemPurchased();
-                if (itemModelObject != null)
-                {
-                    itemModelObject.quantityL += 1;
-                    totalCount += 1;
+                    itemModelObject.quantityL -= 1;
+                    totalCount -= 1;
                     CartTotal.Text = totalCount.ToString();
                     if (order != null)
                     {
@@ -770,59 +752,64 @@ namespace ServingFresh.Views
                             itemSelected.item_quantity = itemModelObject.quantityL;
                             itemSelected.item_price = Convert.ToDouble(itemModelObject.itemPriceLeft.Substring(1).Trim());
                             itemSelected.img = itemModelObject.imageSourceLeft;
-                            itemSelected.description = itemModelObject.item_descLeft;
+                            itemSelected.unit = itemModelObject.itemLeftUnit;
+                            //itemSelected.description = itemModelObject.item_descLeft;
                             order.Add(itemModelObject.itemNameLeft, itemSelected);
                         }
                     }
                 }
+            }
+            
+        }
+
+        void AddItemLeft(System.Object sender, System.EventArgs e)
+        {
+          
+            var button = (Button)sender;
+            var itemModelObject = (ItemsModel)button.CommandParameter;
+            ItemPurchased itemSelected = new ItemPurchased();
+            if (itemModelObject != null)
+            {
+                itemModelObject.quantityL += 1;
+                totalCount += 1;
+                CartTotal.Text = totalCount.ToString();
+                if (order != null)
+                {
+                    if (order.ContainsKey(itemModelObject.itemNameLeft))
+                    {
+                        var itemToUpdate = order[itemModelObject.itemNameLeft];
+                        itemToUpdate.item_quantity = itemModelObject.quantityL;
+                        order[itemModelObject.itemNameLeft] = itemToUpdate;
+                    }
+                    else
+                    {
+                        itemSelected.pur_business_uid = itemModelObject.itm_business_uidLeft;
+                        itemSelected.item_uid = itemModelObject.item_uidLeft;
+                        itemSelected.item_name = itemModelObject.itemNameLeft;
+                        itemSelected.item_quantity = itemModelObject.quantityL;
+                        itemSelected.item_price = Convert.ToDouble(itemModelObject.itemPriceLeft.Substring(1).Trim());
+                        itemSelected.img = itemModelObject.imageSourceLeft;
+                        itemSelected.unit = itemModelObject.itemLeftUnit;
+                        //itemSelected.description = itemModelObject.item_descLeft;
+                        order.Add(itemModelObject.itemNameLeft, itemSelected);
+                    }
+                }
+            }
             
         }
 
         void SubtractItemRight(System.Object sender, System.EventArgs e)
         {
     
-                var button = (Button)sender;
-                var itemModelObject = (ItemsModel)button.CommandParameter;
-                ItemPurchased itemSelected = new ItemPurchased();
-                if (itemModelObject != null)
+            var button = (Button)sender;
+            var itemModelObject = (ItemsModel)button.CommandParameter;
+            ItemPurchased itemSelected = new ItemPurchased();
+            if (itemModelObject != null)
+            {
+                if (itemModelObject.quantityR != 0)
                 {
-                    if (itemModelObject.quantityR != 0)
-                    {
-                        itemModelObject.quantityR -= 1;
-                        totalCount -= 1;
-                        CartTotal.Text = totalCount.ToString();
-                        if (order.ContainsKey(itemModelObject.itemNameRight))
-                        {
-                            var itemToUpdate = order[itemModelObject.itemNameRight];
-                            itemToUpdate.item_quantity = itemModelObject.quantityR;
-                            order[itemModelObject.itemNameRight] = itemToUpdate;
-                        }
-                        else
-                        {
-                            itemSelected.pur_business_uid = itemModelObject.itm_business_uidRight;
-                            itemSelected.item_uid = itemModelObject.item_uidRight;
-                            itemSelected.item_name = itemModelObject.itemNameRight;
-                            itemSelected.item_quantity = itemModelObject.quantityR;
-                            itemSelected.item_price = Convert.ToDouble(itemModelObject.itemPriceRight.Substring(1).Trim());
-                            itemSelected.img = itemModelObject.imageSourceRight;
-                            itemSelected.description = itemModelObject.item_descRight;
-                            order.Add(itemModelObject.itemNameRight, itemSelected);
-                        }
-                    }
-                }
-            
-        }
-
-        void AddItemRight(System.Object sender, System.EventArgs e)
-        {
-         
-                var button = (Button)sender;
-                var itemModelObject = (ItemsModel)button.CommandParameter;
-                ItemPurchased itemSelected = new ItemPurchased();
-                if (itemModelObject != null)
-                {
-                    itemModelObject.quantityR += 1;
-                    totalCount += 1;
+                    itemModelObject.quantityR -= 1;
+                    totalCount -= 1;
                     CartTotal.Text = totalCount.ToString();
                     if (order.ContainsKey(itemModelObject.itemNameRight))
                     {
@@ -838,10 +825,45 @@ namespace ServingFresh.Views
                         itemSelected.item_quantity = itemModelObject.quantityR;
                         itemSelected.item_price = Convert.ToDouble(itemModelObject.itemPriceRight.Substring(1).Trim());
                         itemSelected.img = itemModelObject.imageSourceRight;
-                        itemSelected.description = itemModelObject.item_descRight;
+                        itemSelected.unit = itemModelObject.itemRightUnit;
+                        //itemSelected.description = itemModelObject.item_descRight;
                         order.Add(itemModelObject.itemNameRight, itemSelected);
                     }
                 }
+            }
+            
+        }
+
+        void AddItemRight(System.Object sender, System.EventArgs e)
+        {
+         
+            var button = (Button)sender;
+            var itemModelObject = (ItemsModel)button.CommandParameter;
+            ItemPurchased itemSelected = new ItemPurchased();
+            if (itemModelObject != null)
+            {
+                itemModelObject.quantityR += 1;
+                totalCount += 1;
+                CartTotal.Text = totalCount.ToString();
+                if (order.ContainsKey(itemModelObject.itemNameRight))
+                {
+                    var itemToUpdate = order[itemModelObject.itemNameRight];
+                    itemToUpdate.item_quantity = itemModelObject.quantityR;
+                    order[itemModelObject.itemNameRight] = itemToUpdate;
+                }
+                else
+                {
+                    itemSelected.pur_business_uid = itemModelObject.itm_business_uidRight;
+                    itemSelected.item_uid = itemModelObject.item_uidRight;
+                    itemSelected.item_name = itemModelObject.itemNameRight;
+                    itemSelected.item_quantity = itemModelObject.quantityR;
+                    itemSelected.item_price = Convert.ToDouble(itemModelObject.itemPriceRight.Substring(1).Trim());
+                    itemSelected.img = itemModelObject.imageSourceRight;
+                    itemSelected.unit = itemModelObject.itemRightUnit;
+                    //itemSelected.description = itemModelObject.item_descRight;
+                    order.Add(itemModelObject.itemNameRight, itemSelected);
+                }
+            }
             
         }
 
@@ -907,17 +929,17 @@ namespace ServingFresh.Views
         void CheckOutClickBusinessPage(System.Object sender, System.EventArgs e)
         {
 
-                purchase = new Dictionary<string, ItemPurchased>();
-                foreach (string item in order.Keys)
+            purchase = new Dictionary<string, ItemPurchased>();
+            foreach (string item in order.Keys)
+            {
+                if (order[item].item_quantity != 0)
                 {
-                    if (order[item].item_quantity != 0)
-                    {
-                        purchase.Add(item, order[item]);
-                    }
+                    purchase.Add(item, order[item]);
                 }
+            }
                
-                Application.Current.Properties["day"] = titlePage.Text;
-                Application.Current.MainPage = new CheckoutPage(purchase, titlePage.Text);
+            Application.Current.Properties["day"] = titlePage.Text;
+            Application.Current.MainPage = new CheckoutPage(purchase, titlePage.Text);
             
         }
 
@@ -929,17 +951,17 @@ namespace ServingFresh.Views
         void OrdersClick(System.Object sender, System.EventArgs e)
         {
 
-                purchase = new Dictionary<string, ItemPurchased>();
-                foreach (string item in order.Keys)
+            purchase = new Dictionary<string, ItemPurchased>();
+            foreach (string item in order.Keys)
+            {
+                if (order[item].item_quantity != 0)
                 {
-                    if (order[item].item_quantity != 0)
-                    {
-                        purchase.Add(item, order[item]);
-                    }
+                    purchase.Add(item, order[item]);
                 }
+            }
 
-                Application.Current.Properties["day"] = titlePage.Text;
-                Application.Current.MainPage = new CheckoutPage(purchase, titlePage.Text);
+            Application.Current.Properties["day"] = titlePage.Text;
+            Application.Current.MainPage = new CheckoutPage(purchase, titlePage.Text);
             
         }
 

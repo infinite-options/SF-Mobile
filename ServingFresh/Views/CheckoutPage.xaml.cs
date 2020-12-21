@@ -33,6 +33,7 @@ namespace ServingFresh.Views
         public string item_uid { get; set; }
         public string business_uid { get; set; }
         public string name { get; set; }
+        public string priceUnit { get; set; }
         public int qty { get; set; }
         public double price { get; set; }
         public string total_price { get { return "$ " + (qty * price).ToString("N2"); } }
@@ -51,12 +52,13 @@ namespace ServingFresh.Views
         }
 
         public string img { get; set; }
-        public string description { get; set; }
+        public string unit { get; set; }
+        //public string description { get; set; }
 
 
     }
 
-  
+
     public class PurchaseDataObject
     {
         public string pur_customer_uid { get; set; }
@@ -89,6 +91,11 @@ namespace ServingFresh.Views
         public string cc_zip { get; set; }
         public string charge_id { get; set; }
         public string payment_type { get; set; }
+        public string subtotal { get; set; }
+        public string service_fee { get; set; }
+        public string delivery_fee { get; set; }
+        public string driver_tip { get; set; }
+        public string taxes { get; set; }
     }
     public class PurchaseResponse
     {
@@ -156,6 +163,7 @@ namespace ServingFresh.Views
         public double service_fee;
         public double taxes;
         public double total;
+        public double driver_tips;
         public static int total_qty = 0;
         private bool isAddressValidated;
         private string latitude = "0";
@@ -217,11 +225,12 @@ namespace ServingFresh.Views
                         {
                             qty = order[key].item_quantity,
                             name = order[key].item_name,
+                            priceUnit = "( $" + order[key].item_price.ToString("N2") + " / " + order[key].unit + " )",
                             price = order[key].item_price,
                             item_uid = order[key].item_uid,
                             business_uid = order[key].pur_business_uid,
                             img = order[key].img,
-                            description = order[key].description,
+                            unit = order[key].unit,
                         });
                         orderCopy.Add(key, order[key]);
                     }
@@ -307,11 +316,12 @@ namespace ServingFresh.Views
                         {
                             qty = order[key].item_quantity,
                             name = order[key].item_name,
+                            priceUnit = "( $" + order[key].item_price.ToString("N2") + " / " + order[key].unit + " )",
                             price = order[key].item_price,
                             item_uid = order[key].item_uid,
                             business_uid = order[key].pur_business_uid,
                             img = order[key].img,
-                            description = order[key].description,
+                            unit = order[key].unit,
                         });
                         orderCopy.Add(key, order[key]);
                     }
@@ -436,9 +446,6 @@ namespace ServingFresh.Views
                 couponData = JsonConvert.DeserializeObject<CouponResponse>(result);
 
                 couponsList.Clear();
-                //unsortedNewTotals.Clear();
-                //unsortedDiscounts.Clear();
-                //sortedDiscounts.Clear();
 
                 Debug.WriteLine(result);
 
@@ -447,7 +454,7 @@ namespace ServingFresh.Views
                 double initialServiceFee = GetServiceFee();
                 double initialTaxes = GetTaxes();
                 double initialTotal = initialSubTotal + initialDeliveryFee + initialServiceFee + initialTaxes;
-                int placement = 0;
+                
 
                 foreach (Models.Coupon c in couponData.result)
                 {
@@ -684,6 +691,7 @@ namespace ServingFresh.Views
                             unsortedThreshold.Add(a.threshold);
                         }
 
+                        unsortedThreshold.Sort();
                         // FILTERING NON-ACTIVE COUPONS
                         var couponsSortedLowestToHeighest = new List<couponItem>();
 
@@ -774,6 +782,7 @@ namespace ServingFresh.Views
         {
             subtotal = 0.0;
             total_qty = 0;
+            var tips = 0.0;
             delivery_fee = GetDeliveryFee();
             taxes = GetTaxes();
             service_fee = GetServiceFee();
@@ -820,16 +829,19 @@ namespace ServingFresh.Views
                 if ((delivery_fee - discount_delivery_fee <= 0))
                 {
                     total = subtotal - discount + (0.00) + taxes + service_fee + Double.Parse(DriverTip.Text);
+                    tips = Double.Parse(DriverTip.Text);
                 }
                 else
                 {
                     total = subtotal - discount + (delivery_fee - discount_delivery_fee) + taxes + service_fee + Double.Parse(DriverTip.Text);
+                    tips = Double.Parse(DriverTip.Text);
                 }
                 
             }
 
             GrandTotal.Text = "$ " + total.ToString("N2");
             CartTotal.Text = total_qty.ToString();
+            driver_tips = tips;
         }
 
         // This function return the subtotal amount upon initial purchase
@@ -916,6 +928,8 @@ namespace ServingFresh.Views
             
             string dateTime = DateTime.Parse((string)Application.Current.Properties["delivery_date"]).ToString("yyyy-MM-dd");
             string t = (string)Application.Current.Properties["delivery_time"];
+            Debug.WriteLine("DELIVERY DATE: " + dateTime);
+            Debug.WriteLine("START DELIVERY TIME: " + t);
             string startTime = "";
             foreach(char a in t.ToCharArray())
             {
@@ -970,8 +984,8 @@ namespace ServingFresh.Views
             purchaseObject.amount_paid = total.ToString("N2");
             purchaseObject.info_is_Addon = "FALSE";
 
-            var purchaseString = JsonConvert.SerializeObject(purchaseObject);
-            System.Diagnostics.Debug.WriteLine(purchaseString);
+            //var purchaseString = JsonConvert.SerializeObject(purchaseObject);
+            //System.Diagnostics.Debug.WriteLine(purchaseString);
             }
             else
             {
@@ -981,18 +995,18 @@ namespace ServingFresh.Views
 
         public ObservableCollection<PurchasedItem> GetOrder(ObservableCollection<ItemObject> list)
         {
-           ObservableCollection<PurchasedItem> purchasedOrder = new ObservableCollection<PurchasedItem>();
+            ObservableCollection<PurchasedItem> purchasedOrder = new ObservableCollection<PurchasedItem>();
             foreach(ItemObject i in list)
             {
                 purchasedOrder.Add(new PurchasedItem
                 {
-                    item_uid = i.item_uid,
+                    img = i.img,
                     qty = i.qty.ToString(),
                     name = i.name,
+                    unit = i.unit,
                     price = i.price.ToString(),
+                    item_uid = i.item_uid,
                     itm_business_uid = i.business_uid,
-                    img = i.img,
-                    description = i.description,
                 });
             }
             return purchasedOrder;
@@ -1013,10 +1027,27 @@ namespace ServingFresh.Views
 
             if (total > 0 && cartEmpty != "EMPTY")
             {
-
-
                 string dateTime = DateTime.Parse((string)Application.Current.Properties["delivery_date"]).ToString("yyyy-MM-dd");
-                Debug.WriteLine("Date Time of Paypal: " + dateTime);
+                string t = (string)Application.Current.Properties["delivery_time"];
+                Debug.WriteLine("DELIVERY DATE: " + dateTime);
+                Debug.WriteLine("START DELIVERY TIME: " + t);
+                string startTime = "";
+                foreach (char a in t.ToCharArray())
+                {
+                    if (a != '-')
+                    {
+                        startTime += a;
+                    }
+                    else { break; }
+                }
+                var timeStamp = new DateTime();
+
+                if (startTime != "")
+                {
+                    timeStamp = DateTime.Parse(startTime.Trim());
+                }
+
+
                 purchaseObject.cc_num = "";
                 purchaseObject.cc_exp_date = "";
                 purchaseObject.cc_cvv = "";
@@ -1024,7 +1055,7 @@ namespace ServingFresh.Views
                 purchaseObject.charge_id = "";
                 purchaseObject.payment_type = ((Button)sender).Text == "Checkout with Paypal" ? "PAYPAL" : "STRIPE";
                 purchaseObject.items = GetOrder(cartItems);
-                purchaseObject.start_delivery_date = dateTime;
+                purchaseObject.start_delivery_date = dateTime + " " + timeStamp.ToString("HH:mm:ss");
                 if (!(bool)Application.Current.Properties["guest"])
                 {
                     if(appliedIndex != -1)
@@ -1189,18 +1220,19 @@ namespace ServingFresh.Views
                     if (content != "200")
                     {
                         string SK = "";
-                        string contentTrim = content.Trim();
-                        Debug.WriteLine("S1: " + contentTrim.Substring(1, contentTrim.Length - 2));
-                        string s1 = contentTrim.Substring(1, contentTrim.Length - 2);
-                        if (s1 == "Test")
+                        string type = "";
+                        if (content.Contains("Test"))
                         {
-
+                            type = "TEST";
                             SK = Constant.TestSK;
                         }
-                        else
+                        if(content.Contains("Live"))
                         {
+                            type = "LIVE";
                             SK = Constant.LiveSK;
                         }
+                        Debug.Write("STRIPE MODE: " + type);
+                        Debug.WriteLine("SK     : " + SK);
                         //Debug.WriteLine("SK" + SK);
                         StripeConfiguration.ApiKey = SK;
 
@@ -1263,6 +1295,12 @@ namespace ServingFresh.Views
                             // Successful Payment
                             await DisplayAlert("Congratulations", "Payment was succesfull. We appreciate your business", "OK");
                             ClearCardInfo();
+
+                            purchaseObject.subtotal = GetSubTotal().ToString("N2");
+                            purchaseObject.service_fee = GetServiceFee().ToString("N2");
+                            purchaseObject.delivery_fee = GetDeliveryFee().ToString("N2");
+                            purchaseObject.driver_tip = driver_tips.ToString("N2");
+                            purchaseObject.taxes = GetTaxes().ToString("N2");
 
                             var purchaseString = JsonConvert.SerializeObject(purchaseObject);
                             System.Diagnostics.Debug.WriteLine("Purchase: " + purchaseString);
@@ -1623,6 +1661,7 @@ namespace ServingFresh.Views
                         unsortedThreshold.Add(a.threshold);
                     }
 
+                    unsortedThreshold.Sort();
                     // FILTERING NON-ACTIVE COUPONS
                     var couponsSortedLowestToHeighest = new List<couponItem>();
 
@@ -2040,6 +2079,12 @@ namespace ServingFresh.Views
                 // Successful Payment
                 await DisplayAlert("Congratulations", "Payment was succesfull. We appreciate your business", "OK");
                 ClearCardInfo();
+
+                purchaseObject.subtotal = GetSubTotal().ToString("N2");
+                purchaseObject.service_fee = GetServiceFee().ToString("N2");
+                purchaseObject.delivery_fee = GetDeliveryFee().ToString("N2");
+                purchaseObject.driver_tip = driver_tips.ToString("N2") ;
+                purchaseObject.taxes = GetTaxes().ToString("N2");
 
                 var purchaseString = JsonConvert.SerializeObject(purchaseObject);
                 System.Diagnostics.Debug.WriteLine("Purchase: " + purchaseString);

@@ -225,7 +225,7 @@ namespace ServingFresh.Views
                             isItemLeftVisiable = false,
                             isItemLeftEnable = false,
                             quantityL = 0,
-                            item_descLeft = "",
+                            
 
                             imageSourceRight = "",
                             quantityRight = 0,
@@ -235,7 +235,7 @@ namespace ServingFresh.Views
                             isItemRightVisiable = false,
                             isItemRightEnable = false,
                             quantityR = 0,
-                            item_descRight = ""
+                            
                         }); ;
                     }
                     if (isAmountItemsEven(n))
@@ -257,7 +257,7 @@ namespace ServingFresh.Views
                                 isItemLeftVisiable = true,
                                 isItemLeftEnable = true,
                                 quantityL = 0,
-                                item_descLeft = data.result[j].item_desc,
+                                
 
                                 imageSourceRight = data.result[j + 1].item_photo,
                                 item_uidRight = data.result[j + 1].item_uid,
@@ -269,7 +269,7 @@ namespace ServingFresh.Views
                                 isItemRightVisiable = true,
                                 isItemRightEnable = true,
                                 quantityR = 0,
-                                item_descRight = data.result[j + 1].item_desc
+                                
                             });
                             j = j + 2;
                         }
@@ -292,7 +292,7 @@ namespace ServingFresh.Views
                                 isItemLeftVisiable = true,
                                 isItemLeftEnable = true,
                                 quantityL = 0,
-                                item_descLeft = data.result[j].item_desc,
+                                
 
                                 imageSourceRight = data.result[j + 1].item_photo,
                                 item_uidRight = data.result[j + 1].item_uid,
@@ -304,7 +304,7 @@ namespace ServingFresh.Views
                                 isItemRightVisiable = true,
                                 isItemRightEnable = true,
                                 quantityR = 0,
-                                item_descRight = data.result[j + 1].item_desc
+                                
                             });
                             j = j + 2;
                         }
@@ -322,7 +322,7 @@ namespace ServingFresh.Views
                             isItemLeftVisiable = true,
                             isItemLeftEnable = true,
                             quantityL = 0,
-                            item_descLeft = data.result[j].item_desc,
+                            
 
                             imageSourceRight = "",
                             quantityRight = 0,
@@ -455,7 +455,7 @@ namespace ServingFresh.Views
                             isItemLeftVisiable = false,
                             isItemLeftEnable = false,
                             quantityL = 0,
-                            item_descLeft = "",
+                            
 
                             imageSourceRight = "",
                             quantityRight = 0,
@@ -465,7 +465,7 @@ namespace ServingFresh.Views
                             isItemRightVisiable = false,
                             isItemRightEnable = false,
                             quantityR = 0,
-                            item_descRight = "",
+                            
                         });
                     }
                     if (isAmountItemsEven(n))
@@ -486,7 +486,7 @@ namespace ServingFresh.Views
                                 isItemLeftVisiable = true,
                                 isItemLeftEnable = true,
                                 quantityL = 0,
-                                item_descLeft = data.result[j].item_desc,
+                                
 
 
 
@@ -500,7 +500,7 @@ namespace ServingFresh.Views
                                 isItemRightVisiable = true,
                                 isItemRightEnable = true,
                                 quantityR = 0,
-                                item_descRight = data.result[j + 1].item_desc
+                                
                             });
                             j = j + 2;
                         }
@@ -523,7 +523,7 @@ namespace ServingFresh.Views
                                 isItemLeftVisiable = true,
                                 isItemLeftEnable = true,
                                 quantityL = 0,
-                                item_descLeft = data.result[j].item_desc,
+                                
 
                                 imageSourceRight = data.result[j + 1].item_photo,
                                 item_uidRight = data.result[j + 1].item_uid,
@@ -535,7 +535,7 @@ namespace ServingFresh.Views
                                 isItemRightVisiable = true,
                                 isItemRightEnable = true,
                                 quantityR = 0,
-                                item_descRight = data.result[j + 1].item_desc
+                                
                             });
                             j = j + 2;
                         }
@@ -553,7 +553,7 @@ namespace ServingFresh.Views
                             isItemLeftVisiable = true,
                             isItemLeftEnable = true,
                             quantityL = 0,
-                            item_descLeft = data.result[j].item_desc,
+                            
 
                             imageSourceRight = "",
                             quantityRight = 0,
@@ -699,7 +699,7 @@ namespace ServingFresh.Views
                                 itemSelected.item_quantity = itemModelObject.quantityL;
                                 itemSelected.item_price = Convert.ToDouble(itemModelObject.itemPriceLeft.Substring(1).Trim());
                                 itemSelected.img = itemModelObject.imageSourceLeft;
-                                itemSelected.description = itemModelObject.item_descLeft;
+                                //itemSelected.description = itemModelObject.item_descLeft;
                                 order.Add(itemModelObject.itemNameLeft, itemSelected);
                             }
                         }
@@ -741,7 +741,7 @@ namespace ServingFresh.Views
                             itemSelected.item_quantity = itemModelObject.quantityL;
                             itemSelected.item_price = Convert.ToDouble(itemModelObject.itemPriceLeft.Substring(1).Trim());
                             itemSelected.img = itemModelObject.imageSourceLeft;
-                            itemSelected.description = itemModelObject.item_descLeft;
+                            //itemSelected.description = itemModelObject.item_descLeft;
                             order.Add(itemModelObject.itemNameLeft, itemSelected);
                         }
                     }
@@ -782,7 +782,7 @@ namespace ServingFresh.Views
                             itemSelected.item_quantity = itemModelObject.quantityR;
                             itemSelected.item_price = Convert.ToDouble(itemModelObject.itemPriceRight.Substring(1).Trim());
                             itemSelected.img = itemModelObject.imageSourceRight;
-                            itemSelected.description = itemModelObject.item_descRight;
+                            //itemSelected.description = itemModelObject.item_descRight;
                             order.Add(itemModelObject.itemNameRight, itemSelected);
                         }
                     }
@@ -821,7 +821,7 @@ namespace ServingFresh.Views
                         itemSelected.item_quantity = itemModelObject.quantityR;
                         itemSelected.item_price = Convert.ToDouble(itemModelObject.itemPriceRight.Substring(1).Trim());
                         itemSelected.img = itemModelObject.imageSourceRight;
-                        itemSelected.description = itemModelObject.item_descRight;
+                        //itemSelected.description = itemModelObject.item_descRight;
                         order.Add(itemModelObject.itemNameRight, itemSelected);
                     }
                 }
