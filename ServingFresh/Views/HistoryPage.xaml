@@ -88,9 +88,11 @@
                                     <StackLayout>
                                         <StackLayout Padding="15">
                                             <FlexLayout JustifyContent="SpaceBetween">
-                                                <Label Text="Order Completed" StyleClass="h2, primary" VerticalTextAlignment="Center"/>
+                                                <Label Text="{Binding purchase_status}" StyleClass="h2, primary" VerticalTextAlignment="Center"/>
                                                 <Button Text="Rate Order" StyleClass="btn, primary" Clicked="Button_Clicked"/>
                                             </FlexLayout>
+                                            
+                                            <Label Text="{Binding delivery_date}" StyleClass="black"/>
                                             <Label Text="{Binding purchase_date}" StyleClass="black"/>
                                             <Label Text="{Binding purchase_id}" StyleClass="black"/>
                                         </StackLayout>
@@ -99,10 +101,22 @@
                                             <CollectionView.ItemTemplate>
                                                 <DataTemplate>
                                                     <StackLayout>
-                                                        <Grid Padding="15">
-                                                            <Label Grid.Column="0" Grid.ColumnSpan="3" Text="{Binding name}" StyleClass="p, black"/>
-                                                            <Label Grid.Column="3" Text="{Binding qty}" StyleClass="p"/>
-                                                            <Label Grid.Column="4" Text="{Binding total_price}" HorizontalTextAlignment="End" StyleClass="p, black"/>
+                                                        <Grid Padding="15,0,15,0">
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition Height="50"></RowDefinition>
+                                                            </Grid.RowDefinitions>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="50"></ColumnDefinition>
+                                                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                                                <ColumnDefinition Width="25"></ColumnDefinition>
+                                                                <ColumnDefinition Width="50"></ColumnDefinition>
+                                                            </Grid.ColumnDefinitions>
+
+
+                                                            <Image Grid.Row="0" Grid.Column="0" Source="{Binding img}"></Image>
+                                                            <Label Grid.Row="0" Grid.Column="1"  Text="{Binding namePriceUnit}" StyleClass="p, black"/>
+                                                            <Label Grid.Row="0" Grid.Column="2"  Text="{Binding qty}" StyleClass="p"/>
+                                                            <Label Grid.Row="0" Grid.Column="3" Text="{Binding total_price}" HorizontalTextAlignment="End" StyleClass="p, black"/>
                                                         </Grid>
                                                         <BoxView StyleClass="spacer"/>
                                                     </StackLayout>
@@ -110,9 +124,33 @@
                                             </CollectionView.ItemTemplate>
                                         </CollectionView>
                                         <BoxView StyleClass="spacer"/>
-                                        <FlexLayout Padding="15" JustifyContent="SpaceBetween">
+                                        <FlexLayout Padding="15,0,15,0" JustifyContent="SpaceBetween">
+                                            <Label Text="Subtotal" StyleClass="p, black"/>
+                                            <Label Text="{Binding subtotal}" StyleClass="p, black"/>
+                                        </FlexLayout>
+                                        <FlexLayout Padding="15,0,15,0"  JustifyContent="SpaceBetween">
+                                            <Label Text="Promo applied" StyleClass="p, black"/>
+                                            <Label Text="{Binding promo_applied}" StyleClass="p, black"/>
+                                        </FlexLayout>
+                                        <FlexLayout Padding="15,0,15,0"  JustifyContent="SpaceBetween">
+                                            <Label Text="Delivery Fee" StyleClass="p, black"/>
+                                            <Label Text="{Binding delivery_fee}" StyleClass="p, black"/>
+                                        </FlexLayout>
+                                        <FlexLayout Padding="15,0,15,0"  JustifyContent="SpaceBetween">
+                                            <Label Text="Service Fee" StyleClass="p, black"/>
+                                            <Label Text="{Binding service_fee}" StyleClass="p, black"/>
+                                        </FlexLayout>
+                                        <FlexLayout Padding="15,0,15,0" JustifyContent="SpaceBetween">
+                                            <Label Text="Driver Tip" StyleClass="p, black"/>
+                                            <Label Text="{Binding driver_tip}" StyleClass="p, black"/>
+                                        </FlexLayout>
+                                        <FlexLayout Padding="15,0,15,0"  JustifyContent="SpaceBetween">
+                                            <Label Text="Taxes" StyleClass="p, black"/>
+                                            <Label Text="{Binding taxes}" StyleClass="p, black"/>
+                                        </FlexLayout>
+                                        <FlexLayout Padding="15,0,15,0"  JustifyContent="SpaceBetween">
                                             <Label Text="Total" StyleClass="h3, black"/>
-                                            <Label Text="{Binding amount_due}" StyleClass="p, black"/>
+                                            <Label Text="{Binding total}" StyleClass="p, black"/>
                                         </FlexLayout>
                                         <Grid Padding="15">
                                             <Button Grid.Column="0" Text="View Receipt" StyleClass="btn, primary" Margin="20,0" Clicked="Button_Clicked"/>

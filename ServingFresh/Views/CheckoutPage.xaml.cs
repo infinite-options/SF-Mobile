@@ -239,7 +239,7 @@ namespace ServingFresh.Views
                 purchaseObject = new PurchaseDataObject()
                 {
                     pur_customer_uid = "GUEST",
-                    pur_business_uid = "",
+                    pur_business_uid = "MOBILE",
                     items = GetOrder(cartItems),
                     order_instructions = "",
 
@@ -330,7 +330,7 @@ namespace ServingFresh.Views
                 purchaseObject = new PurchaseDataObject()
                 {
                     pur_customer_uid = Application.Current.Properties.ContainsKey("user_id") ? (string)Application.Current.Properties["user_id"] : "",
-                    pur_business_uid = "",
+                    pur_business_uid = "MOBILE",
                     items = GetOrder(cartItems),
                     order_instructions = "",
 
