@@ -85,7 +85,7 @@ namespace ServingFresh.Views
             {
                 get
                 {
-                    return name + " ( $" + (Double.Parse(qty) * Double.Parse(price)).ToString("N2") + " /" + unit + " ) ";
+                    return name + " ( $" + (Double.Parse(qty) * Double.Parse(price)).ToString("N2") + " / " + unit + " ) ";
                 }
             }
 

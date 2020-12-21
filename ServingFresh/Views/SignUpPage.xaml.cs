@@ -170,8 +170,11 @@ namespace ServingFresh.Views
             Application.Current.Properties["user_longitude"] = "";
             Application.Current.Properties["user_delivery_instructions"] = "";
 
-            validateAddressButton.IsVisible = false;
-            validateAddressButton.IsEnabled = false;
+            //if (!(bool)Application.Current.Properties["guest"])
+            //{
+            //    validateAddressButton.IsVisible = false;
+            //    validateAddressButton.IsEnabled = false;
+            //}
         }
 
         async void ValidateAddressClick(object sender, System.EventArgs e)
@@ -421,7 +424,10 @@ namespace ServingFresh.Views
             {
                 var sender = new System.Object();
                 var e = new System.EventArgs();
-                SignUpNewUser(sender,e);
+                Application.Current.Properties["guest"] = false;
+                validateAddressButton.IsVisible = false;
+                validateAddressButton.IsEnabled = false;
+                // SignUpNewUser(sender,e);
             }
             else
             {

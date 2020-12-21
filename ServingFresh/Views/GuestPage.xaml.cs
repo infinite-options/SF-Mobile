@@ -266,6 +266,15 @@ namespace ServingFresh.Views
         void EnterEmailPasswordToSignUpClick(System.Object sender, System.EventArgs e)
         {
             // Console.WriteLine("You are about to transition to the SignUpPage");
+            Application.Current.Properties["guest"] = false;
+            var address = signUpGuest.address;
+            var unit = signUpGuest.unit; ;
+            var city = signUpGuest.city;
+            var state = signUpGuest.state;
+            var zipcode = signUpGuest.zip_code;
+            var lat = signUpGuest.latitude;
+            var longitude = signUpGuest.longitude;
+            
             Application.Current.MainPage = new SignUpPage();
         }
 
