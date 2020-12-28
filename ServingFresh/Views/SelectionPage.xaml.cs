@@ -54,12 +54,21 @@ namespace ServingFresh.Views
             };
         }
 
-        List<DeliveriesModel> AllDeliveries = new List<DeliveriesModel>();
+        public class AcceptingSchedule
+        {
+            public IList<string> Friday { get; set; }
+            public IList<string> Monday { get; set; }
+            public IList<string> Sunday { get; set; }
+            public IList<string> Tuesday { get; set; }
+            public IList<string> Saturday { get; set; }
+            public IList<string> Thursday { get; set; }
+            public IList<string> Wednesday { get; set; }
+        }
 
+        List<DeliveriesModel> AllDeliveries = new List<DeliveriesModel>();
         List<Business> AllFarms = new List<Business>();
         List<Business> AllFarmersMarkets = new List<Business>();
         List<Business> OpenFarms = new List<Business>();
-
 
         ObservableCollection<DeliveriesModel> Deliveries = new ObservableCollection<DeliveriesModel>();
         ObservableCollection<BusinessCard> Farms = new ObservableCollection<BusinessCard>();
@@ -189,18 +198,18 @@ namespace ServingFresh.Views
                     business_uids = ids,
                 });
             }
-            
 
-            if(schedule.Count != 0)
+
+            if (schedule.Count != 0)
             {
                 Debug.WriteLine("DELIVERY CHECK POINT");
                 var firstElement = schedule[0];
                 var dateE1 = firstElement.delivery_date;
                 var timeE1 = "";
 
-                foreach(char a in firstElement.delivery_time.ToCharArray())
+                foreach (char a in firstElement.delivery_time.ToCharArray())
                 {
-                    if(a != '-')
+                    if (a != '-')
                     {
                         timeE1 += a;
                     }
@@ -221,16 +230,16 @@ namespace ServingFresh.Views
                 var targetTimeString = targetDate + " " + targetTime;
                 var targetTimeStamp = DateTime.Parse(targetTimeString);
                 Debug.WriteLine("TARGET TIME AS DATETIME TYPE       : " + targetTimeStamp);
-                
+
                 var currentTime = DateTime.Now;
                 Debug.WriteLine("CURRENT TIME AS DATETIME TYPE      : " + currentTime);
-                if(currentTime < targetTimeStamp)
+                if (currentTime < targetTimeStamp)
                 {
 
                 }
                 else
                 {
-                    if(schedule.Count == 1)
+                    if (schedule.Count == 1)
                     {
                         firstElement.delivery_date = timeStampE1.AddDays(7).ToString("MMM dd");
                         schedule[0] = firstElement;
@@ -292,6 +301,46 @@ namespace ServingFresh.Views
             {
 
                 data = JsonConvert.DeserializeObject<ServingFreshBusiness>(result);
+                var filterData = new ServingFreshBusiness();
+                filterData.result = new List<Business>();
+
+                foreach (Business a in data.result)
+                {
+                    var hours = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(a.business_accepting_hours);
+                    foreach(string key in hours.Keys)
+                    {
+                        var day = DateTime.Now.DayOfWeek;
+                        if(key == day.ToString())
+                        {
+                            if(hours[key][0] != "" && hours[key][1] != "")
+                            {
+                                // BUSINESS IS OPENED, BUT HAVE TO CHECK IF WE ARE ONTIME
+                                var startT = DateTime.Parse(hours[key][0]);
+                                var endT = DateTime.Parse(hours[key][1]);
+                                var currentT = DateTime.Now;
+
+                                if(startT <= currentT && currentT <= endT)
+                                {
+
+                                    Debug.WriteLine("BUSINESS IS ACCEPTING ORDERS");
+                                    Debug.WriteLine("START: " + startT);
+                                    Debug.WriteLine("END: " + endT);
+                                    Debug.WriteLine("CURRENT: " + currentT);
+                                    filterData.result.Add(a);
+                                }
+                                
+                            }
+                        }
+                    }
+                }
+
+                //foreach (Business a in filterData.result)
+                //{
+                //    Debug.WriteLine(a.business_name);
+                //}
+
+                data.result = filterData.result;
+
 
                 if (result.Contains("280") && data.result.Count != 0)
                 {

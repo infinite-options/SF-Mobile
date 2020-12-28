@@ -112,6 +112,7 @@ namespace ServingFresh.Models
         public string business_type { get; set; }
         public string business_image { get; set; }
         public IDictionary<string,IList<string>> delivery_days { get; set; }
+        public string business_accepting_hours { get; set; }
     }
 
     public class ServingFreshBusiness
