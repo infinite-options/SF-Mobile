@@ -53,11 +53,22 @@ namespace ServingFresh.Views
 
         public string img { get; set; }
         public string unit { get; set; }
-        //public string description { get; set; }
-
-
+        // public string description { get; set;
+        // business_price - double
     }
 
+    public class User
+    {
+        public string delivery_instructions { get; set; }
+    }
+
+    public class InfoObject
+    {
+        public string message { get; set; }
+        public int code { get; set; }
+        public IList<User> result { get; set; }
+        public string sql { get; set; }
+    }
 
     public class PurchaseDataObject
     {
@@ -159,6 +170,7 @@ namespace ServingFresh.Views
         public static ObservableCollection<couponItem> couponsList = new ObservableCollection<couponItem>();
         public double subtotal;
         public double discount;
+        public double delivery_fee_db = 0;
         public double delivery_fee;
         public double service_fee;
         public double taxes;
@@ -180,6 +192,7 @@ namespace ServingFresh.Views
         public string deliveryDay = "";
         public IDictionary<string, ItemPurchased> orderCopy = new Dictionary<string,ItemPurchased>();
         public string cartEmpty = "";
+        
 
         // PAYPAL CREDENTIALS
         // =========================
@@ -296,8 +309,10 @@ namespace ServingFresh.Views
             }
             else
             {
-                GetAvailiableCoupons();
                 InitializeMap();
+                GetAvailiableCoupons();
+                GetDeliveryInstructions();
+
                 if ((string)Application.Current.Properties["day"] == "")
                 {
                     order = null;
@@ -387,7 +402,23 @@ namespace ServingFresh.Views
             }
         }
 
-
+        public async void GetDeliveryInstructions()
+        {
+            var client = new System.Net.Http.HttpClient();
+            var ID = (string)Application.Current.Properties["user_id"];
+            Debug.WriteLine("USER ID: " + ID);
+            var RDSResponse = await client.GetAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/last_delivery_instruction/" + ID);
+            var content = await RDSResponse.Content.ReadAsStringAsync();
+            if (RDSResponse.IsSuccessStatusCode)
+            {
+                var data = JsonConvert.DeserializeObject<InfoObject>(content);
+                Debug.WriteLine("USER DELIVERY INSTRUCTIONS: " + data.result[0].delivery_instructions);
+                if (data.result[0].delivery_instructions != "")
+                {
+                    deliveryInstructions.Text = data.result[0].delivery_instructions;
+                }
+            }
+        }
 
         public void InitializeMap()
         {
@@ -793,16 +824,18 @@ namespace ServingFresh.Views
             }
 
             SubTotal.Text = "$ " + subtotal.ToString("N2");
-            this.discount = discount + discount_delivery_fee;
+            this.discount = discount;
             Discount.Text = "-$ " + discount.ToString("N2");
             
             if((delivery_fee - discount_delivery_fee <= 0))
             {
                 DeliveryFee.Text = "$ " + (0.00).ToString("N2");
+                delivery_fee_db = 0.0;
             }
             else
             {
                 DeliveryFee.Text = "$ " + (delivery_fee - discount_delivery_fee).ToString("N2");
+                delivery_fee_db = delivery_fee - discount_delivery_fee;
             }
             
             taxes = subtotal * (Constant.tax_rate);
@@ -913,9 +946,19 @@ namespace ServingFresh.Views
             cardState.Text = purchaseObject.delivery_state;
             cardCity.Text = purchaseObject.delivery_city;
             cardZip.Text = purchaseObject.delivery_zip;
-            cardDescription.Text = "None";
+            cardDescription.Text = "";
 
-            if(Device.RuntimePlatform == Device.Android)
+                if ((bool)Application.Current.Properties["guest"])
+                {
+                    if (purchaseObject.delivery_first_name == "" || purchaseObject.delivery_last_name == "" || purchaseObject.delivery_email == "")
+                    {
+                        await DisplayAlert("Oops", "Plese set your delivery contact information!", "OK");
+                        contactframe.Height = this.Height / 2;
+                        return;
+                    }
+                }
+
+                if (Device.RuntimePlatform == Device.Android)
             {
                 cardframe.Height = this.Height - 136;
             }
@@ -980,8 +1023,8 @@ namespace ServingFresh.Views
                 purchaseObject.pay_coupon_id = "";
             }
             purchaseObject.amount_due = total.ToString("N2");
-            purchaseObject.amount_discount = discount.ToString("N2");
-            purchaseObject.amount_paid = total.ToString("N2");
+            purchaseObject.amount_discount = discount.ToString("N2"); ;
+            purchaseObject.amount_paid = total.ToString("N2"); ;
             purchaseObject.info_is_Addon = "FALSE";
 
             //var purchaseString = JsonConvert.SerializeObject(purchaseObject);
@@ -1001,10 +1044,10 @@ namespace ServingFresh.Views
                 purchasedOrder.Add(new PurchasedItem
                 {
                     img = i.img,
-                    qty = i.qty.ToString(),
+                    qty = i.qty,
                     name = i.name,
                     unit = i.unit,
-                    price = i.price.ToString(),
+                    price = i.price,
                     item_uid = i.item_uid,
                     itm_business_uid = i.business_uid,
                 });
@@ -1015,18 +1058,37 @@ namespace ServingFresh.Views
         async void CompletePaymentClick(System.Object sender, System.EventArgs e)
         {
             
-                cardframe.Height = 0;
-                options.Height = 65;
-                PayViaStripe();
-            
-           
+            cardframe.Height = 0;
+            options.Height = 65;
+            PayViaStripe();
         }
+
         public string OrderId = "";
         async void PayViaPayPal(System.Object sender, System.EventArgs e)
         {
-
             if (total > 0 && cartEmpty != "EMPTY")
             {
+                if ((bool)Application.Current.Properties["guest"])
+                {
+                    if (purchaseObject.delivery_first_name == "" || purchaseObject.delivery_last_name == "" || purchaseObject.delivery_email == "")
+                    {
+                        await DisplayAlert("Oops", "Plese set your delivery contact information!", "OK");
+                        contactframe.Height = this.Height / 2;
+                        return;
+                    }
+                }
+                
+                if (deliveryInstructions.Text != null)
+                {
+                    if (deliveryInstructions.Text.Trim() == "SFTEST")
+                    {
+                        Debug.WriteLine("DELIVERY INSTRUCTIONS WERE SET 'SFTEST' ");
+                        mode = "TEST";
+                        clientId = Constant.TestClientId;
+                        secret = Constant.TestSecret;
+                    }
+                }
+
                 string dateTime = DateTime.Parse((string)Application.Current.Properties["delivery_date"]).ToString("yyyy-MM-dd");
                 string t = (string)Application.Current.Properties["delivery_time"];
                 Debug.WriteLine("DELIVERY DATE: " + dateTime);
@@ -1046,7 +1108,6 @@ namespace ServingFresh.Views
                 {
                     timeStamp = DateTime.Parse(startTime.Trim());
                 }
-
 
                 purchaseObject.cc_num = "";
                 purchaseObject.cc_exp_date = "";
@@ -1081,9 +1142,9 @@ namespace ServingFresh.Views
                     purchaseObject.pay_coupon_id = "";
                 }
                
-                purchaseObject.amount_due = total.ToString("N2");
-                purchaseObject.amount_discount = discount.ToString("N2");
-                purchaseObject.amount_paid = total.ToString("N2");
+                purchaseObject.amount_due = total.ToString("N2"); ;
+                purchaseObject.amount_discount = discount.ToString("N2"); ;
+                purchaseObject.amount_paid = total.ToString("N2"); ;
                 purchaseObject.info_is_Addon = "FALSE";
                 //Paypal();
 
@@ -1125,8 +1186,6 @@ namespace ServingFresh.Views
             }
         }
 
-
-
         private void WebViewPage_Navigated(object sender, WebNavigatedEventArgs e)
         {
             var source = webViewPage.Source as UrlWebViewSource;
@@ -1144,7 +1203,11 @@ namespace ServingFresh.Views
         {
             var c = new System.Net.Http.HttpClient();
             var paypal = new Credentials();
+            // LIVE 
             paypal.key = Constant.LiveClientId;
+
+            // TEST
+            // paypal.key = Constant.TestClientId;
 
             var stripeObj = JsonConvert.SerializeObject(paypal);
             Debug.WriteLine("key to send JSON: " + stripeObj);
@@ -1184,6 +1247,7 @@ namespace ServingFresh.Views
 
         public static PayPalHttp.HttpClient client()
         {
+            
             if(mode == "TEST")
             {
                 Debug.WriteLine("PAYPAL TEST ENVIROMENT");
@@ -1204,37 +1268,13 @@ namespace ServingFresh.Views
         {
             try
             {
-                var c = new System.Net.Http.HttpClient();
-                var stripe = new Credentials();
-                stripe.key = Constant.LivePK;
-
-                var stripeObj = JsonConvert.SerializeObject(stripe);
-                Debug.WriteLine("key to send JSON: " + stripeObj);
-                var stripeContent = new StringContent(stripeObj, Encoding.UTF8, "application/json");
-                var RDSResponse = await c.PostAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/Stripe_Payment_key_checker", stripeContent);
-                var content = await RDSResponse.Content.ReadAsStringAsync();
-                Debug.WriteLine("Response from key: " + content);
-
-                if (RDSResponse.IsSuccessStatusCode)
+                if (deliveryInstructions.Text != null)
                 {
-                    if (content != "200")
+                    if (deliveryInstructions.Text.Trim() == "SFTEST")
                     {
-                        string SK = "";
-                        string type = "";
-                        if (content.Contains("Test"))
-                        {
-                            type = "TEST";
-                            SK = Constant.TestSK;
-                        }
-                        if(content.Contains("Live"))
-                        {
-                            type = "LIVE";
-                            SK = Constant.LiveSK;
-                        }
-                        Debug.Write("STRIPE MODE: " + type);
-                        Debug.WriteLine("SK     : " + SK);
-                        //Debug.WriteLine("SK" + SK);
-                        StripeConfiguration.ApiKey = SK;
+                        Debug.Write("STRIPE MODE: " + "TEST");
+                        Debug.WriteLine("SK     : " + Constant.TestSK);
+                        StripeConfiguration.ApiKey = Constant.TestSK;
 
                         string CardNo = cardHolderNumber.Text.Trim();
                         string expMonth = cardExpMonth.Text.Trim();
@@ -1296,9 +1336,19 @@ namespace ServingFresh.Views
                             await DisplayAlert("Congratulations", "Payment was succesfull. We appreciate your business", "OK");
                             ClearCardInfo();
 
+                            if (deliveryInstructions.Text == null)
+                            {
+                                Debug.WriteLine("STRIPE");
+                                Debug.WriteLine("DELIVERY INSTRUCTIONS WERE NOT SET");
+                                purchaseObject.delivery_instructions = "";
+                            }
+                            else
+                            {
+                                purchaseObject.delivery_instructions = deliveryInstructions.Text;
+                            }
                             purchaseObject.subtotal = GetSubTotal().ToString("N2");
-                            purchaseObject.service_fee = GetServiceFee().ToString("N2");
-                            purchaseObject.delivery_fee = GetDeliveryFee().ToString("N2");
+                            purchaseObject.service_fee = service_fee.ToString("N2");
+                            purchaseObject.delivery_fee = delivery_fee_db.ToString("N2");
                             purchaseObject.driver_tip = driver_tips.ToString("N2");
                             purchaseObject.taxes = GetTaxes().ToString("N2");
 
@@ -1352,6 +1402,171 @@ namespace ServingFresh.Views
                         }
                     }
                 }
+                else
+                {
+                    var c = new System.Net.Http.HttpClient();
+                    var stripe = new Credentials();
+                    // LIVE
+                    stripe.key = Constant.LivePK;
+
+                    // TEST
+                    //stripe.key = Constant.TestSK;
+
+                    var stripeObj = JsonConvert.SerializeObject(stripe);
+                    Debug.WriteLine("key to send JSON: " + stripeObj);
+                    var stripeContent = new StringContent(stripeObj, Encoding.UTF8, "application/json");
+                    var RDSResponse = await c.PostAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/Stripe_Payment_key_checker", stripeContent);
+                    var content = await RDSResponse.Content.ReadAsStringAsync();
+                    Debug.WriteLine("Response from key: " + content);
+
+                    if (RDSResponse.IsSuccessStatusCode)
+                    {
+                        if (content != "200")
+                        {
+                            string SK = "";
+                            string type = "";
+                            if (content.Contains("Test"))
+                            {
+                                type = "TEST";
+                                SK = Constant.TestSK;
+                            }
+                            if (content.Contains("Live"))
+                            {
+                                type = "LIVE";
+                                SK = Constant.LiveSK;
+                            }
+                            Debug.Write("STRIPE MODE: " + type);
+                            Debug.WriteLine("SK     : " + SK);
+                            //Debug.WriteLine("SK" + SK);
+                            StripeConfiguration.ApiKey = SK;
+
+                            string CardNo = cardHolderNumber.Text.Trim();
+                            string expMonth = cardExpMonth.Text.Trim();
+                            string expYear = cardExpYear.Text.Trim();
+                            string cardCvv = cardCVV.Text.Trim();
+
+                            // Step 1: Create Card
+                            TokenCardOptions stripeOption = new TokenCardOptions();
+                            stripeOption.Number = CardNo;
+                            stripeOption.ExpMonth = Convert.ToInt64(expMonth);
+                            stripeOption.ExpYear = Convert.ToInt64(expYear);
+                            stripeOption.Cvc = cardCvv;
+
+                            // Step 2: Assign card to token object
+                            TokenCreateOptions stripeCard = new TokenCreateOptions();
+                            stripeCard.Card = stripeOption;
+
+                            TokenService service = new TokenService();
+                            Stripe.Token newToken = service.Create(stripeCard);
+
+                            // Step 3: Assign the token to the soruce 
+                            var option = new SourceCreateOptions();
+                            option.Type = SourceType.Card;
+                            option.Currency = "usd";
+                            option.Token = newToken.Id;
+
+                            var sourceService = new SourceService();
+                            Source source = sourceService.Create(option);
+
+                            // Step 4: Create customer
+                            CustomerCreateOptions customer = new CustomerCreateOptions();
+                            customer.Name = cardHolderName.Text.Trim();
+                            customer.Email = cardHolderEmail.Text.ToLower().Trim();
+                            customer.Description = cardDescription.Text.Trim();
+                            if (cardHolderUnit.Text == null)
+                            {
+                                cardHolderUnit.Text = "";
+                            }
+                            customer.Address = new AddressOptions { City = cardCity.Text.Trim(), Country = Constant.Contry, Line1 = cardHolderAddress.Text.Trim(), Line2 = cardHolderUnit.Text.Trim(), PostalCode = cardZip.Text.Trim(), State = cardState.Text.Trim() };
+
+                            var customerService = new CustomerService();
+                            var cust = customerService.Create(customer);
+
+                            // Step 5: Charge option
+                            var chargeOption = new ChargeCreateOptions();
+                            chargeOption.Amount = (long)RemoveDecimalFromTotalAmount(total.ToString("N2"));
+                            chargeOption.Currency = "usd";
+                            chargeOption.ReceiptEmail = cardHolderEmail.Text.ToLower().Trim();
+                            chargeOption.Customer = cust.Id;
+                            chargeOption.Source = source.Id;
+                            chargeOption.Description = cardDescription.Text.Trim();
+
+                            // Step 6: charge the customer
+                            var chargeService = new ChargeService();
+                            Charge charge = chargeService.Create(chargeOption);
+                            if (charge.Status == "succeeded")
+                            {
+                                // Successful Payment
+                                await DisplayAlert("Congratulations", "Payment was succesfull. We appreciate your business", "OK");
+                                ClearCardInfo();
+
+                                if (deliveryInstructions.Text == null)
+                                {
+                                    Debug.WriteLine("STRIPE");
+                                    Debug.WriteLine("DELIVERY INSTRUCTIONS WERE NOT SET");
+                                    purchaseObject.delivery_instructions = "";
+                                }
+                                else
+                                {
+                                    purchaseObject.delivery_instructions = deliveryInstructions.Text;
+                                }
+                                purchaseObject.subtotal = GetSubTotal().ToString("N2");
+                                purchaseObject.service_fee = service_fee.ToString("N2");
+                                purchaseObject.delivery_fee = delivery_fee_db.ToString("N2");
+                                purchaseObject.driver_tip = driver_tips.ToString("N2");
+                                purchaseObject.taxes = GetTaxes().ToString("N2");
+
+                                var purchaseString = JsonConvert.SerializeObject(purchaseObject);
+                                System.Diagnostics.Debug.WriteLine("Purchase: " + purchaseString);
+                                var purchaseMessage = new StringContent(purchaseString, Encoding.UTF8, "application/json");
+                                var client = new System.Net.Http.HttpClient();
+                                var Response = await client.PostAsync(Constant.PurchaseUrl, purchaseMessage);
+
+                                Debug.WriteLine("Order was written to DB: " + Response.IsSuccessStatusCode);
+                                //Debug.WriteLine("Coupon was succesfully updated (subtract)" + RDSCouponResponse);
+                                if (Response.IsSuccessStatusCode)
+                                {
+                                    var RDSResponseContent = await Response.Content.ReadAsStringAsync();
+
+                                    cartItems.Clear();
+                                    updateTotals(0, 0);
+                                    total = 00.00;
+                                    total_qty = 0;
+                                    Application.Current.Properties["day"] = "";
+                                    cartEmpty = "EMPTY";
+                                    cartHeight.Height = 0;
+                                    if (!(bool)Application.Current.Properties["guest"])
+                                    {
+                                        await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
+                                    }
+                                    else
+                                    {
+                                        Application.Current.Properties["guest"] = false;
+
+                                        var firstName = (string)Application.Current.Properties["user_first_name"];
+                                        var lastName = (string)Application.Current.Properties["user_last_name"];
+                                        var email = (string)Application.Current.Properties["user_email"];
+                                        var phone = (string)Application.Current.Properties["user_phone_num"];
+                                        var address = (string)Application.Current.Properties["user_address"];
+                                        var unit = (string)Application.Current.Properties["user_unit"];
+                                        var city = (string)Application.Current.Properties["user_city"];
+                                        var zipcode = (string)Application.Current.Properties["user_zip_code"];
+                                        var state = (string)Application.Current.Properties["user_state"];
+                                        var lat = (string)Application.Current.Properties["user_latitude"];
+                                        var longitude = (string)Application.Current.Properties["user_longitude"];
+
+                                        Application.Current.MainPage = new SignUpPage(firstName, lastName, phone, email, address, unit, city, state, zipcode, "guest", lat, longitude);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                // Fail
+                                await DisplayAlert("Ooops", "Payment was not succesfull. Please try again", "OK");
+                            }
+                        }
+                    }
+                }
             }
             catch(Exception ex)
             {
@@ -1387,7 +1602,7 @@ namespace ServingFresh.Views
                     stringAmount += arrayAmount[i];
                 }
             }
-            System.Diagnostics.Debug.WriteLine(stringAmount);
+            Debug.WriteLine("STRIPE AMOUNT TO CHARGE: " + stringAmount);
             return Int32.Parse(stringAmount);
         }
 
@@ -1765,7 +1980,7 @@ namespace ServingFresh.Views
 
         void InfoClick(System.Object sender, System.EventArgs e)
         {
-            if (!Application.Current.Properties.ContainsKey("enable"))
+            if (!(bool)Application.Current.Properties["guest"])
             {
                 Application.Current.MainPage = new InfoPage();
             }
@@ -1773,7 +1988,7 @@ namespace ServingFresh.Views
 
         void ProfileClick(System.Object sender, System.EventArgs e)
         {
-            if (!Application.Current.Properties.ContainsKey("enable"))
+            if (!(bool)Application.Current.Properties["guest"])
             {
                 Application.Current.MainPage = new ProfilePage();
             }
@@ -2080,10 +2295,24 @@ namespace ServingFresh.Views
                 await DisplayAlert("Congratulations", "Payment was succesfull. We appreciate your business", "OK");
                 ClearCardInfo();
 
+                if(deliveryInstructions.Text == null)
+                {
+                    Debug.WriteLine("PAYPAL");
+                    Debug.WriteLine("DELIVERY INSTRUCTIONS WERE NOT SET");
+                    purchaseObject.delivery_instructions = "";
+                }
+                else
+                {
+                    purchaseObject.delivery_instructions = deliveryInstructions.Text;
+                }
+                
+
+
+                // purchaseObject.delivery_instructions = deliveryInstructions.Text;
                 purchaseObject.subtotal = GetSubTotal().ToString("N2");
-                purchaseObject.service_fee = GetServiceFee().ToString("N2");
-                purchaseObject.delivery_fee = GetDeliveryFee().ToString("N2");
-                purchaseObject.driver_tip = driver_tips.ToString("N2") ;
+                purchaseObject.service_fee = service_fee.ToString("N2");
+                purchaseObject.delivery_fee = delivery_fee_db.ToString("N2");
+                purchaseObject.driver_tip = driver_tips.ToString("N2");
                 purchaseObject.taxes = GetTaxes().ToString("N2");
 
                 var purchaseString = JsonConvert.SerializeObject(purchaseObject);
@@ -2100,6 +2329,8 @@ namespace ServingFresh.Views
 
                 var Response = await client.PostAsync(Constant.PurchaseUrl, purchaseMessage);
                 //var RDSCouponResponse = await client.PostAsync(Constant.UpdateCouponUrl, couponContent);
+                Debug.WriteLine("RESPONSE" + Response.Content);
+                Debug.WriteLine("REASON PHRASE: " + Response.ReasonPhrase);
                 Debug.WriteLine("Order was written to DB: " + Response.IsSuccessStatusCode);
                 //Debug.WriteLine("Coupon was succesfully updated (subtract)" + RDSCouponResponse);
                 if (Response.IsSuccessStatusCode)

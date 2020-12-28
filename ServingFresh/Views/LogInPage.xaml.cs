@@ -15,6 +15,7 @@ using ServingFresh.LogIn.Apple;
 using ServingFresh.Notifications;
 using System.Diagnostics;
 using ServingFresh.Models;
+using Acr.UserDialogs;
 
 namespace ServingFresh.Views
 {
@@ -545,6 +546,7 @@ namespace ServingFresh.Views
 
             AuthenticationState.Authenticator = authenticator;
             presenter.Login(authenticator);
+            
         }
         private async void GoogleAuthenticatorCompleted(object sender, AuthenticatorCompletedEventArgs e)
         {
@@ -560,7 +562,9 @@ namespace ServingFresh.Views
             {
                 try
                 {
+                    
                     GoogleUserProfileAsync(e.Account.Properties["access_token"], e.Account.Properties["refresh_token"], e);
+                    
                 }
                 catch(Exception g)
                 {

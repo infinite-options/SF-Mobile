@@ -288,14 +288,14 @@ namespace ServingFresh.Views
                 await DisplayAlert("Error", "Please enter your zipcode", "OK");
             }
 
-            if (userDeliveryInstructions.Text == null)
-            {
-                userDeliveryInstructions.Text = "";
-            }
-            else
-            {
+            //if (userDeliveryInstructions.Text == null)
+            //{
+            //    userDeliveryInstructions.Text = "";
+            //}
+            //else
+            //{
               
-            }
+            //}
 
             // Setting request for USPS API
             XDocument requestDoc = new XDocument(
@@ -333,12 +333,13 @@ namespace ServingFresh.Views
                         //GetAddressLatitudeLongitude();
                         Geocoder geoCoder = new Geocoder();
 
-                        IEnumerable<Position> approximateLocations = await geoCoder.GetPositionsForAddressAsync(directSignUp.address + "," + directSignUp.city + "," + directSignUp.state);
+                        IEnumerable<Position> approximateLocations = await geoCoder.GetPositionsForAddressAsync(directSignUp.address + "," + directSignUp.city + "," + directSignUp.state + "," + directSignUp.zip_code);
                         Position position = approximateLocations.FirstOrDefault();
 
                         latitude = $"{position.Latitude}";
                         longitude = $"{position.Longitude}";
-
+                        Debug.WriteLine("LATITUDE: " + latitude);
+                        Debug.WriteLine("LONGITUDE: " + longitude);
                         directSignUp.latitude = latitude;
                         directSignUp.longitude = longitude;
                         map.MapType = MapType.Street;
@@ -495,7 +496,7 @@ namespace ServingFresh.Views
                                 Application.Current.Properties["user_zip_code"] = directSignUp.zip_code;
                                 Application.Current.Properties["user_latitude"] = directSignUp.latitude;
                                 Application.Current.Properties["user_longitude"] = directSignUp.longitude;
-                                Application.Current.Properties["user_delivery_instructions"] = userDeliveryInstructions.Text;
+                                //Application.Current.Properties["user_delivery_instructions"] = userDeliveryInstructions.Text;
 
                                 _ = Application.Current.SavePropertiesAsync();
 
@@ -604,7 +605,7 @@ namespace ServingFresh.Views
                                 Application.Current.Properties["user_zip_code"] = directSignUp.zip_code;
                                 Application.Current.Properties["user_latitude"] = directSignUp.latitude;
                                 Application.Current.Properties["user_longitude"] = directSignUp.longitude;
-                                Application.Current.Properties["user_delivery_instructions"] = userDeliveryInstructions.Text;
+                                //Application.Current.Properties["user_delivery_instructions"] = userDeliveryInstructions.Text;
 
                                 _ = Application.Current.SavePropertiesAsync();
 

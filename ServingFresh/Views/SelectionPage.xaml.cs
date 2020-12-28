@@ -554,10 +554,11 @@ namespace ServingFresh.Views
                 unsortedSchedule.Sort();
                 foreach(DateTime a in unsortedSchedule)
                 {
-                    Debug.WriteLine(a.ToString("MMM d"));
+                    Debug.WriteLine(a.ToString("MMM dd"));
                     for (int b = 0; b < businesSchedule.Count; b++)
                     {
-                        if (a.ToString("MMM d") == businesSchedule[b].delivery_date)
+                        Debug.WriteLine("businessSchedule: " + businesSchedule[b].delivery_date);
+                        if (a.ToString("MMM dd") == businesSchedule[b].delivery_date)
                         {
                             ScheduleInfo addInfo = businesSchedule[b];
                             sortedBusinessSchedule.Add(addInfo);
@@ -602,10 +603,11 @@ namespace ServingFresh.Views
                     Debug.WriteLine("CURRENT TIME AS DATETIME TYPE      : " + currentTime);
                     if (currentTime < targetTimeStamp)
                     {
-
+                        
                     }
                     else
                     {
+                        
                         if (sortedBusinessSchedule.Count == 1)
                         {
                             firstElement.delivery_date = timeStampE1.AddDays(7).ToString("MMM dd");

@@ -38,7 +38,7 @@ namespace ServingFresh.iOS
             global::Xamarin.Forms.Forms.Init();
             Xamarin.FormsMaps.Init();
             global::Xamarin.Forms.Forms.Init();
-
+            
             //UIApplication.SharedApplication.UnregisterForRemoteNotifications();
             //var answer = RegistedDeviceToPushNotifications();
             //IsEnable = answer;
@@ -104,6 +104,8 @@ namespace ServingFresh.iOS
                 UIRemoteNotificationType notificationTypes = UIRemoteNotificationType.Alert | UIRemoteNotificationType.Badge | UIRemoteNotificationType.Sound;
                 UIApplication.SharedApplication.RegisterForRemoteNotificationTypes(notificationTypes);
             }
+            // ADDED LINE FOR NOTIFICATIONS WHEN APP IS OPEN
+            UNUserNotificationCenter.Current.Delegate = new NotificationDelegate();
             return true;
         }
 
@@ -255,6 +257,11 @@ namespace ServingFresh.iOS
                     }
                 }
             }
+        }
+
+        // ADDED LINE FOR NOTIFICATIONS WHEN APP IS OPEN
+        public class NotificationDelegate : UNUserNotificationCenterDelegate {
+            public override void WillPresentNotification(UNUserNotificationCenter center, UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler) {completionHandler(UNNotificationPresentationOptions.Alert); }
         }
     }
 }

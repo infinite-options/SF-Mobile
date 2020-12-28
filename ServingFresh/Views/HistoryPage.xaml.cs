@@ -85,7 +85,7 @@ namespace ServingFresh.Views
             {
                 get
                 {
-                    return name + " ( $" + (Double.Parse(qty) * Double.Parse(price)).ToString("N2") + " / " + unit + " ) ";
+                    return name + " ( $" + Double.Parse(price).ToString("N2") + " / " + unit + " ) ";
                 }
             }
 
@@ -140,6 +140,37 @@ namespace ServingFresh.Views
                 {
                     var items = JsonConvert.DeserializeObject<ObservableCollection<HistoryItemObject>>(ho.items);
                     var date = "";
+                    var subtotal = 0.0;
+                    var promo_applied = 0.0;
+                    var delivery_fee = 0.0;
+                    var service_fee = 0.0;
+                    var driver_tip = 0.0;
+                    var taxes = 0.0;
+                    var total = 0.0;
+                    if(ho.subtotal != null)
+                    {
+                        subtotal = ho.subtotal;
+                    }
+                    if(ho.amount_discount != null)
+                    {
+                        promo_applied = ho.amount_discount;
+                    }
+                    if(ho.delivery_fee != null)
+                    {
+                        delivery_fee = ho.delivery_fee;
+                    }
+                    if(ho.service_fee != null)
+                    {
+                        service_fee = ho.service_fee;
+                    }
+                    if(ho.taxes != null)
+                    {
+                        taxes = ho.taxes;
+                    }
+                    if(ho.amount_paid != null)
+                    {
+                        total = ho.amount_paid;
+                    }
                     foreach(char a in ho.start_delivery_date.ToCharArray())
                     {
                         if (a != ' ')
@@ -148,6 +179,8 @@ namespace ServingFresh.Views
                         }
                         else { break; }
                     }
+
+
                     historyList.Add(new HistoryDisplayObject()
                     {
                         items = items,
@@ -158,13 +191,13 @@ namespace ServingFresh.Views
                         
                         purchase_id = "Order ID: " + ho.purchase_uid,
                         purchase_status = "Order " + ho.purchase_status,
-                        subtotal = "$ " + ho.subtotal.ToString("N2"),
-                        promo_applied = "$-" + ho.amount_discount.ToString("N2"),
-                        delivery_fee = "$ " + ho.delivery_fee.ToString("N2"),
-                        service_fee = "$ " + ho.service_fee.ToString("N2"),
-                        driver_tip = "$ " + ho.driver_tip.ToString("N2"),
-                        taxes = "$ " + ho.taxes.ToString("N2"),
-                        total = "$ " + ho.amount_paid.ToString("N2")
+                        subtotal = "$ " + subtotal.ToString("N2"),
+                        promo_applied = "-$" + promo_applied.ToString("N2"),
+                        delivery_fee = "$ " + delivery_fee.ToString("N2"),
+                        service_fee = "$ " + service_fee.ToString("N2"),
+                        driver_tip = "$ " + driver_tip.ToString("N2"),
+                        taxes = "$ " + taxes.ToString("N2"),
+                        total = "$ " + total.ToString("N2")
                         
                     }) ;
                 }

@@ -114,29 +114,29 @@
                                         CornerRadius="20"
                                         BackgroundColor="WhiteSmoke">
                                     </ImageButton>
-                                        <Grid>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="50"></RowDefinition>
-                                             </Grid.RowDefinitions>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"></ColumnDefinition>
-                                                <ColumnDefinition Width="45"></ColumnDefinition>
-                                            </Grid.ColumnDefinitions>
-                                            <BoxView  Grid.Row="0" Grid.Column="0"></BoxView>
-                                            <BoxView  Grid.Row="0" Grid.Column="1"></BoxView>
-                                            <BoxView  Grid.Row="0" Grid.Column="2"></BoxView>
-                                            <!--<BoxView Color="Red" Grid.Row="0" Grid.Column="3"></BoxView>-->
-                                            <Button
-                                                HorizontalOptions="StartAndExpand"
-                                                Grid.Row="0" Grid.Column="3"
-                                                Text="{Binding quantityLeft}"
-                                                TextColor="#FF8500"
-                                                FontAttributes="Bold"
-                                                Opacity="0.9"
-                                                WidthRequest="40"
-                                                BackgroundColor="WhiteSmoke">
-                                            </Button>
-                                        </Grid>
+                                    <Grid WidthRequest="{Binding width}">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="50"></RowDefinition>
+                                            </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                            <ColumnDefinition Width="45"></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <BoxView  Grid.Row="0" Grid.Column="0" HeightRequest="50"></BoxView>
+                                        <!--<BoxView  Grid.Row="0" Grid.Column="1"></BoxView>
+                                        <BoxView  Grid.Row="0" Grid.Column="2"></BoxView>-->
+                                        <!--<BoxView Color="Red" Grid.Row="0" Grid.Column="3"></BoxView>-->
+                                        <Button
+                                            HorizontalOptions="StartAndExpand"
+                                            Grid.Row="0" Grid.Column="1"
+                                            Text="{Binding quantityLeft}"
+                                            TextColor="#FF8500"
+                                            FontAttributes="Bold"
+                                            Opacity="0.9"
+                                            WidthRequest="40"
+                                            BackgroundColor="WhiteSmoke">
+                                        </Button>
+                                    </Grid>
                                     <!--<Button
                                         
                                         Text="{Binding quantityLeft}"
@@ -178,7 +178,7 @@
                                         CornerRadius="20"
                                         BackgroundColor="WhiteSmoke">
                                     </ImageButton>
-                                     <Grid>
+                                     <Grid WidthRequest="{Binding width}">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="50"></RowDefinition>
                                              </Grid.RowDefinitions>
@@ -186,13 +186,13 @@
                                                 <ColumnDefinition Width="*"></ColumnDefinition>
                                                 <ColumnDefinition Width="45"></ColumnDefinition>
                                             </Grid.ColumnDefinitions>
-                                            <BoxView  Grid.Row="0" Grid.Column="0"></BoxView>
-                                            <BoxView  Grid.Row="0" Grid.Column="1"></BoxView>
-                                            <BoxView  Grid.Row="0" Grid.Column="2"></BoxView>
+                                            <BoxView  Grid.Row="0" Grid.Column="0" HeightRequest="50"></BoxView>
+                                            <!--<BoxView  Grid.Row="0" Grid.Column="1"></BoxView>
+                                            <BoxView  Grid.Row="0" Grid.Column="2"></BoxView>-->
                                             <!--<BoxView Color="Red" Grid.Row="0" Grid.Column="3"></BoxView>-->
                                             <Button
                                                 HorizontalOptions="StartAndExpand"
-                                                Grid.Row="0" Grid.Column="3"
+                                                Grid.Row="0" Grid.Column="1"
                                                 Text="{Binding quantityRight}"
                                                 TextColor="#FF8500"
                                                 FontAttributes="Bold"

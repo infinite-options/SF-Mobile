@@ -133,11 +133,18 @@
                             </StackLayout>
                         </Grid>
                         <BoxView StyleClass="spacer"/>
-                        <Grid Padding="15">
+                        <Grid Padding="15" ColumnSpacing="0">
                             <Label Grid.Column="0" Text="Expected Delivery:" StyleClass="h3, primary"/>
                             <StackLayout Grid.Column="1">
                                 <Label x:Name="deliveryDate" FontSize="Micro" StyleClass="p, black"/>
                                 <Label x:Name="deliveryTime" FontSize="Micro" StyleClass="p, black"/>
+                            </StackLayout>
+                        </Grid>
+                        <BoxView StyleClass="spacer"/>
+                        <Grid Padding="15,15,0,0">
+                            <Label Grid.Column="0" Text="Delivery Instructions:" StyleClass="h3, primary"/>
+                            <StackLayout Grid.Column="1" HeightRequest="50" BackgroundColor="LightGoldenrodYellow" Padding="0">
+                                <Editor x:Name="deliveryInstructions" Margin="-10,-8,0,0" HeightRequest="100" Placeholder="Delivery Intructions Here" MaxLength="80" FontSize="Micro" Keyboard="Chat"></Editor>
                             </StackLayout>
                         </Grid>
                         <BoxView StyleClass="spacer"/>
@@ -402,7 +409,7 @@
                         <Entry x:Name="newUserLastName" Placeholder="Last name"></Entry>
                         <Entry x:Name="newUserPhoneNum" Placeholder="Phone number" MaxLength="10"></Entry>
                         <Entry x:Name="newUserEmailAddress" Placeholder="Email Address"></Entry>
-                        <Button Text="Save Address" TextColor="#FF8500" FontAttributes="Bold" BorderColor="#FF8500" BorderWidth="0.5" Clicked="SaveChangesClick"></Button>
+                        <Button Text="Save Info" TextColor="#FF8500" FontAttributes="Bold" BorderColor="#FF8500" BorderWidth="0.5" Clicked="SaveChangesClick"></Button>
                         <Button Text="Cancel" TextColor="#FF8500" FontAttributes="Bold" BorderColor="#FF8500" BorderWidth="0.5" Clicked="ChangeContactInfoCancelClick"></Button>
                     </StackLayout>
                 </ScrollView>

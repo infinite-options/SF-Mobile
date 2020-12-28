@@ -69,7 +69,7 @@
                             Placeholder="Zipcode">
                         </Entry>
                     </Grid>
-                    <Entry x:Name="userDeliveryInstructions" Placeholder="Delivery instructions" IsEnabled="False"></Entry>
+                    <!--<Entry x:Name="userDeliveryInstructions" Placeholder="Delivery instructions" IsEnabled="False"></Entry>-->
                     <Frame HasShadow="False" BackgroundColor="Gray" Padding="0" HeightRequest="200">
                         <maps:Map
                             x:Name="map"

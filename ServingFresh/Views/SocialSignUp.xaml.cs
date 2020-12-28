@@ -196,10 +196,10 @@ namespace ServingFresh.Views
                 await DisplayAlert("Error", "Please enter your zipcode", "OK");
             }
 
-            if (userDeliveryInstructions.Text == null)
-            {
-                userDeliveryInstructions.Text = "";
-            }
+            //if (userDeliveryInstructions.Text == null)
+            //{
+            //    userDeliveryInstructions.Text = "";
+            //}
 
             // Setting request for USPS API
             XDocument requestDoc = new XDocument(
@@ -366,7 +366,7 @@ namespace ServingFresh.Views
                         Application.Current.Properties["user_zip_code"] = socialSignUp.zip_code;
                         Application.Current.Properties["user_latitude"] = socialSignUp.latitude;
                         Application.Current.Properties["user_longitude"] = socialSignUp.longitude;
-                        Application.Current.Properties["user_delivery_instructions"] = userDeliveryInstructions.Text;
+                        //Application.Current.Properties["user_delivery_instructions"] = userDeliveryInstructions.Text;
 
                         _ = Application.Current.SavePropertiesAsync();
 

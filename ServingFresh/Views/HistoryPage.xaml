@@ -97,7 +97,7 @@
                                             <Label Text="{Binding purchase_id}" StyleClass="black"/>
                                         </StackLayout>
                                         <BoxView StyleClass="spacer"/>
-                                        <CollectionView ItemsSource="{Binding items}" Footer="" HeightRequest="{Binding itemsHeight}">
+                                        <CollectionView ItemsSource="{Binding items}" Footer="" HeightRequest="{Binding itemsHeight}" IsEnabled="false">
                                             <CollectionView.ItemTemplate>
                                                 <DataTemplate>
                                                     <StackLayout>
