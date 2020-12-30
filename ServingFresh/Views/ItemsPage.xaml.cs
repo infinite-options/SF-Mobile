@@ -68,8 +68,9 @@ namespace ServingFresh.Views
             public double item_price { get; set; }
             // Additional fields 
             public string img { get; set; }
-            //public string description { get; set; }
-            public string unit { get; set; } 
+            public string description { get; set; }
+            public string unit { get; set; }
+            public double business_price { get; set; }
         }
 
         public IDictionary<string, ItemPurchased> order = new Dictionary<string, ItemPurchased>();
@@ -269,10 +270,12 @@ namespace ServingFresh.Views
                             itemPriceLeft = "$ " + "",
                             itemPriceLeftUnit = "",
                             itemLeftUnit = "",
+                            item_businessPriceLeft = 0,
                             isItemLeftVisiable = false,
                             isItemLeftEnable = false,
                             quantityL = 0,
-                            
+                            item_descLeft = "",
+
 
                             imageSourceRight = "",
                             quantityRight = 0,
@@ -280,11 +283,13 @@ namespace ServingFresh.Views
                             itemPriceRight = "$ " + "",
                             itemPriceRightUnit = "",
                             itemRightUnit = "",
+                            item_businessPriceRight = 0,
                             isItemRightVisiable = false,
                             isItemRightEnable = false,
                             quantityR = 0,
-                            
-                        }); 
+                            item_descRight = "",
+
+                        }); ; 
                     }
                     if (isAmountItemsEven(n))
                     {
@@ -303,10 +308,13 @@ namespace ServingFresh.Views
                                 itemPriceLeft = "$ " + data.result[j].item_price.ToString(),
                                 itemPriceLeftUnit = "$ " + data.result[j].item_price.ToString("N2") + " / "+(string)data.result[j].item_unit.ToString(),
                                 itemLeftUnit = (string)data.result[j].item_unit.ToString(),
+                                item_businessPriceLeft = data.result[j].business_price,
                                 isItemLeftVisiable = true,
                                 isItemLeftEnable = true,
                                 quantityL = 0,
-                                
+                                item_descLeft = data.result[j].item_desc,
+
+
 
                                 imageSourceRight = data.result[j + 1].item_photo,
                                 item_uidRight = data.result[j + 1].item_uid,
@@ -316,10 +324,12 @@ namespace ServingFresh.Views
                                 itemPriceRight = "$ " + data.result[j + 1].item_price.ToString(),
                                 itemPriceRightUnit = "$ " + data.result[j + 1].item_price.ToString("N2") + " / "+(string)data.result[j + 1].item_unit.ToString(),
                                 itemRightUnit = (string)data.result[j + 1].item_unit.ToString(),
+                                item_businessPriceRight = data.result[j + 1].business_price,
                                 isItemRightVisiable = true,
                                 isItemRightEnable = true,
                                 quantityR = 0,
-                                
+                                item_descRight = data.result[j + 1].item_desc,
+
                             });
                             j = j + 2;
                         }
@@ -340,10 +350,13 @@ namespace ServingFresh.Views
                                 itemPriceLeft = "$ " + data.result[j].item_price.ToString(),
                                 itemPriceLeftUnit = "$ " + data.result[j].item_price.ToString("N2") + " / "+(string)data.result[j].item_unit.ToString(),
                                 itemLeftUnit = (string)data.result[j].item_unit.ToString(),
+                                item_businessPriceLeft = data.result[j].business_price,
                                 isItemLeftVisiable = true,
                                 isItemLeftEnable = true,
                                 quantityL = 0,
-                                
+                                item_descLeft = data.result[j].item_desc,
+
+
 
                                 imageSourceRight = data.result[j + 1].item_photo,
                                 item_uidRight = data.result[j + 1].item_uid,
@@ -353,10 +366,12 @@ namespace ServingFresh.Views
                                 itemPriceRight = "$ " + data.result[j + 1].item_price.ToString(),
                                 itemPriceRightUnit = "$ " + data.result[j + 1].item_price.ToString("N2") + " / "+(string)data.result[j + 1].item_unit.ToString(),
                                 itemRightUnit = (string)data.result[j + 1].item_unit.ToString(),
+                                item_businessPriceRight = data.result[j + 1].business_price,
                                 isItemRightVisiable = true,
                                 isItemRightEnable = true,
                                 quantityR = 0,
-                                
+                                item_descRight = data.result[j + 1].item_desc,
+
                             });
                             j = j + 2;
                         }
@@ -372,10 +387,12 @@ namespace ServingFresh.Views
                             itemPriceLeft = "$ " + data.result[j].item_price.ToString(),
                             itemPriceLeftUnit = "$ " + data.result[j].item_price.ToString("N2") + " / "+(string)data.result[j].item_unit.ToString(),
                             itemLeftUnit = (string)data.result[j].item_unit.ToString(),
+                            item_businessPriceLeft = data.result[j].business_price,
                             isItemLeftVisiable = true,
                             isItemLeftEnable = true,
                             quantityL = 0,
-                            
+                            item_descLeft = data.result[j].item_desc,
+
 
                             imageSourceRight = "",
                             quantityRight = 0,
@@ -505,9 +522,11 @@ namespace ServingFresh.Views
                             itemPriceLeft = "$ " + "",
                             itemPriceLeftUnit = "",
                             itemLeftUnit = "",
+                            item_businessPriceLeft = 0,
                             isItemLeftVisiable = false,
                             isItemLeftEnable = false,
                             quantityL = 0,
+                            item_descLeft = "",
                             
 
                             imageSourceRight = "",
@@ -516,9 +535,11 @@ namespace ServingFresh.Views
                             itemPriceRight = "$ " + "",
                             itemPriceRightUnit = "",
                             itemRightUnit = "",
+                            item_businessPriceRight = 0,
                             isItemRightVisiable = false,
                             isItemRightEnable = false,
                             quantityR = 0,
+                            item_descRight = "",
                             
                         });
                     }
@@ -538,10 +559,13 @@ namespace ServingFresh.Views
                                 itemPriceLeft = "$ " + data.result[j].item_price.ToString(),
                                 itemPriceLeftUnit = "$ " + data.result[j].item_price.ToString("N2") + " / "+(string)data.result[j].item_unit.ToString(),
                                 itemLeftUnit = (string)data.result[j].item_unit.ToString(),
+                                item_businessPriceLeft = data.result[j].business_price,
                                 isItemLeftVisiable = true,
                                 isItemLeftEnable = true,
                                 quantityL = 0,
-                                
+                                item_descLeft = data.result[j].item_desc,
+
+
 
 
 
@@ -553,10 +577,12 @@ namespace ServingFresh.Views
                                 itemPriceRight = "$ " + data.result[j + 1].item_price.ToString(),
                                 itemPriceRightUnit = "$ " + data.result[j + 1].item_price.ToString("N2") + " / "+ (string)data.result[j + 1].item_unit.ToString(),
                                 itemRightUnit = (string)data.result[j + 1].item_unit.ToString(),
+                                item_businessPriceRight = data.result[j + 1].business_price,
                                 isItemRightVisiable = true,
                                 isItemRightEnable = true,
                                 quantityR = 0,
-                                
+                                item_descRight = data.result[j + 1].item_desc,
+
                             });
                             j = j + 2;
                         }
@@ -577,10 +603,13 @@ namespace ServingFresh.Views
                                 itemPriceLeft = "$ " + data.result[j].item_price.ToString(),
                                 itemPriceLeftUnit = "$ " + data.result[j].item_price.ToString("N2") + " / "+(string)data.result[j].item_unit.ToString(),
                                 itemLeftUnit = (string)data.result[j].item_unit.ToString(),
+                                item_businessPriceLeft = data.result[j].business_price,
                                 isItemLeftVisiable = true,
                                 isItemLeftEnable = true,
                                 quantityL = 0,
-                                
+                                item_descLeft = data.result[j].item_desc,
+
+
 
                                 imageSourceRight = data.result[j + 1].item_photo,
                                 item_uidRight = data.result[j + 1].item_uid,
@@ -590,10 +619,12 @@ namespace ServingFresh.Views
                                 itemPriceRight = "$ " + data.result[j + 1].item_price.ToString(),
                                 itemPriceRightUnit = "$ " + data.result[j + 1].item_price.ToString("N2") + " / "+(string)data.result[j + 1].item_unit.ToString(),
                                 itemRightUnit = (string)data.result[j + 1].item_unit.ToString(),
+                                item_businessPriceRight = data.result[j + 1].business_price,
                                 isItemRightVisiable = true,
                                 isItemRightEnable = true,
                                 quantityR = 0,
-                                
+                                item_descRight = data.result[j + 1].item_desc,
+
                             });
                             j = j + 2;
                         }
@@ -609,10 +640,13 @@ namespace ServingFresh.Views
                             itemPriceLeft = "$ " + data.result[j].item_price.ToString(),
                             itemPriceLeftUnit = "$ " + data.result[j].item_price.ToString("N2") + " / "+(string)data.result[j].item_unit.ToString(),
                             itemLeftUnit = (string)data.result[j].item_unit.ToString(),
+                            item_businessPriceLeft = data.result[j].business_price,
                             isItemLeftVisiable = true,
                             isItemLeftEnable = true,
                             quantityL = 0,
-                            
+                            item_descLeft = data.result[j].item_desc,
+
+
 
                             imageSourceRight = "",
                             quantityRight = 0,
@@ -753,7 +787,8 @@ namespace ServingFresh.Views
                             itemSelected.item_price = Convert.ToDouble(itemModelObject.itemPriceLeft.Substring(1).Trim());
                             itemSelected.img = itemModelObject.imageSourceLeft;
                             itemSelected.unit = itemModelObject.itemLeftUnit;
-                            //itemSelected.description = itemModelObject.item_descLeft;
+                            itemSelected.description = itemModelObject.item_descLeft;
+                            itemSelected.business_price = itemModelObject.item_businessPriceLeft;
                             order.Add(itemModelObject.itemNameLeft, itemSelected);
                         }
                     }
@@ -790,7 +825,8 @@ namespace ServingFresh.Views
                         itemSelected.item_price = Convert.ToDouble(itemModelObject.itemPriceLeft.Substring(1).Trim());
                         itemSelected.img = itemModelObject.imageSourceLeft;
                         itemSelected.unit = itemModelObject.itemLeftUnit;
-                        //itemSelected.description = itemModelObject.item_descLeft;
+                        itemSelected.description = itemModelObject.item_descLeft;
+                        itemSelected.business_price = itemModelObject.item_businessPriceLeft;
                         order.Add(itemModelObject.itemNameLeft, itemSelected);
                     }
                 }
@@ -826,7 +862,8 @@ namespace ServingFresh.Views
                         itemSelected.item_price = Convert.ToDouble(itemModelObject.itemPriceRight.Substring(1).Trim());
                         itemSelected.img = itemModelObject.imageSourceRight;
                         itemSelected.unit = itemModelObject.itemRightUnit;
-                        //itemSelected.description = itemModelObject.item_descRight;
+                        itemSelected.description = itemModelObject.item_descRight;
+                        itemSelected.business_price = itemModelObject.item_businessPriceRight;
                         order.Add(itemModelObject.itemNameRight, itemSelected);
                     }
                 }
@@ -860,7 +897,8 @@ namespace ServingFresh.Views
                     itemSelected.item_price = Convert.ToDouble(itemModelObject.itemPriceRight.Substring(1).Trim());
                     itemSelected.img = itemModelObject.imageSourceRight;
                     itemSelected.unit = itemModelObject.itemRightUnit;
-                    //itemSelected.description = itemModelObject.item_descRight;
+                    itemSelected.description = itemModelObject.item_descRight;
+                    itemSelected.business_price = itemModelObject.item_businessPriceRight;
                     order.Add(itemModelObject.itemNameRight, itemSelected);
                 }
             }

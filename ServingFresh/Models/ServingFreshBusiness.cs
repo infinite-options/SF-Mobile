@@ -113,6 +113,9 @@ namespace ServingFresh.Models
         public string business_image { get; set; }
         public IDictionary<string,IList<string>> delivery_days { get; set; }
         public string business_accepting_hours { get; set; }
+        public string z_accepting_day { get; set; }
+        public string z_accepting_time { get; set; }
+        public string status { get; set; }
     }
 
     public class ServingFreshBusiness

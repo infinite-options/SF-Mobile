@@ -22,6 +22,7 @@
     <PackageReference Include="Acr.UserDialogs" Version="7.1.0.470" />
     <PackageReference Include="PayPalCheckoutSdk" Version="1.0.3" />
     <PackageReference Include="PayPalHttp" Version="1.0.0" />
+    <PackageReference Include="Xam.Plugin.LatestVersion" Version="1.1.2" />
   </ItemGroup>
   <!--<PackageReference Include="Stripe.net" Version="39.22.0" />-->
 

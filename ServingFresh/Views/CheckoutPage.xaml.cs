@@ -30,6 +30,8 @@ namespace ServingFresh.Views
     public class ItemObject : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        public string description { get; set; }
+        public double business_price { get; set; }
         public string item_uid { get; set; }
         public string business_uid { get; set; }
         public string name { get; set; }
@@ -244,6 +246,8 @@ namespace ServingFresh.Views
                             business_uid = order[key].pur_business_uid,
                             img = order[key].img,
                             unit = order[key].unit,
+                            description = order[key].description,
+                            business_price = order[key].business_price,
                         });
                         orderCopy.Add(key, order[key]);
                     }
@@ -337,6 +341,8 @@ namespace ServingFresh.Views
                             business_uid = order[key].pur_business_uid,
                             img = order[key].img,
                             unit = order[key].unit,
+                            description = order[key].description,
+                            business_price = order[key].business_price,
                         });
                         orderCopy.Add(key, order[key]);
                     }
@@ -1050,6 +1056,8 @@ namespace ServingFresh.Views
                     price = i.price,
                     item_uid = i.item_uid,
                     itm_business_uid = i.business_uid,
+                    description = i.description,
+                    business_price = i.business_price,
                 });
             }
             return purchasedOrder;
