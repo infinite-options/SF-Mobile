@@ -180,6 +180,10 @@ namespace ServingFresh.Views
                         else { break; }
                     }
 
+                    DateTime today = DateTime.Parse(ho.purchase_date);
+
+                    var localPurchaseDate = today.ToLocalTime();
+
 
                     historyList.Add(new HistoryDisplayObject()
                     {
@@ -187,12 +191,12 @@ namespace ServingFresh.Views
 
                         itemsHeight = 55 * items.Count,
                         delivery_date = "Expected Delivery Date: " + date,
-                        purchase_date = "Purchase Date: " + ho.purchase_date,
+                        purchase_date = "Purchase Date: " + localPurchaseDate,
                         
                         purchase_id = "Order ID: " + ho.purchase_uid,
                         purchase_status = "Order " + ho.purchase_status,
                         subtotal = "$ " + subtotal.ToString("N2"),
-                        promo_applied = "-$" + promo_applied.ToString("N2"),
+                        promo_applied = "-$ " + promo_applied.ToString("N2"),
                         delivery_fee = "$ " + delivery_fee.ToString("N2"),
                         service_fee = "$ " + service_fee.ToString("N2"),
                         driver_tip = "$ " + driver_tip.ToString("N2"),

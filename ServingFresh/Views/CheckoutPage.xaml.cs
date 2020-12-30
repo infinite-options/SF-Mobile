@@ -173,10 +173,10 @@ namespace ServingFresh.Views
         public double subtotal;
         public double discount;
         public double delivery_fee_db = 0;
-        public double delivery_fee;
-        public double service_fee;
-        public double taxes;
-        public double total;
+        public double delivery_fee = 0;
+        public double service_fee = 0;
+        public double taxes = 0;
+        public double total = 0;
         public double driver_tips;
         public static int total_qty = 0;
         private bool isAddressValidated;
@@ -207,6 +207,7 @@ namespace ServingFresh.Views
         {
             InitializeComponent();
             GetPayPalCredentials();
+            GetFees(day);
             if (day != "")
             {
                 GetFees(day);
@@ -410,20 +411,28 @@ namespace ServingFresh.Views
 
         public async void GetDeliveryInstructions()
         {
-            var client = new System.Net.Http.HttpClient();
-            var ID = (string)Application.Current.Properties["user_id"];
-            Debug.WriteLine("USER ID: " + ID);
-            var RDSResponse = await client.GetAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/last_delivery_instruction/" + ID);
-            var content = await RDSResponse.Content.ReadAsStringAsync();
-            if (RDSResponse.IsSuccessStatusCode)
+            try
             {
-                var data = JsonConvert.DeserializeObject<InfoObject>(content);
-                Debug.WriteLine("USER DELIVERY INSTRUCTIONS: " + data.result[0].delivery_instructions);
-                if (data.result[0].delivery_instructions != "")
+                var client = new System.Net.Http.HttpClient();
+                var ID = (string)Application.Current.Properties["user_id"];
+                Debug.WriteLine("USER ID: " + ID);
+                var RDSResponse = await client.GetAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/last_delivery_instruction/" + ID);
+                var content = await RDSResponse.Content.ReadAsStringAsync();
+                if (RDSResponse.IsSuccessStatusCode)
                 {
-                    deliveryInstructions.Text = data.result[0].delivery_instructions;
+                    var data = JsonConvert.DeserializeObject<InfoObject>(content);
+                    Debug.WriteLine("USER DELIVERY INSTRUCTIONS: " + data.result[0].delivery_instructions);
+                    if (data.result[0].delivery_instructions != "")
+                    {
+                        deliveryInstructions.Text = data.result[0].delivery_instructions;
+                    }
                 }
             }
+            catch (Exception deliveryInstructions)
+            {
+                Debug.WriteLine(deliveryInstructions.Message);
+            }
+
         }
 
         public void InitializeMap()
@@ -958,7 +967,7 @@ namespace ServingFresh.Views
                 {
                     if (purchaseObject.delivery_first_name == "" || purchaseObject.delivery_last_name == "" || purchaseObject.delivery_email == "")
                     {
-                        await DisplayAlert("Oops", "Plese set your delivery contact information!", "OK");
+                        await DisplayAlert("Oops", "Please enter your delivery contact information!", "OK");
                         contactframe.Height = this.Height / 2;
                         return;
                     }
@@ -1003,8 +1012,8 @@ namespace ServingFresh.Views
             purchaseObject.charge_id = "";
             purchaseObject.payment_type = ((Button)sender).Text == "Checkout with Paypal" ? "PAYPAL" : "STRIPE";
             purchaseObject.items = GetOrder(cartItems);
-            purchaseObject.start_delivery_date = dateTime +" "+ timeStamp.ToString("HH:mm:ss");
-            if (!(bool)Application.Current.Properties["guest"])
+            purchaseObject.start_delivery_date = ((DateTime)Application.Current.Properties["deliveryDate"]).ToString("yyyy-MM-dd HH:mm:ss");
+                if (!(bool)Application.Current.Properties["guest"])
             {
                 if (appliedIndex != -1)
                 {
@@ -1080,7 +1089,7 @@ namespace ServingFresh.Views
                 {
                     if (purchaseObject.delivery_first_name == "" || purchaseObject.delivery_last_name == "" || purchaseObject.delivery_email == "")
                     {
-                        await DisplayAlert("Oops", "Plese set your delivery contact information!", "OK");
+                        await DisplayAlert("Oops", "Please enter your delivery contact information!", "OK");
                         contactframe.Height = this.Height / 2;
                         return;
                     }
@@ -1124,7 +1133,7 @@ namespace ServingFresh.Views
                 purchaseObject.charge_id = "";
                 purchaseObject.payment_type = ((Button)sender).Text == "Checkout with Paypal" ? "PAYPAL" : "STRIPE";
                 purchaseObject.items = GetOrder(cartItems);
-                purchaseObject.start_delivery_date = dateTime + " " + timeStamp.ToString("HH:mm:ss");
+                purchaseObject.start_delivery_date = ((DateTime)Application.Current.Properties["deliveryDate"]).ToString("yyyy-MM-dd HH:mm:ss");
                 if (!(bool)Application.Current.Properties["guest"])
                 {
                     if(appliedIndex != -1)
@@ -1248,7 +1257,7 @@ namespace ServingFresh.Views
             }
             else
             {
-                await DisplayAlert("Oops", "We can't not process your request at this moment.", "OK");
+                await DisplayAlert("Oops", "We can't process your request at this moment.", "OK");
             }
         }
 
@@ -1341,7 +1350,7 @@ namespace ServingFresh.Views
                         if (charge.Status == "succeeded")
                         {
                             // Successful Payment
-                            await DisplayAlert("Congratulations", "Payment was succesfull. We appreciate your business", "OK");
+                            await DisplayAlert("Congratulations", "Payment was successful. We appreciate your business", "OK");
                             ClearCardInfo();
 
                             if (deliveryInstructions.Text == null)
@@ -1406,7 +1415,7 @@ namespace ServingFresh.Views
                         else
                         {
                             // Fail
-                            await DisplayAlert("Ooops", "Payment was not succesfull. Please try again", "OK");
+                            await DisplayAlert("Oops", "Payment was not successful. Please try again", "OK");
                         }
                     }
                 }
@@ -1505,7 +1514,7 @@ namespace ServingFresh.Views
                             if (charge.Status == "succeeded")
                             {
                                 // Successful Payment
-                                await DisplayAlert("Congratulations", "Payment was succesfull. We appreciate your business", "OK");
+                                await DisplayAlert("Congratulations", "Payment was successful. We appreciate your business", "OK");
                                 ClearCardInfo();
 
                                 if (deliveryInstructions.Text == null)
@@ -1570,7 +1579,7 @@ namespace ServingFresh.Views
                             else
                             {
                                 // Fail
-                                await DisplayAlert("Ooops", "Payment was not succesfull. Please try again", "OK");
+                                await DisplayAlert("Oops", "Payment was not successful. Please try again", "OK");
                             }
                         }
                     }
@@ -2104,7 +2113,7 @@ namespace ServingFresh.Views
             }
             if (latitude == "0" || longitude == "0")
             {
-                await DisplayAlert("We couldn't find your address", "Please check for errors.", "Ok");
+                await DisplayAlert("We couldn't find your address", "Please check for errors.", "OK");
             }
             else
             {
@@ -2300,7 +2309,7 @@ namespace ServingFresh.Views
             {
                 Debug.WriteLine("WRITE DATA TO DATA BASE");
                 // Successful Payment
-                await DisplayAlert("Congratulations", "Payment was succesfull. We appreciate your business", "OK");
+                await DisplayAlert("Congratulations", "Payment was successful. We appreciate your business", "OK");
                 ClearCardInfo();
 
                 if(deliveryInstructions.Text == null)
@@ -2379,7 +2388,7 @@ namespace ServingFresh.Views
             }
             else
             {
-                await DisplayAlert("Ooops", "You payment was cancel or not sucessful. Please try again", "OK");
+                await DisplayAlert("Oops", "Your payment was canceled or was not successful. Please try again", "OK");
             }
 
             return response;

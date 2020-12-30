@@ -128,6 +128,7 @@ namespace ServingFresh.Views
             InitializeComponent();
             Init();
             CheckVersion();
+            
         }
 
         public void Init()
@@ -151,6 +152,7 @@ namespace ServingFresh.Views
             {
                 GetBusinesses();
                 Application.Current.Properties["day"] = "";
+                Application.Current.Properties["deliveryDate"] = "";
                 CartTotal.Text = CheckoutPage.total_qty.ToString();
             }
         }
@@ -417,8 +419,12 @@ namespace ServingFresh.Views
                     {
                         Debug.WriteLine("ONTIME");
                         
+                        //deliveryDate = BussinesDeliveryDate(acceptingDate, a.z_delivery_day, a.z_accepting_time);
                         deliveryDate = bussinesDeliveryDate(a.z_delivery_day, a.z_delivery_time);
-
+                        if (deliveryDate < acceptingDate)
+                        {
+                            deliveryDate = deliveryDate.AddDays(7);
+                        }
                         if (!deliverySchedule.Contains(deliveryDate))
                         {
                             var element = new ScheduleInfo();
@@ -477,7 +483,7 @@ namespace ServingFresh.Views
                     else
                     {
                         Debug.WriteLine("NON ONTIME! -> ROLL OVER TO NEXT DELIVERY DATE");
-                        
+
                         deliveryDate = bussinesDeliveryDate(a.z_delivery_day, a.z_delivery_time);
 
                         if (!deliverySchedule.Contains(deliveryDate.AddDays(7)))
@@ -770,9 +776,13 @@ namespace ServingFresh.Views
                     if (currentDate < acceptingDate)
                     {
                         Debug.WriteLine("ONTIME");
-
+                        
                         deliveryDate = bussinesDeliveryDate(a.z_delivery_day, a.z_delivery_time);
-
+                        if(deliveryDate < acceptingDate)
+                        {
+                            deliveryDate = deliveryDate.AddDays(7);
+                        }
+                        //deliveryDate = BussinesDeliveryDate(acceptingDate, a.z_delivery_day, a.z_accepting_time);
                         if (!businesDeliverySchedule.Contains(deliveryDate))
                         {
                             var element = new ScheduleInfo();
@@ -833,6 +843,7 @@ namespace ServingFresh.Views
                         Debug.WriteLine("NON ONTIME! -> ROLL OVER TO NEXT DELIVERY DATE");
 
                         deliveryDate = bussinesDeliveryDate(a.z_delivery_day, a.z_delivery_time);
+                        //deliveryDate = bussinesDeliveryDate
 
                         if (!businesDeliverySchedule.Contains(deliveryDate.AddDays(7)))
                         {
@@ -987,6 +998,44 @@ namespace ServingFresh.Views
             return date;
         }
 
+        public DateTime BussinesDeliveryDate(DateTime lastAcceptingOrdersDate, string day, string time)
+        {
+            string startTime = "";
+
+            foreach (char a in time.ToCharArray())
+            {
+                if (a != '-')
+                {
+                    startTime += a;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            var deliveryDate = DateTime.Parse(startTime.Trim());
+            Debug.WriteLine("DELIVERYY DATE IN BUSINESS" + deliveryDate);
+            Debug.WriteLine("LAST ACCEPTING DATE IN BUSINESS" + lastAcceptingOrdersDate);
+            if (deliveryDate < lastAcceptingOrdersDate)
+            {
+                deliveryDate = deliveryDate.AddDays(7);
+            }
+            Debug.WriteLine("DEFAULT DELIVERY DATE: " + deliveryDate);
+
+            for (int i = 0; i < 7; i++)
+            {
+                if (deliveryDate.DayOfWeek.ToString().ToUpper() == day.ToUpper())
+                {
+                    break;
+                }
+                deliveryDate = deliveryDate.AddDays(1);
+            }
+
+            Debug.WriteLine("DELIVERY DATE: " + deliveryDate);
+            return deliveryDate;
+        }
+
 
         public DateTime lastAcceptingOrdersDate(string day, string hour)
         {
@@ -1070,6 +1119,7 @@ namespace ServingFresh.Views
 
             Application.Current.Properties["delivery_date"] = dm.delivery_date;
             Application.Current.Properties["delivery_time"] = dm.delivery_time;
+            Application.Current.Properties["deliveryDate"] = dm.deliveryTimeStamp;
 
             ItemsPage businessItemPage = new ItemsPage(types, dm.business_uids, weekday);
             Application.Current.MainPage = businessItemPage;

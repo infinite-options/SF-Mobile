@@ -144,7 +144,7 @@
                         <Grid Padding="15,15,0,0">
                             <Label Grid.Column="0" Text="Delivery Instructions:" StyleClass="h3, primary"/>
                             <StackLayout Grid.Column="1" HeightRequest="50" BackgroundColor="LightGoldenrodYellow" Padding="0">
-                                <Editor x:Name="deliveryInstructions" Margin="-10,-8,0,0" HeightRequest="100" Placeholder="Delivery Intructions Here" MaxLength="80" FontSize="Micro" Keyboard="Chat"></Editor>
+                                <Editor BackgroundColor="White" x:Name="deliveryInstructions" Margin="-10,-8,0,0" HeightRequest="100" Placeholder="Enter Intructions Here" MaxLength="80" FontSize="Micro" Keyboard="Chat"></Editor>
                             </StackLayout>
                         </Grid>
                         <BoxView StyleClass="spacer"/>
@@ -298,10 +298,10 @@
                         </FlexLayout>
                         <BoxView StyleClass="spacer"/>
                         <FlexLayout JustifyContent="SpaceBetween" Padding="0,10,0,10">
-                            <Label Padding="15,0,0,0" Text="Driver Tip" StyleClass="p, black"/>
+                            <Label Padding="15,0,0,0" Text="Driver Tip (Optional - Tap to edit)" StyleClass="p, black"/>
                             <StackLayout Orientation="Horizontal" Spacing="0" Margin="0,0,0,0">
                                 <Label Text="$ " StyleClass="p, black"/>
-                                <local:CustomEntry HeightRequest="20" Completed="DriverTip_Completed" WidthRequest="60" Placeholder="0.00" FontSize="Small" Keyboard="Numeric" x:Name="DriverTip" StyleClass="p, black"/>
+                                <local:CustomEntry HeightRequest="20" Completed="DriverTip_Completed" Text="2.00" WidthRequest="60" Placeholder="0.00" FontSize="Small" Keyboard="Numeric" x:Name="DriverTip" StyleClass="p, black"/>
                             </StackLayout>
                         </FlexLayout>
                         <BoxView StyleClass="spacer"/>
