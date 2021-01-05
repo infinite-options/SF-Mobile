@@ -511,7 +511,7 @@ namespace ServingFresh.Views
 
                     var coupon = new couponItem();
                     Debug.WriteLine("COUPON IDS: " + c.coupon_id);
-                    coupon.couponId = c.coupon_id;
+                    coupon.couponId = c.coupon_uid;
                     // INITIALLY, THE IMAGE OF EVERY COUPON IS GRAY. (PLATFORM DEPENDENT)
                     if (Device.RuntimePlatform == Device.Android)
                     {
@@ -1671,7 +1671,7 @@ namespace ServingFresh.Views
                 //double newTotal = 0;
 
                 var coupon = new couponItem();
-                coupon.couponId = c.coupon_id;
+                coupon.couponId = c.coupon_uid;
                 // INITIALLY, THE IMAGE OF EVERY COUPON IS GRAY. (PLATFORM DEPENDENT)
                 if (Device.RuntimePlatform == Device.Android)
                 {

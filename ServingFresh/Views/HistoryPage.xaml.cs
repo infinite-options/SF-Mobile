@@ -171,6 +171,10 @@ namespace ServingFresh.Views
                     {
                         total = ho.amount_paid;
                     }
+                    if(ho.driver_tip != null)
+                    {
+                        driver_tip = ho.driver_tip;
+                    }
                     foreach(char a in ho.start_delivery_date.ToCharArray())
                     {
                         if (a != ' ')

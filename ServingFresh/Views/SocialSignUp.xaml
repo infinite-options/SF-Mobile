@@ -77,6 +77,7 @@
                         </maps:Map>
                     </Frame>
                     <Button
+                        x:Name="validateAddressButton"
                         Text="Validate Address"
                         TextColor="#FF8500"
                         FontAttributes="Bold"
@@ -88,7 +89,7 @@
                         Clicked="ValidateAddressClick">
 
                     </Button>
-                    <Button
+                    <!--<Button
                         Text="Sign up"
                         TextColor="White"
                         CornerRadius="5"
@@ -97,7 +98,7 @@
                         HeightRequest="40"
                         BackgroundColor="#FF8500"
                         Clicked="SignUpNewUser">
-                    </Button>
+                    </Button>-->
                 </StackLayout>
             </ScrollView>
         </StackLayout>
