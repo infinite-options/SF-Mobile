@@ -130,6 +130,8 @@
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-83.5%402x.png" />
     <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\1024x1024.png" />
     <ImageAsset Include="Assets.xcassets\CouponIcon.imageset\CouponIconGray.png" />
+    <ImageAsset Include="Assets.xcassets\Store.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\Store.imageset\store.png" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -176,6 +178,7 @@
     <BundleResource Include="Resources\CouponIconGreen.png" />
     <BundleResource Include="Resources\refund.png" />
     <BundleResource Include="Resources\welcomeBackground.png" />
+    <BundleResource Include="Resources\store.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AppleSignIn\" />
@@ -197,6 +200,7 @@
     <Folder Include="Assets.xcassets\CouponIcon.imageset\" />
     <Folder Include="Renderers\" />
     <Folder Include="AppleNotificationService\" />
+    <Folder Include="Assets.xcassets\Store.imageset\" />
   </ItemGroup>
   <ItemGroup>
     <ITunesArtwork Include="iTunesArtwork" />

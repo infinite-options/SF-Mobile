@@ -45,15 +45,16 @@
                     HorizontalOptions="Center"
                     VerticalOptions="Center"
                     HeightRequest="40"
-                    Source="CartIcon"
+                    Source="store.png"
                     BackgroundColor="Transparent"
                     Clicked="CartClick">
-                    <ImageButton.Effects>
+                    <!--<ImageButton.Effects>
                         <servingfresh:TintImageEffect TintColor="White"/>
-                    </ImageButton.Effects>
+                    </ImageButton.Effects>-->
                     
                 </ImageButton>
                 <Label
+                    BackgroundColor="White"
                     Grid.Column="2"
                     x:Name="CartTotal"
                     StyleClass="secondary"
@@ -62,7 +63,6 @@
                     TranslationY="-12"
                     VerticalOptions="Center"
                     HorizontalOptions="End">
-                    
                 </Label>
             </Grid>
             <BoxView Grid.Row="2" HeightRequest="1" BackgroundColor="Black"></BoxView>
