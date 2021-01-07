@@ -437,7 +437,7 @@ namespace ServingFresh.Views
                             element.delivery_shortname = deliveryDate.DayOfWeek.ToString().Substring(0, 3).ToUpper();
                             element.delivery_time = a.z_delivery_time;
                             element.deliveryTimeStamp = deliveryDate;
-                            element.orderExpTime = acceptingDate.ToString("MMM dd") + " @ " + acceptingDate.ToString("h tt");
+                            element.orderExpTime = "Order by " + acceptingDate.ToString("ddd dd") + " " + acceptingDate.ToString("htt").ToLower();
                             //element.orderExpTime = "Order by " + acceptingDate.ToString("MMM dd");
                             Debug.WriteLine("element.delivery_date: " + element.delivery_date);
                             Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
@@ -500,7 +500,7 @@ namespace ServingFresh.Views
                             element.delivery_shortname = nextDeliveryDate.DayOfWeek.ToString().Substring(0, 3).ToUpper();
                             element.delivery_time = a.z_delivery_time;
                             element.deliveryTimeStamp = nextDeliveryDate;
-                            element.orderExpTime = acceptingDate.AddDays(7).ToString("MMM dd") + " @ " + acceptingDate.AddDays(7).ToString("h tt");
+                            element.orderExpTime = "Order by " + acceptingDate.AddDays(7).ToString("ddd dd") + " " + acceptingDate.AddDays(7).ToString("htt").ToLower();
                             //element.orderExpTime = "Order by " + acceptingDate.AddDays(7).ToString("MMM dd");
                             Debug.WriteLine("element.delivery_date: " + element.delivery_date);
                             Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
@@ -797,7 +797,7 @@ namespace ServingFresh.Views
                             element.delivery_shortname = deliveryDate.DayOfWeek.ToString().Substring(0, 3).ToUpper();
                             element.delivery_time = a.z_delivery_time;
                             element.deliveryTimeStamp = deliveryDate;
-                            element.orderExpTime =  acceptingDate.ToString("MMM dd") + " @ " + acceptingDate.ToString("h tt");
+                            element.orderExpTime = "Order by " + acceptingDate.ToString("ddd dd") + " " + acceptingDate.ToString("htt").ToLower();
                             //element.orderExpTime = "Order by " + acceptingDate.ToString("MMM dd");
                             Debug.WriteLine("element.delivery_date: " + element.delivery_date);
                             Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
@@ -861,7 +861,7 @@ namespace ServingFresh.Views
                             element.delivery_shortname = nextDeliveryDate.DayOfWeek.ToString().Substring(0, 3).ToUpper();
                             element.delivery_time = a.z_delivery_time;
                             element.deliveryTimeStamp = nextDeliveryDate;
-                            element.orderExpTime = acceptingDate.AddDays(7).ToString("MMM dd") + " @ " + acceptingDate.AddDays(7).ToString("h tt");
+                            element.orderExpTime = "Order by " + acceptingDate.AddDays(7).ToString("ddd dd") + " " + acceptingDate.AddDays(7).ToString("htt").ToLower();
                             //element.orderExpTime = "Order by " + acceptingDate.AddDays(7).ToString("MMM dd");
                             Debug.WriteLine("element.delivery_date: " + element.delivery_date);
                             Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);

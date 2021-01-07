@@ -55,6 +55,7 @@ namespace ServingFresh.Views
 
         public string img { get; set; }
         public string unit { get; set; }
+        public string taxable { get; set; }
         // public string description { get; set;
         // business_price - double
     }
@@ -249,6 +250,7 @@ namespace ServingFresh.Views
                             unit = order[key].unit,
                             description = order[key].description,
                             business_price = order[key].business_price,
+                            taxable = order[key].taxable,
                         });
                         orderCopy.Add(key, order[key]);
                     }
@@ -344,6 +346,7 @@ namespace ServingFresh.Views
                             unit = order[key].unit,
                             description = order[key].description,
                             business_price = order[key].business_price,
+                            taxable = order[key].taxable,
                         });
                         orderCopy.Add(key, order[key]);
                     }
@@ -453,6 +456,7 @@ namespace ServingFresh.Views
 
                 var RDSResponse = await client.GetAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/get_Fee_Tax/" + zone + "," + day);
                 var content = await RDSResponse.Content.ReadAsStringAsync();
+                Debug.WriteLine(content);
                 if (RDSResponse.IsSuccessStatusCode)
                 {
                     var data = JsonConvert.DeserializeObject<ZoneFees>(content);
@@ -852,8 +856,20 @@ namespace ServingFresh.Views
                 DeliveryFee.Text = "$ " + (delivery_fee - discount_delivery_fee).ToString("N2");
                 delivery_fee_db = delivery_fee - discount_delivery_fee;
             }
-            
-            taxes = subtotal * (Constant.tax_rate);
+
+
+            var cartTax = 0.0;
+            foreach (ItemObject item in cartItems)
+            {
+                var tax = 0.0;
+                if(item.taxable == "TRUE")
+                {
+                    tax = (item.qty * item.price) * GetTaxes() / 100;
+                    cartTax += tax;
+                }
+            }
+
+            taxes = cartTax;
             Taxes.Text = "$ " + taxes.ToString("N2");
 
             if (DriverTip.Text == null)

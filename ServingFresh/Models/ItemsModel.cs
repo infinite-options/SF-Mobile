@@ -22,6 +22,7 @@ namespace ServingFresh.Models
         // Additional
         public string item_descLeft { get; set; }
         public double item_businessPriceLeft { get; set; }
+        public string itemTaxableLeft { get; set; }
 
         public string imageSourceRight { get; set; }
         public string item_uidRight { get; set; }
@@ -36,6 +37,7 @@ namespace ServingFresh.Models
         // Additional
         public string item_descRight { get; set; }
         public double item_businessPriceRight { get; set; }
+        public string itemTaxableRight { get; set; }
 
         public int quantityL
         {

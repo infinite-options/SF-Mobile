@@ -61,7 +61,7 @@
                           <CollectionView.ItemTemplate>
                               <DataTemplate>
                                   <StackLayout Padding="10">
-                                      <Frame Padding="0" CornerRadius="10" HasShadow="False" BackgroundColor="White" HeightRequest="120" WidthRequest="120">
+                                      <Frame Padding="0" CornerRadius="10" HasShadow="False" BackgroundColor="White" HeightRequest="110" WidthRequest="110">
                                           <StackLayout Spacing="0">
                                               <StackLayout.GestureRecognizers>
                                                   <TapGestureRecognizer Tapped="Open_Farm" CommandParameter="{Binding .}"/>
@@ -71,8 +71,8 @@
                                               </Frame>
                                               <Label Text="{Binding delivery_date}" StyleClass="h2, primary, center" VerticalTextAlignment="Center" VerticalOptions="FillAndExpand"/>
                                               <Label Text="{Binding delivery_time}" HorizontalOptions="Center" VerticalTextAlignment="Center" VerticalOptions="FillAndExpand"/>
-                                              <Label Text="Order by" TextColor="#FF8500"  HorizontalOptions="Center" VerticalTextAlignment="Center" VerticalOptions="FillAndExpand"/>
-                                              <Label Text="{Binding orderExpTime}" TextColor="#FF8500"  HorizontalOptions="Center" VerticalTextAlignment="Center" VerticalOptions="FillAndExpand"/>
+                                              <!--<Label Text="Order by Tue 1pm" TextColor="#FF8500" FontSize="10"  HorizontalOptions="Center" VerticalTextAlignment="Center" VerticalOptions="FillAndExpand"/>-->
+                                              <Label Text="{Binding orderExpTime}" FontSize="10" TextColor="#FF8500"  HorizontalOptions="Center" VerticalTextAlignment="Center" VerticalOptions="FillAndExpand"/>
                                           </StackLayout>
                                       </Frame>
                                   </StackLayout>

@@ -36,6 +36,7 @@ namespace ServingFresh.Views
             public string item_photo { get; set; }
             public object exp_date { get; set; }
             public string business_delivery_hours { get; set; }
+            public string taxable { get; set; }
         }
 
         public class ServingFreshBusinessItems
@@ -71,6 +72,7 @@ namespace ServingFresh.Views
             public string description { get; set; }
             public string unit { get; set; }
             public double business_price { get; set; }
+            public string taxable { get; set; }
         }
 
         public IDictionary<string, ItemPurchased> order = new Dictionary<string, ItemPurchased>();
@@ -203,6 +205,8 @@ namespace ServingFresh.Views
                 
 
                 var httpResponse = await client.PostAsync(Constant.GetItemsUrl, getItemsStringMessage);
+                //var list = await httpResponse.Content.ReadAsStringAsync();
+                //Debug.WriteLine("ITEMS LIST: " + list);
                 var r = await httpResponse.Content.ReadAsStreamAsync();
                 StreamReader sr = new StreamReader(r);
                 JsonReader reader = new JsonTextReader(sr);
@@ -225,7 +229,7 @@ namespace ServingFresh.Views
                         else
                         {
                             var savedItem = uniqueItems[key];
-                            
+
                             if (savedItem.item_price != a.item_price)
                             {
                                 var priceSelected = Math.Min(savedItem.business_price, a.business_price);
@@ -275,6 +279,7 @@ namespace ServingFresh.Views
                             isItemLeftEnable = false,
                             quantityL = 0,
                             item_descLeft = "",
+                            itemTaxableLeft = "",
 
 
                             imageSourceRight = "",
@@ -288,14 +293,22 @@ namespace ServingFresh.Views
                             isItemRightEnable = false,
                             quantityR = 0,
                             item_descRight = "",
+                            itemTaxableRight = "",
 
-                        }); ; 
+                        }); ;
                     }
                     if (isAmountItemsEven(n))
                     {
                         for (int i = 0; i < n / 2; i++)
                         {
-                            
+                            if (data.result[j].taxable == null || data.result[j].taxable == "NULL")
+                            {
+                                data.result[j].taxable = "FALSE";
+                            }
+                            if (data.result[j + 1].taxable == null || data.result[j + 1].taxable == "NULL")
+                            {
+                                data.result[j + 1].taxable = "FALSE";
+                            }
                             this.datagrid.Add(new ItemsModel()
                             {
                                 height = this.Width / 2 - 10,
@@ -306,13 +319,14 @@ namespace ServingFresh.Views
                                 quantityLeft = 0,
                                 itemNameLeft = data.result[j].item_name,
                                 itemPriceLeft = "$ " + data.result[j].item_price.ToString(),
-                                itemPriceLeftUnit = "$ " + data.result[j].item_price.ToString("N2") + " / "+(string)data.result[j].item_unit.ToString(),
+                                itemPriceLeftUnit = "$ " + data.result[j].item_price.ToString("N2") + " / " + (string)data.result[j].item_unit.ToString(),
                                 itemLeftUnit = (string)data.result[j].item_unit.ToString(),
                                 item_businessPriceLeft = data.result[j].business_price,
                                 isItemLeftVisiable = true,
                                 isItemLeftEnable = true,
                                 quantityL = 0,
                                 item_descLeft = data.result[j].item_desc,
+                                itemTaxableLeft = data.result[j].taxable,
 
 
 
@@ -322,13 +336,14 @@ namespace ServingFresh.Views
                                 quantityRight = 0,
                                 itemNameRight = data.result[j + 1].item_name,
                                 itemPriceRight = "$ " + data.result[j + 1].item_price.ToString(),
-                                itemPriceRightUnit = "$ " + data.result[j + 1].item_price.ToString("N2") + " / "+(string)data.result[j + 1].item_unit.ToString(),
+                                itemPriceRightUnit = "$ " + data.result[j + 1].item_price.ToString("N2") + " / " + (string)data.result[j + 1].item_unit.ToString(),
                                 itemRightUnit = (string)data.result[j + 1].item_unit.ToString(),
                                 item_businessPriceRight = data.result[j + 1].business_price,
                                 isItemRightVisiable = true,
                                 isItemRightEnable = true,
                                 quantityR = 0,
                                 item_descRight = data.result[j + 1].item_desc,
+                                itemTaxableRight = data.result[j + 1].taxable,
 
                             });
                             j = j + 2;
@@ -338,6 +353,14 @@ namespace ServingFresh.Views
                     {
                         for (int i = 0; i < n / 2; i++)
                         {
+                            if (data.result[j].taxable == null || data.result[j].taxable == "NULL")
+                            {
+                                data.result[j].taxable = "FALSE";
+                            }
+                            if (data.result[j + 1].taxable == null || data.result[j + 1].taxable == "NULL")
+                            {
+                                data.result[j + 1].taxable = "FALSE";
+                            }
                             this.datagrid.Add(new ItemsModel()
                             {
                                 height = this.Width / 2 - 10,
@@ -348,13 +371,14 @@ namespace ServingFresh.Views
                                 quantityLeft = 0,
                                 itemNameLeft = data.result[j].item_name,
                                 itemPriceLeft = "$ " + data.result[j].item_price.ToString(),
-                                itemPriceLeftUnit = "$ " + data.result[j].item_price.ToString("N2") + " / "+(string)data.result[j].item_unit.ToString(),
+                                itemPriceLeftUnit = "$ " + data.result[j].item_price.ToString("N2") + " / " + (string)data.result[j].item_unit.ToString(),
                                 itemLeftUnit = (string)data.result[j].item_unit.ToString(),
                                 item_businessPriceLeft = data.result[j].business_price,
                                 isItemLeftVisiable = true,
                                 isItemLeftEnable = true,
                                 quantityL = 0,
                                 item_descLeft = data.result[j].item_desc,
+                                itemTaxableLeft = data.result[j].taxable,
 
 
 
@@ -364,16 +388,21 @@ namespace ServingFresh.Views
                                 quantityRight = 0,
                                 itemNameRight = data.result[j + 1].item_name,
                                 itemPriceRight = "$ " + data.result[j + 1].item_price.ToString(),
-                                itemPriceRightUnit = "$ " + data.result[j + 1].item_price.ToString("N2") + " / "+(string)data.result[j + 1].item_unit.ToString(),
+                                itemPriceRightUnit = "$ " + data.result[j + 1].item_price.ToString("N2") + " / " + (string)data.result[j + 1].item_unit.ToString(),
                                 itemRightUnit = (string)data.result[j + 1].item_unit.ToString(),
                                 item_businessPriceRight = data.result[j + 1].business_price,
                                 isItemRightVisiable = true,
                                 isItemRightEnable = true,
                                 quantityR = 0,
                                 item_descRight = data.result[j + 1].item_desc,
+                                itemTaxableRight = data.result[j + 1].taxable,
 
                             });
                             j = j + 2;
+                        }
+                        if (data.result[j].taxable == null || data.result[j].taxable == "NULL")
+                        {
+                            data.result[j].taxable = "FALSE";
                         }
                         this.datagrid.Add(new ItemsModel()
                         {
@@ -392,6 +421,7 @@ namespace ServingFresh.Views
                             isItemLeftEnable = true,
                             quantityL = 0,
                             item_descLeft = data.result[j].item_desc,
+                            itemTaxableLeft = data.result[j].taxable,
 
 
                             imageSourceRight = "",
@@ -456,6 +486,8 @@ namespace ServingFresh.Views
 
                 var httpResponse = await client.PostAsync(Constant.GetItemsUrl, getItemsStringMessage);
                 var r = await httpResponse.Content.ReadAsStreamAsync();
+                var list = await httpResponse.Content.ReadAsStringAsync();
+                Debug.WriteLine("ITEMS LIST: " + list);
                 //var da = await httpResponse.Content.ReadAsStringAsync();
                 //Debug.WriteLine("PURCHASE: " + da);
                 StreamReader sr = new StreamReader(r);
@@ -512,6 +544,7 @@ namespace ServingFresh.Views
                     int j = 0;
                     if (n == 0)
                     {
+                        
                         this.datagrid.Add(new ItemsModel()
                         {
                             height = this.Width / 2 - 10,
@@ -527,7 +560,7 @@ namespace ServingFresh.Views
                             isItemLeftEnable = false,
                             quantityL = 0,
                             item_descLeft = "",
-                            
+                            itemTaxableLeft = "",
 
                             imageSourceRight = "",
                             quantityRight = 0,
@@ -540,6 +573,7 @@ namespace ServingFresh.Views
                             isItemRightEnable = false,
                             quantityR = 0,
                             item_descRight = "",
+                            itemTaxableRight = "",
                             
                         });
                     }
@@ -547,6 +581,14 @@ namespace ServingFresh.Views
                     {
                         for (int i = 0; i < n / 2; i++)
                         {
+                            if (data.result[j].taxable == null || data.result[j].taxable == "NULL")
+                            {
+                                data.result[j].taxable = "FALSE";
+                            }
+                            if (data.result[j + 1].taxable == null || data.result[j + 1].taxable == "NULL")
+                            {
+                                data.result[j + 1].taxable = "FALSE";
+                            }
                             this.datagrid.Add(new ItemsModel()
                             {
                                 height = this.Width / 2 - 10,
@@ -564,7 +606,7 @@ namespace ServingFresh.Views
                                 isItemLeftEnable = true,
                                 quantityL = 0,
                                 item_descLeft = data.result[j].item_desc,
-
+                                itemTaxableLeft = data.result[j].taxable,
 
 
 
@@ -582,6 +624,7 @@ namespace ServingFresh.Views
                                 isItemRightEnable = true,
                                 quantityR = 0,
                                 item_descRight = data.result[j + 1].item_desc,
+                                itemTaxableRight = data.result[j + 1].taxable,
 
                             });
                             j = j + 2;
@@ -591,6 +634,14 @@ namespace ServingFresh.Views
                     {
                         for (int i = 0; i < n / 2; i++)
                         {
+                            if (data.result[j].taxable == null || data.result[j].taxable == "NULL")
+                            {
+                                data.result[j].taxable = "FALSE";
+                            }
+                            if (data.result[j + 1].taxable == null || data.result[j + 1].taxable == "NULL")
+                            {
+                                data.result[j + 1].taxable = "FALSE";
+                            }
                             this.datagrid.Add(new ItemsModel()
                             {
                                 height = this.Width / 2 - 10,
@@ -608,7 +659,7 @@ namespace ServingFresh.Views
                                 isItemLeftEnable = true,
                                 quantityL = 0,
                                 item_descLeft = data.result[j].item_desc,
-
+                                itemTaxableLeft = data.result[j].taxable,
 
 
                                 imageSourceRight = data.result[j + 1].item_photo,
@@ -624,9 +675,14 @@ namespace ServingFresh.Views
                                 isItemRightEnable = true,
                                 quantityR = 0,
                                 item_descRight = data.result[j + 1].item_desc,
+                                itemTaxableRight = data.result[j + 1].taxable,
 
                             });
                             j = j + 2;
+                        }
+                        if (data.result[j].taxable == null || data.result[j].taxable == "NULL")
+                        {
+                            data.result[j].taxable = "FALSE";
                         }
                         this.datagrid.Add(new ItemsModel()
                         {
@@ -645,6 +701,7 @@ namespace ServingFresh.Views
                             isItemLeftEnable = true,
                             quantityL = 0,
                             item_descLeft = data.result[j].item_desc,
+                            itemTaxableLeft = data.result[j].taxable,
 
 
 
@@ -789,6 +846,7 @@ namespace ServingFresh.Views
                             itemSelected.unit = itemModelObject.itemLeftUnit;
                             itemSelected.description = itemModelObject.item_descLeft;
                             itemSelected.business_price = itemModelObject.item_businessPriceLeft;
+                            itemSelected.taxable = itemModelObject.itemTaxableLeft;
                             order.Add(itemModelObject.itemNameLeft, itemSelected);
                         }
                     }
@@ -827,6 +885,7 @@ namespace ServingFresh.Views
                         itemSelected.unit = itemModelObject.itemLeftUnit;
                         itemSelected.description = itemModelObject.item_descLeft;
                         itemSelected.business_price = itemModelObject.item_businessPriceLeft;
+                        itemSelected.taxable = itemModelObject.itemTaxableLeft;
                         order.Add(itemModelObject.itemNameLeft, itemSelected);
                     }
                 }
@@ -864,6 +923,7 @@ namespace ServingFresh.Views
                         itemSelected.unit = itemModelObject.itemRightUnit;
                         itemSelected.description = itemModelObject.item_descRight;
                         itemSelected.business_price = itemModelObject.item_businessPriceRight;
+                        itemSelected.taxable = itemModelObject.itemTaxableRight;
                         order.Add(itemModelObject.itemNameRight, itemSelected);
                     }
                 }
@@ -899,6 +959,7 @@ namespace ServingFresh.Views
                     itemSelected.unit = itemModelObject.itemRightUnit;
                     itemSelected.description = itemModelObject.item_descRight;
                     itemSelected.business_price = itemModelObject.item_businessPriceRight;
+                    itemSelected.taxable = itemModelObject.itemTaxableRight;
                     order.Add(itemModelObject.itemNameRight, itemSelected);
                 }
             }
