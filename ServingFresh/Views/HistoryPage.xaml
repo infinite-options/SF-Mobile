@@ -153,8 +153,8 @@
                                             <Label Text="{Binding total}" StyleClass="p, black"/>
                                         </FlexLayout>
                                         <Grid Padding="15">
-                                            <Button Grid.Column="0" Text="View Receipt" StyleClass="btn, primary" Margin="20,0" Clicked="Button_Clicked"/>
-                                            <Button Grid.Column="1" Text="Get Help" StyleClass="btn, primary" Margin="20,0" Clicked="Button_Clicked"/>
+                                            <Button Grid.Column="0" Text="View Receipt" StyleClass="btn, primary" Margin="20,0" Clicked="Button_Clicked" IsVisible="False" IsEnabled="False"/>
+                                            <Button Grid.Column="1" Text="Get Help" StyleClass="btn, primary" Margin="20,0" Clicked="Button_Clicked" IsVisible="False" IsEnabled="False"/>
                                         </Grid>
                                         <BoxView HeightRequest="5" BackgroundColor="LightGray"/>
                                     </StackLayout>

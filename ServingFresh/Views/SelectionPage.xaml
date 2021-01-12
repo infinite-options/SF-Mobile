@@ -61,7 +61,7 @@
                           <CollectionView.ItemTemplate>
                               <DataTemplate>
                                   <StackLayout Padding="10">
-                                      <Frame Padding="0" CornerRadius="10" HasShadow="False" BackgroundColor="White" HeightRequest="110" WidthRequest="110">
+                                      <Frame Padding="0" CornerRadius="10" HasShadow="False" BackgroundColor="White" HeightRequest="100" WidthRequest="100">
                                           <StackLayout Spacing="0">
                                               <StackLayout.GestureRecognizers>
                                                   <TapGestureRecognizer Tapped="Open_Farm" CommandParameter="{Binding .}"/>
@@ -112,12 +112,12 @@
                         </ListView.ItemTemplate>
                       </ListView>-->
 
-                       <CollectionView x:Name="farm_list" >
+                       <CollectionView x:Name="farm_list"  >
                             <CollectionView.ItemsLayout>
                                 <GridItemsLayout Orientation="Vertical" Span="3" />               
                             </CollectionView.ItemsLayout>
-                            <CollectionView.ItemTemplate>
-                                <DataTemplate>
+                            <CollectionView.ItemTemplate >
+                                <DataTemplate >
                                     <StackLayout Padding="10" WidthRequest="100">
                                         <Frame Padding="1" CornerRadius="10" HasShadow="False" BorderColor="{Binding border_color}" HeightRequest="100" WidthRequest="100">
                                         <Frame Padding="1" CornerRadius="10" HasShadow="False" BorderColor="{Binding border_color}">
@@ -127,7 +127,7 @@
                                             <Image Source="{Binding business_image}" HeightRequest="100" Aspect="Fill"/>
                                         </Frame>
                                         </Frame>
-                                        <Label Text="{Binding business_name}" StyleClass="black, center"/>
+                                        <Label Text="{Binding business_name}" HeightRequest="30" StyleClass="black, center"/>
                                     </StackLayout>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
