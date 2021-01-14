@@ -1105,11 +1105,11 @@ namespace ServingFresh.Views
         
         async void CompletePaymentClick(System.Object sender, System.EventArgs e)
         {
-            UserDialogs.Instance.ShowLoading("Processing your payment...");
+            //UserDialogs.Instance.ShowLoading("Processing your payment...");
             cardframe.Height = 0;
             options.Height = 65;
             PayViaStripe();
-            UserDialogs.Instance.HideLoading();
+            //UserDialogs.Instance.HideLoading();
         }
 
         public string OrderId = "";
@@ -1321,6 +1321,8 @@ namespace ServingFresh.Views
                 {
                     if (deliveryInstructions.Text.Trim() == "SFTEST")
                     {
+                        UserDialogs.Instance.Loading("Processing Payment...");
+                        
                         Debug.Write("STRIPE MODE: " + "TEST");
                         Debug.WriteLine("SK     : " + Constant.TestSK);
                         StripeConfiguration.ApiKey = Constant.TestSK;
@@ -1390,8 +1392,9 @@ namespace ServingFresh.Views
                         Charge charge = chargeService.Create(chargeOption);
                         if (charge.Status == "succeeded")
                         {
+                            //UserDialogs.Instance.ShowLoading("Processing your payment...");
                             // Successful Payment
-                            await DisplayAlert("Congratulations", "Payment was successful. We appreciate your business", "OK");
+                            //await DisplayAlert("Congratulations", "Payment was successful. We appreciate your business", "OK");
                             ClearCardInfo();
 
                             if (deliveryInstructions.Text == null)
@@ -1431,6 +1434,7 @@ namespace ServingFresh.Views
                                 cartHeight.Height = 0;
                                 if (!(bool)Application.Current.Properties["guest"])
                                 {
+                                    Application.Current.MainPage = new HistoryPage("SUCCESS");
                                     //await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
                                 }
                                 else
@@ -1452,16 +1456,19 @@ namespace ServingFresh.Views
                                     Application.Current.MainPage = new SignUpPage(firstName, lastName, phone, email, address, unit, city, state, zipcode, "guest", lat, longitude);
                                 }
                             }
+                            UserDialogs.Instance.HideLoading();
                         }
                         else
                         {
                             // Fail
+                            UserDialogs.Instance.HideLoading();
                             await DisplayAlert("Oops", "Payment was not successful. Please try again", "OK");
                         }
                     }
                 }
                 else
                 {
+                    UserDialogs.Instance.Loading("Processing Payment...");
                     var c = new System.Net.Http.HttpClient();
                     var stripe = new Credentials();
                     // LIVE
@@ -1605,6 +1612,7 @@ namespace ServingFresh.Views
                                     cartHeight.Height = 0;
                                     if (!(bool)Application.Current.Properties["guest"])
                                     {
+                                        Application.Current.MainPage = new HistoryPage("SUCCESS");
                                         //await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
                                     }
                                     else
@@ -1626,10 +1634,12 @@ namespace ServingFresh.Views
                                         Application.Current.MainPage = new SignUpPage(firstName, lastName, phone, email, address, unit, city, state, zipcode, "guest", lat, longitude);
                                     }
                                 }
+                                UserDialogs.Instance.HideLoading();
                             }
                             else
                             {
                                 // Fail
+                                UserDialogs.Instance.HideLoading();
                                 await DisplayAlert("Oops", "Payment was not successful. Please try again", "OK");
                             }
                         }
@@ -2352,6 +2362,7 @@ namespace ServingFresh.Views
         {
             // Construct a request object and set desired parameters
             // Replace ORDER-ID with the approved order id from create order
+            UserDialogs.Instance.Loading("Processing Payment...");
             Debug.WriteLine("id: " + id);
             var request = new OrdersCaptureRequest(id);
             request.RequestBody(new OrderActionRequest());
@@ -2369,7 +2380,7 @@ namespace ServingFresh.Views
             {
                 Debug.WriteLine("WRITE DATA TO DATA BASE");
                 // Successful Payment
-                await DisplayAlert("Congratulations", "Payment was successful. We appreciate your business", "OK");
+                //await DisplayAlert("Congratulations", "Payment was successful. We appreciate your business", "OK");
                 //ClearCardInfo();
 
                 if(deliveryInstructions.Text == null)
@@ -2424,6 +2435,7 @@ namespace ServingFresh.Views
                     cartHeight.Height = 0;
                     if (!(bool)Application.Current.Properties["guest"])
                     {
+                        Application.Current.MainPage = new HistoryPage("SUCCESS");
                         //await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
                     }
                     else
@@ -2445,9 +2457,11 @@ namespace ServingFresh.Views
                         Application.Current.MainPage = new SignUpPage(firstName, lastName, phone, email, address, unit, city, state, zipcode, "guest", lat, longitude);
                     }
                 }
+                UserDialogs.Instance.HideLoading();
             }
             else
             {
+                UserDialogs.Instance.HideLoading();
                 await DisplayAlert("Oops", "Your payment was canceled or was not successful. Please try again", "OK");
             }
 

@@ -76,7 +76,7 @@
                     </Entry>
                     <Entry
                         x:Name="userPhoneNumber"
-                        Placeholder="Phone number"
+                        Placeholder="Phone number - Enter only 10 digits"
                         MaxLength="10"
                         Keyboard="Numeric">
                     </Entry>

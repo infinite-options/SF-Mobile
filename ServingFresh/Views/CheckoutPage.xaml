@@ -406,7 +406,7 @@
                         <Label Grid.Row="0" Grid.Column="0" x:Name="addInfo" Text="Delivery Contact Info" TextColor="Black" FontAttributes="Bold" FontSize="Medium" Padding="0,0,0,10"></Label>
                         <Entry x:Name="newUserFirstName" Placeholder="First name"></Entry>
                         <Entry x:Name="newUserLastName" Placeholder="Last name"></Entry>
-                        <Entry x:Name="newUserPhoneNum" Placeholder="Phone number" MaxLength="10"></Entry>
+                        <Entry x:Name="newUserPhoneNum" Placeholder="Phone number - Enter only 10 digits" MaxLength="10"></Entry>
                         <Entry x:Name="newUserEmailAddress" Placeholder="Email Address"></Entry>
                         <Button Text="Save Info" TextColor="#FF8500" FontAttributes="Bold" BorderColor="#FF8500" BorderWidth="0.5" Clicked="SaveChangesClick"></Button>
                         <Button Text="Cancel" TextColor="#FF8500" FontAttributes="Bold" BorderColor="#FF8500" BorderWidth="0.5" Clicked="ChangeContactInfoCancelClick"></Button>

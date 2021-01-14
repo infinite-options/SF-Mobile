@@ -317,6 +317,11 @@ namespace ServingFresh.Views
                         Application.Current.Properties["user_longitude"] = signUpGuest.longitude;
                         Application.Current.Properties["user_delivery_instructions"] = "";
 
+                        Application.Current.Properties["CardNumber"] = "";
+                        Application.Current.Properties["CardExpMonth"] = "";
+                        Application.Current.Properties["CardExpYear"] = "";
+                        Application.Current.Properties["CardCVV"] = "";
+
                         _ = Application.Current.SavePropertiesAsync();
                         Application.Current.MainPage = new SelectionPage();
                     }

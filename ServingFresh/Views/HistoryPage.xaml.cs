@@ -121,11 +121,36 @@ namespace ServingFresh.Views
         public string day = "";
         public HistoryPage(string day = "")
         {
+            
             InitializeComponent();
-            this.day = day;
+            
+            if (day != "" && day != "SUCCESS")
+            {
+                this.day = day;
+            }
             historyList = new ObservableCollection<HistoryDisplayObject>();
             CartTotal.Text = CheckoutPage.total_qty.ToString();
             LoadHistory();
+
+            if(day == "SUCCESS")
+            {
+                ShowSuccessfullPayment();
+            }
+            
+        }
+
+        //public HistoryPage()
+        //{
+        //    InitializeComponent();
+        //    this.day = day;
+        //    historyList = new ObservableCollection<HistoryDisplayObject>();
+        //    CartTotal.Text = CheckoutPage.total_qty.ToString();
+        //    LoadHistory();
+        //}
+
+        public async void ShowSuccessfullPayment()
+        {
+            await DisplayAlert("Congratulations", "Payment was successful. We appreciate your business", "OK");
         }
         public async void LoadHistory()
         {

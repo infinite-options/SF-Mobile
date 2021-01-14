@@ -40,7 +40,7 @@
                     </Entry>
                     <Entry
                         x:Name="userPhoneNumber"
-                        Placeholder="Phone number"
+                        Placeholder="Phone number - Enter only 10 digits"
                         Keyboard="Numeric"
                         MaxLength="10">
                     </Entry>
