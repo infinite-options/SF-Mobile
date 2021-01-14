@@ -749,7 +749,7 @@ namespace ServingFresh.Views
             }
             else
             {
-                await DisplayAlert("Oops!", "Our system is down. We are working to fix this issue.", "OK");
+                //await DisplayAlert("Oops!", "Our system is down. We are working to fix this issue.", "OK");
                 return;
             }
         }

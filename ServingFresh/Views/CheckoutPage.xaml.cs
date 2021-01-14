@@ -24,6 +24,7 @@ using PayPalCheckoutSdk.Orders;
 using PayPalHttp;
 
 using System.Threading.Tasks;
+using Acr.UserDialogs;
 
 namespace ServingFresh.Views
 {
@@ -203,6 +204,7 @@ namespace ServingFresh.Views
         static string clientId = "";
         static string secret = "";
         static string mode = "";
+
         // =========================
 
         public CheckoutPage(IDictionary<string, ItemPurchased> order = null, string day = "")
@@ -409,6 +411,22 @@ namespace ServingFresh.Views
                     ServiceFee.Text = "$ " + service_fee.ToString("N2");
                     DeliveryFee.Text = "$ " + delivery_fee.ToString("N2");
                 }
+
+                string CardNo = (string)Application.Current.Properties["CardNumber"];
+                string expMonth = (string)Application.Current.Properties["CardExpMonth"];
+                string expYear = (string)Application.Current.Properties["CardExpYear"];
+                string cardCvv = (string)Application.Current.Properties["CardCVV"];
+
+                if(CardNo != "")
+                {
+                    cardHolderNumber.Text = CardNo;
+                    cardExpMonth.Text = expMonth;
+                    cardExpYear.Text = expYear;
+                    cardCVV.Text = cardCvv;
+                }
+ 
+
+
                 updateTotals(0, 0);
             }
         }
@@ -1087,10 +1105,11 @@ namespace ServingFresh.Views
         
         async void CompletePaymentClick(System.Object sender, System.EventArgs e)
         {
-            
+            UserDialogs.Instance.ShowLoading("Processing your payment...");
             cardframe.Height = 0;
             options.Height = 65;
             PayViaStripe();
+            UserDialogs.Instance.HideLoading();
         }
 
         public string OrderId = "";
@@ -1311,6 +1330,15 @@ namespace ServingFresh.Views
                         string expYear = cardExpYear.Text.Trim();
                         string cardCvv = cardCVV.Text.Trim();
 
+                        // STORE INFO
+                        if (!(bool)Application.Current.Properties["guest"])
+                        {
+                            Application.Current.Properties["CardNumber"] = CardNo;
+                            Application.Current.Properties["CardExpMonth"] = expMonth;
+                            Application.Current.Properties["CardExpYear"] = expYear;
+                            Application.Current.Properties["CardCVV"] = cardCvv;
+                        }
+
                         // Step 1: Create Card
                         TokenCardOptions stripeOption = new TokenCardOptions();
                         stripeOption.Number = CardNo;
@@ -1403,7 +1431,7 @@ namespace ServingFresh.Views
                                 cartHeight.Height = 0;
                                 if (!(bool)Application.Current.Properties["guest"])
                                 {
-                                    await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
+                                    //await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
                                 }
                                 else
                                 {
@@ -1474,6 +1502,16 @@ namespace ServingFresh.Views
                             string expMonth = cardExpMonth.Text.Trim();
                             string expYear = cardExpYear.Text.Trim();
                             string cardCvv = cardCVV.Text.Trim();
+
+                            // STORE INFO
+
+                            if (!(bool)Application.Current.Properties["guest"])
+                            {
+                                Application.Current.Properties["CardNumber"] = CardNo;
+                                Application.Current.Properties["CardExpMonth"] = expMonth;
+                                Application.Current.Properties["CardExpYear"] = expYear;
+                                Application.Current.Properties["CardCVV"] = cardCvv;
+                            }
 
                             // Step 1: Create Card
                             TokenCardOptions stripeOption = new TokenCardOptions();
@@ -1567,7 +1605,7 @@ namespace ServingFresh.Views
                                     cartHeight.Height = 0;
                                     if (!(bool)Application.Current.Properties["guest"])
                                     {
-                                        await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
+                                        //await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
                                     }
                                     else
                                     {
@@ -1642,6 +1680,7 @@ namespace ServingFresh.Views
             options.Height = 65;
         }
 
+        // ====================================================================
         public void increase_qty(object sender, EventArgs e)
         {
             Label l = (Label)sender;
@@ -1665,6 +1704,8 @@ namespace ServingFresh.Views
                 GetNewDefaltCoupon();
             }
         }
+        // =====================================================================
+
         public void GetNewDefaltCoupon()
         {
             couponsList.Clear();
@@ -1931,14 +1972,11 @@ namespace ServingFresh.Views
                 couponsList[i].index = i;
             }
 
-           // coupon_list.ItemsSource = couponsList;
-
             if (couponsList.Count != 0)
             {
                 if (couponsList[0].status == "ACTIVE")
                 {
                     couponsList[0].image = "CouponIconOrange.png";
-                    //couponsList[0].update();
                     updateTotals(couponsList[0].discount, couponsList[0].shipping);
                     appliedIndex = 0;
                 }
@@ -1955,7 +1993,15 @@ namespace ServingFresh.Views
         {
             if (!(bool)Application.Current.Properties["guest"])
             {
-                Application.Current.MainPage = new HistoryPage();
+                if(deliveryDay != "")
+                {
+                    Application.Current.MainPage = new HistoryPage(deliveryDay);
+                }
+                else
+                {
+                    Application.Current.MainPage = new HistoryPage();
+                }
+                
             }
         }
 
@@ -2209,11 +2255,15 @@ namespace ServingFresh.Views
             addresframe.Height = 0;
         }
 
-        void SaveChangesClick(System.Object sender, System.EventArgs e)
+        async void SaveChangesClick(System.Object sender, System.EventArgs e)
         {
             contactframe.Height = 0;
 
-
+            if(newUserFirstName.Text == null || newUserLastName.Text == null || newUserPhoneNum.Text == null || newUserEmailAddress.Text == null)
+            {
+                await DisplayAlert("Oops","You forgot to enter your first name, last name, phone number, or email address", "OK");
+                return;
+            }
             if (newUserFirstName.Text != null)
             {
                 Application.Current.Properties["user_first_name"] = newUserFirstName.Text.Trim();
@@ -2320,7 +2370,7 @@ namespace ServingFresh.Views
                 Debug.WriteLine("WRITE DATA TO DATA BASE");
                 // Successful Payment
                 await DisplayAlert("Congratulations", "Payment was successful. We appreciate your business", "OK");
-                ClearCardInfo();
+                //ClearCardInfo();
 
                 if(deliveryInstructions.Text == null)
                 {
@@ -2374,7 +2424,7 @@ namespace ServingFresh.Views
                     cartHeight.Height = 0;
                     if (!(bool)Application.Current.Properties["guest"])
                     {
-                        await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
+                        //await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
                     }
                     else
                     {

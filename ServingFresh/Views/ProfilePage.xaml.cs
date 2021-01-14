@@ -387,6 +387,10 @@ namespace ServingFresh.Views
             System.Diagnostics.Debug.WriteLine("user_zip_code :" + Application.Current.Properties["user_zip_code"]);
             System.Diagnostics.Debug.WriteLine("user_latitude :" + Application.Current.Properties["user_latitude"]);
             System.Diagnostics.Debug.WriteLine("user_longitude :" + Application.Current.Properties["user_longitude"]);
+            Application.Current.Properties["CardNumber"] = "";
+            Application.Current.Properties["CardExpMonth"] = "";
+            Application.Current.Properties["CardExpYear"] = "";
+            Application.Current.Properties["CardCVV"] = "";
             RemoveAppProperties();
             Application.Current.MainPage = new LogInPage();
         }

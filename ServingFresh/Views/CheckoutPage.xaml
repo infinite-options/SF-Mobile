@@ -324,22 +324,22 @@
                 <ScrollView>
                     <StackLayout>
                             <Label Text="Payment Information" TextColor="Black" FontAttributes="Bold" FontSize="Medium" ></Label>
-                            <Entry Placeholder="Email Address" x:Name="cardHolderEmail"></Entry>
-                            <Entry Placeholder="Cardholder Name" x:Name="cardHolderName"></Entry>
-                            <Entry Placeholder="Card Number" x:Name="cardHolderNumber" MaxLength="16"></Entry>
+                            <Entry Placeholder="Email Address" x:Name="cardHolderEmail" TextColor="Black"></Entry>
+                            <Entry Placeholder="Cardholder Name" x:Name="cardHolderName" TextColor="Black"></Entry>
+                            <Entry Placeholder="Card Number" x:Name="cardHolderNumber" MaxLength="16" TextColor="Black" Keyboard="Numeric"></Entry>
                                 <Grid >
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                     </Grid.ColumnDefinitions>
-                                    <Entry Grid.Row="0" Grid.Column="0" Placeholder="Exp MM" x:Name="cardExpMonth" MaxLength="2"></Entry>
-                                    <Entry Grid.Row="0" Grid.Column="1" Placeholder="Exp YY" x:Name="cardExpYear" MaxLength="2"></Entry>
-                                    <Entry Grid.Row="0" Grid.Column="2" Placeholder="CVV" x:Name="cardCVV" MaxLength="3"></Entry>
+                                    <Entry Grid.Row="0" Grid.Column="0" Placeholder="Exp MM" x:Name="cardExpMonth" MaxLength="2" TextColor="Black" Keyboard="Numeric"></Entry>
+                                    <Entry Grid.Row="0" Grid.Column="1" Placeholder="Exp YY" x:Name="cardExpYear" MaxLength="2" TextColor="Black" Keyboard="Numeric"></Entry>
+                                    <Entry Grid.Row="0" Grid.Column="2" Placeholder="CVV" x:Name="cardCVV" MaxLength="3" TextColor="Black" Keyboard="Numeric"></Entry>
                                 </Grid>
                           
-                                <Entry Placeholder="Address" x:Name="cardHolderAddress"></Entry>
-                                 <Entry Placeholder="Unit" x:Name="cardHolderUnit"></Entry>
+                                <Entry Placeholder="Address" x:Name="cardHolderAddress" TextColor="Black"></Entry>
+                                 <Entry Placeholder="Unit" x:Name="cardHolderUnit" TextColor="Black"></Entry>
                                   <StackLayout >
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -351,7 +351,7 @@
                                     <Entry Grid.Row="0" Grid.Column="1" Placeholder="State" x:Name="cardState" ></Entry>
                                     <Entry Grid.Row="0" Grid.Column="2" Placeholder="Zip" x:Name="cardZip" ></Entry>
                                 </Grid>
-                                <Entry Placeholder="Purchase Description" x:Name="cardDescription"></Entry>
+                                <Entry Placeholder="Purchase Description" x:Name="cardDescription" TextColor="Black"></Entry>
                             </StackLayout>
                         <Button Text="Complete Payment" TextColor="White" FontAttributes="Bold" Clicked="CompletePaymentClick" BackgroundColor="#FF8500"></Button>
                         <Button Text="Cancel" TextColor="#FF8500" FontAttributes="Bold" BorderColor="LightGray" BorderWidth="0.5" Clicked="CancelPaymentClick"></Button>

@@ -21,6 +21,7 @@ namespace ServingFresh
             //SecureStorage.RemoveAll();
             //Preferences.Clear();
             Application.Current.Properties["guest"] = false;
+            CardInfo();
 
             if (Application.Current.Properties.ContainsKey("user_id"))
             {
@@ -75,6 +76,14 @@ namespace ServingFresh
             {
                 MainPage = new LogInPage();
             }
+        }
+
+        public void CardInfo()
+        {
+            Application.Current.Properties["CardNumber"] = "";
+            Application.Current.Properties["CardExpMonth"] = "";
+            Application.Current.Properties["CardExpYear"] = "";
+            Application.Current.Properties["CardCVV"] = "";
         }
 
         protected override async void OnStart()

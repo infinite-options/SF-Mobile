@@ -118,10 +118,11 @@ namespace ServingFresh.Views
                    
 
         public ObservableCollection<HistoryDisplayObject> historyList;
-
-        public HistoryPage()
+        public string day = "";
+        public HistoryPage(string day = "")
         {
             InitializeComponent();
+            this.day = day;
             historyList = new ObservableCollection<HistoryDisplayObject>();
             CartTotal.Text = CheckoutPage.total_qty.ToString();
             LoadHistory();
@@ -219,7 +220,7 @@ namespace ServingFresh.Views
         }
         public void openCheckout(object sender, EventArgs e)
         {
-            Application.Current.MainPage = new CheckoutPage();
+            Application.Current.MainPage = new CheckoutPage(null,day);
         }
         public void openRefund(object sender, EventArgs e)
         {
