@@ -471,8 +471,6 @@ namespace ServingFresh.Views
         {
             try
             {
-
-
                 GetItemPost post = new GetItemPost();
                 post.type = types;
                 post.ids = b_uids;

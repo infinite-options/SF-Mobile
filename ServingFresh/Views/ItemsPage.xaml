@@ -150,8 +150,20 @@
                                         <StackLayout Grid.Row="2">
                                             <Frame Padding="0" HeightRequest="90" HasShadow="False" BackgroundColor="WhiteSmoke" Opacity="0.9" BorderColor="LightGray">
                                                 <Grid>
-                                                    <Button Grid.Column="0" WidthRequest="92" Text="-" TextColor="#FF8500" Font="35" Clicked="SubtractItemLeft" CommandParameter="{Binding .}"></Button>
-                                                    <Button Grid.Column="1" WidthRequest="92" Text="+" TextColor="#FF8500" Font="25" Clicked="AddItemLeft" CommandParameter="{Binding .}"></Button>
+                                                    <Button  Grid.Column="0" WidthRequest="92" Text="-" TextColor="#FF8500" Font="35" Clicked="SubtractItemLeft" CommandParameter="{Binding .}">
+                                                        <Button.Margin>
+                                                        <OnPlatform x:TypeArguments="Thickness">
+                                                            <On Platform="Android" Value="0,-25,0,0"/>
+                                                        </OnPlatform>
+                                                        </Button.Margin>
+                                                    </Button>
+                                                    <Button Grid.Column="1" WidthRequest="92" Text="+" TextColor="#FF8500" Font="25" Clicked="AddItemLeft" CommandParameter="{Binding .}">
+                                                        <Button.Margin>
+                                                        <OnPlatform x:TypeArguments="Thickness">
+                                                            <On Platform="Android" Value="0,-18,0,0"/>
+                                                        </OnPlatform>
+                                                        </Button.Margin>
+                                                    </Button>
                                                 </Grid>
                                             </Frame>
                                             <Frame Padding="0" Margin="0,-7,0,0" HeightRequest="90" HasShadow="False" BorderColor="LightGray">
@@ -214,8 +226,20 @@
                                         <StackLayout Grid.Row="2">
                                             <Frame Padding="0" HeightRequest="90" HasShadow="False" BackgroundColor="WhiteSmoke" Opacity="0.9" BorderColor="LightGray">
                                                 <Grid>
-                                                    <Button Grid.Column="0" WidthRequest="120" Text="-" TextColor="#FF8500" Font="35" Clicked="SubtractItemRight" CommandParameter="{Binding .}"></Button>
-                                                    <Button Grid.Column="1" WidthRequest="75" Text="+" TextColor="#FF8500" Font="25" Clicked="AddItemRight" CommandParameter="{Binding .}"></Button>
+                                                    <Button Grid.Column="0" WidthRequest="120" Text="-" TextColor="#FF8500" Font="35" Clicked="SubtractItemRight" CommandParameter="{Binding .}">
+                                                        <Button.Margin>
+                                                        <OnPlatform x:TypeArguments="Thickness">
+                                                            <On Platform="Android" Value="0,-25,0,0"/>
+                                                        </OnPlatform>
+                                                        </Button.Margin>
+                                                    </Button>
+                                                    <Button Grid.Column="1" WidthRequest="75" Text="+" TextColor="#FF8500" Font="25" Clicked="AddItemRight" CommandParameter="{Binding .}">
+                                                        <Button.Margin>
+                                                        <OnPlatform x:TypeArguments="Thickness">
+                                                            <On Platform="Android" Value="0,-18,0,0"/>
+                                                        </OnPlatform>
+                                                        </Button.Margin>
+                                                    </Button>
                                                 </Grid>
                                             </Frame>
                                             <Frame Padding="0" Margin="0,-7,0,0" HeightRequest="90" HasShadow="False" BorderColor="LightGray">

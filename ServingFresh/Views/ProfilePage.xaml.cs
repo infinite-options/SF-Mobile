@@ -64,6 +64,7 @@ namespace ServingFresh.Views
             InitializeProfile();
 
             userEmailAddress.Text = (string)Application.Current.Properties["user_email"];
+            userEmailAddress.TextColor = Color.Black;
             userFirstName.Text = (string)Application.Current.Properties["user_first_name"];
             userLastName.Text = (string)Application.Current.Properties["user_last_name"];
             if((string)Application.Current.Properties["platform"] != "DIRECT")

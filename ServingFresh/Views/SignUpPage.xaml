@@ -6,7 +6,7 @@
     xmlns:servingfresh="clr-namespace:ServingFresh.Models"
     x:Class="ServingFresh.Views.SignUpPage">
     <ContentPage.Content>
-        <StackLayout Padding="0,0,0,0">
+        <StackLayout Padding="0,0,0,0" BackgroundColor="White">
             <Grid BackgroundColor="#136D74">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="136"></RowDefinition>
@@ -49,60 +49,84 @@
                     <Entry
                         x:Name="userEmailAddress"
                         Placeholder="Email Address"
-                        Keyboard="Email">
+                        Keyboard="Email"
+                        TextColor="Black"
+                        PlaceholderColor="Gray">
                     </Entry>
                     <Entry
                         x:Name="userConfirmEmailAddress"
-                        Placeholder="Confirm Email Address"></Entry>
+                        Placeholder="Confirm Email Address"
+                        TextColor="Black"
+                        PlaceholderColor="Gray"></Entry>
                     <Entry
                         x:Name="userPassword"
-                        Placeholder="Enter Password">
+                        Placeholder="Enter Password"
+                        TextColor="Black"
+                        PlaceholderColor="Gray">
                     </Entry>
                     <Entry
                         x:Name="userConfirmPassword"
-                        Placeholder="Confirm Password">
+                        Placeholder="Confirm Password"
+                        TextColor="Black"
+                        PlaceholderColor="Gray">
                     </Entry>
                     <Grid>
-                        <servingfresh:CustomEntry Placeholder="Push Notification" IsReadOnly="True" Margin="7,0,0,0"></servingfresh:CustomEntry>
+                        <servingfresh:CustomEntry Placeholder="Push Notification" PlaceholderColor="Gray" IsReadOnly="True" Margin="7,0,0,0"></servingfresh:CustomEntry>
                         <Switch x:Name="localNotificationButton" HorizontalOptions="End" Grid.Column="1" Toggled="Switch_Toggled"></Switch>
                     </Grid>
                     <Entry
                         x:Name="userFirstName"
-                        Placeholder="First name">
+                        Placeholder="First name"
+                        TextColor="Black"
+                        PlaceholderColor="Gray">
                     </Entry>
                     <Entry
                         x:Name="userLastName"
-                        Placeholder="Last name">
+                        Placeholder="Last name"
+                        TextColor="Black"
+                        PlaceholderColor="Gray">
                     </Entry>
                     <Entry
                         x:Name="userPhoneNumber"
                         Placeholder="Phone number - Enter only 10 digits"
                         MaxLength="10"
-                        Keyboard="Numeric">
+                        Keyboard="Numeric"
+                        TextColor="Black"
+                        PlaceholderColor="Gray">
                     </Entry>
                     <Entry
                         x:Name="userAddress"
-                        Placeholder="Street Address">
+                        Placeholder="Street Address"
+                        TextColor="Black"
+                        PlaceholderColor="Gray">
                     </Entry>
                     <Entry
                         x:Name="userUnitNumber"
-                        Placeholder="Apt number">
+                        Placeholder="Apt number"
+                        TextColor="Black"
+                        PlaceholderColor="Gray">
                     </Entry>
                     <Grid>
                         <Entry
                             x:Name="userCity"
                             Grid.Column="0"
-                            Placeholder="City">
+                            Placeholder="City"
+                            TextColor="Black"
+                            PlaceholderColor="Gray">
                         </Entry>
                         <Entry
                             x:Name="userState"
                             Grid.Column="1"
-                            Placeholder="State">
+                            Placeholder="State"
+                            TextColor="Black"
+                            PlaceholderColor="Gray">
                         </Entry>
                         <Entry
                             x:Name="userZipcode"
                             Grid.Column="2"
-                            Placeholder="Zipcode">
+                            Placeholder="Zipcode"
+                            TextColor="Black"
+                            PlaceholderColor="Gray">
                         </Entry>
                     </Grid>
                     <!--<Entry x:Name="userDeliveryInstructions" Placeholder="Delivery instructions" IsEnabled="False"></Entry>-->

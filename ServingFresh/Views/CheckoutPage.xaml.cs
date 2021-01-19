@@ -57,6 +57,9 @@ namespace ServingFresh.Views
         public string img { get; set; }
         public string unit { get; set; }
         public string taxable { get; set; }
+
+
+
         // public string description { get; set;
         // business_price - double
     }
@@ -211,6 +214,7 @@ namespace ServingFresh.Views
         {
             InitializeComponent();
             GetPayPalCredentials();
+            
             //GetFees(day);
             if (day != "")
             {
@@ -958,6 +962,8 @@ namespace ServingFresh.Views
             return total;
         }
 
+
+
         public void AddItems(object sender, EventArgs e)
         {
             if (cartEmpty != "EMPTY")
@@ -1108,6 +1114,12 @@ namespace ServingFresh.Views
             //UserDialogs.Instance.ShowLoading("Processing your payment...");
             cardframe.Height = 0;
             options.Height = 65;
+
+            if (Device.RuntimePlatform == Device.Android)
+            {
+                UpdateTotalAmount(sender, e);
+            }
+
             PayViaStripe();
             //UserDialogs.Instance.HideLoading();
         }
@@ -1136,6 +1148,11 @@ namespace ServingFresh.Views
                         clientId = Constant.TestClientId;
                         secret = Constant.TestSecret;
                     }
+                }
+
+                if(Device.RuntimePlatform == Device.Android)
+                {
+                    UpdateTotalAmount(sender, e);
                 }
 
                 string dateTime = DateTime.Parse((string)Application.Current.Properties["delivery_date"]).ToString("yyyy-MM-dd");
@@ -1206,7 +1223,7 @@ namespace ServingFresh.Views
                 paypalframe.Height = this.Height -136;
                 webViewPage.HeightRequest = this.Height -136;
                 options.Height = 0;
-
+                
                 var response = await createOrder(purchaseObject.amount_due);
                 var content = response.Result<PayPalCheckoutSdk.Orders.Order>();
                 PayPalCheckoutSdk.Orders.Order result = response.Result<PayPalCheckoutSdk.Orders.Order>();
@@ -1220,13 +1237,14 @@ namespace ServingFresh.Views
                     Console.WriteLine("\t{0}: {1}\tCall Type: {2}", link.Rel, link.Href, link.Method);
                     if (link.Rel == "approve")
                     {
-                        webViewPage.Source = link.Href;
+                        //webViewPage.Source = link.Href;
+                        Debug.WriteLine("PAYPAL URL: "+ link.Href);
+                        webViewPage.Source = "https://servingfresh.me";
                     }
                 }
 
                 webViewPage.Navigated += WebViewPage_Navigated;
-
-
+                
                 OrderId = result.Id;
             }
             else
@@ -1239,13 +1257,22 @@ namespace ServingFresh.Views
         {
             var source = webViewPage.Source as UrlWebViewSource;
             Debug.WriteLine("Source From WebView: " + source.Url);
-            if (source.Url == "https://servingfresh.me/")
+            if (source.Url.Contains("https://servingfresh.me/"))
             {
                 paypalframe.Height = 0;
                 options.Height = 65;
                 Debug.WriteLine("We got to serving fresh");
                 _ = captureOrder(OrderId);
             }
+
+            //else if(source.Url.Contains("https://servingfresh.me/"))
+            //{
+            //    //source.Url.Contains("https://devblogs.microsoft.com/xamarin/")
+            //    paypalframe.Height = 0;
+            //    options.Height = 65;
+            //    Debug.WriteLine("We got to serving fresh");
+            //    _ = captureOrder(OrderId);
+            //}
         }
 
         public async void GetPayPalCredentials()
@@ -1321,8 +1348,8 @@ namespace ServingFresh.Views
                 {
                     if (deliveryInstructions.Text.Trim() == "SFTEST")
                     {
-                        UserDialogs.Instance.Loading("Processing Payment...");
-                        
+                        //UserDialogs.Instance.Loading("Processing Payment...");
+                        UserDialogs.Instance.ShowLoading("Processing Payment...");
                         Debug.Write("STRIPE MODE: " + "TEST");
                         Debug.WriteLine("SK     : " + Constant.TestSK);
                         StripeConfiguration.ApiKey = Constant.TestSK;
@@ -1434,6 +1461,8 @@ namespace ServingFresh.Views
                                 cartHeight.Height = 0;
                                 if (!(bool)Application.Current.Properties["guest"])
                                 {
+                                    //UserDialogs.Instance.HideLoading();
+                                    //UserDialogs.Instance.HideLoading();
                                     Application.Current.MainPage = new HistoryPage("SUCCESS");
                                     //await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
                                 }
@@ -1453,6 +1482,7 @@ namespace ServingFresh.Views
                                     var lat = (string)Application.Current.Properties["user_latitude"];
                                     var longitude = (string)Application.Current.Properties["user_longitude"];
 
+                                    //UserDialogs.Instance.HideLoading();
                                     Application.Current.MainPage = new SignUpPage(firstName, lastName, phone, email, address, unit, city, state, zipcode, "guest", lat, longitude);
                                 }
                             }
@@ -1468,7 +1498,8 @@ namespace ServingFresh.Views
                 }
                 else
                 {
-                    UserDialogs.Instance.Loading("Processing Payment...");
+                    //UserDialogs.Instance.Loading("Processing Payment...");
+                    UserDialogs.Instance.ShowLoading("Processing Payment...");
                     var c = new System.Net.Http.HttpClient();
                     var stripe = new Credentials();
                     // LIVE
@@ -1612,6 +1643,7 @@ namespace ServingFresh.Views
                                     cartHeight.Height = 0;
                                     if (!(bool)Application.Current.Properties["guest"])
                                     {
+                                        //UserDialogs.Instance.HideLoading();
                                         Application.Current.MainPage = new HistoryPage("SUCCESS");
                                         //await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
                                     }
@@ -1630,7 +1662,7 @@ namespace ServingFresh.Views
                                         var state = (string)Application.Current.Properties["user_state"];
                                         var lat = (string)Application.Current.Properties["user_latitude"];
                                         var longitude = (string)Application.Current.Properties["user_longitude"];
-
+                                        //UserDialogs.Instance.HideLoading();
                                         Application.Current.MainPage = new SignUpPage(firstName, lastName, phone, email, address, unit, city, state, zipcode, "guest", lat, longitude);
                                     }
                                 }
@@ -1639,6 +1671,7 @@ namespace ServingFresh.Views
                             else
                             {
                                 // Fail
+                                
                                 UserDialogs.Instance.HideLoading();
                                 await DisplayAlert("Oops", "Payment was not successful. Please try again", "OK");
                             }
@@ -1990,6 +2023,10 @@ namespace ServingFresh.Views
                     updateTotals(couponsList[0].discount, couponsList[0].shipping);
                     appliedIndex = 0;
                 }
+                else
+                {
+                    updateTotals(0, 0);
+                }
             }
             else
             {
@@ -2022,12 +2059,25 @@ namespace ServingFresh.Views
 
         void DriverTip_Completed(System.Object sender, System.EventArgs e)
         {
-            DriverTip.Focus();
+            //DriverTip.Focus();
+            Debug.WriteLine("Tap on tip driverTip_completed");
+            UpdateTotalAmount(sender, e);
+        }
+
+        void DriverTip_Focused(System.Object sender, Xamarin.Forms.FocusEventArgs e)
+        {
+            Debug.WriteLine("Focus");
+        }
+
+
+        void DriverTip_Unfocused(System.Object sender, Xamarin.Forms.FocusEventArgs e)
+        {
+            UpdateTotalAmount(sender, e);
         }
 
         void UpdateTotalAmount(System.Object sender, System.EventArgs e)
         {
-           
+            Debug.WriteLine("TOUCH TO UPDATE");
             if (total != 0)
             {
                 if(appliedIndex != -1)
@@ -2043,7 +2093,6 @@ namespace ServingFresh.Views
             {
                 updateTotals(0, 0);
             }
-         
         }
 
         public void openRefund(object sender, EventArgs e)
@@ -2321,20 +2370,22 @@ namespace ServingFresh.Views
             HttpResponse response;
             // Construct a request object and set desired parameters
             // Here, OrdersCreateRequest() creates a POST request to /v2/checkout/orders
+
+
             var order = new OrderRequest()
             {
                 CheckoutPaymentIntent = "CAPTURE",
                 PurchaseUnits = new List<PurchaseUnitRequest>()
-                {
-                    new PurchaseUnitRequest()
                     {
-                        AmountWithBreakdown = new AmountWithBreakdown()
+                        new PurchaseUnitRequest()
                         {
-                            CurrencyCode = "USD",
-                            Value = amount
+                            AmountWithBreakdown = new AmountWithBreakdown()
+                            {
+                                CurrencyCode = "USD",
+                                Value = amount
+                            }
                         }
-                    }
-                },
+                    },
                 ApplicationContext = new ApplicationContext()
                 {
                     ReturnUrl = "https://servingfresh.me",
@@ -2342,12 +2393,75 @@ namespace ServingFresh.Views
                 }
             };
 
-
-            // Call API with your client and get a response for your call
             var request = new OrdersCreateRequest();
             request.Prefer("return=representation");
             request.RequestBody(order);
             response = await client().Execute(request);
+
+            //if (Device.RuntimePlatform == Device.iOS)
+            //{
+            //    var order = new OrderRequest()
+            //    {
+            //        CheckoutPaymentIntent = "CAPTURE",
+            //        PurchaseUnits = new List<PurchaseUnitRequest>()
+            //        {
+            //            new PurchaseUnitRequest()
+            //            {
+            //                AmountWithBreakdown = new AmountWithBreakdown()
+            //                {
+            //                    CurrencyCode = "USD",
+            //                    Value = amount
+            //                }
+            //            }
+            //        },
+            //        ApplicationContext = new ApplicationContext()
+            //        {
+            //            ReturnUrl = "https://servingfresh.me",
+            //            CancelUrl = "https://servingfresh.me"
+            //        }
+            //    };
+
+            //    var request = new OrdersCreateRequest();
+            //    request.Prefer("return=representation");
+            //    request.RequestBody(order);
+            //    response = await client().Execute(request);
+            //}
+            //else
+            //{
+            //    var order = new OrderRequest()
+            //    {
+            //        CheckoutPaymentIntent = "CAPTURE",
+            //        PurchaseUnits = new List<PurchaseUnitRequest>()
+            //        {
+            //            new PurchaseUnitRequest()
+            //            {
+            //                AmountWithBreakdown = new AmountWithBreakdown()
+            //                {
+            //                    CurrencyCode = "USD",
+            //                    Value = amount
+            //                }
+            //            }
+            //        },
+            //        ApplicationContext = new ApplicationContext()
+            //        {
+            //            //ReturnUrl = "https://devblogs.microsoft.com/xamarin",
+            //            //CancelUrl = "https://devblogs.microsoft.com/xamarin"
+            //            ReturnUrl = "https://servingfresh.me",
+            //            CancelUrl = "https://servingfresh.me"
+            //        }
+            //    };
+
+            //    var request = new OrdersCreateRequest();
+            //    request.Prefer("return=representation");
+            //    request.RequestBody(order);
+            //    response = await client().Execute(request);
+            //}
+
+            // Call API with your client and get a response for your call
+            //var request = new OrdersCreateRequest();
+            //request.Prefer("return=representation");
+            //request.RequestBody(order);
+            //response = await client().Execute(request);
             return response;
         }
 
@@ -2362,7 +2476,7 @@ namespace ServingFresh.Views
         {
             // Construct a request object and set desired parameters
             // Replace ORDER-ID with the approved order id from create order
-            UserDialogs.Instance.Loading("Processing Payment...");
+            // UserDialogs.Instance.Loading("Processing Payment...");
             Debug.WriteLine("id: " + id);
             var request = new OrdersCaptureRequest(id);
             request.RequestBody(new OrderActionRequest());
@@ -2457,11 +2571,11 @@ namespace ServingFresh.Views
                         Application.Current.MainPage = new SignUpPage(firstName, lastName, phone, email, address, unit, city, state, zipcode, "guest", lat, longitude);
                     }
                 }
-                UserDialogs.Instance.HideLoading();
+                //UserDialogs.Instance.HideLoading();
             }
             else
             {
-                UserDialogs.Instance.HideLoading();
+                //UserDialogs.Instance.HideLoading();
                 await DisplayAlert("Oops", "Your payment was canceled or was not successful. Please try again", "OK");
             }
 
@@ -2470,9 +2584,9 @@ namespace ServingFresh.Views
 
         void TapGestureRecognizer_Tapped_1(System.Object sender, System.EventArgs e)
         {
-            //string source = webViewPage.Source;
-          
-            //Debug.WriteLine("Source From WebView: " + source);
+            string source = webViewPage.Source.ToString();
+
+            Debug.WriteLine("Source From WebView: " + source);
         }
 
         void TapGestureRecognizer_Tapped_2(System.Object sender, System.EventArgs e)
@@ -2481,5 +2595,10 @@ namespace ServingFresh.Views
             
             Debug.WriteLine("Source From WebView: " + source);
         }
+
+        //void EntryClick(System.Object sender, System.EventArgs e)
+        //{
+        //    Debug.WriteLine("Tip typing");
+        //}
     }
 }

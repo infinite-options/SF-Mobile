@@ -562,7 +562,7 @@ namespace ServingFresh.Views
             {
                 try
                 {
-                    Application.Current.MainPage = new SelectionPage();
+                    //Application.Current.MainPage = new SelectionPage();
                     GoogleUserProfileAsync(e.Account.Properties["access_token"], e.Account.Properties["refresh_token"], e);
                     
                 }
@@ -575,7 +575,7 @@ namespace ServingFresh.Views
             else
             {
                 await DisplayAlert("Error", "Google was not able to autheticate your account", "OK");
-                Application.Current.MainPage = new LogInPage();
+                //Application.Current.MainPage = new LogInPage();
             }
         }
 

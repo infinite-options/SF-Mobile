@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="ServingFresh.Views.GuestPage"  xmlns:maps="clr-namespace:Xamarin.Forms.Maps;assembly=Xamarin.Forms.Maps">
     <ContentPage.Content>
-        <StackLayout Padding="0,0,0,0">
+        <StackLayout Padding="0,0,0,0" BackgroundColor="White">
             <Label
                 HeightRequest="136"
                 HorizontalTextAlignment="Center"
@@ -34,31 +34,41 @@
                         <Entry
                             x:Name="userAddress"
                             Placeholder="Street Address (so we can show you delivery days)"
-                            FontSize="Small">
+                            FontSize="Small"
+                            PlaceholderColor="Gray"
+                            TextColor="Black">
                         </Entry>
                         <Entry
                             x:Name="userUnitNumber"
                             Placeholder="Apt number"
-                            FontSize="Small">
+                            FontSize="Small"
+                            PlaceholderColor="Gray"
+                            TextColor="Black">
                         </Entry>
                         <Grid>
                             <Entry
                                 x:Name="userCity"
                                 Grid.Column="0"
                                 Placeholder="City"
-                                FontSize="Small">
+                                FontSize="Small"
+                                PlaceholderColor="Gray"
+                                TextColor="Black">
                             </Entry>
                             <Entry
                                 x:Name="userState"
                                 Grid.Column="1"
                                 Placeholder="State"
-                                FontSize="Small">
+                                FontSize="Small"
+                                PlaceholderColor="Gray"
+                                TextColor="Black">
                             </Entry>
                             <Entry
                                 x:Name="userZipcode"
                                 Grid.Column="2"
                                 Placeholder="Zipcode"
-                                FontSize="Small">
+                                FontSize="Small"
+                                PlaceholderColor="Gray"
+                                TextColor="Black">
                             </Entry>
                         </Grid>
                         <Frame HasShadow="False" BackgroundColor="Gray" Padding="0" HeightRequest="200">

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Net.Http;
+using Acr.UserDialogs;
 using Newtonsoft.Json;
 using ServingFresh.Config;
 using Xamarin.Forms;
@@ -134,6 +135,7 @@ namespace ServingFresh.Views
 
             if(day == "SUCCESS")
             {
+                //UserDialogs.Instance.HideLoading();
                 ShowSuccessfullPayment();
             }
             
@@ -173,6 +175,7 @@ namespace ServingFresh.Views
                     var driver_tip = 0.0;
                     var taxes = 0.0;
                     var total = 0.0;
+                    var deliveryStatus = "";
                     if(ho.subtotal != null)
                     {
                         subtotal = ho.subtotal;
@@ -210,6 +213,14 @@ namespace ServingFresh.Views
                         else { break; }
                     }
 
+                    if(ho.delivery_status != null && ho.delivery_status == "TRUE")
+                    {
+                        deliveryStatus = "DELIVERED";
+                    }else if(ho.delivery_status != null && ho.delivery_status == "FALSE")
+                    {
+                        deliveryStatus = "ACTIVE";
+                    }
+
                     DateTime today = DateTime.Parse(ho.purchase_date);
 
                     var localPurchaseDate = today.ToLocalTime();
@@ -224,14 +235,14 @@ namespace ServingFresh.Views
                         purchase_date = "Purchase Date: " + localPurchaseDate,
                         
                         purchase_id = "Order ID: " + ho.purchase_uid,
-                        purchase_status = "Order " + ho.purchase_status,
+                        purchase_status = "Order " + deliveryStatus,
                         subtotal = "$ " + subtotal.ToString("N2"),
                         promo_applied = "-$ " + promo_applied.ToString("N2"),
                         delivery_fee = "$ " + delivery_fee.ToString("N2"),
                         service_fee = "$ " + service_fee.ToString("N2"),
                         driver_tip = "$ " + driver_tip.ToString("N2"),
                         taxes = "$ " + taxes.ToString("N2"),
-                        total = "$ " + total.ToString("N2")
+                        total = "$ " + total.ToString("N2"),
                         
                     }) ;
                 }

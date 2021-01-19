@@ -21,8 +21,8 @@
     <PackageReference Include="PayPalCheckoutSdk" Version="1.0.3" />
     <PackageReference Include="PayPalHttp" Version="1.0.0" />
     <PackageReference Include="Xam.Plugin.LatestVersion" Version="1.1.2" />
-    <PackageReference Include="Xamarin.Forms" Version="4.8.0.1687" />
     <PackageReference Include="Xamarin.Forms.Maps" Version="4.8.0.1687" />
+    <PackageReference Include="Xamarin.Forms" Version="4.8.0.1687" />
   </ItemGroup>
   <!--<PackageReference Include="Stripe.net" Version="39.22.0" />-->
 

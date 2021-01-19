@@ -7,7 +7,7 @@
     xmlns:customentry="clr-namespace:ServingFresh.Models"
     x:Class="ServingFresh.Views.ProfilePage">
     <ContentPage.Content>
-        <Grid RowSpacing="0">
+        <Grid RowSpacing="0" BackgroundColor="White">
             <Grid.RowDefinitions>
                 <RowDefinition Height="35"></RowDefinition>
                 <RowDefinition Height="95"></RowDefinition>
@@ -63,22 +63,26 @@
         <ScrollView >
             <StackLayout
                 Margin="10,10,10,0">
-                <Entry
+                <Label
                     x:Name="userEmailAddress"
-                    Placeholder="Email Address"
-                    IsEnabled="False">
-                </Entry>
+                    TextColor="Black"
+                    FontSize="Medium">
+                </Label>
                 <StackLayout x:Name="passwordCredentials">
                     <Entry
                     x:Name="userPassword"
                     Placeholder="Enter New Password"
                     Keyboard="Default"
+                    PlaceholderColor="Gray"
+                    TextColor="Black"
                     >
                     </Entry>
                     <Entry
                         x:Name="userConfirmPassword"
                         Placeholder="Confirm New Password"
                         Keyboard="Default"
+                        PlaceholderColor="Gray"
+                        TextColor="Black"
                         >
                     </Entry>
                     <Button
@@ -93,45 +97,61 @@
                     </Button>
                 </StackLayout>
                 <Grid>
-                    <customentry:CustomEntry Placeholder="Push Notification" IsReadOnly="True" Margin="7,0,0,0" ></customentry:CustomEntry>
+                    <customentry:CustomEntry Placeholder="Push Notification" PlaceholderColor="Gray" IsReadOnly="True" Margin="7,0,0,0" ></customentry:CustomEntry>
                     <Switch x:Name="notificationButton" HorizontalOptions="End" Grid.Column="1" Toggled="Switch_Toggled"></Switch>
                 </Grid>
                 <Entry
                     x:Name="userFirstName"
-                    Placeholder="First name">
+                    TextColor="Black"
+                    Placeholder="First name"
+                    PlaceholderColor="Gray">
                 </Entry>
                 <Entry
                     x:Name="userLastName"
-                    Placeholder="Last name">
+                    Placeholder="Last name"
+                    PlaceholderColor="Gray"
+                    TextColor="Black">
                 </Entry>
                 <Entry
                     x:Name="userPhoneNumber"
                     Placeholder="Phone number"
-                    MaxLength="10">
+                    MaxLength="10"
+                    PlaceholderColor="Gray"
+                    TextColor="Black">
                 </Entry>
                 <Entry
                     x:Name="userAddress"
-                    Placeholder="Street Address">
+                    Placeholder="Street Address"
+                    PlaceholderColor="Gray"
+                    TextColor="Black">
                 </Entry>
                 <Entry
                     x:Name="userUnitNumber"
-                    Placeholder="Apt number">
+                    Placeholder="Apt number"
+                    PlaceholderColor="Gray"
+                    TextColor="Black">
                 </Entry>
                 <Grid>
                     <Entry
                         x:Name="userCity"
                         Grid.Column="0"
-                        Placeholder="City">
+                        Placeholder="City"
+                        PlaceholderColor="Gray"
+                        TextColor="Black">
                     </Entry>
                     <Entry
                         x:Name="userState"
                         Grid.Column="1"
-                        Placeholder="State">
+                        Placeholder="State"
+                        PlaceholderColor="Gray"
+                        TextColor="Black">
                     </Entry>
                     <Entry
                         x:Name="userZipcode"
                         Grid.Column="2"
-                        Placeholder="Zipcode">
+                        Placeholder="Zipcode"
+                        PlaceholderColor="Gray"
+                        TextColor="Black">
                     </Entry>
                 </Grid>
                 <Frame HasShadow="False" BackgroundColor="Gray" Padding="0" HeightRequest="200">

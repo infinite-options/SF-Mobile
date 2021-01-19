@@ -7,7 +7,7 @@
     xmlns:local="clr-namespace:ServingFresh.Models"
     xmlns:servingfresh="clr-namespace:ServingFresh.Effects">
      <ContentPage.Content>
-        <Grid RowSpacing="0" x:Name="GridInfo">
+        <Grid RowSpacing="0" x:Name="GridInfo" BackgroundColor="White">
             <Grid.RowDefinitions>
                 <RowDefinition Height="35"></RowDefinition>
                 <RowDefinition Height="95"></RowDefinition>
@@ -142,8 +142,14 @@
                         <BoxView StyleClass="spacer"/>
                         <Grid Padding="15,15,0,0">
                             <Label Grid.Column="0" Text="Delivery Instructions:" StyleClass="h3, primary"/>
-                            <StackLayout Grid.Column="1" HeightRequest="50" BackgroundColor="LightGoldenrodYellow" Padding="0">
-                                <Editor BackgroundColor="White" x:Name="deliveryInstructions" Margin="-10,-8,0,0" HeightRequest="100" Placeholder="Enter Intructions Here" MaxLength="80" FontSize="Micro" Keyboard="Chat"></Editor>
+                            <StackLayout Grid.Column="1" HeightRequest="50" BackgroundColor="White" Padding="0">
+                                <Editor BackgroundColor="White" TextColor="Black" x:Name="deliveryInstructions" Margin="-10,-8,0,0" HeightRequest="100" Placeholder="Enter Intructions Here" MaxLength="80" FontSize="Micro" Keyboard="Chat">
+                                    <Editor.HeightRequest>
+                                        <OnPlatform x:TypeArguments="x:Double">
+                                            <On Platform="Android" Value="50"/>
+                                        </OnPlatform>
+                                    </Editor.HeightRequest>
+                                </Editor>
                             </StackLayout>
                         </Grid>
                         <BoxView StyleClass="spacer"/>
@@ -300,7 +306,12 @@
                             <Label Padding="15,0,0,0" Text="Driver Tip (Optional - Tap to edit)" StyleClass="p, black"/>
                             <StackLayout Orientation="Horizontal" Spacing="0" Margin="0,0,0,0">
                                 <Label Text="$ " StyleClass="p, black"/>
-                                <local:CustomEntry HeightRequest="20" Completed="DriverTip_Completed" Text="2.00" WidthRequest="60" Placeholder="0.00" FontSize="Small" Keyboard="Numeric" x:Name="DriverTip" StyleClass="p, black"/>
+                                <!--<local:CustomEntry HeightRequest="20" Completed="DriverTip_Completed" Text="2.00" TextColor="Black" WidthRequest="60" Placeholder="0.00" FontSize="Small" Keyboard="Numeric" x:Name="DriverTip" StyleClass="p, black"/>-->
+                                <Entry HeightRequest="50" Completed="DriverTip_Completed" Unfocused="DriverTip_Unfocused" Focused="DriverTip_Focused" Text="2.00" TextColor="Black" WidthRequest="60" Placeholder="0.00" FontSize="Small" Keyboard="Numeric" x:Name="DriverTip" StyleClass="p, black">
+                                    <!--<Entry.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="EntryClick"></TapGestureRecognizer>
+                                    </Entry.GestureRecognizers>-->
+                                </Entry>
                             </StackLayout>
                         </FlexLayout>
                         <BoxView StyleClass="spacer"/>
@@ -322,24 +333,24 @@
             </StackLayout>
             <Frame Grid.Row="5" x:Name="CardInfo">
                 <ScrollView>
-                    <StackLayout>
+                    <StackLayout BackgroundColor="White">
                             <Label Text="Payment Information" TextColor="Black" FontAttributes="Bold" FontSize="Medium" ></Label>
-                            <Entry Placeholder="Email Address" x:Name="cardHolderEmail" TextColor="Black"></Entry>
-                            <Entry Placeholder="Cardholder Name" x:Name="cardHolderName" TextColor="Black"></Entry>
-                            <Entry Placeholder="Card Number" x:Name="cardHolderNumber" MaxLength="16" TextColor="Black" Keyboard="Numeric"></Entry>
+                            <Entry Placeholder="Email Address" x:Name="cardHolderEmail" TextColor="Black" PlaceholderColor="Gray"></Entry>
+                            <Entry Placeholder="Cardholder Name" x:Name="cardHolderName" TextColor="Black" PlaceholderColor="Gray"></Entry>
+                            <Entry Placeholder="Card Number" x:Name="cardHolderNumber" MaxLength="16" TextColor="Black" Keyboard="Numeric" PlaceholderColor="Gray"></Entry>
                                 <Grid >
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                     </Grid.ColumnDefinitions>
-                                    <Entry Grid.Row="0" Grid.Column="0" Placeholder="Exp MM" x:Name="cardExpMonth" MaxLength="2" TextColor="Black" Keyboard="Numeric"></Entry>
-                                    <Entry Grid.Row="0" Grid.Column="1" Placeholder="Exp YY" x:Name="cardExpYear" MaxLength="2" TextColor="Black" Keyboard="Numeric"></Entry>
-                                    <Entry Grid.Row="0" Grid.Column="2" Placeholder="CVV" x:Name="cardCVV" MaxLength="3" TextColor="Black" Keyboard="Numeric"></Entry>
+                                    <Entry Grid.Row="0" Grid.Column="0" Placeholder="Exp MM" PlaceholderColor="Gray" x:Name="cardExpMonth" MaxLength="2" TextColor="Black" Keyboard="Numeric"></Entry>
+                                    <Entry Grid.Row="0" Grid.Column="1" Placeholder="Exp YY" PlaceholderColor="Gray" x:Name="cardExpYear" MaxLength="2" TextColor="Black" Keyboard="Numeric"></Entry>
+                                    <Entry Grid.Row="0" Grid.Column="2" Placeholder="CVV" PlaceholderColor="Gray" x:Name="cardCVV" MaxLength="3" TextColor="Black" Keyboard="Numeric"></Entry>
                                 </Grid>
                           
-                                <Entry Placeholder="Address" x:Name="cardHolderAddress" TextColor="Black"></Entry>
-                                 <Entry Placeholder="Unit" x:Name="cardHolderUnit" TextColor="Black"></Entry>
+                                <Entry Placeholder="Address" x:Name="cardHolderAddress" TextColor="Black" PlaceholderColor="Gray" ></Entry>
+                                 <Entry Placeholder="Unit" x:Name="cardHolderUnit" TextColor="Black" PlaceholderColor="Gray" ></Entry>
                                   <StackLayout >
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -347,11 +358,11 @@
                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                     </Grid.ColumnDefinitions>
-                                    <Entry Grid.Row="0" Grid.Column="0" Placeholder="City" x:Name="cardCity" ></Entry>
-                                    <Entry Grid.Row="0" Grid.Column="1" Placeholder="State" x:Name="cardState" ></Entry>
-                                    <Entry Grid.Row="0" Grid.Column="2" Placeholder="Zip" x:Name="cardZip" ></Entry>
+                                    <Entry Grid.Row="0" Grid.Column="0" Placeholder="City" x:Name="cardCity" PlaceholderColor="Gray" TextColor="Black" ></Entry>
+                                    <Entry Grid.Row="0" Grid.Column="1" Placeholder="State" x:Name="cardState" PlaceholderColor="Gray" TextColor="Black" ></Entry>
+                                    <Entry Grid.Row="0" Grid.Column="2" Placeholder="Zip" x:Name="cardZip" PlaceholderColor="Gray" TextColor="Black"  ></Entry>
                                 </Grid>
-                                <Entry Placeholder="Purchase Description" x:Name="cardDescription" TextColor="Black"></Entry>
+                                <Entry Placeholder="Purchase Description" x:Name="cardDescription" TextColor="Black" PlaceholderColor="Gray" ></Entry>
                             </StackLayout>
                         <Button Text="Complete Payment" TextColor="White" FontAttributes="Bold" Clicked="CompletePaymentClick" BackgroundColor="#FF8500"></Button>
                         <Button Text="Cancel" TextColor="#FF8500" FontAttributes="Bold" BorderColor="LightGray" BorderWidth="0.5" Clicked="CancelPaymentClick"></Button>
@@ -389,7 +400,7 @@
                         </Grid>
                         <Entry x:Name="newUserDeliveryInstructions" Placeholder="Delivery instructions"></Entry>
                         <Frame HasShadow="False" BackgroundColor="Gray" Padding="0" HeightRequest="150">
-                            <maps:Map
+                            <maps:Map HeightRequest="1"
                                 x:Name="map"
                                 IsVisible="true">
                             </maps:Map>
@@ -404,10 +415,10 @@
                 <ScrollView>
                     <StackLayout>
                         <Label Grid.Row="0" Grid.Column="0" x:Name="addInfo" Text="Delivery Contact Info" TextColor="Black" FontAttributes="Bold" FontSize="Medium" Padding="0,0,0,10"></Label>
-                        <Entry x:Name="newUserFirstName" Placeholder="First name"></Entry>
-                        <Entry x:Name="newUserLastName" Placeholder="Last name"></Entry>
-                        <Entry x:Name="newUserPhoneNum" Placeholder="Phone number - Enter only 10 digits" MaxLength="10"></Entry>
-                        <Entry x:Name="newUserEmailAddress" Placeholder="Email Address"></Entry>
+                        <Entry x:Name="newUserFirstName" Placeholder="First name" PlaceholderColor="Gray" TextColor="Black"></Entry>
+                        <Entry x:Name="newUserLastName" Placeholder="Last name" PlaceholderColor="Gray" TextColor="Black"></Entry>
+                        <Entry x:Name="newUserPhoneNum" Placeholder="Phone number - Enter only 10 digits" MaxLength="10" TextColor="Black" PlaceholderColor="Gray"></Entry>
+                        <Entry x:Name="newUserEmailAddress" Placeholder="Email Address" PlaceholderColor="Gray" TextColor="Black" ></Entry>
                         <Button Text="Save Info" TextColor="#FF8500" FontAttributes="Bold" BorderColor="#FF8500" BorderWidth="0.5" Clicked="SaveChangesClick"></Button>
                         <Button Text="Cancel" TextColor="#FF8500" FontAttributes="Bold" BorderColor="#FF8500" BorderWidth="0.5" Clicked="ChangeContactInfoCancelClick"></Button>
                     </StackLayout>

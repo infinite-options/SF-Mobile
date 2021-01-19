@@ -5,7 +5,7 @@
     x:Class="ServingFresh.Views.RefundPage"
     xmlns:servingfresh="clr-namespace:ServingFresh.Effects">
     <ContentPage.Content>
-        <Grid RowSpacing="0" Margin="0,0,0,0">
+        <Grid RowSpacing="0" Margin="0,0,0,0" BackgroundColor="White">
             <Grid.RowDefinitions>
                 <RowDefinition Height="35"></RowDefinition>
                 <RowDefinition Height="95"></RowDefinition>

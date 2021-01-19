@@ -5,7 +5,7 @@
     xmlns:servingfresh="clr-namespace:ServingFresh.Effects"
     x:Class="ServingFresh.Views.HistoryPage">
    <ContentPage.Content>
-        <Grid RowSpacing="0">
+        <Grid RowSpacing="0" BackgroundColor="White">
             <Grid.RowDefinitions>
                 <RowDefinition Height="35"></RowDefinition>
                 <RowDefinition Height="95"></RowDefinition>

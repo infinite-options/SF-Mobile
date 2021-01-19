@@ -650,7 +650,8 @@ namespace ServingFresh.Views
 
         async void SignUpMessageForGuest()
         {
-            var result = await DisplayAlert("", "You are one step away from having an account and accessing additional coupons and promotions. Press 'Continue' to Sign Up or 'Cancel' to return to home page", "Continue", "Cancel");
+            //await DisplayAlert("Congratulations", "Payment was successful. We appreciate your business", "OK");
+            var result = await DisplayAlert("", "Your payment was successful. We appreciate your business.\n\nYou are one step away from having an account and accessing additional coupons and promotions.", "Sign Up", "Home Page");
             if (result)
             {
                 var sender = new System.Object();
