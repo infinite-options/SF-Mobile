@@ -84,7 +84,9 @@ namespace ServingFresh.LogIn.Apple
 
                     if (Application.Current.Properties.ContainsKey(account.UserId.ToString()))
                     {
-                        AppleUserProfileAsync(account.UserId, account.Token, (string)Application.Current.Properties[account.UserId.ToString()], account.Name);
+                        account.Email = (string)Application.Current.Properties[account.UserId.ToString()];
+                        Application.Current.MainPage = new SelectionPage("", "", null, account, "APPLE");
+                        //AppleUserProfileAsync(account.UserId, account.Token, (string)Application.Current.Properties[account.UserId.ToString()], account.Name);
                     }
                     else
                     {
@@ -105,7 +107,9 @@ namespace ServingFresh.LogIn.Apple
                         {
                             var data = JsonConvert.DeserializeObject<AppleUser>(responseContent);
                             Application.Current.Properties[account.UserId.ToString()] = data.result[0].customer_email;
-                            AppleUserProfileAsync(account.UserId, account.Token, (string)Application.Current.Properties[account.UserId.ToString()], account.Name);
+                            account.Email = (string)Application.Current.Properties[account.UserId.ToString()];
+                            Application.Current.MainPage = new SelectionPage("", "", null, account, "APPLE");
+                            //AppleUserProfileAsync(account.UserId, account.Token, (string)Application.Current.Properties[account.UserId.ToString()], account.Name);
                         }
                         else
                         {

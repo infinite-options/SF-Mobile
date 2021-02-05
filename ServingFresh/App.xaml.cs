@@ -32,10 +32,6 @@ namespace ServingFresh
 
                     if (today <= expTime)
                     {
-                        System.Diagnostics.Debug.WriteLine("There is a time stam go in selection page");
-                        System.Diagnostics.Debug.WriteLine("expTime"+ expTime);
-
-                        System.Diagnostics.Debug.WriteLine("Running on Android: Line 35");
                         Console.WriteLine("guid: " + Preferences.Get("guid", null));
                         MainPage = new SelectionPage();
                     }
@@ -93,7 +89,6 @@ namespace ServingFresh
             if (appleSignInService != null)
             {
                 userId = await SecureStorage.GetAsync(AppleUserIdKey);
-                System.Diagnostics.Debug.WriteLine("This is userID :" + userId);
                 if (appleSignInService.IsAvailable && !string.IsNullOrEmpty(userId))
                 {
                     var credentialState = await appleSignInService.GetCredentialStateAsync(userId);
@@ -103,7 +98,6 @@ namespace ServingFresh
                             break;
                         case AppleSignInCredentialState.NotFound:
                         case AppleSignInCredentialState.Revoked:
-                            //Logout;
                             SecureStorage.Remove(AppleUserIdKey);
                             Preferences.Set(LoggedInKey, false);
                             MainPage = new LogInPage();

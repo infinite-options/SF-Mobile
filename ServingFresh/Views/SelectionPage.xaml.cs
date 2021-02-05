@@ -10,6 +10,12 @@ using Newtonsoft.Json;
 using Xamarin.Essentials;
 using System.Diagnostics;
 using Plugin.LatestVersion;
+using Xamarin.Auth;
+using ServingFresh.LogIn.Apple;
+using Acr.UserDialogs;
+using ServingFresh.LogIn.Classes;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace ServingFresh.Views
 {
@@ -107,40 +113,275 @@ namespace ServingFresh.Views
 
         List<DeliveryInfo> deliveryDays = new List<DeliveryInfo>();
         List<string> deliveryDayList = new List<string>();
-
         List<DeliveriesModel> deliveryScheduleUnfiltered = new List<DeliveriesModel>();
         List<Delivery> deliveryScheduleFiltered = new List<Delivery>();
-        public List<ScheduleInfo> schedule = new List<ScheduleInfo>();
-
+        List<ScheduleInfo> schedule = new List<ScheduleInfo>();
         List<string> businessList = new List<string>();
         List<BusinessCard> businesses = new List<BusinessCard>();
         List<BusinessCard> business = new List<BusinessCard>();
-        public ServingFreshBusiness data = new ServingFreshBusiness();
-
-        public  List<ScheduleInfo> copy = new List<ScheduleInfo>();
-        public bool versionUpdate = false;
-
+        List<ScheduleInfo> copy = new List<ScheduleInfo>();
         List<DateTime> deliverySchedule = new List<DateTime>();
-        
+        List<ScheduleInfo> displaySchedule = new List<ScheduleInfo>();
+        ServingFreshBusiness data = new ServingFreshBusiness();
+        private string deviceId;
+
+        // THIS SELECTION PAGE IS USE IN ALL LOGINS ONLY
+
+        //public DeliveriesPage(string accessToken = "", string refreshToken = "", AuthenticatorCompletedEventArgs e = null, AppleAccount account = null, string platform = "")
+        //{
+        //    InitializeComponent();
+        //    UserDialogs.Instance.ShowLoading("Please wait while we are processing your request...");
+        //    SetHeightWidthOnMap();
+        //    SetWidthOnHelpButtonRow();
+        //    SetDefaultLocationOnMap();
+        //    BackupDisplay.Margin = new Thickness(0, Application.Current.MainPage.Height, 0, 0);
+        //    if (platform == "GOOGLE")
+        //    {
+        //        VerifyUserAccount(accessToken, refreshToken, e, null, "GOOGLE");
+        //    }
+        //    else if (platform == "FACEBOOK")
+        //    {
+        //        VerifyUserAccount(accessToken, "", null, null, "FACEBOOK");
+        //    }
+        //    else if (platform == "APPLE")
+        //    {
+        //        VerifyUserAccount(account.UserId, "", null, account, "APPLE");
+        //    }
+        //}
+
+        public SelectionPage(string accessToken = "", string refreshToken = "", AuthenticatorCompletedEventArgs googleCredentials = null, AppleAccount appleCredentials = null, string platform = "")
+        {
+            InitializeComponent();
+            _ = VerifyUserCredentials(accessToken, refreshToken, googleCredentials, appleCredentials, platform);
+        }
+
+        static async Task WaitAndApologizeAsync()
+        {
+            await Task.Delay(2000);
+        }
+
+        public async Task VerifyUserCredentials(string accessToken = "", string refreshToken = "", AuthenticatorCompletedEventArgs googleAccount = null, AppleAccount appleCredentials = null, string platform= "")
+        {
+            try
+            {
+                //var progress = UserDialogs.Instance.Loading("Loading...");
+                var client = new HttpClient();
+                var socialLogInPost = new SocialLogInPost();
+
+                var googleData = new GoogleResponse();
+                var facebookData = new FacebookResponse();
+
+                if (platform == "GOOGLE")
+                {
+                    var request = new OAuth2Request("GET", new Uri(Constant.GoogleUserInfoUrl), null, googleAccount.Account);
+                    var GoogleResponse = await request.GetResponseAsync();
+                    var googelUserData = GoogleResponse.GetResponseText();
+
+                    googleData = JsonConvert.DeserializeObject<GoogleResponse>(googelUserData);
+
+                    socialLogInPost.email = googleData.email;
+                    socialLogInPost.social_id = googleData.id;
+                }
+                else if (platform == "FACEBOOK")
+                {
+                    var facebookResponse = client.GetStringAsync(Constant.FacebookUserInfoUrl + accessToken);
+                    var facebookUserData = facebookResponse.Result;
+
+                    facebookData = JsonConvert.DeserializeObject<FacebookResponse>(facebookUserData);
+
+                    socialLogInPost.email = facebookData.email;
+                    socialLogInPost.social_id = facebookData.id;
+                }
+                else if (platform == "APPLE")
+                {
+                    socialLogInPost.email = appleCredentials.Email;
+                    socialLogInPost.social_id = appleCredentials.UserId;
+                }
+
+                socialLogInPost.password = "";
+                socialLogInPost.signup_platform = platform;
+
+                var socialLogInPostSerialized = JsonConvert.SerializeObject(socialLogInPost);
+                var postContent = new StringContent(socialLogInPostSerialized, Encoding.UTF8, "application/json");
+
+                var test = UserDialogs.Instance.Loading("Loading...");
+                var RDSResponse = await client.PostAsync(Constant.LogInUrl, postContent);
+                var responseContent = await RDSResponse.Content.ReadAsStringAsync();
+                var authetication = JsonConvert.DeserializeObject<SuccessfulSocialLogIn>(responseContent);
+                if (RDSResponse.IsSuccessStatusCode)
+                {
+                    if (responseContent != null)
+                    {
+                        if (authetication.code.ToString() == Constant.EmailNotFound)
+                        {
+                            test.Hide();
+                            if(platform == "GOOGLE")
+                            {
+                                Application.Current.MainPage = new SocialSignUp(googleData.id, googleData.given_name, googleData.family_name, googleData.email, accessToken, refreshToken, "GOOGLE");
+                            }
+                            else if (platform == "FACEBOOK")
+                            {
+                                Application.Current.MainPage = new SocialSignUp(facebookData.id, facebookData.name, "", facebookData.email, accessToken, accessToken, "FACEBOOK");
+                            }
+                            else if (platform == "APPLE")
+                            {
+                                Application.Current.MainPage = new SocialSignUp(appleCredentials.UserId, appleCredentials.Name, "", appleCredentials.Email, appleCredentials.Token, appleCredentials.Token, "APPLE");
+                            }
+                        }
+                        if (authetication.code.ToString() == Constant.AutheticatedSuccesful)
+                        {
+                            try
+                            {
+                                var data = JsonConvert.DeserializeObject<SuccessfulSocialLogIn>(responseContent);
+                                Application.Current.Properties["user_id"] = data.result[0].customer_uid;
+
+                                UpdateTokensPost updateTokesPost = new UpdateTokensPost();
+                                updateTokesPost.uid = data.result[0].customer_uid;
+                                if (platform == "GOOGLE")
+                                {
+                                    updateTokesPost.mobile_access_token = accessToken;
+                                    updateTokesPost.mobile_refresh_token = refreshToken;
+                                }
+                                else if (platform == "FACEBOOK")
+                                {
+                                    updateTokesPost.mobile_access_token = accessToken;
+                                    updateTokesPost.mobile_refresh_token = accessToken;
+                                }else if (platform == "APPLE")
+                                {
+                                    updateTokesPost.mobile_access_token = appleCredentials.Token;
+                                    updateTokesPost.mobile_refresh_token = appleCredentials.Token;
+                                }
+
+                                var updateTokesPostSerializedObject = JsonConvert.SerializeObject(updateTokesPost);
+                                var updateTokesContent = new StringContent(updateTokesPostSerializedObject, Encoding.UTF8, "application/json");
+                                var updateTokesResponse = await client.PostAsync(Constant.UpdateTokensUrl, updateTokesContent);
+                                var updateTokenResponseContent = await updateTokesResponse.Content.ReadAsStringAsync();
+
+                                if (updateTokesResponse.IsSuccessStatusCode)
+                                {
+                                    var user = new RequestUserInfo();
+                                    user.uid = data.result[0].customer_uid;
+
+                                    var requestSelializedObject = JsonConvert.SerializeObject(user);
+                                    var requestContent = new StringContent(requestSelializedObject, Encoding.UTF8, "application/json");
+
+                                    var clientRequest = await client.PostAsync(Constant.GetUserInfoUrl, requestContent);
+
+                                    if (clientRequest.IsSuccessStatusCode)
+                                    {
+                                        var userSfJSON = await clientRequest.Content.ReadAsStringAsync();
+                                        var userProfile = JsonConvert.DeserializeObject<UserInfo>(userSfJSON);
+
+                                        DateTime today = DateTime.Now;
+                                        DateTime expDate = today.AddDays(Constant.days);
+
+                                        Application.Current.Properties["user_id"] = data.result[0].customer_uid;
+                                        Application.Current.Properties["time_stamp"] = expDate;
+                                        Application.Current.Properties["platform"] = platform;
+                                        Application.Current.Properties["user_email"] = userProfile.result[0].customer_email;
+                                        Application.Current.Properties["user_first_name"] = userProfile.result[0].customer_first_name;
+                                        Application.Current.Properties["user_last_name"] = userProfile.result[0].customer_last_name;
+                                        Application.Current.Properties["user_phone_num"] = userProfile.result[0].customer_phone_num;
+                                        Application.Current.Properties["user_address"] = userProfile.result[0].customer_address;
+                                        Application.Current.Properties["user_unit"] = userProfile.result[0].customer_unit;
+                                        Application.Current.Properties["user_city"] = userProfile.result[0].customer_city;
+                                        Application.Current.Properties["user_state"] = userProfile.result[0].customer_state;
+                                        Application.Current.Properties["user_zip_code"] = userProfile.result[0].customer_zip;
+                                        Application.Current.Properties["user_latitude"] = userProfile.result[0].customer_lat;
+                                        Application.Current.Properties["user_longitude"] = userProfile.result[0].customer_long;
+
+                                        _ = Application.Current.SavePropertiesAsync();
+                                        await CheckVersion();
+
+                                        if (Device.RuntimePlatform == Device.iOS)
+                                        {
+                                            deviceId = Preferences.Get("guid", null);
+                                            if (deviceId != null) { Debug.WriteLine("This is the iOS GUID from Log in: " + deviceId); }
+                                        }
+                                        else
+                                        {
+                                            deviceId = Preferences.Get("guid", null);
+                                            if (deviceId != null) { Debug.WriteLine("This is the Android GUID from Log in " + deviceId); }
+                                        }
+
+                                        if (deviceId != null)
+                                        {
+                                            NotificationPost notificationPost = new NotificationPost();
+
+                                            notificationPost.uid = (string)Application.Current.Properties["user_id"];
+                                            notificationPost.guid = deviceId.Substring(5);
+                                            Application.Current.Properties["guid"] = deviceId.Substring(5);
+                                            notificationPost.notification = "TRUE";
+
+                                            var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
+                                            Debug.WriteLine("Notification JSON Object to send: " + notificationSerializedObject);
+
+                                            var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
+
+                                            var clientResponse = await client.PostAsync(Constant.NotificationsUrl, notificationContent);
+
+                                            Debug.WriteLine("Status code: " + clientResponse.IsSuccessStatusCode);
+
+                                            if (clientResponse.IsSuccessStatusCode)
+                                            {
+                                                System.Diagnostics.Debug.WriteLine("We have post the guid to the database");
+                                            }
+                                            else
+                                            {
+                                                await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
+                                            }
+                                        }
+                                        test.Hide();
+                                        //Application.Current.MainPage = new SelectionPage();
+                                    }
+                                    else
+                                    {
+                                        test.Hide();
+                                        await DisplayAlert("Alert!", "Our internal system was not able to retrieve your user information. We are working to solve this issue.", "OK");
+                                    }
+                                }
+                                else
+                                {
+                                    test.Hide();
+                                    await DisplayAlert("Oops", "We are facing some problems with our internal system. We weren't able to update your credentials", "OK");
+                                }
+                                test.Hide();
+                            }
+                            catch (Exception second)
+                            {
+                                Debug.WriteLine(second.Message);
+                            }
+                        }
+                        if (authetication.code.ToString() == Constant.ErrorPlatform)
+                        {
+                            var RDSCode = JsonConvert.DeserializeObject<RDSLogInMessage>(responseContent);
+                            test.Hide();
+                            Application.Current.MainPage = new LogInPage("Message", RDSCode.message);
+                        }
+
+                        if (authetication.code.ToString() == Constant.ErrorUserDirectLogIn)
+                        {
+                            test.Hide();
+                            Application.Current.MainPage = new LogInPage("Oops!", "You have an existing Serving Fresh account. Please use direct login");
+                        }
+                    }
+                }
+                test.Hide();
+            }
+            catch (Exception first)
+            {
+                Debug.WriteLine(first.Message);
+            }
+        }
 
 
         public SelectionPage()
         {
             InitializeComponent();
-            Init();
-            CheckVersion();
-            
+            _ = CheckVersion();
         }
 
-        public void Init()
-        {
-            BackgroundColor = Constants.PrimaryColor;
-            //delivery_list.ItemsSource = Deliveries;
-            //market_list.ItemsSource = FarmersMarkets;
-            //farm_list.ItemsSource = Farms;
-        }
-
-        public async void CheckVersion()
+        public async Task CheckVersion()
         {
             var isLatest = await CrossLatestVersion.Current.IsUsingLatestVersion();
             
@@ -151,276 +392,53 @@ namespace ServingFresh.Views
             }
             else
             {
-                GetBusinesses();
+                _ = GetBusinesses();
+                Application.Current.Properties["zone"] = "";
                 Application.Current.Properties["day"] = "";
                 Application.Current.Properties["deliveryDate"] = "";
                 CartTotal.Text = CheckoutPage.total_qty.ToString();
             }
         }
-
-        public void GetDays()
-        {
-            deliveryScheduleUnfiltered.Clear();
-            deliveryScheduleFiltered.Clear();
-            var date = DateTime.Now;
-            var monthNames = new List<string>();
-            monthNames.Add("");
-            monthNames.Add("Jan");
-            monthNames.Add("Feb");
-            monthNames.Add("Mar");
-            monthNames.Add("Apr");
-            monthNames.Add("May");
-            monthNames.Add("Jun");
-            monthNames.Add("Jul");
-            monthNames.Add("Aug");
-            monthNames.Add("Sep");
-            monthNames.Add("Oct");
-            monthNames.Add("Nov");
-            monthNames.Add("Dec");
-            for (int i = 0; i < 7; i++)
-            {
-                deliveryScheduleUnfiltered.Add(new DeliveriesModel()
-                {
-                    delivery_dayofweek = date.DayOfWeek.ToString(),
-                    delivery_shortname = date.DayOfWeek.ToString().Substring(0, 3).ToUpper(),
-                    delivery_date = monthNames[date.Month] + " " + date.Day
-                });
-                date = date.AddDays(1);
-            }
-
-            foreach(DeliveriesModel i in deliveryScheduleUnfiltered)
-            {
-                foreach(DeliveryInfo j in deliveryDays)
-                {
-                    if(i.delivery_dayofweek.ToUpper() == j.delivery_day.ToUpper())
-                    {
-                        deliveryScheduleFiltered.Add(new Delivery() {
-                            delivery_dayofweek = i.delivery_dayofweek,
-                            delivery_shortname = i.delivery_shortname,
-                            delivery_date = i.delivery_date,
-                            delivery_time = j.delivery_time
-                        });
-                    }
-                }
-            }
-
-            foreach(Delivery k in deliveryScheduleFiltered)
-            {
-                List<string> ids = new List<string>();
-                foreach(Business b in data.result)
-                {
-                    if(k.delivery_dayofweek.ToUpper() == b.z_delivery_day.ToUpper() && k.delivery_time == b.z_delivery_time)
-                    {
-                        ids.Add(b.z_biz_id);
-                    }
-                }
-                string deliveryStartTime = "";
-
-                foreach(char a in k.delivery_time.ToCharArray())
-                {
-                    if(a != '-')
-                    {
-                        deliveryStartTime += a;
-                    }
-                    else { break; }
-                }
-                schedule.Add(new ScheduleInfo()
-                {
-                    delivery_date = k.delivery_date,
-                    delivery_shortname = k.delivery_shortname,
-                    delivery_dayofweek = k.delivery_dayofweek,
-                    delivery_time = k.delivery_time,
-                    business_uids = ids,
-                    
-                });
-            }
-            List<ScheduleInfo> copySchedule = new List<ScheduleInfo>();
-            List<ScheduleInfo> temp = new List<ScheduleInfo>();
-            foreach (ScheduleInfo a in schedule)
-            {
-                copySchedule.Add(a);
-            }
-            
-            deliverySchedule.Sort();
-            foreach(DateTime a in deliverySchedule)
-            {
-                temp.Add(new ScheduleInfo()
-                {
-                    delivery_date = a.ToString("MMM") + " " + a.Day.ToString(),
-                    delivery_shortname = a.DayOfWeek.ToString().Substring(0, 3).ToUpper(),
-                    delivery_dayofweek = a.DayOfWeek.ToString(),
-                    delivery_time = "",
-                    business_uids = schedule[0].business_uids,
-                    
-                }); ;
-
-                ////delivery_dayofweek = date.DayOfWeek.ToString(),
-                ////delivery_shortname = date.DayOfWeek.ToString().Substring(0, 3).ToUpper(),
-                ////delivery_date = monthNames[date.Month] + " " + date.Day
-                //Debug.WriteLine(a);
-                //for (int i = 0; i < copySchedule.Count; i++)
-                //{
-                //    if(copySchedule[i].status == "NON-ACTIVE")
-                //    {
-                //        if (a.DayOfWeek.ToString().ToUpper() == copySchedule[i].delivery_dayofweek.ToUpper())
-                //        {
-                //            var d = copySchedule[i];
-                //            d.delivery_date = a.ToString("MMM") + " " + a.Day.ToString();
-                //            temp.Add(d);
-                //            copySchedule[i].status = "ACTIVE";
-                //        }
-                //    }
-                //}
-            }
-
-            //foreach (ScheduleInfo a in temp)
-            //{
-            //    foreach (ScheduleInfo b in schedule)
-            //    {
-            //        if (a.delivery_dayofweek == b.delivery_dayofweek && a.startTime.Trim() == b.startTime.ToUpper().Trim())
-            //        {
-            //            a.delivery_time = b.delivery_time;
-            //            a.business_uids = b.business_uids;
-            //        }
-            //    }
-            //}
-
-            schedule = temp;
-            //Debug.WriteLine(a);
-            //var d = new ScheduleInfo();
-            //d.delivery_shortname = a.DayOfWeek.ToString().Substring(0, 3).ToUpper();
-            //d.delivery_date = a.ToString("MMM") + " " + a.Day.ToString();
-            //temp.Add(d);
-
-
-            //if (schedule.Count != 0)
-            //{
-            //    Debug.WriteLine("DELIVERY CHECK POINT");
-            //    var firstElement = schedule[0];
-            //    var dateE1 = firstElement.delivery_date;
-            //    var timeE1 = "";
-
-            //    foreach (char a in firstElement.delivery_time.ToCharArray())
-            //    {
-            //        if (a != '-')
-            //        {
-            //            timeE1 += a;
-            //        }
-            //    }
-            //    timeE1.Trim().ToUpper();
-            //    Debug.WriteLine("DELIVERY DATE                      : " + dateE1);
-            //    Debug.WriteLine("DELIVERY TIME                      : " + timeE1);
-            //    var timeStampDate = DateTime.Parse(dateE1);
-            //    var timeStampTime = DateTime.Parse(timeE1);
-
-            //    Debug.WriteLine("DELIVERY TIME AS DATETIME TYPE DATE: " + timeStampDate);
-            //    Debug.WriteLine("DELIVERY TIME AS DATETIME TYPE TIME: " + timeStampTime);
-            //    var timeStampString = timeStampDate.ToString("MM/dd/yyyy") + " " + timeStampTime.ToString("HH:mm:ss");
-            //    var timeStampE1 = DateTime.Parse(timeStampString);
-            //    Debug.WriteLine("DELIVERY TIME AS DATETIME TYPE     : " + timeStampE1);
-            //    var targetDate = timeStampE1.AddDays(-1).ToString("MM/dd/yyyy");
-            //    var targetTime = DateTime.Parse("01:00 PM").ToString("HH:mm:ss");
-            //    var targetTimeString = targetDate + " " + targetTime;
-            //    var targetTimeStamp = DateTime.Parse(targetTimeString);
-            //    Debug.WriteLine("TARGET TIME AS DATETIME TYPE       : " + targetTimeStamp);
-
-            //    var currentTime = DateTime.Now;
-            //    Debug.WriteLine("CURRENT TIME AS DATETIME TYPE      : " + currentTime);
-            //    if (currentTime < targetTimeStamp)
-            //    {
-
-            //    }
-            //    else
-            //    {
-            //        if (schedule.Count == 1)
-            //        {
-            //            firstElement.delivery_date = timeStampE1.AddDays(7).ToString("MMM dd");
-            //            schedule[0] = firstElement;
-            //        }
-            //        else
-            //        {
-            //            var lastElement = firstElement;
-            //            schedule.RemoveAt(0);
-            //            lastElement.delivery_date = timeStampE1.AddDays(7).ToString("MMM dd");
-            //            schedule.Add(lastElement);
-            //        }
-            //    }
-            //}
-            //delivery_list.ItemsSource = schedule;
-            delivery_list.ItemsSource = schedule;
-        }
-
-        void ResetDays()
-        {
-            //List<string> business_uids = new List<string>();
-            //if (selected_farm_id != "")
-            //{
-            //    business_uids.Add(selected_farm_id);
-            //}
-            //else
-            //{
-            //    foreach (BusinessCard bc in Farms)
-            //    {
-            //        business_uids.Add(bc.business_uid);
-            //    }
-            //}
-            //Deliveries.Clear();
-            //foreach (DeliveriesModel dm in AllDeliveries)
-            //{
-            //    if (anyBusinessesOpen(business_uids, dm.delivery_dayofweek))
-            //        Deliveries.Add(dm);
-            //}
-        }
-
-        public List<ScheduleInfo> displaySchedule = new List<ScheduleInfo>();
  
-        public async void GetBusinesses()
+        public async Task GetBusinesses()
         {
-            string userLat = (string)Application.Current.Properties["user_latitude"];
-            string userLong = (string)Application.Current.Properties["user_longitude"];
-            if (userLat == "0" && userLong == "0")
-            {
-                userLong = "-121.8866517";
-                userLat = "37.2270928";
-            }
+            //var progress = UserDialogs.Instance.Loading("Loading...");
+            var userLat = (string)Application.Current.Properties["user_latitude"];
+            var userLong = (string)Application.Current.Properties["user_longitude"];
+
+            if (userLat == "0" && userLong == "0"){ userLong = "-121.8866517"; userLat = "37.2270928";}
 
             var client = new HttpClient();
             var response = await client.GetAsync(Constant.ZoneUrl + userLong + "," + userLat);
-            Debug.WriteLine(Constant.ZoneUrl + userLong + "," + userLat);
             var result = await response.Content.ReadAsStringAsync();
+            //Debug.WriteLine("ZONE URL: "Constant.ZoneUrl + userLong + "," + userLat);
+            //Debug.WriteLine("LIST OF FARMS: " + result);
 
-            Debug.WriteLine("List of farms: " + result);
-
-            Application.Current.Properties["zone"] = "";
-                
             if (response.IsSuccessStatusCode)
             {
 
                 data = JsonConvert.DeserializeObject<ServingFreshBusiness>(result);
-                //var filterData = new ServingFreshBusiness();
-                //filterData.result = new List<Business>();
 
                 var currentDate = DateTime.Now;
                 var tempDateTable = GetTable(currentDate);
 
-                Debug.WriteLine("TEMP TABLE FOR LOOK UPS");
-                foreach(DateTime t in tempDateTable)
-                {
-                    Debug.WriteLine(t);
-                }
+                //Debug.WriteLine("TEMP TABLE FOR LOOK UPS");
+                //foreach(DateTime t in tempDateTable)
+                //{
+                //    Debug.WriteLine(t);
+                //}
 
                 foreach (Business a in data.result)
                 {
                     var acceptingDate = LastAcceptingOrdersDate(tempDateTable, a.z_accepting_day, a.z_accepting_time);
                     var deliveryDate = new DateTime();
-                    Debug.WriteLine("CURRENT DATE: " + currentDate);
-                    Debug.WriteLine("LAST ACCEPTING DATE: " + acceptingDate);
+                    //Debug.WriteLine("CURRENT DATE: " + currentDate);
+                    //Debug.WriteLine("LAST ACCEPTING DATE: " + acceptingDate);
 
                     if (currentDate < acceptingDate)
                     {
-                        Debug.WriteLine("ONTIME");
-                        
-                        //deliveryDate = BussinesDeliveryDate(acceptingDate, a.z_delivery_day, a.z_accepting_time);
+                        //Debug.WriteLine("ONTIME");
+
                         deliveryDate = bussinesDeliveryDate(a.z_delivery_day, a.z_delivery_time);
                         if (deliveryDate < acceptingDate)
                         {
@@ -438,18 +456,18 @@ namespace ServingFresh.Views
                             element.delivery_time = a.z_delivery_time;
                             element.deliveryTimeStamp = deliveryDate;
                             element.orderExpTime = "Order by " + acceptingDate.ToString("ddd") + " " + acceptingDate.ToString("htt").ToLower();
-                            //element.orderExpTime = "Order by " + acceptingDate.ToString("MMM dd");
-                            Debug.WriteLine("element.delivery_date: " + element.delivery_date);
-                            Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
-                            Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
-                            Debug.WriteLine("element.delivery_time: " + element.delivery_time);
-                            Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
-                            Debug.WriteLine("business_uids list: ");
 
-                            foreach(string ID in element.business_uids)
-                            {
-                                Debug.WriteLine(ID);
-                            }
+                            //Debug.WriteLine("element.delivery_date: " + element.delivery_date);
+                            //Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
+                            //Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
+                            //Debug.WriteLine("element.delivery_time: " + element.delivery_time);
+                            //Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
+                            //Debug.WriteLine("business_uids list: ");
+
+                            //foreach(string ID in element.business_uids)
+                            //{
+                            //    Debug.WriteLine(ID);
+                            //}
 
                             deliverySchedule.Add(deliveryDate);
                             displaySchedule.Add(element);
@@ -465,17 +483,17 @@ namespace ServingFresh.Views
                                     e.business_uids.Add(a.z_biz_id);
                                     element.business_uids = e.business_uids;
 
-                                    Debug.WriteLine("element.delivery_date: " + element.delivery_date);
-                                    Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
-                                    Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
-                                    Debug.WriteLine("element.delivery_time: " + element.delivery_time);
-                                    Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
-                                    Debug.WriteLine("business_uids list: ");
+                                    //Debug.WriteLine("element.delivery_date: " + element.delivery_date);
+                                    //Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
+                                    //Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
+                                    //Debug.WriteLine("element.delivery_time: " + element.delivery_time);
+                                    //Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
+                                    //Debug.WriteLine("business_uids list: ");
 
-                                    foreach (string ID in element.business_uids)
-                                    {
-                                        Debug.WriteLine(ID);
-                                    }
+                                    //foreach (string ID in element.business_uids)
+                                    //{
+                                    //    Debug.WriteLine(ID);
+                                    //}
 
                                     break;
                                 }
@@ -484,7 +502,7 @@ namespace ServingFresh.Views
                     }
                     else
                     {
-                        Debug.WriteLine("NON ONTIME! -> ROLL OVER TO NEXT DELIVERY DATE");
+                        //Debug.WriteLine("NON ONTIME! -> ROLL OVER TO NEXT DELIVERY DATE");
 
                         deliveryDate = bussinesDeliveryDate(a.z_delivery_day, a.z_delivery_time);
 
@@ -501,18 +519,18 @@ namespace ServingFresh.Views
                             element.delivery_time = a.z_delivery_time;
                             element.deliveryTimeStamp = nextDeliveryDate;
                             element.orderExpTime = "Order by " + acceptingDate.AddDays(7).ToString("ddd") + " " + acceptingDate.AddDays(7).ToString("htt").ToLower();
-                            //element.orderExpTime = "Order by " + acceptingDate.AddDays(7).ToString("MMM dd");
-                            Debug.WriteLine("element.delivery_date: " + element.delivery_date);
-                            Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
-                            Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
-                            Debug.WriteLine("element.delivery_time: " + element.delivery_time);
-                            Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
-                            Debug.Write("business_uids list: ");
 
-                            foreach (string ID in element.business_uids)
-                            {
-                                Debug.Write(ID + ", ");
-                            }
+                            //Debug.WriteLine("element.delivery_date: " + element.delivery_date);
+                            //Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
+                            //Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
+                            //Debug.WriteLine("element.delivery_time: " + element.delivery_time);
+                            //Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
+                            //Debug.Write("business_uids list: ");
+
+                            //foreach (string ID in element.business_uids)
+                            //{
+                            //    Debug.Write(ID + ", ");
+                            //}
 
                             deliverySchedule.Add(nextDeliveryDate);
                             displaySchedule.Add(element);
@@ -530,17 +548,17 @@ namespace ServingFresh.Views
                                     e.business_uids.Add(a.z_biz_id);
                                     element.business_uids = e.business_uids;
 
-                                    Debug.WriteLine("element.delivery_date: " + element.delivery_date);
-                                    Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
-                                    Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
-                                    Debug.WriteLine("element.delivery_time: " + element.delivery_time);
-                                    Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
-                                    Debug.Write("business_uids list: ");
+                                    //Debug.WriteLine("element.delivery_date: " + element.delivery_date);
+                                    //Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
+                                    //Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
+                                    //Debug.WriteLine("element.delivery_time: " + element.delivery_time);
+                                    //Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
+                                    //Debug.Write("business_uids list: ");
 
-                                    foreach (string ID in element.business_uids)
-                                    {
-                                        Debug.Write(ID + ", ");
-                                    }
+                                    //foreach (string ID in element.business_uids)
+                                    //{
+                                    //    Debug.Write(ID + ", ");
+                                    //}
 
                                     break;
                                 }
@@ -550,28 +568,28 @@ namespace ServingFresh.Views
                 }
 
                 // DISPLAY SCHEDULE ELEMENTS;
-                Debug.WriteLine("");
-                Debug.WriteLine("");
-                Debug.WriteLine("DISPLAY SCHEDULE ELEMENTS NOT SORTED");
-                Debug.WriteLine("");
+                //Debug.WriteLine("");
+                //Debug.WriteLine("");
+                //Debug.WriteLine("DISPLAY SCHEDULE ELEMENTS NOT SORTED");
+                //Debug.WriteLine("");
 
-                foreach (ScheduleInfo element in displaySchedule)
-                {
-                    Debug.WriteLine("element.delivery_date: " + element.delivery_date);
-                    Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
-                    Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
-                    Debug.WriteLine("element.delivery_time: " + element.delivery_time);
-                    Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
-                    Debug.Write("business_uids list: ");
+                //foreach (ScheduleInfo element in displaySchedule)
+                //{
+                //    Debug.WriteLine("element.delivery_date: " + element.delivery_date);
+                //    Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
+                //    Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
+                //    Debug.WriteLine("element.delivery_time: " + element.delivery_time);
+                //    Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
+                //    Debug.Write("business_uids list: ");
 
-                    foreach (string ID in element.business_uids)
-                    {
-                        Debug.Write(ID + ", ");
-                    }
+                //    foreach (string ID in element.business_uids)
+                //    {
+                //        Debug.Write(ID + ", ");
+                //    }
 
-                    Debug.WriteLine("");
-                    Debug.WriteLine("");
-                }
+                //    Debug.WriteLine("");
+                //    Debug.WriteLine("");
+                //}
 
                 deliverySchedule.Sort();
                 List<ScheduleInfo> sortedSchedule = new List<ScheduleInfo>();
@@ -589,76 +607,35 @@ namespace ServingFresh.Views
 
                 displaySchedule = sortedSchedule;
 
-                Debug.WriteLine("");
-                Debug.WriteLine("");
-                Debug.WriteLine("DISPLAY SCHEDULE ELEMENTS SORTED");
-                Debug.WriteLine("");
+                //Debug.WriteLine("");
+                //Debug.WriteLine("");
+                //Debug.WriteLine("DISPLAY SCHEDULE ELEMENTS SORTED");
+                //Debug.WriteLine("");
 
-                foreach (ScheduleInfo element in displaySchedule)
-                {
-                    Debug.WriteLine("element.delivery_date: " + element.delivery_date);
-                    Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
-                    Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
-                    Debug.WriteLine("element.delivery_time: " + element.delivery_time);
-                    Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
-                    Debug.Write("business_uids list: ");
-
-                    foreach (string ID in element.business_uids)
-                    {
-                        Debug.Write(ID + ", ");
-                    }
-
-                    Debug.WriteLine("");
-                    Debug.WriteLine("");
-                }
-
-
-                // ALGORITHM WHEN USING BUSINESS ACCEPTING HOURS
-                // =============================================
-                //foreach (Business a in data.result)
+                //foreach (ScheduleInfo element in displaySchedule)
                 //{
-                //    var hours = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(a.business_accepting_hours);
-                //    foreach(string key in hours.Keys)
+                //    Debug.WriteLine("element.delivery_date: " + element.delivery_date);
+                //    Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
+                //    Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
+                //    Debug.WriteLine("element.delivery_time: " + element.delivery_time);
+                //    Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
+                //    Debug.Write("business_uids list: ");
+
+                //    foreach (string ID in element.business_uids)
                 //    {
-                //        var day = DateTime.Now.DayOfWeek;
-                //        if(key == day.ToString())
-                //        {
-                //            if(hours[key][0] != "" && hours[key][1] != "")
-                //            {
-                //                // BUSINESS IS OPENED, BUT HAVE TO CHECK IF WE ARE ONTIME
-                //                var startT = DateTime.Parse(hours[key][0]);
-                //                var endT = DateTime.Parse(hours[key][1]);
-                //                var currentT = DateTime.Now;
-
-                //                if(startT <= currentT && currentT <= endT)
-                //                {
-
-                //                    Debug.WriteLine("BUSINESS IS ACCEPTING ORDERS");
-                //                    Debug.WriteLine("START: " + startT);
-                //                    Debug.WriteLine("END: " + endT);
-                //                    Debug.WriteLine("CURRENT: " + currentT);
-                //                    filterData.result.Add(a);
-                //                }
-
-                //            }
-                //        }
+                //        Debug.Write(ID + ", ");
                 //    }
+
+                //    Debug.WriteLine("");
+                //    Debug.WriteLine("");
                 //}
-
-                //foreach (Business a in filterData.result)
-                //{
-                //    Debug.WriteLine(a.business_name);
-                //}
-
-                //data.result = filterData.result;
-
 
                 if (result.Contains("280") && data.result.Count != 0)
                 {
                     // Parse it
                     Application.Current.Properties["zone"] = data.result[0].zone;
-                    Debug.WriteLine("Zone to save: " + Application.Current.Properties["zone"]);
-                    Debug.WriteLine("Parsing Data");
+                    //Debug.WriteLine("Zone to save: " + Application.Current.Properties["zone"]);
+                    //Debug.WriteLine("Parsing Data");
                     deliveryDays.Clear();
                     businessList.Clear();
 
@@ -698,7 +675,7 @@ namespace ServingFresh.Views
 
                     foreach (string id in businessList)
                     {
-                        Debug.WriteLine(id + " :");
+                        //Debug.WriteLine(id + " :");
                         IDictionary<string,IList<string>> days = new Dictionary<string,IList<string>>();
                         foreach(Business b in data.result)
                         {
@@ -731,11 +708,11 @@ namespace ServingFresh.Views
                         }
                     }
 
-                    foreach(DeliveryInfo i in deliveryDays)
-                    {
-                        Debug.WriteLine(i.delivery_day);
-                        Debug.WriteLine(i.delivery_time);
-                    }
+                    //foreach(DeliveryInfo i in deliveryDays)
+                    //{
+                    //    Debug.WriteLine(i.delivery_day);
+                    //    Debug.WriteLine(i.delivery_time);
+                    //}
 
                     //GetDays();
                     delivery_list.ItemsSource = displaySchedule;
@@ -761,11 +738,11 @@ namespace ServingFresh.Views
             var businesDeliverySchedule = new List<DateTime>();
             var businesDisplaySchedule = new List<ScheduleInfo>();
 
-            Debug.WriteLine("TEMP TABLE FOR LOOK UPS");
-            foreach (DateTime t in tempDateTable)
-            {
-                Debug.WriteLine(t);
-            }
+            //Debug.WriteLine("TEMP TABLE FOR LOOK UPS");
+            //foreach (DateTime t in tempDateTable)
+            //{
+            //    Debug.WriteLine(t);
+            //}
 
             foreach (Business a in data.result)
             {
@@ -773,19 +750,19 @@ namespace ServingFresh.Views
                 {
                     var acceptingDate = LastAcceptingOrdersDate(tempDateTable, a.z_accepting_day, a.z_accepting_time);
                     var deliveryDate = new DateTime();
-                    Debug.WriteLine("CURRENT DATE: " + currentDate);
-                    Debug.WriteLine("LAST ACCEPTING DATE: " + acceptingDate);
+                    //Debug.WriteLine("CURRENT DATE: " + currentDate);
+                    //Debug.WriteLine("LAST ACCEPTING DATE: " + acceptingDate);
 
                     if (currentDate < acceptingDate)
                     {
-                        Debug.WriteLine("ONTIME");
+                        //Debug.WriteLine("ONTIME");
                         
                         deliveryDate = bussinesDeliveryDate(a.z_delivery_day, a.z_delivery_time);
                         if(deliveryDate < acceptingDate)
                         {
                             deliveryDate = deliveryDate.AddDays(7);
                         }
-                        //deliveryDate = BussinesDeliveryDate(acceptingDate, a.z_delivery_day, a.z_accepting_time);
+
                         if (!businesDeliverySchedule.Contains(deliveryDate))
                         {
                             var element = new ScheduleInfo();
@@ -798,18 +775,18 @@ namespace ServingFresh.Views
                             element.delivery_time = a.z_delivery_time;
                             element.deliveryTimeStamp = deliveryDate;
                             element.orderExpTime = "Order by " + acceptingDate.ToString("ddd") + " " + acceptingDate.ToString("htt").ToLower();
-                            //element.orderExpTime = "Order by " + acceptingDate.ToString("MMM dd");
-                            Debug.WriteLine("element.delivery_date: " + element.delivery_date);
-                            Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
-                            Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
-                            Debug.WriteLine("element.delivery_time: " + element.delivery_time);
-                            Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
-                            Debug.WriteLine("business_uids list: ");
 
-                            foreach (string ID in element.business_uids)
-                            {
-                                Debug.WriteLine(ID);
-                            }
+                            //Debug.WriteLine("element.delivery_date: " + element.delivery_date);
+                            //Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
+                            //Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
+                            //Debug.WriteLine("element.delivery_time: " + element.delivery_time);
+                            //Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
+                            //Debug.WriteLine("business_uids list: ");
+
+                            //foreach (string ID in element.business_uids)
+                            //{
+                            //    Debug.WriteLine(ID);
+                            //}
 
                             businesDeliverySchedule.Add(deliveryDate);
                             businesDisplaySchedule.Add(element);
@@ -825,17 +802,17 @@ namespace ServingFresh.Views
                                     e.business_uids.Add(a.z_biz_id);
                                     element.business_uids = e.business_uids;
 
-                                    Debug.WriteLine("element.delivery_date: " + element.delivery_date);
-                                    Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
-                                    Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
-                                    Debug.WriteLine("element.delivery_time: " + element.delivery_time);
-                                    Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
-                                    Debug.WriteLine("business_uids list: ");
+                                    //Debug.WriteLine("element.delivery_date: " + element.delivery_date);
+                                    //Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
+                                    //Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
+                                    //Debug.WriteLine("element.delivery_time: " + element.delivery_time);
+                                    //Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
+                                    //Debug.WriteLine("business_uids list: ");
 
-                                    foreach (string ID in element.business_uids)
-                                    {
-                                        Debug.WriteLine(ID);
-                                    }
+                                    //foreach (string ID in element.business_uids)
+                                    //{
+                                    //    Debug.WriteLine(ID);
+                                    //}
 
                                     break;
                                 }
@@ -844,10 +821,9 @@ namespace ServingFresh.Views
                     }
                     else
                     {
-                        Debug.WriteLine("NON ONTIME! -> ROLL OVER TO NEXT DELIVERY DATE");
+                        //Debug.WriteLine("NON ONTIME! -> ROLL OVER TO NEXT DELIVERY DATE");
 
                         deliveryDate = bussinesDeliveryDate(a.z_delivery_day, a.z_delivery_time);
-                        //deliveryDate = bussinesDeliveryDate
 
                         if (!businesDeliverySchedule.Contains(deliveryDate.AddDays(7)))
                         {
@@ -862,18 +838,18 @@ namespace ServingFresh.Views
                             element.delivery_time = a.z_delivery_time;
                             element.deliveryTimeStamp = nextDeliveryDate;
                             element.orderExpTime = "Order by " + acceptingDate.AddDays(7).ToString("ddd") + " " + acceptingDate.AddDays(7).ToString("htt").ToLower();
-                            //element.orderExpTime = "Order by " + acceptingDate.AddDays(7).ToString("MMM dd");
-                            Debug.WriteLine("element.delivery_date: " + element.delivery_date);
-                            Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
-                            Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
-                            Debug.WriteLine("element.delivery_time: " + element.delivery_time);
-                            Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
-                            Debug.Write("business_uids list: ");
 
-                            foreach (string ID in element.business_uids)
-                            {
-                                Debug.Write(ID + ", ");
-                            }
+                            //Debug.WriteLine("element.delivery_date: " + element.delivery_date);
+                            //Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
+                            //Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
+                            //Debug.WriteLine("element.delivery_time: " + element.delivery_time);
+                            //Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
+                            //Debug.Write("business_uids list: ");
+
+                            //foreach (string ID in element.business_uids)
+                            //{
+                            //    Debug.Write(ID + ", ");
+                            //}
 
                             businesDeliverySchedule.Add(nextDeliveryDate);
                             businesDisplaySchedule.Add(element);
@@ -891,17 +867,17 @@ namespace ServingFresh.Views
                                     e.business_uids.Add(a.z_biz_id);
                                     element.business_uids = e.business_uids;
 
-                                    Debug.WriteLine("element.delivery_date: " + element.delivery_date);
-                                    Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
-                                    Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
-                                    Debug.WriteLine("element.delivery_time: " + element.delivery_time);
-                                    Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
-                                    Debug.Write("business_uids list: ");
+                                    //Debug.WriteLine("element.delivery_date: " + element.delivery_date);
+                                    //Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
+                                    //Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
+                                    //Debug.WriteLine("element.delivery_time: " + element.delivery_time);
+                                    //Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
+                                    //Debug.Write("business_uids list: ");
 
-                                    foreach (string ID in element.business_uids)
-                                    {
-                                        Debug.Write(ID + ", ");
-                                    }
+                                    //foreach (string ID in element.business_uids)
+                                    //{
+                                    //    Debug.Write(ID + ", ");
+                                    //}
 
                                     break;
                                 }
@@ -912,28 +888,28 @@ namespace ServingFresh.Views
             }
 
             // DISPLAY SCHEDULE ELEMENTS;
-            Debug.WriteLine("");
-            Debug.WriteLine("");
-            Debug.WriteLine("DISPLAY SCHEDULE ELEMENTS NOT SORTED");
-            Debug.WriteLine("");
+            //Debug.WriteLine("");
+            //Debug.WriteLine("");
+            //Debug.WriteLine("DISPLAY SCHEDULE ELEMENTS NOT SORTED");
+            //Debug.WriteLine("");
 
-            foreach (ScheduleInfo element in businesDisplaySchedule)
-            {
-                Debug.WriteLine("element.delivery_date: " + element.delivery_date);
-                Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
-                Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
-                Debug.WriteLine("element.delivery_time: " + element.delivery_time);
-                Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
-                Debug.Write("business_uids list: ");
+            //foreach (ScheduleInfo element in businesDisplaySchedule)
+            //{
+            //    Debug.WriteLine("element.delivery_date: " + element.delivery_date);
+            //    Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
+            //    Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
+            //    Debug.WriteLine("element.delivery_time: " + element.delivery_time);
+            //    Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
+            //    Debug.Write("business_uids list: ");
 
-                foreach (string ID in element.business_uids)
-                {
-                    Debug.Write(ID + ", ");
-                }
+            //    foreach (string ID in element.business_uids)
+            //    {
+            //        Debug.Write(ID + ", ");
+            //    }
 
-                Debug.WriteLine("");
-                Debug.WriteLine("");
-            }
+            //    Debug.WriteLine("");
+            //    Debug.WriteLine("");
+            //}
 
             businesDeliverySchedule.Sort();
             List<ScheduleInfo> sortedSchedule = new List<ScheduleInfo>();
@@ -951,28 +927,28 @@ namespace ServingFresh.Views
 
             businesDisplaySchedule = sortedSchedule;
 
-            Debug.WriteLine("");
-            Debug.WriteLine("");
-            Debug.WriteLine("DISPLAY SCHEDULE ELEMENTS SORTED");
-            Debug.WriteLine("");
+            //Debug.WriteLine("");
+            //Debug.WriteLine("");
+            //Debug.WriteLine("DISPLAY SCHEDULE ELEMENTS SORTED");
+            //Debug.WriteLine("");
 
-            foreach (ScheduleInfo element in businesDisplaySchedule)
-            {
-                Debug.WriteLine("element.delivery_date: " + element.delivery_date);
-                Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
-                Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
-                Debug.WriteLine("element.delivery_time: " + element.delivery_time);
-                Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
-                Debug.Write("business_uids list: ");
+            //foreach (ScheduleInfo element in businesDisplaySchedule)
+            //{
+            //    Debug.WriteLine("element.delivery_date: " + element.delivery_date);
+            //    Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
+            //    Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
+            //    Debug.WriteLine("element.delivery_time: " + element.delivery_time);
+            //    Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
+            //    Debug.Write("business_uids list: ");
 
-                foreach (string ID in element.business_uids)
-                {
-                    Debug.Write(ID + ", ");
-                }
+            //    foreach (string ID in element.business_uids)
+            //    {
+            //        Debug.Write(ID + ", ");
+            //    }
 
-                Debug.WriteLine("");
-                Debug.WriteLine("");
-            }
+            //    Debug.WriteLine("");
+            //    Debug.WriteLine("");
+            //}
             return businesDeliverySchedule;
         }
 
@@ -1020,13 +996,13 @@ namespace ServingFresh.Views
             }
 
             var deliveryDate = DateTime.Parse(startTime.Trim());
-            Debug.WriteLine("DELIVERYY DATE IN BUSINESS" + deliveryDate);
-            Debug.WriteLine("LAST ACCEPTING DATE IN BUSINESS" + lastAcceptingOrdersDate);
+            //Debug.WriteLine("DELIVERYY DATE IN BUSINESS" + deliveryDate);
+            //Debug.WriteLine("LAST ACCEPTING DATE IN BUSINESS" + lastAcceptingOrdersDate);
             if (deliveryDate < lastAcceptingOrdersDate)
             {
                 deliveryDate = deliveryDate.AddDays(7);
             }
-            Debug.WriteLine("DEFAULT DELIVERY DATE: " + deliveryDate);
+            //Debug.WriteLine("DEFAULT DELIVERY DATE: " + deliveryDate);
 
             for (int i = 0; i < 7; i++)
             {
@@ -1037,7 +1013,7 @@ namespace ServingFresh.Views
                 deliveryDate = deliveryDate.AddDays(1);
             }
 
-            Debug.WriteLine("DELIVERY DATE: " + deliveryDate);
+            //Debug.WriteLine("DELIVERY DATE: " + deliveryDate);
             return deliveryDate;
         }
 
@@ -1046,8 +1022,8 @@ namespace ServingFresh.Views
         {
             var acceptingDate = DateTime.Parse(hour);
 
-            Debug.WriteLine("DEFAULT ACCEPTING ORDERS DATE: " + acceptingDate);
-            Debug.WriteLine("LAST ACCEPTING DAY: " + day.ToUpper());
+            //Debug.WriteLine("DEFAULT ACCEPTING ORDERS DATE: " + acceptingDate);
+            //Debug.WriteLine("LAST ACCEPTING DAY: " + day.ToUpper());
 
             for (int i = 0; i < 7; i++)
             {
@@ -1058,7 +1034,7 @@ namespace ServingFresh.Views
                 acceptingDate = acceptingDate.AddDays(1);
             }
 
-            Debug.WriteLine("LAST ACCEPTING ORDERS DATE: " + acceptingDate);
+            //Debug.WriteLine("LAST ACCEPTING ORDERS DATE: " + acceptingDate);
             return acceptingDate;
         }
 
@@ -1079,7 +1055,7 @@ namespace ServingFresh.Views
             }
 
             var deliveryDate = DateTime.Parse(startTime.Trim());
-            Debug.WriteLine("DEFAULT DELIVERY DATE: " + deliveryDate);
+            //Debug.WriteLine("DEFAULT DELIVERY DATE: " + deliveryDate);
 
             for (int i = 0; i < 7; i++)
             {
@@ -1090,7 +1066,7 @@ namespace ServingFresh.Views
                 deliveryDate = deliveryDate.AddDays(1);
             }
 
-            Debug.WriteLine("DELIVERY DATE: " + deliveryDate);
+            //Debug.WriteLine("DELIVERY DATE: " + deliveryDate);
             return deliveryDate;
         }
 
@@ -1130,76 +1106,7 @@ namespace ServingFresh.Views
             Application.Current.MainPage = businessItemPage;
         }
 
-        void Change_Color(Object sender, EventArgs e)
-        {
-            //try
-            //{
-            //    var imgbtn = (ImageButton)sender;
-            //    var sl = (StackLayout)imgbtn.Parent;
-            //    var l = (Label)sl.Children[1];
-            //    var type = "";
-            //    if (l.Text == "Fruits") type = "fruit";
-            //    else if (l.Text == "Vegetables") type = "vegetable";
-            //    else if (l.Text == "Desserts") type = "dessert";
-            //    else if (l.Text == "Other") type = "other";
-            //    var tint = (TintImageEffect)imgbtn.Effects[0];
-            //    if (tint.TintColor == Constants.PrimaryColor)
-            //    {
-            //        tint.TintColor = Constants.SecondaryColor;
-            //        types.Add(type);
-            //    }
-            //    else if (tint.TintColor == Constants.SecondaryColor)
-            //    {
-            //        tint.TintColor = Constants.PrimaryColor;
-            //        types.Remove(type);
-            //    }
-            //    imgbtn.Effects.Clear();
-            //    imgbtn.Effects.Add(tint);
-            //    ResetFarmersMarkets();
-            //    ResetFarms();
-            //    ResetDays();
-            //}
-            //catch (Exception ex)
-            //{
-            //    Debug.WriteLine(ex.Message);
-            //}
-           
-        }
 
-        void Update_Item_Types()
-        {
-            //bool hasFruit = false;
-            //bool hasVegetable = false;
-            //bool hasDessert = false;
-            //bool hasOther = false;
-            //foreach (BusinessCard bc in Farms)
-            //{
-            //    if (!hasFruit && bc.item_type.Contains("fruit")) hasFruit = true;
-            //    if (!hasVegetable && bc.item_type.Contains("vegetable")) hasVegetable = true;
-            //    if (!hasDessert && bc.item_type.Contains("dessert")) hasDessert = true;
-            //    if (!hasOther && bc.item_type.Contains("other")) hasOther = true;
-            //}
-            //var tint = (TintImageEffect)FruitIcon.Effects[0];
-            //if (hasFruit) tint.TintColor = types.Contains("fruit") ? Constants.SecondaryColor : Constants.PrimaryColor;
-            //else tint.TintColor = Color.LightGray;
-            //FruitIcon.Effects.Clear();
-            //FruitIcon.Effects.Add(tint);
-            //tint = (TintImageEffect)VegetableIcon.Effects[0];
-            //if (hasVegetable) tint.TintColor = types.Contains("vegetable") ? Constants.SecondaryColor : Constants.PrimaryColor;
-            //else tint.TintColor = Color.LightGray;
-            //VegetableIcon.Effects.Clear();
-            //VegetableIcon.Effects.Add(tint);
-            //tint = (TintImageEffect)DessertIcon.Effects[0];
-            //if (hasDessert) tint.TintColor = types.Contains("dessert") ? Constants.SecondaryColor : Constants.PrimaryColor;
-            //else tint.TintColor = Color.LightGray;
-            //DessertIcon.Effects.Clear();
-            //DessertIcon.Effects.Add(tint);
-            //tint = (TintImageEffect)OtherIcon.Effects[0];
-            //if (hasOther) tint.TintColor = types.Contains("other") ? Constants.SecondaryColor : Constants.PrimaryColor;
-            //else tint.TintColor = Color.LightGray;
-            //OtherIcon.Effects.Clear();
-            //OtherIcon.Effects.Add(tint);
-        }
 
         void Change_Border_Color(Object sender, EventArgs e)
         {
@@ -1231,28 +1138,28 @@ namespace ServingFresh.Views
                     }
                 }
 
-                Debug.WriteLine("");
-                Debug.WriteLine("");
-                Debug.WriteLine("DISPLAY SCHEDULE ELEMENTS SORTED");
-                Debug.WriteLine("");
+                //Debug.WriteLine("");
+                //Debug.WriteLine("");
+                //Debug.WriteLine("DISPLAY SCHEDULE ELEMENTS SORTED");
+                //Debug.WriteLine("");
 
-                foreach (ScheduleInfo element in businessDisplaySchedule)
-                {
-                    Debug.WriteLine("element.delivery_date: " + element.delivery_date);
-                    Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
-                    Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
-                    Debug.WriteLine("element.delivery_time: " + element.delivery_time);
-                    Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
-                    Debug.Write("business_uids list: ");
+                //foreach (ScheduleInfo element in businessDisplaySchedule)
+                //{
+                //    Debug.WriteLine("element.delivery_date: " + element.delivery_date);
+                //    Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
+                //    Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
+                //    Debug.WriteLine("element.delivery_time: " + element.delivery_time);
+                //    Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
+                //    Debug.Write("business_uids list: ");
 
-                    foreach (string ID in element.business_uids)
-                    {
-                        Debug.Write(ID + ", ");
-                    }
+                //    foreach (string ID in element.business_uids)
+                //    {
+                //        Debug.Write(ID + ", ");
+                //    }
 
-                    Debug.WriteLine("");
-                    Debug.WriteLine("");
-                }
+                //    Debug.WriteLine("");
+                //    Debug.WriteLine("");
+                //}
 
                 farm_list.ItemsSource = business;
                 delivery_list.ItemsSource = businessDisplaySchedule;
@@ -1277,7 +1184,6 @@ namespace ServingFresh.Views
 
         void OrdersClick(System.Object sender, System.EventArgs e)
         {
-            
             Application.Current.MainPage = new CheckoutPage();
         }
 

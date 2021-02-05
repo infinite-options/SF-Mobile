@@ -91,7 +91,6 @@ namespace ServingFresh.Views
             directSignUp.zip_code = userZipcode.Text;
             directSignUp.latitude = latitude;
             directSignUp.longitude = longitude;
-            directSignUp.referral_source = "MOBILE";
             directSignUp.role = "CUSTOMER";
             directSignUp.mobile_access_token = "FALSE";
             directSignUp.mobile_refresh_token = "FALSE";
@@ -125,6 +124,15 @@ namespace ServingFresh.Views
 
         public void InitializeSignUpPost()
         {
+            var device = "";
+            if (Device.RuntimePlatform == Device.Android)
+            {
+                device = "MOBILE ANDROID";
+            }
+            else
+            {
+                device = "MOBILE IOS";
+            }
             directSignUp.email = "";
             directSignUp.first_name = "";
             directSignUp.last_name = "";
@@ -136,7 +144,7 @@ namespace ServingFresh.Views
             directSignUp.zip_code = "";
             directSignUp.latitude = "0.0";
             directSignUp.longitude = "0.0";
-            directSignUp.referral_source = "MOBILE";
+            directSignUp.referral_source = device;
             directSignUp.role = "CUSTOMER";
             directSignUp.mobile_access_token = "FALSE";
             directSignUp.mobile_refresh_token = "FALSE";

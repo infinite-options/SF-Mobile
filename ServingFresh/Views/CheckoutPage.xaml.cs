@@ -214,7 +214,14 @@ namespace ServingFresh.Views
         {
             InitializeComponent();
             GetPayPalCredentials();
-            
+            if(Device.RuntimePlatform == Device.Android)
+            {
+                DriverTip.HeightRequest = 25;
+                DriverTip.Margin = new Thickness(0, -15, 0, 0);
+                tipStack.HeightRequest = 25;
+                deliveryInstructions.Margin = new Thickness(0, -5, 0, 0);
+               
+            }
             //GetFees(day);
             if (day != "")
             {
@@ -461,7 +468,6 @@ namespace ServingFresh.Views
             {
                 Debug.WriteLine("DELIVERY INSTRUCTION ERROR: " + deliveryInstructions.Message);
             }
-
         }
 
         public void InitializeMap()
@@ -1112,15 +1118,18 @@ namespace ServingFresh.Views
         async void CompletePaymentClick(System.Object sender, System.EventArgs e)
         {
             //UserDialogs.Instance.ShowLoading("Processing your payment...");
-            cardframe.Height = 0;
-            options.Height = 65;
+            //cardframe.Height = 0;
+            //options.Height = 65;
 
             if (Device.RuntimePlatform == Device.Android)
             {
                 UpdateTotalAmount(sender, e);
             }
-
-            PayViaStripe();
+            UserDialogs.Instance.ShowLoading("Processing Payment...");
+            await PayViaStripe();
+            UserDialogs.Instance.HideLoading();
+            cardframe.Height = 0;
+            options.Height = 65;
             //UserDialogs.Instance.HideLoading();
         }
 
@@ -1237,9 +1246,9 @@ namespace ServingFresh.Views
                     Console.WriteLine("\t{0}: {1}\tCall Type: {2}", link.Rel, link.Href, link.Method);
                     if (link.Rel == "approve")
                     {
-                        //webViewPage.Source = link.Href;
-                        Debug.WriteLine("PAYPAL URL: "+ link.Href);
-                        webViewPage.Source = "https://servingfresh.me";
+                        webViewPage.Source = link.Href;
+                        //Debug.WriteLine("PAYPAL URL: "+ link.Href);
+                        //webViewPage.Source = "https://servingfresh.me";
                     }
                 }
 
@@ -1340,7 +1349,7 @@ namespace ServingFresh.Views
             return null;
         }
 
-        async void PayViaStripe()
+        async Task PayViaStripe()
         {
             try
             {
@@ -1349,7 +1358,7 @@ namespace ServingFresh.Views
                     if (deliveryInstructions.Text.Trim() == "SFTEST")
                     {
                         //UserDialogs.Instance.Loading("Processing Payment...");
-                        UserDialogs.Instance.ShowLoading("Processing Payment...");
+                        //UserDialogs.Instance.ShowLoading("Processing Payment...");
                         Debug.Write("STRIPE MODE: " + "TEST");
                         Debug.WriteLine("SK     : " + Constant.TestSK);
                         StripeConfiguration.ApiKey = Constant.TestSK;

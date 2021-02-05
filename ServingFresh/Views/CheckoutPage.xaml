@@ -143,13 +143,22 @@
                         <Grid Padding="15,15,0,0">
                             <Label Grid.Column="0" Text="Delivery Instructions:" StyleClass="h3, primary"/>
                             <StackLayout Grid.Column="1" HeightRequest="50" BackgroundColor="White" Padding="0">
-                                <Editor BackgroundColor="White" TextColor="Black" x:Name="deliveryInstructions" Margin="-10,-8,0,0" HeightRequest="100" Placeholder="Enter Intructions Here" MaxLength="80" FontSize="Micro" Keyboard="Chat">
-                                    <Editor.HeightRequest>
+                                <!--<Entry BackgroundColor="White" TextColor="Black" PlaceholderColor="Gray" x:Name="deliveryInstructions" Margin="-10,-8,0,0" HeightRequest="100" Placeholder="Enter Intructions Here" MaxLength="80" FontSize="Micro" Keyboard="Chat">
+                                    <Entry.HeightRequest>
                                         <OnPlatform x:TypeArguments="x:Double">
                                             <On Platform="Android" Value="50"/>
                                         </OnPlatform>
-                                    </Editor.HeightRequest>
-                                </Editor>
+                                    </Entry.HeightRequest>
+                                </Entry>-->
+                                <!--<Entry  TextColor="Black" PlaceholderColor="Gray" x:Name="deliveryInstructions"  HeightRequest="100" Placeholder="Enter Intructions Here" MaxLength="80" FontSize="Micro" Keyboard="Chat">
+                                    <Entry.HeightRequest>
+                                        <OnPlatform x:TypeArguments="x:Double">
+                                            <On Platform="Android" Value="50"/>
+                                        </OnPlatform>
+                                    </Entry.HeightRequest>
+                                </Entry>-->
+                                <local:CustomEntry Placeholder="Enter Intructions Here" x:Name="deliveryInstructions" TextColor="Black" PlaceholderColor="Gray"  Margin="-10,0,0,0" FontSize="Micro" Keyboard="Chat">
+                                </local:CustomEntry>
                             </StackLayout>
                         </Grid>
                         <BoxView StyleClass="spacer"/>
@@ -251,7 +260,9 @@
                             </CollectionView>
                         </Grid>
                         <BoxView x:Name="couponSpace" StyleClass="spacer"/>
-                        <Label x:Name="couponsLabel" Text="Choose one of the eligible promos to apply" FontAttributes="Bold" FontSize="15" StyleClass="black" Padding="15,0,15,0"/>
+                        <Label Grid.Row="0" Grid.Column="0" x:Name="couponsLabel" Text="Applied coupon is in Orange." TextColor="#FF8500" FontAttributes="Bold" FontSize="15" Padding="15,0,15,0" />
+                        <Label Grid.Row="0" Grid.Column="2"  Text="Eligiable coupons appear in Green." FontAttributes="Bold" FontSize="15" TextColor="#136D74" Padding="15,0,15,0" />
+                        <!--<Label x:Name="couponsLabel" Text="Applied coupons appear in Orange. Eligiable coupons appear in Green" FontAttributes="Bold" FontSize="15" StyleClass="black" Padding="15,0,15,0"/>-->
                         <!--<ScrollView Orientation="Horizontal" HeightRequest="150" Padding="0">-->
                             <CollectionView x:Name="coupon_list" ItemsLayout="HorizontalList" HeightRequest="150" >
                                 <CollectionView.ItemTemplate >
@@ -304,14 +315,14 @@
                         <BoxView StyleClass="spacer"/>
                         <FlexLayout JustifyContent="SpaceBetween" Padding="0,10,0,10">
                             <Label Padding="15,0,0,0" Text="Driver Tip (Optional - Tap to edit)" StyleClass="p, black"/>
-                            <StackLayout Orientation="Horizontal" Spacing="0" Margin="0,0,0,0">
+                            <StackLayout Orientation="Horizontal" Spacing="0" Margin="0,0,0,0" x:Name="tipStack">
                                 <Label Text="$ " StyleClass="p, black"/>
                                 <!--<local:CustomEntry HeightRequest="20" Completed="DriverTip_Completed" Text="2.00" TextColor="Black" WidthRequest="60" Placeholder="0.00" FontSize="Small" Keyboard="Numeric" x:Name="DriverTip" StyleClass="p, black"/>-->
-                                <Entry HeightRequest="50" Completed="DriverTip_Completed" Unfocused="DriverTip_Unfocused" Focused="DriverTip_Focused" Text="2.00" TextColor="Black" WidthRequest="60" Placeholder="0.00" FontSize="Small" Keyboard="Numeric" x:Name="DriverTip" StyleClass="p, black">
+                                <local:CustomEntry HeightRequest="20" Completed="DriverTip_Completed" Unfocused="DriverTip_Unfocused" Focused="DriverTip_Focused" Text="2.00" TextColor="Black" WidthRequest="60" Placeholder="0.00" FontSize="Small" Keyboard="Numeric" x:Name="DriverTip" StyleClass="p, black">
                                     <!--<Entry.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="EntryClick"></TapGestureRecognizer>
                                     </Entry.GestureRecognizers>-->
-                                </Entry>
+                                </local:CustomEntry>
                             </StackLayout>
                         </FlexLayout>
                         <BoxView StyleClass="spacer"/>

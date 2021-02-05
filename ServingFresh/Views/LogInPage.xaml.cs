@@ -55,6 +55,41 @@ namespace ServingFresh.Views
             }
         }
 
+        public LogInPage(string title, string message)
+        {
+            InitializeComponent();
+            InitializeAppProperties();
+
+            if (Device.RuntimePlatform == Device.Android)
+            {
+                System.Diagnostics.Debug.WriteLine("Running on Android: Line 32");
+                Console.WriteLine("guid: " + Preferences.Get("guid", null));
+                appleLogInButton.IsEnabled = false;
+            }
+            else
+            {
+                InitializedAppleLogin();
+                appleNotification.IsNotifications();
+            }
+
+            if (Device.RuntimePlatform == Device.iOS)
+            {
+                deviceId = Preferences.Get("guid", null);
+                if (deviceId != null) { Debug.WriteLine("This is the iOS GUID from Log in: " + deviceId); }
+            }
+            else
+            {
+                deviceId = Preferences.Get("guid", null);
+                if (deviceId != null) { Debug.WriteLine("This is the Android GUID from Log in " + deviceId); }
+            }
+            MessageFromSelectionPage(title,message);
+        }
+
+        public async void MessageFromSelectionPage(string title, string message)
+        {
+            await DisplayAlert(title, message, "OK");
+        }
+
         public void InitializeAppProperties()
         {
             Application.Current.Properties["user_email"] = "";
@@ -171,9 +206,6 @@ namespace ServingFresh.Views
                                         await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
                                     }
                                 }
-
-
-
                                 Application.Current.MainPage = new SelectionPage();
                             }catch (Exception ex){
 
@@ -204,7 +236,7 @@ namespace ServingFresh.Views
         {
             try
             {
-                System.Diagnostics.Debug.WriteLine(userEmail);
+                Debug.WriteLine(userEmail);
 
                 SaltPost saltPost = new SaltPost();
                 saltPost.email = userEmail;
@@ -212,12 +244,12 @@ namespace ServingFresh.Views
                 var saltPostSerilizedObject = JsonConvert.SerializeObject(saltPost);
                 var saltPostContent = new StringContent(saltPostSerilizedObject, Encoding.UTF8, "application/json");
 
-                System.Diagnostics.Debug.WriteLine(saltPostSerilizedObject);
+                Debug.WriteLine(saltPostSerilizedObject);
 
                 var client = new HttpClient();
                 var DRSResponse = await client.PostAsync(Constant.AccountSaltUrl, saltPostContent);
                 var DRSMessage = await DRSResponse.Content.ReadAsStringAsync();
-                System.Diagnostics.Debug.WriteLine(DRSMessage);
+                Debug.WriteLine(DRSMessage);
 
                 AccountSalt userInformation = null;
 
@@ -231,7 +263,7 @@ namespace ServingFresh.Views
                     if (DRSMessage.Contains(Constant.UseSocialMediaLogin))
                     {
                         createAccount = true;
-                        System.Diagnostics.Debug.WriteLine(DRSMessage);
+                        Debug.WriteLine(DRSMessage);
                         await DisplayAlert("Oops!", data.message, "OK");
                     }
                     else if (DRSMessage.Contains(Constant.EmailNotFound))
@@ -277,7 +309,7 @@ namespace ServingFresh.Views
                 var httpContent = new StringContent(loginPostContentJson, Encoding.UTF8, "application/json"); 
                 var response = await client.PostAsync(Constant.LogInUrl, httpContent); 
                 var message = await response.Content.ReadAsStringAsync();
-                System.Diagnostics.Debug.WriteLine(message);
+                Debug.WriteLine(message);
 
                 if (message.Contains(Constant.AutheticatedSuccesful))
                 {
@@ -293,7 +325,7 @@ namespace ServingFresh.Views
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine("Exception message: " + e.Message);
+                Debug.WriteLine("Exception message: " + e.Message);
                 return null;
             }
         }
@@ -324,7 +356,7 @@ namespace ServingFresh.Views
             presenter.Login(authenticator);
         }
 
-        public void FacebookAuthenticatorCompleted(object sender, AuthenticatorCompletedEventArgs e)
+        public async void FacebookAuthenticatorCompleted(object sender, AuthenticatorCompletedEventArgs e)
         {
             var authenticator = sender as OAuth2Authenticator;
 
@@ -336,7 +368,19 @@ namespace ServingFresh.Views
 
             if (e.IsAuthenticated)
             {
-                FacebookUserProfileAsync(e.Account.Properties["access_token"]);
+                try
+                {
+                    Application.Current.MainPage = new SelectionPage(e.Account.Properties["access_token"], "", null, null, "FACEBOOK");
+                }
+                catch (Exception g)
+                {
+                    Debug.WriteLine(g.Message);
+                }
+            }
+            else
+            {
+                Application.Current.MainPage = new LogInPage();
+                await DisplayAlert("Error", "Google was not able to autheticate your account", "OK");
             }
         }
 
@@ -345,9 +389,6 @@ namespace ServingFresh.Views
 
             try
             {
-
-
-
                 var client = new HttpClient();
                 var socialLogInPost = new SocialLogInPost();
 
@@ -516,7 +557,7 @@ namespace ServingFresh.Views
                 authenticator.Completed -= FacebookAuthenticatorCompleted;
                 authenticator.Error -= FacebookAutheticatorError;
             }
-
+            Application.Current.MainPage = new LogInPage();
             await DisplayAlert("Authentication error: ", e.Message, "OK");
         }
 
@@ -562,9 +603,8 @@ namespace ServingFresh.Views
             {
                 try
                 {
-                    //Application.Current.MainPage = new SelectionPage();
-                    GoogleUserProfileAsync(e.Account.Properties["access_token"], e.Account.Properties["refresh_token"], e);
-                    
+                    Application.Current.MainPage = new SelectionPage(e.Account.Properties["access_token"], e.Account.Properties["refresh_token"],e,null,"GOOGLE");
+                    //GoogleUserProfileAsync(e.Account.Properties["access_token"], e.Account.Properties["refresh_token"], e);
                 }
                 catch(Exception g)
                 {
@@ -574,8 +614,8 @@ namespace ServingFresh.Views
             }
             else
             {
+                Application.Current.MainPage = new LogInPage();
                 await DisplayAlert("Error", "Google was not able to autheticate your account", "OK");
-                //Application.Current.MainPage = new LogInPage();
             }
         }
 
@@ -583,6 +623,8 @@ namespace ServingFresh.Views
         {
             try
             {
+                var progress = UserDialogs.Instance.Loading("Sending your request...");
+                
                 var client = new HttpClient();
                 var socialLogInPost = new SocialLogInPost();
 
@@ -744,6 +786,7 @@ namespace ServingFresh.Views
                         }
                     }
                 }
+                progress.Hide();
             }
             catch (Exception first)
             {
@@ -760,7 +803,7 @@ namespace ServingFresh.Views
                 authenticator.Completed -= GoogleAuthenticatorCompleted;
                 authenticator.Error -= GoogleAuthenticatorError;
             }
-
+            Application.Current.MainPage = new LogInPage();
             await DisplayAlert("Authentication error: ", e.Message, "OK");
         }
 

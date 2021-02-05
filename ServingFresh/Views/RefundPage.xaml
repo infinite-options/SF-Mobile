@@ -95,8 +95,8 @@
                             <Label Text="3. Press send" StyleClass="p, black"/>
                             <Label Text="We'll either add your items to our next delivery or issue you a coupon code for your next order! Tell us if you have a preference. Easy peasy!" StyleClass="p, black"/>
                         </StackLayout>
-                        <Entry x:Name="refundEmail" Placeholder="Your Email Goes Here"></Entry>
-                        <Entry x:Name="refundNote" Placeholder="Add Note Goes Here"></Entry>
+                        <Entry x:Name="refundEmail" Placeholder="Your Email Goes Here" TextColor="Black" PlaceholderColor="Gray" ></Entry>
+                        <Entry x:Name="refundNote" Placeholder="Add Note Goes Here" TextColor="Black" PlaceholderColor="Gray" ></Entry>
                         <Button Text="Send" TextColor="White" FontAttributes="Bold" BackgroundColor="#FF8500" Clicked="SendRefundRequest"></Button>
                     </StackLayout>
                 </ScrollView>

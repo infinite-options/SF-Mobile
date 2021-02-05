@@ -114,7 +114,7 @@ namespace ServingFresh.Views
             public string driver_tip { get; set; }
             public string taxes { get; set; }
             public string total { get; set; }
-
+            public string coupon_id { get; set; }
         }
                    
 
@@ -159,6 +159,7 @@ namespace ServingFresh.Views
             string userId = (string)Application.Current.Properties["user_id"];
             var client = new HttpClient();
             var response = await client.GetAsync(Constant.GetHistoryUrl + userId);
+            Debug.WriteLine("HISTORY: " + Constant.GetHistoryUrl + userId);
             string result = await response.Content.ReadAsStringAsync();
             Debug.WriteLine(result);
             try
@@ -176,6 +177,7 @@ namespace ServingFresh.Views
                     var taxes = 0.0;
                     var total = 0.0;
                     var deliveryStatus = "";
+                    var couponApplied = "None";
                     if(ho.subtotal != null)
                     {
                         subtotal = ho.subtotal;
@@ -221,6 +223,14 @@ namespace ServingFresh.Views
                         deliveryStatus = "ACTIVE";
                     }
 
+                    if(ho.pay_coupon_id != null)
+                    {
+                        if(ho.pay_coupon_id != "")
+                        {
+                            couponApplied = ho.pay_coupon_id;
+                        }
+                    }
+
                     DateTime today = DateTime.Parse(ho.purchase_date);
 
                     var localPurchaseDate = today.ToLocalTime();
@@ -233,7 +243,7 @@ namespace ServingFresh.Views
                         itemsHeight = 55 * items.Count,
                         delivery_date = "Expected Delivery Date: " + date,
                         purchase_date = "Purchase Date: " + localPurchaseDate,
-                        
+                        coupon_id = "Coupon ID: " + couponApplied,
                         purchase_id = "Order ID: " + ho.purchase_uid,
                         purchase_status = "Order " + deliveryStatus,
                         subtotal = "$ " + subtotal.ToString("N2"),
@@ -243,7 +253,7 @@ namespace ServingFresh.Views
                         driver_tip = "$ " + driver_tip.ToString("N2"),
                         taxes = "$ " + taxes.ToString("N2"),
                         total = "$ " + total.ToString("N2"),
-                        
+
                     }) ;
                 }
             }

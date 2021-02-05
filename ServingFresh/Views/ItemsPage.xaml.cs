@@ -232,21 +232,50 @@ namespace ServingFresh.Views
 
                             if (savedItem.item_price != a.item_price)
                             {
-                                var priceSelected = Math.Min(savedItem.business_price, a.business_price);
-                                savedItem.item_price = priceSelected;
-                                uniqueItems[key] = savedItem;
+                                if (savedItem.business_price != Math.Min(savedItem.business_price, a.business_price))
+                                {
+                                    //savedItem.item_uid = a.item_uid;
+                                    savedItem = a;
+                                }
                             }
                             else
                             {
                                 List<DateTime> creationDates = new List<DateTime>();
+
+                                Debug.WriteLine("SAVED ITEM UID {0}, SAVED TIME STAMP {1}", savedItem.item_uid, savedItem.created_at);
+                                Debug.WriteLine("NEW ITEM UID {0}, NEW TIME STAMP {1}", a.item_uid, a.created_at);
+
                                 creationDates.Add(DateTime.Parse(savedItem.created_at));
                                 creationDates.Add(DateTime.Parse(a.created_at));
-                                var itemToSave = a;
-                                //a.created_at == creationDates[0].ToString("yyyy-MM-dd HH:mm:ss")
-                                if (a.created_at == creationDates[0].ToString("yyyy-MM-dd"))
+                                creationDates.Sort();
+
+                                if (creationDates[0] != creationDates[1])
                                 {
-                                    savedItem = a;
+                                    Debug.WriteLine("CREATED FIRST {0}, STRING DATETIME INDEX 0 {1}", creationDates[0], creationDates[0].ToString("yyyy-MM-dd HH:mm:ss"));
+
+                                    if (savedItem.created_at != creationDates[0].ToString("yyyy-MM-dd HH:mm:ss"))
+                                    {
+                                        //savedItem.item_uid = a.item_uid;
+                                        savedItem = a;
+                                    }
                                 }
+                                else
+                                {
+                                    var itemsIdsList = new List<long>();
+                                    var savedItemId = savedItem.item_uid.Replace('-', '0');
+                                    var newItemId = a.item_uid.Replace('-', '0');
+
+                                    itemsIdsList.Add(long.Parse(savedItemId));
+                                    itemsIdsList.Add(long.Parse(newItemId));
+                                    itemsIdsList.Sort();
+
+                                    if (savedItemId != itemsIdsList[0].ToString())
+                                    {
+                                        //savedItem.item_uid = a.item_uid;
+                                        savedItem = a;
+                                    }
+                                }
+                                Debug.WriteLine("SELECTED ITEM UID: " + savedItem.item_uid);
                                 uniqueItems[key] = savedItem;
                             }
                         }
@@ -508,23 +537,53 @@ namespace ServingFresh.Views
                         else
                         {
                             var savedItem = uniqueItems[key];
-                            
-                            if(savedItem.item_price != a.item_price){
-                                var priceSelected = Math.Min(savedItem.business_price, a.business_price);
-                                savedItem.item_price = priceSelected;
-                                uniqueItems[key] = savedItem;
+
+                            if (savedItem.item_price != a.item_price)
+                            {
+                                if(savedItem.business_price != Math.Min(savedItem.business_price, a.business_price))
+                                {
+                                    //savedItem.item_uid = a.item_uid;
+                                    savedItem = a;
+                                }
                             }
                             else
                             {
                                 List<DateTime> creationDates = new List<DateTime>();
+                                Debug.WriteLine("NAME {0}, {1}", savedItem.item_name, a.item_name);
+                                Debug.WriteLine("SAVED ITEM UID {0}, SAVED TIME STAMP {1}", savedItem.item_uid, savedItem.created_at);
+                                Debug.WriteLine("NEW ITEM UID {0}, NEW TIME STAMP {1}", a.item_uid, a.created_at);
+
                                 creationDates.Add(DateTime.Parse(savedItem.created_at));
                                 creationDates.Add(DateTime.Parse(a.created_at));
-                                var itemToSave = a;
-                                //a.created_at == creationDates[0].ToString("yyyy-MM-dd HH:mm:ss")
-                                if (a.created_at == creationDates[0].ToString("yyyy-MM-dd"))
+                                creationDates.Sort();
+
+                                if(creationDates[0] != creationDates[1])
                                 {
-                                    savedItem = a;
+                                    Debug.WriteLine("CREATED FIRST {0}, STRING DATETIME INDEX 0 {1}", creationDates[0], creationDates[0].ToString("yyyy-MM-dd HH:mm:ss"));
+
+                                    if(savedItem.created_at != creationDates[0].ToString("yyyy-MM-dd HH:mm:ss"))
+                                    {
+                                        //savedItem.item_uid = a.item_uid;
+                                        savedItem = a;
+                                    }
                                 }
+                                else
+                                {
+                                    var itemsIdsList = new List<long>();
+                                    var savedItemId = savedItem.item_uid.Replace('-', '0');
+                                    var newItemId = a.item_uid.Replace('-', '0');
+
+                                    itemsIdsList.Add(long.Parse(savedItemId));
+                                    itemsIdsList.Add(long.Parse(newItemId));
+                                    itemsIdsList.Sort();
+
+                                    if (savedItemId != itemsIdsList[0].ToString())
+                                    {
+                                        //savedItem.item_uid = a.item_uid;
+                                        savedItem = a;
+                                    }
+                                }
+                                Debug.WriteLine("SELECTED ITEM UID: " + savedItem.item_uid);
                                 uniqueItems[key] = savedItem;
                             }
                         }

@@ -70,7 +70,16 @@ namespace ServingFresh.Views
             if((string)Application.Current.Properties["platform"] != "DIRECT")
             {
                 passwordCredentials.HeightRequest = 0;
-            }  
+            }
+
+            if (Application.Current.Properties.ContainsKey("guid"))
+            {
+                notificationButton.IsToggled = true;
+            }
+            else
+            {
+                notificationButton.IsToggled = false;
+            }
             userAddress.Text = (string)Application.Current.Properties["user_address"];
             userUnitNumber.Text = (string)Application.Current.Properties["user_unit"];
             userCity.Text = (string)Application.Current.Properties["user_city"];
@@ -452,33 +461,41 @@ namespace ServingFresh.Views
 
         async void Switch_Toggled(System.Object sender, Xamarin.Forms.ToggledEventArgs e)
         {
-            var notification = (Switch)sender;
-            Debug.WriteLine(notification.IsToggled);
-
-            var updateNotification = new UpdateNotification();
-            updateNotification.uid = (string)Application.Current.Properties["user_id"];
-            updateNotification.guid = (string)Application.Current.Properties["guid"];
-            updateNotification.notification = notification.IsToggled.ToString().ToUpper();
-
-
-            var updateClient = new HttpClient();
-
-
-            var p = JsonConvert.SerializeObject(updateNotification);
-            var content = new StringContent(p, Encoding.UTF8, "application/json");
-
-            System.Diagnostics.Debug.WriteLine("Sign up JSON Object: " + p);
-            
-            var RDSResponse = await updateClient.PostAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/update_guid_notification/customer,update", content);
-            var r = await RDSResponse.Content.ReadAsStringAsync();
-            Debug.WriteLine("Response: " + r);
-            if (RDSResponse.IsSuccessStatusCode)
+            try
             {
-                await DisplayAlert("Awesome!", "We've updated your notification settings", "OK");
+                var notification = (Switch)sender;
+                Debug.WriteLine(notification.IsToggled);
+                var updateNotification = new UpdateNotification();
+                updateNotification.uid = (string)Application.Current.Properties["user_id"];
+                updateNotification.guid = (string)Application.Current.Properties["guid"];
+                updateNotification.notification = notification.IsToggled.ToString().ToUpper();
+
+
+                var updateClient = new HttpClient();
+
+
+                var p = JsonConvert.SerializeObject(updateNotification);
+                var content = new StringContent(p, Encoding.UTF8, "application/json");
+
+                System.Diagnostics.Debug.WriteLine("Sign up JSON Object: " + p);
+
+                var RDSResponse = await updateClient.PostAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/update_guid_notification/customer,update", content);
+                var r = await RDSResponse.Content.ReadAsStringAsync();
+                Debug.WriteLine("Response: " + r);
+                if (RDSResponse.IsSuccessStatusCode)
+                {
+                    //await DisplayAlert("Awesome!", "We've updated your notification settings", "OK");
+                }
+                else
+                {
+                    await DisplayAlert("Ooops", "Our system is down. We can't process this request at the moment", "OK");
+                }
+                
+ 
             }
-            else
+            catch (Exception notificationUpdateStatus)
             {
-                await DisplayAlert("Ooops", "Our system is down. We can't process this request at the moment", "OK");
+                
             }
         }
 

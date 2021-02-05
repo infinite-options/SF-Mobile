@@ -30,6 +30,7 @@ namespace ServingFresh.Views
         public SocialSignUp(string socialId, string firstName, string lastName, string emailAddress, string accessToken, string refreshToken, string platform)
         {
             InitializeComponent();
+            ShowSignUpMessage();
             InitializeSignUpPost();
             InitializeAppProperties();
             InitializeMap();
@@ -69,8 +70,22 @@ namespace ServingFresh.Views
             }
         }
 
-        public void InitializeSignUpPost()
+        public async void ShowSignUpMessage()
         {
+            await DisplayAlert("Message", "It looks like you don't have a Serving Fresh account. Please sign up!", "OK");
+        }
+
+        public  void InitializeSignUpPost()
+        {
+            var device = "";
+            if(Device.RuntimePlatform == Device.Android)
+            {
+                device = "MOBILE ANDROID";
+            }
+            else
+            {
+                device = "MOBILE IOS";
+            }
             socialSignUp.email = "";
             socialSignUp.first_name = "";
             socialSignUp.last_name = "";
@@ -82,7 +97,7 @@ namespace ServingFresh.Views
             socialSignUp.zip_code = "";
             socialSignUp.latitude = "0.0";
             socialSignUp.longitude = "0.0";
-            socialSignUp.referral_source = "MOBILE";
+            socialSignUp.referral_source = device;
             socialSignUp.role = "CUSTOMER";
             socialSignUp.mobile_access_token = "";
             socialSignUp.mobile_refresh_token = "";
@@ -444,6 +459,8 @@ namespace ServingFresh.Views
                 if (isAddessValidated)
                 {
                     var client = new HttpClient();
+
+
                     var socialSignUpSerializedObject = JsonConvert.SerializeObject(socialSignUp);
                     var content = new StringContent(socialSignUpSerializedObject, Encoding.UTF8, "application/json");
 
@@ -541,6 +558,11 @@ namespace ServingFresh.Views
             {
                 Debug.WriteLine("Something went wrong here");
             }
+        }
+
+        void TapGestureRecognizer_Tapped(System.Object sender, System.EventArgs e)
+        {
+            Application.Current.MainPage = new LogInPage();
         }
     }
 }

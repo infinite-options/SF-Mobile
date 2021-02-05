@@ -95,6 +95,7 @@
                                             <Label Text="{Binding delivery_date}" StyleClass="black"/>
                                             <Label Text="{Binding purchase_date}" StyleClass="black"/>
                                             <Label Text="{Binding purchase_id}" StyleClass="black"/>
+                                            <Label Text="{Binding coupon_id}" StyleClass="black"/>
                                         </StackLayout>
                                         <BoxView StyleClass="spacer"/>
                                         <CollectionView ItemsSource="{Binding items}" Footer="" HeightRequest="{Binding itemsHeight}" IsEnabled="false">

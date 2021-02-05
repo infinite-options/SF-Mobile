@@ -6,7 +6,7 @@
     xmlns:servingfresh="clr-namespace:ServingFresh.Effects"
     x:Class="ServingFresh.Views.SelectionPage">
   <ContentPage.Content>
-        <Grid RowSpacing="0">
+        <Grid RowSpacing="0" x:Name="myGrid">
             <Grid.RowDefinitions>
                 <RowDefinition Height="35"></RowDefinition>
                 <RowDefinition Height="95"></RowDefinition>
