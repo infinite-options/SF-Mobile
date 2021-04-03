@@ -1,0 +1,195 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:maps="clr-namespace:Xamarin.Forms.Maps;assembly=Xamarin.Forms.Maps"
+    x:Class="ServingFresh.Views.CartPage">
+    <ContentPage.Content>
+        <Grid RowSpacing="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="94"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" ColumnSpacing="0" BackgroundColor="#136D74">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="100"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <StackLayout Grid.Column="0" Margin="100,40,0,0" Spacing="0" >
+                     <Label x:Name="title" HorizontalOptions="CenterAndExpand" VerticalOptions="Center" Text="Cart" FontSize="26" TextColor="#FFFFFF" FontAttributes="Bold"></Label>
+                </StackLayout>
+                <StackLayout Grid.Column="1" Margin="0,15,0,0" VerticalOptions="Center" HorizontalOptions="Center">
+                    <RelativeLayout
+                        RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}"
+                        RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}">
+                        <Image Margin="0,20,0,0" Source="CartIcon.png" HeightRequest="40">
+                            <Image.GestureRecognizers>
+                                <TapGestureRecognizer ></TapGestureRecognizer>
+                            </Image.GestureRecognizers>
+                        </Image>
+                        <Frame Margin="30,20,0,0" HeightRequest="20" MinimumWidthRequest="20" CornerRadius="10" Padding="0" HasShadow="False">
+                            <Label x:Name="CartTotal" Margin="5,1,5,0" Text="0"  TextColor="#FF8500" FontSize="14" FontAttributes="Bold"></Label>
+                        </Frame>
+                    </RelativeLayout>
+                </StackLayout>
+            </Grid>
+            <Frame Grid.Row="1" CornerRadius="20" Margin="1,1,1,1" BorderColor="#136D74" HasShadow="False">
+                <StackLayout>
+                    <Grid HeightRequest="60">
+                        <StackLayout Grid.Column="0" VerticalOptions="Center">
+                            <Label Text="Cart" TextColor="#136D74" FontAttributes="Bold" FontSize="20" HorizontalTextAlignment="Center"></Label>
+                            <BoxView HeightRequest="1" Color="#136D74" Margin="10,0,10,0"></BoxView>
+                        </StackLayout>
+                        <StackLayout Grid.Column="1" VerticalOptions="Center" Opacity="0.5">
+                            <Label Text="History" TextColor="#136D74" FontSize="20" HorizontalTextAlignment="Center"></Label>
+                            <BoxView HeightRequest="1" Color="#136D74" Margin="10,0,10,0"></BoxView>
+                        </StackLayout>
+                        <StackLayout Grid.Column="2" VerticalOptions="Center" Opacity="0.5">
+                            <Label Text="Refunds" TextColor="#136D74" FontSize="20" HorizontalTextAlignment="Center"></Label>
+                            <BoxView HeightRequest="1" Color="#136D74" Margin="10,0,10,0"></BoxView>
+                        </StackLayout>
+                    </Grid>
+                    <StackLayout>
+                        <ScrollView>
+                            <StackLayout>
+                                <StackLayout>
+                                    <Label Text="Expected Delivery:" TextColor="#136D74" FontSize="16" FontAttributes="Bold"></Label>
+                                    <Label Text="Wednesday, Aug 20, 2020, between 6pm to 8pm" FontSize="14" TextColor="Black"></Label>
+                                </StackLayout>
+                                <StackLayout>
+                                    <Label Text="Delivery Address:" TextColor="#136D74" FontSize="16" FontAttributes="Bold"></Label>
+                                    <Label Text="Wednesday, Aug 20, 2020, between 6pm to 8pm" FontSize="14" TextColor="Black"></Label>
+                                </StackLayout>
+                                <BoxView HeightRequest="1" Color="LightGray"></BoxView>
+                                <Grid>
+                                    <Label Grid.Column="0" VerticalTextAlignment="Center" Text="Your order" TextColor="Black" FontSize="18" FontAttributes="Bold"></Label>
+                                    <StackLayout Grid.Column="1"  HorizontalOptions="End">
+                                        <Button Text="+ Add items" TextColor="White" BackgroundColor="#FF8500" CornerRadius="10" WidthRequest="100" HeightRequest="30" HorizontalOptions="CenterAndExpand" ></Button>
+                                    </StackLayout>
+                                </Grid>
+                                <BoxView HeightRequest="1" Color="LightGray"></BoxView>
+                                <StackLayout x:Name="cartItems"></StackLayout>
+                                <Grid>
+                                    <Label Grid.Column="0" Text="Subtotal" TextColor="Black" FontSize="14"></Label>
+                                    <Label Grid.Column="1" HorizontalTextAlignment="End" Text="$11.99" TextColor="Black" FontSize="14"></Label>
+                                </Grid>
+                                <BoxView HeightRequest="1" Color="LightGray"></BoxView>
+                                <StackLayout x:Name="guessAddressInfo">
+                                    <Label Text="Enter full address" TextColor="Black" FontSize="16" FontAttributes="Bold"></Label>
+                                    <Entry Placeholder="Street Address (so we can find)" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
+                                    <Entry Placeholder="Apt number" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
+                                    <Grid>
+                                        <Entry Grid.Column="0" Placeholder="City" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
+                                        <Entry Grid.Column="1" Placeholder="State" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
+                                        <Entry Grid.Column="2" Placeholder="Zip" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
+                                    </Grid>
+                                    <Frame Margin="5,0,5,0" HeightRequest="100" BackgroundColor="LightGray" CornerRadius="20" HasShadow="False" Padding="0" IsClippedToBounds="True">
+                                        <maps:Map HeightRequest="1"
+                                             x:Name="map"
+                                             IsVisible="true">
+                                        </maps:Map>
+                                    </Frame>
+                                    <BoxView HeightRequest="1" Color="LightGray"></BoxView>
+                                    <Label Text="Coupons:" TextColor="Black" FontSize="16" FontAttributes="Bold"></Label>
+                                    <StackLayout HeightRequest="40">
+                                        <CollectionView Grid.Column="1" x:Name="couponsList" ItemsLayout="HorizontalList" HeightRequest="40">
+                                            <CollectionView.ItemTemplate>
+                                                <DataTemplate>
+                                                    <StackLayout HeightRequest="10">
+
+                                                    </StackLayout>
+                                                </DataTemplate>
+                                            </CollectionView.ItemTemplate>
+                                        </CollectionView>
+                                    </StackLayout>
+                                    <BoxView HeightRequest="1" Color="LightGray"></BoxView>
+                                    <Grid>
+                                        <Label Grid.Column="0" Text="Coupon applied" TextColor="#136D74" FontSize="14"></Label>
+                                        <Label Grid.Column="1" HorizontalTextAlignment="End" Text="$11.99" TextColor="Black" FontSize="14"></Label>
+                                    </Grid>
+                                    <BoxView HeightRequest="1" Color="LightGray"></BoxView>
+                                    <Grid>
+                                        <Label Grid.Column="0" Text="Delivery Fee" TextColor="Black" FontSize="14"></Label>
+                                        <StackLayout Grid.Column="1" Orientation="Horizontal" HorizontalOptions="End">
+                                            <Label  Text="$11.99" TextDecorations="Strikethrough" TextColor="Gray" FontSize="14"></Label>
+                                            <Label  Text="Free" TextColor="#136D74" FontAttributes="Italic" FontSize="14"></Label>
+                                        </StackLayout>
+                                    </Grid>
+                                    <BoxView HeightRequest="1" Color="LightGray"></BoxView>
+                                    <Grid>
+                                        <Label Grid.Column="0" Text="Service Fee" TextColor="Black" FontSize="14"></Label>
+                                        <Label Grid.Column="1" HorizontalTextAlignment="End" Text="$11.99" TextColor="Black" FontSize="14"></Label>
+                                    </Grid>
+                                    <BoxView HeightRequest="1" Color="LightGray"></BoxView>
+                                    <StackLayout>
+                                        <Grid>
+                                            <Label Grid.Column="0" Text="Driver tip" TextColor="Black" FontSize="14"></Label>
+                                            <Label Grid.Column="1" HorizontalTextAlignment="End" Text="$11.99" TextColor="Black" FontSize="14"></Label>
+                                        </Grid>
+                                        <StackLayout Orientation="Horizontal" HeightRequest="30" Spacing="15">
+                                            <Button Grid.Column="0" WidthRequest="55" HorizontalOptions="Center" Text="No tip" TextColor="Black" FontSize="14" BorderWidth="1" BorderColor="#136D74"></Button>
+                                            <Button Grid.Column="1" WidthRequest="55" HorizontalOptions="Center" Text="$2" TextColor="Black" FontSize="14" BorderWidth="1" BorderColor="#136D74"></Button>
+                                            <Button Grid.Column="2" WidthRequest="55" HorizontalOptions="Center" Text="$3" TextColor="Black" FontSize="14" BorderWidth="1" BorderColor="#136D74"></Button>
+                                            <Button Grid.Column="3" WidthRequest="55" HorizontalOptions="Center" Text="$5" TextColor="Black" FontSize="14" BorderWidth="1" BorderColor="#136D74"></Button>
+                                        </StackLayout>
+                                    </StackLayout>
+                                    <BoxView HeightRequest="1" Color="LightGray"></BoxView>
+                                    <Grid>
+                                        <Label Grid.Column="0" Text="Taxes" TextColor="Black" FontSize="14"></Label>
+                                        <Label Grid.Column="1" HorizontalTextAlignment="End" Text="$11.99" TextColor="Black" FontSize="14"></Label>
+                                    </Grid>
+                                    <BoxView HeightRequest="1" Color="LightGray"></BoxView>
+                                    <Grid>
+                                        <Label Grid.Column="0" Text="Subtotal" TextColor="Black" FontSize="20" FontAttributes="Bold"></Label>
+                                        <Label Grid.Column="1" HorizontalTextAlignment="End" Text="$15.49"  TextColor="Black" FontSize="20" FontAttributes="Bold"></Label>
+                                    </Grid>
+                                    <BoxView HeightRequest="1" Color="LightGray"></BoxView>
+                                    <Grid>
+                                        <Entry Placeholder="Enter Ambassador Code" PlaceholderColor="Black" TextColor="Black" FontSize="13"></Entry>
+                                        <Label Grid.Column="1" HorizontalTextAlignment="End" VerticalTextAlignment="Center" Text="$11.99" TextColor="Black" FontSize="14"></Label>
+                                    </Grid>
+                                    <BoxView HeightRequest="1" Color="LightGray"></BoxView>
+                                    <Grid>
+                                        <Label Grid.Column="0" Text="Total" TextColor="Black" FontSize="20" FontAttributes="Bold"></Label>
+                                        <Label Grid.Column="1" HorizontalTextAlignment="End" Text="$15.49"  TextColor="Black" FontSize="20" FontAttributes="Bold"></Label>
+                                    </Grid>
+                                    <StackLayout Margin="0,15,0,0" HeightRequest="0">
+                                        <StackLayout Padding="20,0,20,0">
+                                            <Button Text="Proceed as guest" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold"></Button>
+                                            <Label Text="Already have an account?" TextColor="#2B6D74" FontSize="14" HorizontalTextAlignment="Center"></Label>
+                                            <Button Text="Login"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold"></Button>
+                                            <Label Text="Save time and create an account" FontSize="14" TextColor="#2B6D74" HorizontalTextAlignment="Center"></Label>
+                                            <Button Text="Sign up"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold"></Button>
+                                        </StackLayout>
+                                    </StackLayout>
+                                    <StackLayout Margin="0,15,0,0">
+                                        <StackLayout Padding="20,0,20,0" Spacing="30">
+                                            <Button Text="Checkout with Stripe" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold"></Button>
+                                            <Button Text="Checkout with PayPal" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold"></Button>
+                                        </StackLayout>
+                                    </StackLayout>
+                                    <StackLayout Margin="0,30,0,0">
+                                        <Entry Placeholder="Card Number" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                                <ColumnDefinition Width="100"></ColumnDefinition>
+                                            </Grid.ColumnDefinitions>
+                                            <Entry Grid.Column="0" Placeholder="Apt number" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
+                                            <Entry Grid.Column="1" Placeholder="CVV" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
+                                        </Grid>
+                                        <Grid>
+                                            <Entry Grid.Column="0" Placeholder="Exp MM" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
+                                            <Entry Grid.Column="1" Placeholder="Exp YYYY" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
+                                            <Entry Grid.Column="2" Placeholder="ZIP" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
+                                        </Grid>
+                                        <Button Margin="0,15,0,0" HeightRequest="59" Text="Complete Payment with Stripe" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold"></Button>
+                                    </StackLayout>
+                                </StackLayout>
+                             </StackLayout>
+                        </ScrollView>
+                    </StackLayout>
+                </StackLayout>
+            </Frame>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

@@ -288,7 +288,7 @@ namespace ServingFresh.Views
                     if (result.Contains("280") && data.result.Count != 0)
                     {
                         
-                        if ((string)Application.Current.Properties["zone"] == data.result[0].zone)
+                        if ((string)Application.Current.Properties["zone"] == data.business_details[0].zone)
                         {
                             update = await DisplayAlert("Great!", "We have sucessfully updated your information", "OK", "Cancel");
                         }

@@ -40,8 +40,8 @@
     <WarningLevel>4</WarningLevel>
     <MtouchLink>None</MtouchLink>
     <MtouchArch>x86_64</MtouchArch>
-    <CodesignProvision>VS: com.servingfresh Development</CodesignProvision>
-    <CodesignKey>Apple Development: Oscar Torres (HS4TL94K2Y)</CodesignKey>
+    <CodesignProvision>Serving Fresh</CodesignProvision>
+    <CodesignKey>Apple Distribution: Infinite Options, LLC (8V66NC2T37)</CodesignKey>
     <MtouchExtraArgs>--optimize=experimental-xforms-product-type</MtouchExtraArgs>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
   </PropertyGroup>
@@ -68,9 +68,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <MtouchArch>ARM64</MtouchArch>
-    <CodesignKey>Apple Distribution: Infinite Options, LLC (8V66NC2T37)</CodesignKey>
+    <CodesignKey>Apple Development: Oscar Torres (HS4TL94K2Y)</CodesignKey>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-    <CodesignProvision>Serving Fresh</CodesignProvision>
+    <CodesignProvision>VS: com.servingfresh Development</CodesignProvision>
     <MtouchLink>SdkOnly</MtouchLink>
   </PropertyGroup>
   <ItemGroup>
@@ -145,9 +145,9 @@
     <Reference Include="System.Numerics.Vectors" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Xamarin.Essentials" Version="1.6.0" />
+    <PackageReference Include="Xamarin.Essentials" Version="1.6.1" />
     <PackageReference Include="Newtonsoft.Json">
-      <Version>12.0.3</Version>
+      <Version>13.0.1</Version>
     </PackageReference>
     <PackageReference Include="System.Net.Http">
       <Version>4.3.4</Version>
@@ -180,6 +180,21 @@
     <BundleResource Include="Resources\store.png" />
     <BundleResource Include="Resources\SFIcon.png" />
     <BundleResource Include="Resources\128x128.png" />
+    <BundleResource Include="Resources\heartIcon.png" />
+    <BundleResource Include="Resources\produceIcon.png" />
+    <BundleResource Include="Resources\nextIcon.png" />
+    <BundleResource Include="Resources\selectedDessertsIcon.png" />
+    <BundleResource Include="Resources\selectedFavoritesIcon.png" />
+    <BundleResource Include="Resources\selectedFruitsIcon.png" />
+    <BundleResource Include="Resources\selectedOthersIcon.png" />
+    <BundleResource Include="Resources\unselectedDessertsIcon.png" />
+    <BundleResource Include="Resources\unselectedFavoritesIcon.png" />
+    <BundleResource Include="Resources\unselectedFruitsIcon.png" />
+    <BundleResource Include="Resources\unselectedOthersIcon.png" />
+    <BundleResource Include="Resources\unselectedVegetablesIcon.png" />
+    <BundleResource Include="Resources\selectedVegetablesIcon.png" />
+    <BundleResource Include="Resources\informationIcon.png" />
+    <BundleResource Include="Resources\unselectedHeartIcon.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AppleSignIn\" />

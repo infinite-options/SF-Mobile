@@ -89,7 +89,7 @@
                 </StackLayout>
             </FlexLayout>
             <StackLayout Grid.Row="4">
-                <CollectionView x:Name="itemList"  BackgroundColor="White" SelectionMode="None">
+                <!--<CollectionView x:Name="itemList"  BackgroundColor="White" SelectionMode="None">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
                             <Grid HorizontalOptions="Center" Padding="15,10,5,0" BackgroundColor="White" ColumnSpacing="10">
@@ -123,9 +123,9 @@
                                             <ColumnDefinition Width="45"></ColumnDefinition>
                                         </Grid.ColumnDefinitions>
                                         <BoxView  Grid.Row="0" Grid.Column="0" HeightRequest="50"></BoxView>
-                                        <!--<BoxView  Grid.Row="0" Grid.Column="1"></BoxView>
-                                        <BoxView  Grid.Row="0" Grid.Column="2"></BoxView>-->
-                                        <!--<BoxView Color="Red" Grid.Row="0" Grid.Column="3"></BoxView>-->
+                                        <BoxView  Grid.Row="0" Grid.Column="1"></BoxView>
+                                        <BoxView  Grid.Row="0" Grid.Column="2"></BoxView>
+                                        <BoxView Color="Red" Grid.Row="0" Grid.Column="3"></BoxView>
                                         <Button
                                             HorizontalOptions="StartAndExpand"
                                             Grid.Row="0" Grid.Column="1"
@@ -137,7 +137,7 @@
                                             BackgroundColor="WhiteSmoke">
                                         </Button>
                                     </Grid>
-                                    <!--<Button
+                                    <Button
                                         
                                         Text="{Binding quantityLeft}"
                                         TextColor="#FF8500"
@@ -145,7 +145,7 @@
                                         Opacity="0.9"
                                         WidthRequest="40"
                                         BackgroundColor="WhiteSmoke">
-                                    </Button>-->
+                                    </Button>
                                     <Grid>
                                         <StackLayout Grid.Row="2">
                                             <Frame Padding="0" HeightRequest="90" HasShadow="False" BackgroundColor="WhiteSmoke" Opacity="0.9" BorderColor="LightGray">
@@ -169,9 +169,9 @@
                                             <Frame Padding="0" Margin="0,-7,0,0" HeightRequest="90" HasShadow="False" BorderColor="LightGray">
                                                 <Grid>
                                                     <Label Grid.Column="0" Grid.Row="0" WidthRequest="120" Padding="10,0,0,0" Text="{Binding itemNameLeft}" TextColor="Black" HorizontalTextAlignment="Start" VerticalTextAlignment="Center" FontSize="10"></Label>
-                                                    <!--<Label Grid.Column="0" Grid.Row="1" WidthRequest="120" Padding="10,0,0,0" Text="{Binding item_descLeft}" TextColor="Black" HorizontalTextAlignment="Start" FontSize="10"></Label>-->
+                                                    <Label Grid.Column="0" Grid.Row="1" WidthRequest="120" Padding="10,0,0,0" Text="{Binding item_descLeft}" TextColor="Black" HorizontalTextAlignment="Start" FontSize="10"></Label>
                                                     <Label Grid.Column="1" Grid.Row="0" WidthRequest="75" Text="{Binding itemPriceLeftUnit}" TextColor="Black" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontSize="10"></Label>
-                                                    <!--<Label Grid.Column="1" Grid.Row="1" WidthRequest="75" Text="{Binding itemPriceLeftUnit}" TextColor="Black" HorizontalTextAlignment="Center" FontSize="10"></Label>-->
+                                                    <Label Grid.Column="1" Grid.Row="1" WidthRequest="75" Text="{Binding itemPriceLeftUnit}" TextColor="Black" HorizontalTextAlignment="Center" FontSize="10"></Label>
                                                 </Grid>
                                             </Frame>
                                         </StackLayout>
@@ -199,9 +199,9 @@
                                                 <ColumnDefinition Width="45"></ColumnDefinition>
                                             </Grid.ColumnDefinitions>
                                             <BoxView  Grid.Row="0" Grid.Column="0" HeightRequest="50"></BoxView>
-                                            <!--<BoxView  Grid.Row="0" Grid.Column="1"></BoxView>
-                                            <BoxView  Grid.Row="0" Grid.Column="2"></BoxView>-->
-                                            <!--<BoxView Color="Red" Grid.Row="0" Grid.Column="3"></BoxView>-->
+                                            <BoxView  Grid.Row="0" Grid.Column="1"></BoxView>
+                                            <BoxView  Grid.Row="0" Grid.Column="2"></BoxView>
+                                            <BoxView Color="Red" Grid.Row="0" Grid.Column="3"></BoxView>
                                             <Button
                                                 HorizontalOptions="StartAndExpand"
                                                 Grid.Row="0" Grid.Column="1"
@@ -213,7 +213,7 @@
                                                 BackgroundColor="WhiteSmoke">
                                             </Button>
                                         </Grid>
-                                    <!--<Button
+                                    <Button
                                         HorizontalOptions="End"
                                         Text="{Binding quantityRight}"
                                         TextColor="#FF8500"
@@ -221,7 +221,7 @@
                                         Opacity="0.9"
                                         WidthRequest="40"
                                         BackgroundColor="WhiteSmoke">
-                                    </Button>-->
+                                    </Button>
                                     <Grid>
                                         <StackLayout Grid.Row="2">
                                             <Frame Padding="0" HeightRequest="90" HasShadow="False" BackgroundColor="WhiteSmoke" Opacity="0.9" BorderColor="LightGray">
@@ -245,9 +245,9 @@
                                             <Frame Padding="0" Margin="0,-7,0,0" HeightRequest="90" HasShadow="False" BorderColor="LightGray">
                                                 <Grid>
                                                     <Label Grid.Column="0" Grid.Row="0" WidthRequest="120" Text="{Binding itemNameRight}" Padding="10,0,0,0" TextColor="Black" HorizontalTextAlignment="Start" VerticalTextAlignment="Center" FontSize="10"></Label>
-                                                    <!--<Label Grid.Column="0" Grid.Row="1" WidthRequest="120" Text="{Binding item_descRight}" Padding="10,0,0,0" TextColor="Black" HorizontalTextAlignment="Start" FontSize="10"></Label>-->
+                                                    <Label Grid.Column="0" Grid.Row="1" WidthRequest="120" Text="{Binding item_descRight}" Padding="10,0,0,0" TextColor="Black" HorizontalTextAlignment="Start" FontSize="10"></Label>
                                                     <Label Grid.Column="1" Grid.Row="0" WidthRequest="75"  Text="{Binding itemPriceRightUnit}" TextColor="Black" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontSize="10"></Label>
-                                                    <!--<Label Grid.Column="1" Grid.Row="1" WidthRequest="75"  Text="{Binding itemPriceRightUnit}" TextColor="Black" HorizontalTextAlignment="Center" FontSize="10"></Label>-->
+                                                    <Label Grid.Column="1" Grid.Row="1" WidthRequest="75"  Text="{Binding itemPriceRightUnit}" TextColor="Black" HorizontalTextAlignment="Center" FontSize="10"></Label>
                                                 </Grid>
                                             </Frame>
                                         </StackLayout>
@@ -256,7 +256,189 @@
                             </Grid>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
-                </CollectionView>
+                </CollectionView>-->
+                <ListView HasUnevenRows="True" x:Name="itemList" CachingStrategy="RecycleElementAndDataTemplate">
+                     <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <!--<Grid HeightRequest="200">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Frame Grid.Column="0" BackgroundColor="Pink">
+
+                                    </Frame>
+                                    <Frame Grid.Column="1" BackgroundColor="Green">
+
+                                    </Frame>
+                                </Grid>-->
+                            <Grid HorizontalOptions="Center" Padding="15,10,5,0" BackgroundColor="White" ColumnSpacing="10">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="{Binding height}"></RowDefinition>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions >
+                                    <ColumnDefinition Width="{Binding width}"></ColumnDefinition>
+                                    <ColumnDefinition Width="{Binding width}"></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <RelativeLayout
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    IsVisible="{Binding isItemLeftVisiable}"
+                                    IsEnabled="{Binding isItemLeftEnable}">
+                                    <ImageButton
+                                        HeightRequest="{Binding width}"
+                                        WidthRequest="{Binding width}"
+                                        Source="{Binding imageSourceLeft}"
+                                        Aspect="Fill"
+                                        CornerRadius="20"
+                                        BackgroundColor="WhiteSmoke">
+                                    </ImageButton>
+                                    <Grid WidthRequest="{Binding width}">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="50"></RowDefinition>
+                                            </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                            <ColumnDefinition Width="45"></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <BoxView  Grid.Row="0" Grid.Column="0" HeightRequest="50"></BoxView>
+                                        <BoxView  Grid.Row="0" Grid.Column="1"></BoxView>
+                                        <BoxView  Grid.Row="0" Grid.Column="2"></BoxView>
+                                        <BoxView Color="Red" Grid.Row="0" Grid.Column="3"></BoxView>
+                                        <Button
+                                            HorizontalOptions="StartAndExpand"
+                                            Grid.Row="0" Grid.Column="1"
+                                            Text="{Binding quantityLeft}"
+                                            TextColor="#FF8500"
+                                            FontAttributes="Bold"
+                                            Opacity="0.9"
+                                            WidthRequest="40"
+                                            BackgroundColor="WhiteSmoke">
+                                        </Button>
+                                    </Grid>
+                                    <Button
+                                        
+                                        Text="{Binding quantityLeft}"
+                                        TextColor="#FF8500"
+                                        FontAttributes="Bold"
+                                        Opacity="0.9"
+                                        WidthRequest="40"
+                                        BackgroundColor="WhiteSmoke">
+                                    </Button>
+                                    <Grid>
+                                        <StackLayout Grid.Row="2">
+                                            <Frame Padding="0" HeightRequest="90" HasShadow="False" BackgroundColor="WhiteSmoke" Opacity="0.9" BorderColor="LightGray">
+                                                <Grid>
+                                                    <Button  Grid.Column="0" WidthRequest="92" Text="-" TextColor="#FF8500" Font="35" Clicked="SubtractItemLeft" CommandParameter="{Binding .}">
+                                                        <Button.Margin>
+                                                        <OnPlatform x:TypeArguments="Thickness">
+                                                            <On Platform="Android" Value="0,-25,0,0"/>
+                                                        </OnPlatform>
+                                                        </Button.Margin>
+                                                    </Button>
+                                                    <Button Grid.Column="1" WidthRequest="92" Text="+" TextColor="#FF8500" Font="25" Clicked="AddItemLeft" CommandParameter="{Binding .}">
+                                                        <Button.Margin>
+                                                        <OnPlatform x:TypeArguments="Thickness">
+                                                            <On Platform="Android" Value="0,-18,0,0"/>
+                                                        </OnPlatform>
+                                                        </Button.Margin>
+                                                    </Button>
+                                                </Grid>
+                                            </Frame>
+                                            <Frame Padding="0" Margin="0,-7,0,0" HeightRequest="90" HasShadow="False" BorderColor="LightGray">
+                                                <Grid>
+                                                    <Label Grid.Column="0" Grid.Row="0" WidthRequest="120" Padding="10,0,0,0" Text="{Binding itemNameLeft}" TextColor="Black" HorizontalTextAlignment="Start" VerticalTextAlignment="Center" FontSize="10"></Label>
+                                                    <Label Grid.Column="0" Grid.Row="1" WidthRequest="120" Padding="10,0,0,0" Text="{Binding item_descLeft}" TextColor="Black" HorizontalTextAlignment="Start" FontSize="10"></Label>
+                                                    <Label Grid.Column="1" Grid.Row="0" WidthRequest="75" Text="{Binding itemPriceLeftUnit}" TextColor="Black" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontSize="10"></Label>
+                                                    <Label Grid.Column="1" Grid.Row="1" WidthRequest="75" Text="{Binding itemPriceLeftUnit}" TextColor="Black" HorizontalTextAlignment="Center" FontSize="10"></Label>
+                                                </Grid>
+                                            </Frame>
+                                        </StackLayout>
+                                    </Grid>
+                                </RelativeLayout>
+                                <RelativeLayout
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    IsVisible="{Binding isItemRightVisiable}"
+                                    IsEnabled="{Binding isItemRightEnable}">
+                                    <ImageButton
+                                        HeightRequest="{Binding width}"
+                                        WidthRequest="{Binding width}"
+                                        Source="{Binding imageSourceRight}"
+                                        Aspect="Fill"
+                                        CornerRadius="20"
+                                        BackgroundColor="WhiteSmoke">
+                                    </ImageButton>
+                                     <Grid WidthRequest="{Binding width}">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="50"></RowDefinition>
+                                             </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                                <ColumnDefinition Width="45"></ColumnDefinition>
+                                            </Grid.ColumnDefinitions>
+                                            <BoxView  Grid.Row="0" Grid.Column="0" HeightRequest="50"></BoxView>
+                                            <BoxView  Grid.Row="0" Grid.Column="1"></BoxView>
+                                            <BoxView  Grid.Row="0" Grid.Column="2"></BoxView>
+                                            <BoxView Color="Red" Grid.Row="0" Grid.Column="3"></BoxView>
+                                            <Button
+                                                HorizontalOptions="StartAndExpand"
+                                                Grid.Row="0" Grid.Column="1"
+                                                Text="{Binding quantityRight}"
+                                                TextColor="#FF8500"
+                                                FontAttributes="Bold"
+                                                Opacity="0.9"
+                                                WidthRequest="40"
+                                                BackgroundColor="WhiteSmoke">
+                                            </Button>
+                                        </Grid>
+                                    <Button
+                                        HorizontalOptions="End"
+                                        Text="{Binding quantityRight}"
+                                        TextColor="#FF8500"
+                                        FontAttributes="Bold"
+                                        Opacity="0.9"
+                                        WidthRequest="40"
+                                        BackgroundColor="WhiteSmoke">
+                                    </Button>
+                                    <Grid>
+                                        <StackLayout Grid.Row="2">
+                                            <Frame Padding="0" HeightRequest="90" HasShadow="False" BackgroundColor="WhiteSmoke" Opacity="0.9" BorderColor="LightGray">
+                                                <Grid>
+                                                    <Button Grid.Column="0" WidthRequest="120" Text="-" TextColor="#FF8500" Font="35" Clicked="SubtractItemRight" CommandParameter="{Binding .}">
+                                                        <Button.Margin>
+                                                        <OnPlatform x:TypeArguments="Thickness">
+                                                            <On Platform="Android" Value="0,-25,0,0"/>
+                                                        </OnPlatform>
+                                                        </Button.Margin>
+                                                    </Button>
+                                                    <Button Grid.Column="1" WidthRequest="75" Text="+" TextColor="#FF8500" Font="25" Clicked="AddItemRight" CommandParameter="{Binding .}">
+                                                        <Button.Margin>
+                                                        <OnPlatform x:TypeArguments="Thickness">
+                                                            <On Platform="Android" Value="0,-18,0,0"/>
+                                                        </OnPlatform>
+                                                        </Button.Margin>
+                                                    </Button>
+                                                </Grid>
+                                            </Frame>
+                                            <Frame Padding="0" Margin="0,-7,0,0" HeightRequest="90" HasShadow="False" BorderColor="LightGray">
+                                                <Grid>
+                                                    <Label Grid.Column="0" Grid.Row="0" WidthRequest="120" Text="{Binding itemNameRight}" Padding="10,0,0,0" TextColor="Black" HorizontalTextAlignment="Start" VerticalTextAlignment="Center" FontSize="10"></Label>
+                                                    <Label Grid.Column="0" Grid.Row="1" WidthRequest="120" Text="{Binding item_descRight}" Padding="10,0,0,0" TextColor="Black" HorizontalTextAlignment="Start" FontSize="10"></Label>
+                                                    <Label Grid.Column="1" Grid.Row="0" WidthRequest="75"  Text="{Binding itemPriceRightUnit}" TextColor="Black" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontSize="10"></Label>
+                                                    <Label Grid.Column="1" Grid.Row="1" WidthRequest="75"  Text="{Binding itemPriceRightUnit}" TextColor="Black" HorizontalTextAlignment="Center" FontSize="10"></Label>
+                                                </Grid>
+                                            </Frame>
+                                        </StackLayout>
+                                    </Grid>
+                                </RelativeLayout>
+                            </Grid>
+                            </ViewCell>
+                        </DataTemplate>
+                      </ListView.ItemTemplate>
+                </ListView>
             </StackLayout>
             <Grid Grid.Row="5" BackgroundColor="WhiteSmoke">
                 <Grid.RowDefinitions>

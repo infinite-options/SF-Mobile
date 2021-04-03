@@ -38,7 +38,7 @@ namespace ServingFresh.iOS
             global::Xamarin.Forms.Forms.Init();
             Xamarin.FormsMaps.Init();
             global::Xamarin.Forms.Forms.Init();
-            
+            Forms9Patch.iOS.Settings.Initialize(this);
             //UIApplication.SharedApplication.UnregisterForRemoteNotifications();
             //var answer = RegistedDeviceToPushNotifications();
             //IsEnable = answer;

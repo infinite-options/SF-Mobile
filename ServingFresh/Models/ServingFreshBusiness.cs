@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using static ServingFresh.Views.ItemsPage;
 
 namespace ServingFresh.Models
 {
@@ -101,6 +102,25 @@ namespace ServingFresh.Models
     //}
     // ==========================================
 
+    public class Result
+    {
+        public string item_uid { get; set; }
+        public string created_at { get; set; }
+        public string itm_business_uid { get; set; }
+        public string item_name { get; set; }
+        public string item_status { get; set; }
+        public string item_type { get; set; }
+        public string item_desc { get; set; }
+        public string item_unit { get; set; }
+        public double business_price { get; set; }
+        public double item_price { get; set; }
+        public string item_sizes { get; set; }
+        public string favorite { get; set; }
+        public string item_photo { get; set; }
+        public string exp_date { get; set; }
+        public string taxable { get; set; }
+    }
+
     public class Business
     {
         public string zone { get; set; }
@@ -122,7 +142,8 @@ namespace ServingFresh.Models
     {
         public string message { get; set; }
         public int code { get; set; }
-        public IList<Business> result { get; set; }
+        public IList<Items> result { get; set; }
         public string sql { get; set; }
+        public IList<Business> business_details { get; set; }
     }
 }

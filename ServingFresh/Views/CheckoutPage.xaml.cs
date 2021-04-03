@@ -796,6 +796,7 @@ namespace ServingFresh.Views
                     if (couponsList[0].status == "ACTIVE")
                     {
                         couponsList[0].image = "CouponIconOrange.png";
+                        Debug.WriteLine("COUPON DISCOUNT: {0}, COUPON SHIPPING: {1}", couponsList[0].discount, couponsList[0].shipping);
                         updateTotals(couponsList[0].discount, couponsList[0].shipping);
                         appliedIndex = 0;
                     }
@@ -1450,7 +1451,7 @@ namespace ServingFresh.Views
                             purchaseObject.taxes = GetTaxes().ToString("N2");
 
                             var purchaseString = JsonConvert.SerializeObject(purchaseObject);
-                            System.Diagnostics.Debug.WriteLine("Purchase: " + purchaseString);
+                            Debug.WriteLine("Purchase: " + purchaseString);
                             var purchaseMessage = new StringContent(purchaseString, Encoding.UTF8, "application/json");
                             var client = new System.Net.Http.HttpClient();
                             var Response = await client.PostAsync(Constant.PurchaseUrl, purchaseMessage);
@@ -2029,6 +2030,7 @@ namespace ServingFresh.Views
                 if (couponsList[0].status == "ACTIVE")
                 {
                     couponsList[0].image = "CouponIconOrange.png";
+                    Debug.WriteLine("COUPON DISCOUNT: {0}, COUPON SHIPPING: {1}", couponsList[0].discount, couponsList[0].shipping);
                     updateTotals(couponsList[0].discount, couponsList[0].shipping);
                     appliedIndex = 0;
                 }
@@ -2527,7 +2529,7 @@ namespace ServingFresh.Views
                 purchaseObject.taxes = GetTaxes().ToString("N2");
 
                 var purchaseString = JsonConvert.SerializeObject(purchaseObject);
-                System.Diagnostics.Debug.WriteLine("Purchase: " + purchaseString);
+                Debug.WriteLine("Purchase: " + purchaseString);
                 var purchaseMessage = new StringContent(purchaseString, Encoding.UTF8, "application/json");
                 var client = new System.Net.Http.HttpClient();
 

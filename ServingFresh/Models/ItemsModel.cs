@@ -38,6 +38,50 @@ namespace ServingFresh.Models
         public string item_descRight { get; set; }
         public double item_businessPriceRight { get; set; }
         public string itemTaxableRight { get; set; }
+        public string itemTypeLeft { get; set; }
+        public string itemTypeRight { get; set; }
+        public Xamarin.Forms.Color colorLeft { get; set; }
+        public Xamarin.Forms.Color colorRight { get; set; }
+
+
+        public string favoriteIconLeft { get; set; }
+        public string favoriteIconRight { get; set; }
+
+        public string favoriteIconLeftUpdate
+        {
+            set
+            {
+                favoriteIconLeft = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("favoriteIconLeft"));
+            }
+        }
+
+        public string favoriteIconRightUpdate
+        {
+            set
+            {
+                favoriteIconRight = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("favoriteIconRight"));
+            }
+        }
+
+        public Xamarin.Forms.Color colorLeftUpdate
+        {
+            set
+            {
+                colorLeft = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("colorLeft"));
+            }
+        }
+
+        public Xamarin.Forms.Color colorRightUpdate
+        {
+            set
+            {
+                colorRight = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("colorRight"));
+            }
+        }
 
         public int quantityL
         {
