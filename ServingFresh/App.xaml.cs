@@ -21,9 +21,9 @@ namespace ServingFresh
             //SecureStorage.RemoveAll();
             //Preferences.Clear();
 
-            Application.Current.MainPage = new CartPage();
+            Application.Current.MainPage = new PrincipalPage();
 
-            Application.Current.Properties["guest"] = false;
+            Application.Current.Properties["guest"] = true;
             Application.Current.Properties["user_email"] = "";
             Application.Current.Properties["user_first_name"] = "";
             Application.Current.Properties["user_last_name"] = "";

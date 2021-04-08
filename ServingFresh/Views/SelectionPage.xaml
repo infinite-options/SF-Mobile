@@ -325,7 +325,7 @@
                      <Label x:Name="title" HorizontalOptions="CenterAndExpand" VerticalOptions="Center" Text="Tue, Sep 20" FontSize="26" TextColor="#FFFFFF" FontAttributes="Bold"></Label>
                      <StackLayout Orientation="Horizontal" Spacing="0" HorizontalOptions="Center">
                         <Label  Text="Delivery time: " FontSize="10" TextColor="#FFFFFF" FontAttributes="Bold"></Label>
-                        <Label x:Name="deliveryTime"  Text="Delivery time:" FontSize="10" TextColor="#FFFFFF" FontAttributes="Bold"></Label>
+                        <Label x:Name="deliveryTime"  Text="" FontSize="10" TextColor="#FFFFFF" FontAttributes="Bold"></Label>
                      </StackLayout>
                 </StackLayout>
                 <StackLayout Grid.Column="1" Margin="0,15,0,0" VerticalOptions="Center" HorizontalOptions="Center">
@@ -336,6 +336,9 @@
                             <Image.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="CheckOutClickBusinessPage"></TapGestureRecognizer>
                             </Image.GestureRecognizers>
+                             <Image.Effects>
+                                <servingfresh:TintImageEffect TintColor="White"/>
+                            </Image.Effects>
                         </Image>
                         <Frame Margin="30,20,0,0" HeightRequest="20" MinimumWidthRequest="20" CornerRadius="10" Padding="0" HasShadow="False">
                             <Label x:Name="CartTotal" Margin="5,1,5,0" Text="0"  TextColor="#FF8500" FontSize="14" FontAttributes="Bold"></Label>
@@ -393,7 +396,6 @@
                     </Grid.RowDefinitions>
                     <StackLayout Grid.Row="0" Orientation="Horizontal">
                         <Label Margin="15,5,0,0" Text="Delivery dates available" TextColor="#136D74" FontSize="10"></Label>
-
                         <Label Margin="0,5,0,0" x:Name="orderBy" Text="" TextColor="#136D74" FontSize="10"></Label>
                     </StackLayout>
                     <Grid Margin="15,0,15,0" Grid.Row="1" ColumnSpacing="0">
@@ -435,13 +437,13 @@
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <ViewCell>
-                            <Grid HeightRequest="200" ColumnSpacing="0">
+                            <Grid HeightRequest="190" ColumnSpacing="0">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"></ColumnDefinition>
                                     <ColumnDefinition Width="*"></ColumnDefinition>
                                 </Grid.ColumnDefinitions>
-                            <StackLayout Margin="20,0,7,0" Grid.Column="0" Spacing="0">
-                                <Frame HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" >
+                            <StackLayout Margin="20,0,7,0" Grid.Column="0" Spacing="0" >
+                                <Frame HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding opacityLeft}">
                                     <RelativeLayout>
                                         <Frame
                                             BackgroundColor="Transparent"
@@ -477,10 +479,10 @@
                                                 </Frame>
                                             </StackLayout>
                                         </Grid>
-
+                                         
                                     </RelativeLayout>
                                 </Frame>
-                                <Frame HasShadow="false" Padding="5" HeightRequest="55" CornerRadius="10" BorderColor="#FF8500" BackgroundColor="{Binding colorLeft}">
+                                <Frame HasShadow="false" Padding="5" HeightRequest="40" CornerRadius="10"  IsEnabled="{Binding isItemLeftEnable}" BackgroundColor="{Binding colorLeft}" Opacity="{Binding opacityLeft}">
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="*"></RowDefinition>
@@ -503,9 +505,10 @@
                                         </Grid>
                                     </Grid>
                                 </Frame>
+                                <Label Margin="0,-110,0,0" IsVisible="{Binding isItemLeftUnavailable}" Text="Not available on this day" TextColor="Black" FontSize="11" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
                             </StackLayout>
                             <StackLayout Margin="7,0,20,0" Grid.Column="1" Spacing="0">
-                                <Frame HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10">
+                                <Frame HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding opacityRight}">
                                     <RelativeLayout>
                                         <Frame
                                             BackgroundColor="Transparent"
@@ -517,7 +520,6 @@
                                             RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
                                             <Image Source="{Binding imageSourceRight}" Aspect="Fill"></Image>
                                         </Frame>
-
                                         <Grid
                                             ColumnSpacing="0"
                                             HeightRequest="120"
@@ -534,17 +536,16 @@
                                                     </StackLayout>
                                                 </Frame>
                                             </StackLayout>
-                                            <StackLayout Grid.Column="1" ></StackLayout>
+                                            <StackLayout Grid.Column="1"></StackLayout>
                                             <StackLayout Grid.Column="2">
                                                 <Frame Margin="7,3,3,0"  WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
                                                     <Image Source="informationIcon.png"></Image>
                                                 </Frame>
                                             </StackLayout>
                                         </Grid>
-
                                     </RelativeLayout>
                                 </Frame>
-                                <Frame  HasShadow="false" Padding="5" HeightRequest="55" CornerRadius="10" BorderColor="#FF8500" BackgroundColor="{Binding colorRight}">
+                                <Frame  HasShadow="false" Padding="5" HeightRequest="40" CornerRadius="10" IsEnabled="{Binding isItemRightEnable}" BackgroundColor="{Binding colorRight}" Opacity="{Binding opacityRight}">
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="*"></RowDefinition>
@@ -567,6 +568,7 @@
                                         </Grid>
                                     </Grid>
                                 </Frame>
+                                <Label Margin="0,-110,0,0" IsVisible="{Binding isItemRightUnavailable}" Text="Not available on this day" TextColor="Black" FontSize="11" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
                             </StackLayout>
                             </Grid>
                             </ViewCell>

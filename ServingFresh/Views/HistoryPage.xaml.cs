@@ -266,7 +266,8 @@ namespace ServingFresh.Views
         }
         public void openCheckout(object sender, EventArgs e)
         {
-            Application.Current.MainPage = new CheckoutPage(null,day);
+            //Application.Current.MainPage = new CheckoutPage(null,day);
+            Application.Current.MainPage = new CheckoutPage(null, null);
         }
         public void openRefund(object sender, EventArgs e)
         {

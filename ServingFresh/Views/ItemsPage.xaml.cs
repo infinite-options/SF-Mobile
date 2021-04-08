@@ -73,6 +73,7 @@ namespace ServingFresh.Views
             public string unit { get; set; }
             public double business_price { get; set; }
             public string taxable { get; set; }
+            public bool isItemAvailable { get; set; }
         }
 
         public IDictionary<string, ItemPurchased> order = new Dictionary<string, ItemPurchased>();
@@ -1095,8 +1096,9 @@ namespace ServingFresh.Views
             }
                
             Application.Current.Properties["day"] = titlePage.Text;
-            Application.Current.MainPage = new CheckoutPage(purchase, titlePage.Text);
-            
+            //Application.Current.MainPage = new CheckoutPage(purchase, titlePage.Text);
+            Application.Current.MainPage = new CheckoutPage(purchase, null);
+
         }
 
         void DeliveryDaysClick(System.Object sender, System.EventArgs e)
@@ -1117,8 +1119,9 @@ namespace ServingFresh.Views
             }
 
             Application.Current.Properties["day"] = titlePage.Text;
-            Application.Current.MainPage = new CheckoutPage(purchase, titlePage.Text);
-            
+            //Application.Current.MainPage = new CheckoutPage(purchase, titlePage.Text);
+            Application.Current.MainPage = new CheckoutPage(purchase, null);
+
         }
 
         void InfoClick(System.Object sender, System.EventArgs e)

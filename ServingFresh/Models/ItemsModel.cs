@@ -47,6 +47,66 @@ namespace ServingFresh.Models
         public string favoriteIconLeft { get; set; }
         public string favoriteIconRight { get; set; }
 
+        public double opacityLeft { get; set; }
+        public double opacityRight { get; set; }
+
+        public bool isItemLeftUnavailable { get; set; }
+        public bool isItemRightUnavailable { get; set; }
+
+        public bool isItemLeftUnavailableUpdate
+        {
+            set
+            {
+                isItemLeftUnavailable = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("isItemLeftUnavailable"));
+            }
+        }
+
+        public bool isItemRightUnavailableUpdate
+        {
+            set
+            {
+                isItemRightUnavailable = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("isItemRightUnavailable"));
+            }
+        }
+
+        public bool isItemLeftEnableUpdate
+        {
+            set
+            {
+                isItemLeftEnable = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("isItemLeftEnable"));
+            }
+        }
+
+        public bool isItemRightEnableUpdate
+        {
+            set
+            {
+                isItemRightEnable = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("isItemRightEnable"));
+            }
+        }
+
+        public double opacityLeftUpdate
+        {
+            set
+            {
+                opacityLeft = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("opacityLeft"));
+            }
+        }
+
+        public double opacityRightUpdate
+        {
+            set
+            {
+                opacityRight = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("opacityRight"));
+            }
+        }
+
         public string favoriteIconLeftUpdate
         {
             set

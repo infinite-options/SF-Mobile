@@ -89,6 +89,8 @@ namespace ServingFresh.Views
         string selected_market_id = "";
         string selected_farm_id = "";
 
+        ScheduleInfo selectedDeliveryDate;
+
         public class DeliveryInfo
         {
             public string delivery_day { get; set; }
@@ -747,6 +749,7 @@ namespace ServingFresh.Views
 
                     if (displaySchedule.Count != 0)
                     {
+                        selectedDeliveryDate = displaySchedule[0];
                         displaySchedule[0].colorScheduleUpdate = Color.FromHex("#FF8500");
                         displaySchedule[0].textColorUpdate = Color.FromHex("#FFFFFF"); 
                         var day = DateTime.Parse(displaySchedule[0].deliveryTimeStamp.ToString());
@@ -768,16 +771,17 @@ namespace ServingFresh.Views
                         {
                             if(!displaySchedule[0].business_uids.Contains(i.itm_business_uidLeft))
                             {
-                                i.colorLeftUpdate = Color.FromHex("#a19797");
+                                i.opacityLeftUpdate = 0.5;
+                                i.isItemLeftEnableUpdate = false;
+                                i.isItemLeftUnavailableUpdate = true;
                             }
                             else if (!displaySchedule[0].business_uids.Contains(i.itm_business_uidRight))
                             {
-                                i.colorRightUpdate = Color.FromHex("#a19797");
+                                i.opacityRightUpdate = 0.5;
+                                i.isItemRightEnableUpdate = false;
+                                i.isItemRightUnavailableUpdate = true;
                             }
                         }
-
-                        
-
                     }
                     //farm_list.ItemsSource = businesses;
                 }
@@ -921,6 +925,9 @@ namespace ServingFresh.Views
                             colorLeft = Color.FromHex("#FFFFFF"),
                             itemTypeLeft = "",
                             favoriteIconLeft = "unselectedHeartIcon.png",
+                            opacityLeft = 0,
+                            isItemLeftUnavailable = false,
+
 
                             imageSourceRight = "",
                             quantityRight = 0,
@@ -937,7 +944,9 @@ namespace ServingFresh.Views
                             colorRight = Color.FromHex("#FFFFFF"),
                             itemTypeRight = "",
                             favoriteIconRight = "unselectedHeartIcon.png",
-                        });;
+                            opacityRight = 0,
+                            isItemRightUnavailable = false,
+                        });
                     }
                     if (isAmountItemsEven(n))
                     {
@@ -972,7 +981,8 @@ namespace ServingFresh.Views
                                 colorLeft = Color.FromHex("#FFFFFF"),
                                 itemTypeLeft = listOfItems[j].item_type,
                                 favoriteIconLeft = "unselectedHeartIcon.png",
-
+                                opacityLeft = 1,
+                                isItemLeftUnavailable = false,
 
                                 imageSourceRight = listOfItems[j + 1].item_photo,
                                 item_uidRight = listOfItems[j + 1].item_uid,
@@ -991,7 +1001,9 @@ namespace ServingFresh.Views
                                 colorRight = Color.FromHex("#FFFFFF"),
                                 itemTypeRight = listOfItems[j + 1].item_type,
                                 favoriteIconRight = "unselectedHeartIcon.png",
-                            });
+                                opacityRight = 1,
+                                isItemRightUnavailable = false,
+                            });;
                             j = j + 2;
                         }
                     }
@@ -1028,6 +1040,8 @@ namespace ServingFresh.Views
                                 colorLeft = Color.FromHex("#FFFFFF"),
                                 itemTypeLeft = listOfItems[j].item_type,
                                 favoriteIconLeft = "unselectedHeartIcon.png",
+                                opacityLeft = 1,
+                                isItemLeftUnavailable = false,
 
                                 imageSourceRight = listOfItems[j + 1].item_photo,
                                 item_uidRight = listOfItems[j + 1].item_uid,
@@ -1046,6 +1060,8 @@ namespace ServingFresh.Views
                                 colorRight = Color.FromHex("#FFFFFF"),
                                 itemTypeRight = listOfItems[j + 1].item_type,
                                 favoriteIconRight = "unselectedHeartIcon.png",
+                                opacityRight = 1,
+                                isItemRightUnavailable = false,
 
                             });
                             j = j + 2;
@@ -1075,7 +1091,8 @@ namespace ServingFresh.Views
                             colorLeft = Color.FromHex("#FFFFFF"),
                             itemTypeLeft = listOfItems[j].item_type,
                             favoriteIconLeft = "unselectedHeartIcon.png",
-
+                            opacityLeft = 1,
+                            isItemLeftUnavailable = false,
 
                             imageSourceRight = "",
                             quantityRight = 0,
@@ -1087,7 +1104,9 @@ namespace ServingFresh.Views
                             colorRight = Color.FromHex("#FFFFFF"),
                             itemTypeRight = "",
                             favoriteIconRight = "unselectedHeartIcon.png",
-                        });
+                            opacityRight = 0,
+                            isItemRightUnavailable = false,
+                        }) ;
                     }
                 }
 
@@ -1141,7 +1160,8 @@ namespace ServingFresh.Views
                 {
                     itemModelObject.quantityL -= 1;
                     totalCount -= 1;
-                    CartTotal.Text = totalCount.ToString();
+                    //CartTotal.Text = totalCount.ToString();
+                    
                     if (order != null)
                     {
                         if (order.ContainsKey(itemModelObject.itemNameLeft))
@@ -1162,6 +1182,7 @@ namespace ServingFresh.Views
                             itemSelected.description = itemModelObject.item_descLeft;
                             itemSelected.business_price = itemModelObject.item_businessPriceLeft;
                             itemSelected.taxable = itemModelObject.itemTaxableLeft;
+                            itemSelected.isItemAvailable = true;
                             order.Add(itemModelObject.itemNameLeft, itemSelected);
                         }
                     }
@@ -1170,7 +1191,9 @@ namespace ServingFresh.Views
                     {
                         itemModelObject.colorLeft = Color.FromHex("#FFFFFF");
                         itemModelObject.colorLeftUpdate = Color.FromHex("#FFFFFF");
+                        order.Remove(itemModelObject.itemNameLeft);
                     }
+                    UpdateNumberOfItemsInCart();
                 }
                 else
                 {
@@ -1193,7 +1216,8 @@ namespace ServingFresh.Views
                 itemModelObject.colorLeftUpdate = Color.FromHex("#ffce99");
                 itemModelObject.quantityL += 1;
                 totalCount += 1;
-                CartTotal.Text = totalCount.ToString();
+                //CartTotal.Text = totalCount.ToString();
+                
                 if (order != null)
                 {
                     if (order.ContainsKey(itemModelObject.itemNameLeft))
@@ -1214,9 +1238,11 @@ namespace ServingFresh.Views
                         itemSelected.description = itemModelObject.item_descLeft;
                         itemSelected.business_price = itemModelObject.item_businessPriceLeft;
                         itemSelected.taxable = itemModelObject.itemTaxableLeft;
+                        itemSelected.isItemAvailable = true;
                         order.Add(itemModelObject.itemNameLeft, itemSelected);
                     }
                 }
+                UpdateNumberOfItemsInCart();
             }
 
         }
@@ -1233,7 +1259,8 @@ namespace ServingFresh.Views
                 {
                     itemModelObject.quantityR -= 1;
                     totalCount -= 1;
-                    CartTotal.Text = totalCount.ToString();
+                    //CartTotal.Text = totalCount.ToString();
+                    
                     if (order.ContainsKey(itemModelObject.itemNameRight))
                     {
                         var itemToUpdate = order[itemModelObject.itemNameRight];
@@ -1252,6 +1279,7 @@ namespace ServingFresh.Views
                         itemSelected.description = itemModelObject.item_descRight;
                         itemSelected.business_price = itemModelObject.item_businessPriceRight;
                         itemSelected.taxable = itemModelObject.itemTaxableRight;
+                        itemSelected.isItemAvailable = true;
                         order.Add(itemModelObject.itemNameRight, itemSelected);
                     }
 
@@ -1259,7 +1287,9 @@ namespace ServingFresh.Views
                     {
                         itemModelObject.colorRight = Color.FromHex("#FFFFFF");
                         itemModelObject.colorRightUpdate = Color.FromHex("#FFFFFF");
+                        order.Remove(itemModelObject.itemNameRight);
                     }
+                    UpdateNumberOfItemsInCart();
                 }
                 else
                 {
@@ -1282,7 +1312,8 @@ namespace ServingFresh.Views
                 itemModelObject.colorRightUpdate = Color.FromHex("#ffce99");
                 itemModelObject.quantityR += 1;
                 totalCount += 1;
-                CartTotal.Text = totalCount.ToString();
+                //CartTotal.Text = totalCount.ToString();
+                
                 if (order.ContainsKey(itemModelObject.itemNameRight))
                 {
                     var itemToUpdate = order[itemModelObject.itemNameRight];
@@ -1301,10 +1332,11 @@ namespace ServingFresh.Views
                     itemSelected.description = itemModelObject.item_descRight;
                     itemSelected.business_price = itemModelObject.item_businessPriceRight;
                     itemSelected.taxable = itemModelObject.itemTaxableRight;
+                    itemSelected.isItemAvailable = true;
                     order.Add(itemModelObject.itemNameRight, itemSelected);
                 }
+                UpdateNumberOfItemsInCart();
             }
-
         }
 
         private Dictionary<string, ItemPurchased> purchase = new Dictionary<string, ItemPurchased>();
@@ -1316,15 +1348,40 @@ namespace ServingFresh.Views
             {
                 if (order[item].item_quantity != 0)
                 {
+                    if (!selectedDeliveryDate.business_uids.Contains(order[item].pur_business_uid))
+                    {
+                        order[item].isItemAvailable = false;
+                    }
+                    else
+                    {
+                        order[item].isItemAvailable = true;
+                    }
+                    Debug.WriteLine("ITEM NAME: {0}, IS ITEM AVAILABLE: {1}", item, order[item].isItemAvailable);
                     purchase.Add(item, order[item]);
                 }
             }
 
+
             Application.Current.Properties["day"] = title.Text;
-            Application.Current.MainPage = new CheckoutPage(purchase, title.Text);
+            Application.Current.MainPage = new CheckoutPage(purchase, selectedDeliveryDate);
+            //Application.Current.MainPage = new CartPage(purchase, selectedDeliveryDate);
         }
 
-
+        void UpdateNumberOfItemsInCart()
+        {
+            var totalItemsToDelivery = 0;
+            foreach (string item in order.Keys)
+            {
+                if (order[item].item_quantity != 0)
+                {
+                    if (selectedDeliveryDate.business_uids.Contains(order[item].pur_business_uid))
+                    {
+                        totalItemsToDelivery += order[item].item_quantity;
+                    }
+                }
+            }
+            CartTotal.Text = totalItemsToDelivery.ToString();
+        }
 
 
         public List<DateTime> GetBusinessSchedule(ServingFreshBusiness data, string businessID)
@@ -1702,12 +1759,6 @@ namespace ServingFresh.Views
                 }
             }
 
-            //foreach(string type in filterTypes)
-            //{
-            //    Debug.WriteLine("FILTER TYPE: " + type);
-            //}
-
-            // items
 
             if(filterTypes.Count != 0)
             {
@@ -1720,12 +1771,51 @@ namespace ServingFresh.Views
                     }
                 }
                 GetData(filteredList);
+
             }
             else
             {
                 GetData(data.result);
             }
-            
+
+            foreach (ItemsModel i in datagrid)
+            {
+                //i.colorLeftUpdate = Color.FromHex("#FFFFFF");
+                //i.colorRightUpdate = Color.FromHex("#FFFFFF");
+                i.opacityLeftUpdate = 1;
+                i.opacityRightUpdate = 1;
+                i.isItemLeftEnableUpdate = true;
+                i.isItemRightEnableUpdate = true;
+                i.isItemLeftUnavailableUpdate = false;
+                i.isItemRightUnavailableUpdate = false;
+
+                if (!selectedDeliveryDate.business_uids.Contains(i.itm_business_uidLeft))
+                {
+                    i.opacityLeftUpdate = 0.5;
+                    i.isItemLeftEnableUpdate = false;
+                    i.isItemLeftUnavailableUpdate = true;
+                }
+
+                if (!selectedDeliveryDate.business_uids.Contains(i.itm_business_uidRight))
+                {
+                    i.opacityRightUpdate = 0.5;
+                    i.isItemRightEnableUpdate = false;
+                    i.isItemRightUnavailableUpdate = true;
+                }
+
+                if (order.ContainsKey(i.itemNameLeft))
+                {
+                    i.colorLeftUpdate = Color.FromHex("#ffce99");
+                    i.quantityL = order[i.itemNameLeft].item_quantity;
+                }
+
+                if (order.ContainsKey(i.itemNameRight))
+                {
+                    i.colorRightUpdate = Color.FromHex("#ffce99");
+                    i.quantityR = order[i.itemNameRight].item_quantity;
+                }
+            }
+            UpdateNumberOfItemsInCart();
         }
 
         string GetImageSouce(string name)
@@ -1786,8 +1876,9 @@ namespace ServingFresh.Views
             var dm = (ScheduleInfo)tgr.CommandParameter;
             string weekday = dm.delivery_dayofweek;
 
+            selectedDeliveryDate = dm;
             deliveryTime.Text = dm.delivery_time;
-            orderBy.Text = dm.orderExpTime;
+            orderBy.Text = "(" + dm.orderExpTime + ")";
 
             Debug.WriteLine(weekday);
             foreach(string b_uid in dm.business_uids)
@@ -1809,19 +1900,29 @@ namespace ServingFresh.Views
 
             foreach (ItemsModel i in datagrid)
             {
-                i.colorLeftUpdate = Color.FromHex("#FFFFFF");
-                i.colorRightUpdate = Color.FromHex("#FFFFFF");
+                //i.colorLeftUpdate = Color.FromHex("#FFFFFF");
+                //i.colorRightUpdate = Color.FromHex("#FFFFFF");
+                i.opacityLeftUpdate = 1;
+                i.opacityRightUpdate = 1;
+                i.isItemLeftEnableUpdate = true;
+                i.isItemRightEnableUpdate = true;
+                i.isItemLeftUnavailableUpdate = false;
+                i.isItemRightUnavailableUpdate = false;
 
                 if (!dm.business_uids.Contains(i.itm_business_uidLeft))
                 {
-                    i.colorLeftUpdate = Color.FromHex("#a19797");
+                    i.opacityLeftUpdate = 0.5;
+                    i.isItemLeftEnableUpdate = false;
+                    i.isItemLeftUnavailableUpdate = true;
                 }
                 else if (!dm.business_uids.Contains(i.itm_business_uidRight))
                 {
-                    i.colorRightUpdate = Color.FromHex("#a19797");
+                    i.opacityRightUpdate = 0.5;
+                    i.isItemRightEnableUpdate = false;
+                    i.isItemRightUnavailableUpdate = true;
                 }
             }
-
+            UpdateNumberOfItemsInCart();
             //ItemsPage businessItemPage = new ItemsPage(types, dm.business_uids, weekday);
             //Application.Current.MainPage = businessItemPage;
         }

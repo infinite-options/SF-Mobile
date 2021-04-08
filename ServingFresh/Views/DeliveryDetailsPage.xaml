@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:maps="clr-namespace:Xamarin.Forms.Maps;assembly=Xamarin.Forms.Maps"
+    x:Class="ServingFresh.Views.DeliveryDetailsPage">
+    <ContentPage.Content>
+    <Grid RowSpacing="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="94"></RowDefinition>
+                <RowDefinition Height="50"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition x:Name="paypalRow" Height="0"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" ColumnSpacing="0" BackgroundColor="#136D74">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="60"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <StackLayout Grid.Column="0" Margin="60,40,0,0" Spacing="0" HorizontalOptions="Center" >
+                     <Label x:Name="title" HorizontalOptions="CenterAndExpand" HorizontalTextAlignment="Center" VerticalOptions="Center" Text="Enter delivery details" FontSize="24" TextColor="#FFFFFF" FontAttributes="Bold"></Label>
+                </StackLayout>
+                <StackLayout Grid.Column="1" Margin="0,15,0,0" VerticalOptions="Center" HorizontalOptions="Center">
+                    <RelativeLayout
+                        RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}"
+                        RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}">
+                        <Image Margin="0,20,0,0" Source="CartIcon.png" HeightRequest="40">
+                            <Image.GestureRecognizers>
+                                <TapGestureRecognizer ></TapGestureRecognizer>
+                            </Image.GestureRecognizers>
+                        </Image>
+                        <Frame Margin="30,20,0,0" HeightRequest="20" MinimumWidthRequest="20" CornerRadius="10" Padding="0" HasShadow="False">
+                            <Label x:Name="cartItemsNumber" Margin="5,1,5,0" Text="0"  TextColor="#FF8500" FontSize="14" FontAttributes="Bold"></Label>
+                        </Frame>
+                    </RelativeLayout>
+                </StackLayout>
+            </Grid>
+            <StackLayout Grid.Row="1" Margin="0,0,0,0" HeightRequest="50" Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
+                <Label VerticalTextAlignment="Center" Text="Enter Delivery Details" TextColor="#136D74" TextDecorations="Underline" FontSize="9" FontAttributes="Bold"></Label>
+                <Label VerticalTextAlignment="Center" Text=">" TextColor="#136D74" TextDecorations="Underline" FontSize="9" FontAttributes="Bold"></Label>
+                <Label VerticalTextAlignment="Center" Text="Complete Payment" TextColor="#136D74" TextDecorations="Underline" FontSize="9" FontAttributes="Bold"></Label>
+                <Label VerticalTextAlignment="Center" Text=">" TextColor="#136D74" TextDecorations="Underline" FontSize="9" FontAttributes="Bold"></Label>
+                <Label VerticalTextAlignment="Center" Text="Order Confirmation" TextColor="#136D74" TextDecorations="Underline" FontSize="9" FontAttributes="Bold"></Label>
+            </StackLayout>
+            <Frame Grid.Row="2" CornerRadius="20" HasShadow="False">
+                <StackLayout>
+                    <ScrollView>
+                        <StackLayout>
+                            <StackLayout>
+                                <Entry x:Name="firstName" Placeholder="First name (so we can address you)" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
+                                <Entry x:Name="lastName" Placeholder="Last name (in case you want to be formal)" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
+                                <Entry x:Name="phoneNumber" Placeholder="Phone number (so we can call if there is an issue)" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
+                                <Entry x:Name="emailAddress" Placeholder="Email address (for order confirmation)" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
+                            </StackLayout>
+                            <StackLayout>
+                                <Frame Margin="1,5,1,10" HeightRequest="100" BackgroundColor="LightGray" CornerRadius="20" HasShadow="False" Padding="0" IsClippedToBounds="True">
+                                    <maps:Map HeightRequest="1"
+                                        x:Name="map"
+                                        IsVisible="true">
+                                    </maps:Map>
+                                </Frame>
+                            </StackLayout>
+                            <StackLayout>
+                                <Grid>
+                                    <Label Grid.Column="0" Text="Push Notifications" TextColor="Gray" FontSize="18" FontAttributes="Bold" VerticalTextAlignment="Center"></Label>
+                                    <Switch Grid.Column="1" HorizontalOptions="End"></Switch>
+                                </Grid>
+                            </StackLayout>
+                            <StackLayout Padding="20,10,20,0" Spacing="15">
+                                <Button Text="Checkout with Stripe" Clicked="CheckoutWithStripe" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold"></Button>
+                                <Button Text="Checkout with PayPal" Clicked="CheckoutWithPayPal" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold"></Button>
+                            </StackLayout>
+                            <StackLayout Margin="0,30,0,0" x:Name="stripeInformationView" HeightRequest="0">
+                                <Entry x:Name="cardHolderName" Placeholder="Cardholder Name" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                        <ColumnDefinition Width="100"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Entry Grid.Column="0" x:Name="cardHolderNumber" MaxLength="16" Placeholder="Card Number" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
+                                    <Entry Grid.Column="1" x:Name="cardCVV" Placeholder="CVV" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
+                                </Grid>
+                                <Grid>
+                                    <Entry Grid.Column="0" x:Name="cardExpMonth" MaxLength="2" Placeholder="Exp MM" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
+                                    <Entry Grid.Column="1" x:Name="cardExpYear" MaxLength="2" Placeholder="Exp YYYY" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
+                                    <Entry Grid.Column="2" x:Name="cardZip" MaxLength="5" Placeholder="ZIP" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
+                                </Grid>
+                                <Button Margin="0,15,0,0" HeightRequest="59" Text="Complete Payment with Stripe" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="CompletePaymentWithStripe"></Button>
+                            </StackLayout>
+                        </StackLayout>
+                    </ScrollView>
+            </StackLayout>
+            </Frame>
+            <Frame Grid.Row="3" Margin="1,0,1,0" CornerRadius="10" BorderColor="#2B6D74">
+                 <WebView x:Name="webView" HeightRequest="100"></WebView>
+            </Frame>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>
