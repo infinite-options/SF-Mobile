@@ -30,5 +30,11 @@ namespace ServingFresh.Views
             map.MoveToRegion(mapSpan);
             map.Pins.Add(address);
         }
+
+        void ReturnToStore(System.Object sender, System.EventArgs e)
+        {
+            Application.Current.MainPage = new SelectionPage();
+        }
+
     }  
 }

@@ -5,17 +5,17 @@
     x:Class="ServingFresh.Views.RefundPage"
     xmlns:servingfresh="clr-namespace:ServingFresh.Effects">
     <ContentPage.Content>
-        <Grid RowSpacing="0" Margin="0,0,0,0" BackgroundColor="White">
+        <Grid RowSpacing="0" BackgroundColor="White">
             <Grid.RowDefinitions>
-                <RowDefinition Height="35"></RowDefinition>
-                <RowDefinition Height="95"></RowDefinition>
-                <RowDefinition Height="1"></RowDefinition>
-                <RowDefinition Height="65"></RowDefinition>
+                <RowDefinition Height="94"></RowDefinition>
+                <RowDefinition Height="60"></RowDefinition>
+                <!--<RowDefinition Height="1"></RowDefinition>
+                <RowDefinition Height="65"></RowDefinition>-->
                 <RowDefinition Height="*"></RowDefinition>
                 <RowDefinition Height="80"></RowDefinition>
             </Grid.RowDefinitions>
-            <Label Grid.Row="0" BackgroundColor="#136D74"></Label>
-            <Grid Grid.Row="1" BackgroundColor="#136D74">
+            <!--<Label Grid.Row="0" BackgroundColor="#136D74"></Label>-->
+            <!--<Grid Grid.Row="1" BackgroundColor="#136D74">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="70"></ColumnDefinition>
                     <ColumnDefinition Width="*"></ColumnDefinition>
@@ -52,10 +52,10 @@
                     TranslationY="-12"
                     VerticalOptions="Center"
                     HorizontalOptions="End"/>
-            </Grid>
-            <BoxView Grid.Row="2" HeightRequest="1" BackgroundColor="Black"></BoxView>
-            <Grid
-                Grid.Row="3"
+            </Grid>-->
+            <!--<BoxView Grid.Row="2" HeightRequest="1" BackgroundColor="Black"></BoxView>-->
+            <!--<Grid
+                Grid.Row="1"
                 ColumnSpacing="0.5"
                 BackgroundColor="#136D74">
                 <Grid.ColumnDefinitions>
@@ -78,22 +78,68 @@
                 </Label>
                 <BoxView WidthRequest="1" BackgroundColor="Black" VerticalOptions="FillAndExpand" Grid.Column="3"/>
                 <Label Text="Refund" StyleClass="h3, secondary, center" Grid.Column="4" VerticalTextAlignment="Center"/>
+            </Grid>-->
+                        <Grid Grid.Row="0" ColumnSpacing="0" BackgroundColor="#136D74">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="100"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <StackLayout Grid.Column="0" Margin="100,40,0,0" Spacing="0" >
+                     <Label x:Name="title" HorizontalOptions="CenterAndExpand" VerticalOptions="Center" Text="Refunds" FontSize="30" TextColor="#FFFFFF" FontAttributes="Bold"></Label>
+                </StackLayout>
+                <StackLayout Grid.Column="1" Margin="0,15,0,0" VerticalOptions="Center" HorizontalOptions="Center">
+                    <RelativeLayout
+                        RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}"
+                        RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}">
+                        <Image Margin="0,20,0,0" Source="CartIcon.png" HeightRequest="40">
+                            <Image.GestureRecognizers>
+                                <TapGestureRecognizer></TapGestureRecognizer>
+                            </Image.GestureRecognizers>
+                        </Image>
+                        <Frame Margin="30,20,0,0" HeightRequest="20" MinimumWidthRequest="20" CornerRadius="10"  Padding="0" HasShadow="False">
+                            <Label x:Name="CartTotal" Margin="5,1,5,0" Text="0"  TextColor="#FF8500" FontSize="14" FontAttributes="Bold"></Label>
+                        </Frame>
+                    </RelativeLayout>
+                </StackLayout>
             </Grid>
-            <StackLayout Grid.Row="4">
+            <Grid Grid.Row="1">
+                <StackLayout Grid.Column="0" VerticalOptions="Center" Opacity="0.5">
+                    <Label Text="Cart" TextColor="#136D74"  FontSize="20" HorizontalTextAlignment="Center"></Label>
+                    <BoxView HeightRequest="1" Color="#136D74" Margin="10,0,10,0"></BoxView>
+                    <StackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="openCheckout"/>
+                    </StackLayout.GestureRecognizers>
+                </StackLayout>
+                <StackLayout Grid.Column="1" VerticalOptions="Center" Opacity="0.5">
+                    <Label Text="History" TextColor="#136D74" FontSize="20" HorizontalTextAlignment="Center"></Label>
+                    <BoxView HeightRequest="1" Color="#136D74" Margin="10,0,10,0"></BoxView>
+                    <StackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="openHistory"/>
+                    </StackLayout.GestureRecognizers>
+                </StackLayout>
+                <StackLayout Grid.Column="2" VerticalOptions="Center" Opacity="1">
+                    <Label Text="Refunds" TextColor="#136D74" FontSize="20" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
+                    <BoxView HeightRequest="1" Color="#136D74" Margin="10,0,10,0"></BoxView>
+                </StackLayout>
+            </Grid>
+            <StackLayout Grid.Row="2">
                 <ScrollView>
-                    <StackLayout Padding="10,0,10,0">
-                        <Frame HeightRequest="300" BackgroundColor="White">
+                    <StackLayout Padding="5,0,5,0">
+                        <Frame HeightRequest="320" BackgroundColor="#F8FAFA" HasShadow="False">
                             <Image x:Name="refundItemImage" BackgroundColor="White"/>
                         </Frame>
-                        
-                        <Button Text="Take Photo" StyleClass="btn, secondary-outline" Clicked="TakePictureClick"/>
-                        <Button Text="Choose a Photo from Gallery" StyleClass="btn, secondary-outline" Clicked="ChoosePictureFromGalleryClick"/>
-                        <StackLayout Padding="15,0" Spacing="15">
-                            <Label Text="Easy Peasy Return Instructions" StyleClass="h1, black, center"/>
-                            <Label Text="1. Take a picture of what you want to return" StyleClass="p, black"/>
-                            <Label Text="2. Enter your email address and a note (required)" StyleClass="p, black"/>
-                            <Label Text="3. Press send" StyleClass="p, black"/>
-                            <Label Text="We'll either add your items to our next delivery or issue you a coupon code for your next order! Tell us if you have a preference. Easy peasy!" StyleClass="p, black"/>
+                        <StackLayout Margin="16,0,16,0">
+                            <Button Text="Take Photo" TextColor="White" FontSize="14" FontAttributes="Bold" BackgroundColor="#FF8500" Clicked="TakePictureClick"/>
+                            <Button Text="Choose a Photo from Gallery" FontSize="14" FontAttributes="Bold" TextColor="White" BackgroundColor="#FF8500" Clicked="ChoosePictureFromGalleryClick"/>
+                        </StackLayout>
+                        <StackLayout HeightRequest="28" Margin="0,10,0,10">
+                            <Label Text="Easy Peasy Return Instructions" HorizontalTextAlignment="Center" TextColor="Black" FontSize="22" FontAttributes="Bold"/>
+                        </StackLayout>
+                        <StackLayout Padding="12,0,8,0" Spacing="22">
+                            <Label Text="1. Take a picture of what you want to return" TextColor="Black" FontSize="14"/>
+                            <Label Text="2. Enter your email address and a note (required)" TextColor="Black" FontSize="14"/>
+                            <Label Text="3. Press send" TextColor="Black" FontSize="14"/>
+                            <Label Text="We'll either add your items to our next delivery or issue you a coupon code for your next order! Tell us if you have a preference. Easy peasy!" TextColor="Black" FontSize="14"/>
                         </StackLayout>
                         <Entry x:Name="refundEmail" Placeholder="Your Email Goes Here" TextColor="Black" PlaceholderColor="Gray" ></Entry>
                         <Entry x:Name="refundNote" Placeholder="Add Note Goes Here" TextColor="Black" PlaceholderColor="Gray" ></Entry>
@@ -101,29 +147,35 @@
                     </StackLayout>
                 </ScrollView>
             </StackLayout>
-            <Grid Grid.Row="5" BackgroundColor="WhiteSmoke">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="45"></RowDefinition>
-                    <RowDefinition Height="*"></RowDefinition>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-                <ImageButton Grid.Row="0" Grid.Column="0" BackgroundColor="Transparent" Source="CalendarI" Padding="6" Clicked="DeliveryDaysClick"></ImageButton>
-                <Label Grid.Row="1" Grid.Column="0" Text="Days" HorizontalTextAlignment="Center"></Label>
-                <ImageButton Grid.Row="0" Grid.Column="1" BackgroundColor="Transparent" Source="RefundIcon" Padding="6" Clicked="OrdersClick">
-                    <ImageButton.Effects>
-                        <servingfresh:TintImageEffect TintColor="#FF8500"/>
-                    </ImageButton.Effects>
-                </ImageButton>
-                <Label Grid.Row="1" Grid.Column="1" Text="Orders" HorizontalTextAlignment="Center"></Label>
-                <ImageButton Grid.Row="0" Grid.Column="2" BackgroundColor="Transparent" Source="InfoIcon" Padding="6" Clicked="InfoClick"></ImageButton>
-                <Label Grid.Row="1" Grid.Column="2" Text="Info" HorizontalTextAlignment="Center"></Label>
-                <ImageButton Grid.Row="0" Grid.Column="3" BackgroundColor="Transparent" Source="UserIcon" Padding="6" Clicked="ProfileClick"></ImageButton>
-                <Label Grid.Row="1" Grid.Column="3" Text="Profile" HorizontalTextAlignment="Center"></Label>
+            <Grid Grid.Row="3" BackgroundColor="WhiteSmoke" >
+                <StackLayout Grid.Column="0" VerticalOptions="Center" Spacing="0">
+                    <Frame Padding="0" BackgroundColor="Transparent" HasShadow="False"  HeightRequest="46" WidthRequest="46">
+                        <ImageButton Grid.Row="0" Grid.Column="0" BackgroundColor="Transparent" Source="CalendarI" Padding="6" Clicked="DeliveryDaysClick"></ImageButton>
+                    </Frame>
+                    <Label Margin="0,-3,0,0" Text="Days" TextColor="#979797" FontSize="12" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
+                </StackLayout>
+                <StackLayout Grid.Column="1" VerticalOptions="Center" Spacing="0">
+                    <Frame Padding="0" BackgroundColor="Transparent" HasShadow="False"  HeightRequest="46" WidthRequest="46">
+                        <ImageButton Grid.Row="0" Grid.Column="1" BackgroundColor="Transparent" Source="RefundIcon" Padding="6" Clicked="OrdersClick">
+                            <ImageButton.Effects>
+                                <servingfresh:TintImageEffect TintColor="#FF8500"/>
+                            </ImageButton.Effects>
+                        </ImageButton>
+                    </Frame>
+                    <Label Margin="0,-3,0,0" Text="Orders" TextColor="#979797" FontSize="12" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
+                </StackLayout>
+                <StackLayout Grid.Column="2" VerticalOptions="Center" Spacing="0">
+                    <Frame Padding="0" BackgroundColor="Transparent" HasShadow="False"  HeightRequest="46" WidthRequest="46">
+                        <ImageButton Grid.Row="0" Grid.Column="2" BackgroundColor="Transparent" Source="InfoIcon" Padding="6" Clicked="InfoClick"></ImageButton>
+                    </Frame>
+                    <Label Margin="0,-3,0,0" Text="Info" TextColor="#979797" FontSize="12" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
+                </StackLayout>
+                <StackLayout Grid.Column="3" VerticalOptions="Center" Spacing="0">
+                    <Frame Padding="0" BackgroundColor="Transparent" HasShadow="False"  HeightRequest="46" WidthRequest="46">
+                        <ImageButton Grid.Row="0" Grid.Column="3" BackgroundColor="Transparent" Source="UserIcon" Padding="6" Clicked="ProfileClick"></ImageButton>
+                    </Frame>
+                    <Label Margin="0,-3,0,0" Text="Profile" TextColor="#979797" FontSize="12" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
+                </StackLayout>
             </Grid>
         </Grid>
     </ContentPage.Content>

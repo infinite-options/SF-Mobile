@@ -30,7 +30,7 @@ namespace ServingFresh.Views
 
         void OrderscClick(System.Object sender, System.EventArgs e)
         {
-            Application.Current.MainPage = new CheckoutPage();
+            Application.Current.MainPage = new CheckoutPage("info");
         }
 
         void InfoClick(System.Object sender, System.EventArgs e)

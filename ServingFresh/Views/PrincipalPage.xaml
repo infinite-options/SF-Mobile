@@ -69,7 +69,11 @@
                                     Margin="20,10,10,0"
                                     Grid.Column="0"
                                     VerticalOptions="Start">
-                                    <Image Source="asGuestIcon.png"></Image>
+                                    <Image Source="asGuestIcon.png">
+                                        <Image.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"></TapGestureRecognizer>
+                                        </Image.GestureRecognizers>
+                                    </Image>
                                 </StackLayout>
                                 <StackLayout
                                     Margin="10,20,20,0"

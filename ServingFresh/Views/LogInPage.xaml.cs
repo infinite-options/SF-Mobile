@@ -855,5 +855,10 @@ namespace ServingFresh.Views
         {
             Application.Current.MainPage = new SignUpPage();
         }
+
+        void ReturnBackToPrincipalPage(System.Object sender, System.EventArgs e)
+        {
+            Application.Current.MainPage = new PrincipalPage();
+        }
     }
 }

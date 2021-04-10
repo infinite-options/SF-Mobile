@@ -216,7 +216,7 @@ namespace ServingFresh.Views
         private int appliedIndex = -1;
         double savings = 0;
         public string deliveryDay = "";
-        public IDictionary<string, ItemPurchased> orderCopy = new Dictionary<string,ItemPurchased>();
+        public Dictionary<string, ItemPurchased> orderCopy = new Dictionary<string,ItemPurchased>();
         public string cartEmpty = "";
 
         public ScheduleInfo deliveryInfo;
@@ -228,11 +228,36 @@ namespace ServingFresh.Views
 
         // =========================
 
+        public CheckoutPage(string another)
+        {
+            InitializeComponent();
+            CartItems.HeightRequest = 0;
+            if ((bool)Application.Current.Properties["guest"])
+            {
+                customerPaymentsView.HeightRequest = 0;
+                customerStripeInformationView.HeightRequest = 0;
+                customerDeliveryAddressView.HeightRequest = 0;
+            }
+            else
+            {
+                guestAddressInfoView.HeightRequest = 0;
+                guestPaymentsView.HeightRequest = 0;
+            }
+        }
+
+
         public CheckoutPage(IDictionary<string, ItemPurchased> order = null, ScheduleInfo deliveryInfo = null)
         {
             InitializeComponent();
             this.deliveryInfo = deliveryInfo;
-            expectedDelivery.Text = deliveryInfo.deliveryTimeStamp.ToString("dddd, MMM dd, yyyy, ") + " between " + deliveryInfo.delivery_time;
+            if(deliveryInfo != null)
+            {
+                expectedDelivery.Text = deliveryInfo.deliveryTimeStamp.ToString("dddd, MMM dd, yyyy, ") + " between " + deliveryInfo.delivery_time;
+            }
+            else
+            {
+                expectedDelivery.Text = "";
+            }
             Application.Current.Properties["delivery_date"] = deliveryInfo.delivery_date;
             Application.Current.Properties["delivery_time"] = deliveryInfo.delivery_time;
             Application.Current.Properties["deliveryDate"] = deliveryInfo.deliveryTimeStamp;
@@ -361,7 +386,8 @@ namespace ServingFresh.Views
                 InitializeMap();
                 GetAvailiableCoupons();
                 GetDeliveryInstructions();
-
+                guestAddressInfoView.HeightRequest = 0;
+                guestPaymentsView.HeightRequest = 0;
                 if ((string)Application.Current.Properties["day"] == "")
                 {
                     order = null;
@@ -389,6 +415,7 @@ namespace ServingFresh.Views
                             description = order[key].description,
                             business_price = order[key].business_price,
                             taxable = order[key].taxable,
+                            isItemAvailable = order[key].isItemAvailable,
                         });
                         orderCopy.Add(key, order[key]);
                     }
@@ -843,7 +870,7 @@ namespace ServingFresh.Views
             }
         }
 
-        void CartClick(System.Object sender, System.EventArgs e)
+        void ReturnToStore(System.Object sender, System.EventArgs e)
         {
             if(cartEmpty != "EMPTY")
             {
@@ -857,12 +884,42 @@ namespace ServingFresh.Views
                         }
                     }
                 }
-                Application.Current.MainPage = new ItemsPage(orderCopy, deliveryDay);
+                //Application.Current.MainPage = new ItemsPage(orderCopy, deliveryDay);
+                foreach(string itemKey in orderCopy.Keys)
+                {
+                    Debug.WriteLine("ITEM NAME IN ORDER: {0}, ITEM QUANTITY: {1}", itemKey, orderCopy[itemKey].item_quantity);
+                }
+                Debug.WriteLine("PASSED ON TO SELECTION PAGE WITH LOCATION AND PREVIOUS ORDER");
+                Application.Current.MainPage = new SelectionPage(GetCurrentLocation(), orderCopy);
             }
             else
             {
                 Application.Current.MainPage = new SelectionPage();
             }
+        }
+
+        Location GetCurrentLocation()
+        {
+            var location = new Location();
+            try
+            {
+                var latitudeString = Application.Current.Properties.ContainsKey("user_latitude")? (string)Application.Current.Properties["user_latitude"]: "0.0";
+                var longitudeString = Application.Current.Properties.ContainsKey("user_longitude") ? (string)Application.Current.Properties["user_longitude"] : "0.0";
+
+                if(latitudeString != "" && longitudeString != "")
+                {
+                    location.Latitude = double.Parse(latitudeString);
+                    location.Longitude = double.Parse(longitudeString);
+                }
+            }
+            catch (Exception parsingCoordinatesIssue)
+            {
+                // set longitude and latitude to zero
+                Debug.WriteLine("ISSUE PARSING COORDINATES: " + parsingCoordinatesIssue.Message);
+                location.Latitude = 0;
+                location.Longitude = 0;
+            }
+            return location;
         }
 
         void ApplyActiveCoupon(System.Object sender, System.EventArgs e)
@@ -965,7 +1022,7 @@ namespace ServingFresh.Views
             }
 
             GrandTotal.Text = "$" + total.ToString("N2");
-            viewTotal.Text = "$" + total.ToString("N2");
+            //viewTotal.Text = "$" + total.ToString("N2");
             CartTotal.Text = total_qty.ToString();
             //driver_tips = tips;
         }
@@ -1009,36 +1066,28 @@ namespace ServingFresh.Views
         }
 
 
-
-        public void AddItems(object sender, EventArgs e)
-        {
-            if (cartEmpty != "EMPTY")
-            {
-                foreach (ItemObject i in cartItems)
-                {
-                    foreach (string key in orderCopy.Keys)
-                    {
-                        if (orderCopy[key].item_name == i.name)
-                        {
-                            orderCopy[key].item_quantity = i.qty;
-                        }
-                    }
-                }
-                Application.Current.MainPage = new ItemsPage(orderCopy, deliveryDay);
-            }
-            else
-            {
-                Application.Current.MainPage = new SelectionPage();
-            }
-        }
-
         public async void checkoutAsync(object sender, EventArgs e)
         {
+
+
             if (total > 0 && cartEmpty != "EMPTY")
             {
-           
-            //cardHolderEmail.Text = purchaseObject.delivery_email;
-            //cardHolderName.Text = purchaseObject.delivery_first_name + " " + purchaseObject.delivery_last_name;
+
+                var button = (Button)sender;
+
+                if (button.BackgroundColor == Color.FromHex("#FF8500"))
+                {
+                    button.BackgroundColor = Color.FromHex("#2B6D74");
+                    customerStripeInformationView.HeightRequest = 194;
+
+                }
+                else
+                {
+                    button.BackgroundColor = Color.FromHex("#FF8500");
+                    customerStripeInformationView.HeightRequest = 0;
+                }
+                //cardHolderEmail.Text = purchaseObject.delivery_email;
+                cardHolderName.Text = purchaseObject.delivery_first_name + " " + purchaseObject.delivery_last_name;
             //cardHolderAddress.Text = purchaseObject.delivery_address;
             //cardHolderUnit.Text = purchaseObject.delivery_unit;
             //cardState.Text = purchaseObject.delivery_state;
@@ -1064,9 +1113,9 @@ namespace ServingFresh.Views
             {
                 //cardframe.Height = this.Height;
             }
-           
-            //options.Height = 0;
-            
+
+            customerStripeInformationView.HeightRequest = 194;
+
             string dateTime = DateTime.Parse((string)Application.Current.Properties["delivery_date"]).ToString("yyyy-MM-dd");
             string t = (string)Application.Current.Properties["delivery_time"];
             Debug.WriteLine("DELIVERY DATE: " + dateTime);
@@ -1096,7 +1145,7 @@ namespace ServingFresh.Views
             purchaseObject.payment_type = ((Button)sender).Text == "Checkout with Paypal" ? "PAYPAL" : "STRIPE";
             purchaseObject.items = GetOrder(cartItems);
             purchaseObject.start_delivery_date = ((DateTime)Application.Current.Properties["deliveryDate"]).ToString("yyyy-MM-dd HH:mm:ss");
-                if (!(bool)Application.Current.Properties["guest"])
+            if (!(bool)Application.Current.Properties["guest"])
             {
                 if (appliedIndex != -1)
                 {
@@ -1181,28 +1230,28 @@ namespace ServingFresh.Views
         {
             if (total > 0 && cartEmpty != "EMPTY")
             {
-                if ((bool)Application.Current.Properties["guest"])
-                {
-                    if (purchaseObject.delivery_first_name == "" || purchaseObject.delivery_last_name == "" || purchaseObject.delivery_email == "")
-                    {
-                        await DisplayAlert("Oops", "Please enter your delivery contact information!", "OK");
-                        //contactframe.Height = this.Height / 2;
-                        return;
-                    }
-                }
-                
-                //if (deliveryInstructions.Text != null)
+                //if ((bool)Application.Current.Properties["guest"])
                 //{
-                //    if (deliveryInstructions.Text.Trim() == "SFTEST")
+                //    if (purchaseObject.delivery_first_name == "" || purchaseObject.delivery_last_name == "" || purchaseObject.delivery_email == "")
                 //    {
-                //        Debug.WriteLine("DELIVERY INSTRUCTIONS WERE SET 'SFTEST' ");
-                //        mode = "TEST";
-                //        clientId = Constant.TestClientId;
-                //        secret = Constant.TestSecret;
+                //        await DisplayAlert("Oops", "Please enter your delivery contact information!", "OK");
+                //        //contactframe.Height = this.Height / 2;
+                //        return;
                 //    }
                 //}
 
-                if(Device.RuntimePlatform == Device.Android)
+                if (deliveryInstructions.Text != null)
+                {
+                    if (deliveryInstructions.Text.Trim() == "SFTEST")
+                    {
+                        Debug.WriteLine("DELIVERY INSTRUCTIONS WERE SET 'SFTEST' ");
+                        mode = "TEST";
+                        clientId = Constant.TestClientId;
+                        secret = Constant.TestSecret;
+                    }
+                }
+
+                if (Device.RuntimePlatform == Device.Android)
                 {
                     UpdateTotalAmount(sender, e);
                 }
@@ -1232,7 +1281,7 @@ namespace ServingFresh.Views
                 purchaseObject.cc_cvv = "";
                 purchaseObject.cc_zip = "";
                 purchaseObject.charge_id = "";
-                purchaseObject.payment_type = ((Button)sender).Text == "Checkout with Paypal" ? "PAYPAL" : "STRIPE";
+                purchaseObject.payment_type = "PAYPAL";
                 purchaseObject.items = GetOrder(cartItems);
                 purchaseObject.start_delivery_date = ((DateTime)Application.Current.Properties["deliveryDate"]).ToString("yyyy-MM-dd HH:mm:ss");
                 if (!(bool)Application.Current.Properties["guest"])
@@ -1273,7 +1322,7 @@ namespace ServingFresh.Views
                 var factor = 200 * point;
 
                 paypalframe.Height = this.Height -136;
-                webViewPage.HeightRequest = this.Height -136;
+                //webViewPage.HeightRequest = this.Height -136;
                 //options.Height = 0;
                 
                 var response = await createOrder(purchaseObject.amount_due);
@@ -1488,7 +1537,7 @@ namespace ServingFresh.Views
                             else
                             {
                                 purchaseObject.delivery_instructions = deliveryInstructions.Text;
-                                purchaseObject.delivery_instructions = "";
+                                //purchaseObject.delivery_instructions = "";
                             }
                             purchaseObject.subtotal = GetSubTotal().ToString("N2");
                             purchaseObject.service_fee = service_fee.ToString("N2");

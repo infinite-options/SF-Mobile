@@ -75,6 +75,7 @@
                                     <Entry Placeholder="Create Password" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
                                     <Entry Placeholder="Confirm Password" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
                                     <Button Margin="0,15,0,0" Text="Sign up" Font="20" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold"></Button>
+                                    <Button Margin="0,15,0,0" Text="Return to store" Clicked="ReturnToStore" Font="20" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold"></Button>
                                 </StackLayout>
                             </StackLayout>
                         </ScrollView>

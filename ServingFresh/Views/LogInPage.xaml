@@ -1,108 +1,107 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="ServingFresh.Views.LogInPage">
     <ContentPage.Content>
-        <RelativeLayout
-            HorizontalOptions="Fill"
-            VerticalOptions="Fill"
-            BackgroundColor="WhiteSmoke">
-            <Image
-                Source="welcomeBackground.png"
-                Aspect="Fill">
-            </Image>
-            <StackLayout
-                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}"
-                RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}">
-                <Frame BackgroundColor="Transparent" HasShadow="False">
-                    <Image
-                        Source="servingFreshIcon.png">
-                    </Image>
-                    <Frame.Padding>
-                        <OnPlatform x:TypeArguments="Thickness">
-                            <On Platform="Android" Value="50,0,50,0"></On>
-                            <On Platform="iOS" Value="50,40,50,0"></On>
-                        </OnPlatform>
-                    </Frame.Padding>
-                </Frame>
-                <StackLayout Padding="50,0,50,0">
-                    <Entry
-                        x:Name="userEmailAddress"
-                        Placeholder="Email address"
-                        HorizontalTextAlignment="Center"
-                        Keyboard="Email"
-                        PlaceholderColor="Gray"
-                        TextColor="Black">
-                    </Entry>
-                    <Entry
-                        x:Name="userPassword"
-                        Placeholder="Password"
-                        IsPassword="True"
-                        HorizontalTextAlignment="Center"
-                        Keyboard="Email"
-                        PlaceholderColor="Gray"
-                        TextColor="Black">
-                    </Entry>
-                    <Button
-                        x:Name="logInButton"
-                        Text="LOGIN"
-                        TextColor="White"
-                        BackgroundColor="#136D74"
-                        Clicked="DirectLogInClick">
-                    </Button>
-                    <Label
-                        Text="LOGIN OR SIGN UP WITH"
-                        TextColor="Gray"
-                        FontSize="Medium"
-                        FontAttributes="Bold"
-                        HorizontalOptions="Center"
-                        Padding="0,20,0,0">
-                    </Label>
-                    <Grid HeightRequest="100">
+        <Grid RowSpacing="0" BackgroundColor="#E0E6E6F2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="94"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="100"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="100"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <StackLayout Grid.Column="0" Spacing="0" VerticalOptions="Center" HorizontalOptions="Center" Orientation="Horizontal">
+                        <Label Text="^" TextColor="#136D74" Rotation="270" FontSize="30" FontAttributes="Bold" HorizontalTextAlignment="End"></Label>
+                        <Label Text="Back" TextColor="#136D74" FontSize="17" VerticalTextAlignment="Center" FontAttributes="Bold"></Label>
+                        <StackLayout.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="ReturnBackToPrincipalPage"></TapGestureRecognizer>
+                        </StackLayout.GestureRecognizers>
+                    </StackLayout>
+                    <StackLayout Grid.Column="1" VerticalOptions="Center">
+                        <Label Text="Log In" TextColor="#136D74" FontSize="32" FontAttributes="Bold" TextDecorations="Underline" HorizontalTextAlignment="Center" ></Label>
+                    </StackLayout>
+                </Grid>
+            </Grid>
+            <StackLayout Grid.Row="1" Padding="21,121,21,0" >
+                <Entry
+                    x:Name="userEmailAddress"
+                    Placeholder="Email address"
+                    HorizontalTextAlignment="Start"
+                    Keyboard="Email"
+                    PlaceholderColor="Gray"
+                    TextColor="Gray"
+                    FontSize="18"
+                    FontAttributes="Bold">
+                </Entry>
+                <Entry
+                    x:Name="userPassword"
+                    Placeholder="Enter Password"
+                    IsPassword="True"
+                    HorizontalTextAlignment="Start"
+                    Keyboard="Email"
+                    PlaceholderColor="Gray"
+                    TextColor="Gray"
+                    FontSize="18"
+                    FontAttributes="Bold">
+                </Entry>
+                <Button
+                    x:Name="logInButton"
+                    Margin="50,20,50,0"
+                    Text="Login"
+                    FontSize="20"
+                    FontAttributes="Bold"
+                    TextColor="White"
+                    BackgroundColor="#FF8500"
+                    Clicked="DirectLogInClick">
+                </Button>
+                <Label
+                    Text="Reset password"
+                    TextColor="#6D7278"
+                    FontSize="14"
+                    FontAttributes="Bold"
+                    HorizontalOptions="Center"
+                    Margin="0,20,0,20">
+                </Label>
+                <Label
+                    Text="Or login with"
+                    TextColor="#136D74"
+                    FontSize="24"
+                    FontAttributes="Bold"
+                    HorizontalOptions="Center"
+                    Margin="0,0,0,20">
+                </Label>
+                <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
+                    <StackLayout >
                         <ImageButton
-                            Grid.Row="0"
-                            Grid.Column="0"
+                            HeightRequest="40"
                             Source="facebookIcon.png"
-                            Padding="0,0,25,0"
                             BackgroundColor="Transparent"
                             Clicked="FacebookLogInClick">
                         </ImageButton>
+                    </StackLayout>
+                    <StackLayout Margin="50,0,50,0">
                         <ImageButton
-                            Grid.Row="0"
-                            Grid.Column="1"
+                            HeightRequest="40"
                             Source="googleIcon.png"
-                            Padding="10,0,10,0"
                             BackgroundColor="Transparent"
                             Clicked="GoogleLogInClick">
                         </ImageButton>
+                    </StackLayout>
+                    <StackLayout>
                         <ImageButton
+                            HeightRequest="40"
                             x:Name="appleLogInButton"
-                            Grid.Row="0"
-                            Grid.Column="2"
                             Source="appleIcon.png"
-                            Padding="25,0,0,0"
                             BackgroundColor="Transparent"
                             Clicked="AppleLogInClick"
                             Command = "{Binding SignInWithAppleCommand}">
                         </ImageButton>
-                    </Grid>
-                    <Grid>
-                        <ImageButton
-                            Grid.Row="0"
-                            Grid.Column="0"
-                            Source="asGuestIcon.png"
-                            BackgroundColor="Transparent"
-                            Clicked="ProceedAsGuestClick"
-                            >
-                        </ImageButton>
-                        <ImageButton
-                            Grid.Row="1"
-                            Grid.Column="1"
-                            Source="signUpIcon.png"
-                            BackgroundColor="Transparent"
-                            Clicked="SignUpClick">
-                        </ImageButton>
-                    </Grid>
+                    </StackLayout>
                 </StackLayout>
-            </StackLayout>  
-        </RelativeLayout>
+            </StackLayout>
+        </Grid>
     </ContentPage.Content>
 </ContentPage>

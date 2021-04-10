@@ -180,7 +180,7 @@ namespace ServingFresh.Views
         private string deviceId;
         List<Items> data2 = new List<Items>();
         public ObservableCollection<ItemsModel> datagrid = new ObservableCollection<ItemsModel>();
-        public IDictionary<string, ItemPurchased> order = new Dictionary<string, ItemPurchased>();
+        public Dictionary<string, ItemPurchased> order = new Dictionary<string, ItemPurchased>();
         public int totalCount = 0;
         // THIS SELECTION PAGE IS USE IN ALL LOGINS ONLY
 
@@ -346,7 +346,7 @@ namespace ServingFresh.Views
                                         Application.Current.Properties["user_zip_code"] = userProfile.result[0].customer_zip;
                                         Application.Current.Properties["user_latitude"] = userProfile.result[0].customer_lat;
                                         Application.Current.Properties["user_longitude"] = userProfile.result[0].customer_long;
-
+                                        Application.Current.Properties["guest"] = false;
                                         _ = Application.Current.SavePropertiesAsync();
                                         await CheckVersion();
 
@@ -457,30 +457,36 @@ namespace ServingFresh.Views
             }
         }
 
-        public SelectionPage(Location current)
+        public SelectionPage(Location current, Dictionary<string, ItemPurchased> previousOrder = null)
         {
             InitializeComponent();
+
             columnWidth = deliveryDatesColumn.Width;
 
             filters = new ObservableCollection<Filter>();
-
-
-
             filters.Add(new Filter("Fruits", "unselectedFruitsIcon.png", "fruit"));
             filters.Add(new Filter("Vegetables", "unselectedVegetablesIcon.png", "vegetable"));
             filters.Add(new Filter("Desserts", "unselectedDessertsIcon.png", "dessert"));
             filters.Add(new Filter("Others", "unselectedOthersIcon.png", "other"));
             filters.Add(new Filter("Favorites", "unselectedFavoritesIcon.png" , "favorite"));
-
-
             filterList.ItemsSource = filters;
+
             Application.Current.Properties["user_latitude"] = current.Latitude.ToString();
             Application.Current.Properties["user_longitude"] = current.Longitude.ToString();
 
             Debug.WriteLine("INPUT 1 (SelectionPage): " + current.Latitude);
             Debug.WriteLine("INPUT 2 (SelectionPage): " + current.Longitude);
 
+            GetPreviousOrder(previousOrder);
             GetBusinesses();
+        }
+
+        void GetPreviousOrder(Dictionary<string, ItemPurchased> previousOrder = null)
+        {
+            if(previousOrder != null)
+            {
+                order = previousOrder;
+            }
         }
 
         public async void GetBusinesses()
@@ -755,7 +761,7 @@ namespace ServingFresh.Views
                         var day = DateTime.Parse(displaySchedule[0].deliveryTimeStamp.ToString());
                         title.Text = day.ToString("ddd") + ", " + displaySchedule[0].delivery_date.ToString();
                         deliveryTime.Text = displaySchedule[0].delivery_time;
-                        orderBy.Text = displaySchedule[0].orderExpTime;
+                        orderBy.Text = "(" +  displaySchedule[0].orderExpTime + ")";
                         Debug.WriteLine("NUMBER OF ITEMS PASSED TO PARSE FUNCTION: " + data.result.Count);
                         GetData(data.result);
                         //var types = new List<string>();
@@ -781,7 +787,23 @@ namespace ServingFresh.Views
                                 i.isItemRightEnableUpdate = false;
                                 i.isItemRightUnavailableUpdate = true;
                             }
+
+                            if (order != null)
+                            {
+                                if (order.ContainsKey(i.itemNameLeft))
+                                {
+                                    i.colorLeftUpdate = Color.FromHex("#ffce99");
+                                    i.quantityL = order[i.itemNameLeft].item_quantity;
+                                }
+
+                                if (order.ContainsKey(i.itemNameRight))
+                                {
+                                    i.colorRightUpdate = Color.FromHex("#ffce99");
+                                    i.quantityR = order[i.itemNameRight].item_quantity;
+                                }
+                            }
                         }
+                        UpdateNumberOfItemsInCart();
                     }
                     //farm_list.ItemsSource = businesses;
                 }
@@ -1737,8 +1759,8 @@ namespace ServingFresh.Views
             var gestureRecognizer = (TapGestureRecognizer)myStack.GestureRecognizers[0];
             var selectedElement = (Filter)gestureRecognizer.CommandParameter;
 
-            Debug.WriteLine("FILTER LABEL: " + selectedElement.filterName);
-            Debug.WriteLine("FILTER SOURCE: " + selectedElement.iconSource);
+            //Debug.WriteLine("FILTER LABEL: " + selectedElement.filterName);
+            //Debug.WriteLine("FILTER SOURCE: " + selectedElement.iconSource);
 
             if(selectedElement.isSelected == false)
             {
@@ -1877,8 +1899,10 @@ namespace ServingFresh.Views
             string weekday = dm.delivery_dayofweek;
 
             selectedDeliveryDate = dm;
-            deliveryTime.Text = dm.delivery_time;
-            orderBy.Text = "(" + dm.orderExpTime + ")";
+            var day = DateTime.Parse(selectedDeliveryDate.deliveryTimeStamp.ToString());
+            title.Text = day.ToString("ddd") + ", " + selectedDeliveryDate.delivery_date.ToString();
+            deliveryTime.Text = selectedDeliveryDate.delivery_time;
+            orderBy.Text = "(" + selectedDeliveryDate.orderExpTime + ")";
 
             Debug.WriteLine(weekday);
             foreach(string b_uid in dm.business_uids)
@@ -2005,7 +2029,7 @@ namespace ServingFresh.Views
 
         void OrdersClick(System.Object sender, System.EventArgs e)
         {
-            Application.Current.MainPage = new CheckoutPage();
+            CheckOutClickBusinessPage(sender,e);
         }
 
         void InfoClick(System.Object sender, System.EventArgs e)
@@ -2014,7 +2038,6 @@ namespace ServingFresh.Views
             {
                 Application.Current.MainPage = new InfoPage();
             }
-            
         }
 
         void ProfileClick(System.Object sender, System.EventArgs e)
@@ -2033,6 +2056,45 @@ namespace ServingFresh.Views
             {
                 deliveryDatesColumn.Width = columnWidth;
                 filtersColumn.Width = 0;
+                GetData(data.result);
+                foreach (ItemsModel i in datagrid)
+                {
+                    //i.colorLeftUpdate = Color.FromHex("#FFFFFF");
+                    //i.colorRightUpdate = Color.FromHex("#FFFFFF");
+                    i.opacityLeftUpdate = 1;
+                    i.opacityRightUpdate = 1;
+                    i.isItemLeftEnableUpdate = true;
+                    i.isItemRightEnableUpdate = true;
+                    i.isItemLeftUnavailableUpdate = false;
+                    i.isItemRightUnavailableUpdate = false;
+
+                    if (!selectedDeliveryDate.business_uids.Contains(i.itm_business_uidLeft))
+                    {
+                        i.opacityLeftUpdate = 0.5;
+                        i.isItemLeftEnableUpdate = false;
+                        i.isItemLeftUnavailableUpdate = true;
+                    }
+
+                    if (!selectedDeliveryDate.business_uids.Contains(i.itm_business_uidRight))
+                    {
+                        i.opacityRightUpdate = 0.5;
+                        i.isItemRightEnableUpdate = false;
+                        i.isItemRightUnavailableUpdate = true;
+                    }
+
+                    if (order.ContainsKey(i.itemNameLeft))
+                    {
+                        i.colorLeftUpdate = Color.FromHex("#ffce99");
+                        i.quantityL = order[i.itemNameLeft].item_quantity;
+                    }
+
+                    if (order.ContainsKey(i.itemNameRight))
+                    {
+                        i.colorRightUpdate = Color.FromHex("#ffce99");
+                        i.quantityR = order[i.itemNameRight].item_quantity;
+                    }
+                }
+                UpdateNumberOfItemsInCart();
             }
         }
 
@@ -2044,6 +2106,62 @@ namespace ServingFresh.Views
             {
                 deliveryDatesColumn.Width = 0;
                 filtersColumn.Width = columnWidth;
+                if (filterTypes.Count != 0)
+                {
+                    var filteredList = new List<Items>();
+                    foreach (Items produce in data.result)
+                    {
+                        if (filterTypes.Contains(produce.item_type))
+                        {
+                            filteredList.Add(produce);
+                        }
+                    }
+                    GetData(filteredList);
+
+                }
+                else
+                {
+                    GetData(data.result);
+                }
+
+                foreach (ItemsModel i in datagrid)
+                {
+                    //i.colorLeftUpdate = Color.FromHex("#FFFFFF");
+                    //i.colorRightUpdate = Color.FromHex("#FFFFFF");
+                    i.opacityLeftUpdate = 1;
+                    i.opacityRightUpdate = 1;
+                    i.isItemLeftEnableUpdate = true;
+                    i.isItemRightEnableUpdate = true;
+                    i.isItemLeftUnavailableUpdate = false;
+                    i.isItemRightUnavailableUpdate = false;
+
+                    if (!selectedDeliveryDate.business_uids.Contains(i.itm_business_uidLeft))
+                    {
+                        i.opacityLeftUpdate = 0.5;
+                        i.isItemLeftEnableUpdate = false;
+                        i.isItemLeftUnavailableUpdate = true;
+                    }
+
+                    if (!selectedDeliveryDate.business_uids.Contains(i.itm_business_uidRight))
+                    {
+                        i.opacityRightUpdate = 0.5;
+                        i.isItemRightEnableUpdate = false;
+                        i.isItemRightUnavailableUpdate = true;
+                    }
+
+                    if (order.ContainsKey(i.itemNameLeft))
+                    {
+                        i.colorLeftUpdate = Color.FromHex("#ffce99");
+                        i.quantityL = order[i.itemNameLeft].item_quantity;
+                    }
+
+                    if (order.ContainsKey(i.itemNameRight))
+                    {
+                        i.colorRightUpdate = Color.FromHex("#ffce99");
+                        i.quantityR = order[i.itemNameRight].item_quantity;
+                    }
+                }
+                UpdateNumberOfItemsInCart();
             }
         }
 

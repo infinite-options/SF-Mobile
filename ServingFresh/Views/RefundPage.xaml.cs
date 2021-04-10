@@ -153,7 +153,7 @@ namespace ServingFresh.Views
 
         public void openCheckout(object sender, EventArgs e)
         {
-            Application.Current.MainPage = new CheckoutPage();
+            Application.Current.MainPage = new CheckoutPage("refund");
         }
 
         public void openHistory(object sender, EventArgs e)
@@ -171,7 +171,7 @@ namespace ServingFresh.Views
 
         void OrdersClick(System.Object sender, System.EventArgs e)
         {
-            Application.Current.MainPage = new CheckoutPage();
+            Application.Current.MainPage = new CheckoutPage("refund");
         }
 
         void InfoClick(System.Object sender, System.EventArgs e)

@@ -86,7 +86,7 @@ namespace ServingFresh.Views
             {
                 get
                 {
-                    return name + " ( $" + Double.Parse(price).ToString("N2") + " / " + unit + " ) ";
+                    return "(" + unit  +")";
                 }
             }
 
@@ -206,21 +206,17 @@ namespace ServingFresh.Views
                     {
                         driver_tip = ho.driver_tip;
                     }
-                    foreach(char a in ho.start_delivery_date.ToCharArray())
+                    if(ho.start_delivery_date != null)
                     {
-                        if (a != ' ')
-                        {
-                            date += a;
-                        }
-                        else { break; }
+                        date = DateTime.Parse(ho.start_delivery_date).ToString("MMM dd, yyyy") + " at " + DateTime.Parse(ho.start_delivery_date).ToString("hh:mm tt");
                     }
 
                     if(ho.delivery_status != null && ho.delivery_status == "TRUE")
                     {
-                        deliveryStatus = "DELIVERED";
+                        deliveryStatus = "Delivered";
                     }else if(ho.delivery_status != null && ho.delivery_status == "FALSE")
                     {
-                        deliveryStatus = "ACTIVE";
+                        deliveryStatus = "Confirmed";
                     }
 
                     if(ho.pay_coupon_id != null)
@@ -241,18 +237,18 @@ namespace ServingFresh.Views
                         items = items,
 
                         itemsHeight = 55 * items.Count,
-                        delivery_date = "Expected Delivery Date: " + date,
+                        delivery_date = date,
                         purchase_date = "Purchase Date: " + localPurchaseDate,
                         coupon_id = "Coupon ID: " + couponApplied,
-                        purchase_id = "Order ID: " + ho.purchase_uid,
+                        purchase_id = "Order #" + ho.purchase_uid,
                         purchase_status = "Order " + deliveryStatus,
-                        subtotal = "$ " + subtotal.ToString("N2"),
-                        promo_applied = "-$ " + promo_applied.ToString("N2"),
-                        delivery_fee = "$ " + delivery_fee.ToString("N2"),
-                        service_fee = "$ " + service_fee.ToString("N2"),
-                        driver_tip = "$ " + driver_tip.ToString("N2"),
-                        taxes = "$ " + taxes.ToString("N2"),
-                        total = "$ " + total.ToString("N2"),
+                        subtotal = "$" + subtotal.ToString("N2"),
+                        promo_applied = "$" + promo_applied.ToString("N2"),
+                        delivery_fee = "$" + delivery_fee.ToString("N2"),
+                        service_fee = "$" + service_fee.ToString("N2"),
+                        driver_tip = "$" + driver_tip.ToString("N2"),
+                        taxes = "$" + taxes.ToString("N2"),
+                        total = "$" + total.ToString("N2"),
 
                     }) ;
                 }
@@ -267,7 +263,7 @@ namespace ServingFresh.Views
         public void openCheckout(object sender, EventArgs e)
         {
             //Application.Current.MainPage = new CheckoutPage(null,day);
-            Application.Current.MainPage = new CheckoutPage(null, null);
+            Application.Current.MainPage = new CheckoutPage("history");
         }
         public void openRefund(object sender, EventArgs e)
         {

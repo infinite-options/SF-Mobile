@@ -195,6 +195,7 @@
     <BundleResource Include="Resources\selectedVegetablesIcon.png" />
     <BundleResource Include="Resources\informationIcon.png" />
     <BundleResource Include="Resources\unselectedHeartIcon.png" />
+    <BundleResource Include="Resources\storeIcon.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AppleSignIn\" />

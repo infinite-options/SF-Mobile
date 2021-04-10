@@ -5,6 +5,7 @@ using Xamarin.Forms.Xaml;
 using ServingFresh.Config;
 using Xamarin.Essentials;
 using ServingFresh.LogIn.Apple;
+using System.Diagnostics;
 
 namespace ServingFresh
 {
@@ -21,72 +22,67 @@ namespace ServingFresh
             //SecureStorage.RemoveAll();
             //Preferences.Clear();
 
-            Application.Current.MainPage = new PrincipalPage();
+            //Application.Current.MainPage = new PrincipalPage();
 
-            Application.Current.Properties["guest"] = true;
-            Application.Current.Properties["user_email"] = "";
-            Application.Current.Properties["user_first_name"] = "";
-            Application.Current.Properties["user_last_name"] = "";
-            Application.Current.Properties["user_phone_num"] = "";
-            Application.Current.Properties["user_address"] = "";
-            Application.Current.Properties["user_unit"] = "";
-            Application.Current.Properties["user_city"] = "";
-            Application.Current.Properties["user_state"] = "";
-            Application.Current.Properties["user_zip_code"] = "";
-            Application.Current.Properties["user_latitude"] = "";
-            Application.Current.Properties["user_longitude"] = "";
-            Application.Current.Properties["user_delivery_instructions"] = "";
             CardInfo();
+            try
+            {
+                if (Application.Current.Properties.ContainsKey("user_id"))
+                {
+                    if (Application.Current.Properties.ContainsKey("time_stamp"))
+                    {
+                        DateTime today = DateTime.Now;
+                        DateTime expTime = (DateTime)Application.Current.Properties["time_stamp"];
 
-            //if (Application.Current.Properties.ContainsKey("user_id"))
-            //{
-            //    if (Application.Current.Properties.ContainsKey("time_stamp"))
-            //    {
-            //        DateTime today = DateTime.Now;
-            //        DateTime expTime = (DateTime)Application.Current.Properties["time_stamp"];
+                        if (today <= expTime)
+                        {
+                            //Console.WriteLine("guid: " + Preferences.Get("guid", null));
+                            MainPage = new SelectionPage();
+                        }
+                        else
+                        {
+                            LogInPage client = new LogInPage();
+                            MainPage = client;
 
-            //        if (today <= expTime)
-            //        {
-            //            Console.WriteLine("guid: " + Preferences.Get("guid", null));
-            //            MainPage = new SelectionPage();
-            //        }
-            //        else
-            //        {
-            //            LogInPage client = new LogInPage();
-            //            MainPage = client;
+                            if (Application.Current.Properties.ContainsKey("time_stamp"))
+                            {
+                                string socialPlatform = (string)Application.Current.Properties["platform"];
 
-            //            if (Application.Current.Properties.ContainsKey("time_stamp"))
-            //            {
-            //                string socialPlatform = (string)Application.Current.Properties["platform"];
-
-            //                if (socialPlatform.Equals(Constant.Facebook))
-            //                {
-            //                    client.FacebookLogInClick(new object(), new EventArgs());
-            //                }
-            //                else if (socialPlatform.Equals(Constant.Google))
-            //                {
-            //                    client.GoogleLogInClick(new object(), new EventArgs());
-            //                }
-            //                else if (socialPlatform.Equals(Constant.Apple))
-            //                {
-            //                    client.AppleLogInClick(new object(), new EventArgs());
-            //                }
-            //                else
-            //                {
-            //                    MainPage = new LogInPage();
-            //                }
-            //            }
-            //        }
-            //    }
-            //    else
-            //    {
-            //        MainPage = new LogInPage();
-            //    }
-            //}
-            //else
-            //{
-            //    MainPage = new LogInPage();
-            //}
+                                if (socialPlatform.Equals(Constant.Facebook))
+                                {
+                                    client.FacebookLogInClick(new object(), new EventArgs());
+                                }
+                                else if (socialPlatform.Equals(Constant.Google))
+                                {
+                                    client.GoogleLogInClick(new object(), new EventArgs());
+                                }
+                                else if (socialPlatform.Equals(Constant.Apple))
+                                {
+                                    client.AppleLogInClick(new object(), new EventArgs());
+                                }
+                                else
+                                {
+                                    MainPage = new LogInPage();
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        MainPage = new LogInPage();
+                    }
+                }
+                else
+                {
+                    MainPage = new PrincipalPage();
+                }
+            }
+            catch (Exception autoLoginFailed)
+            {
+                MainPage = new PrincipalPage();
+                Debug.WriteLine("ERROR ON AUTO LOGIN");
+                Debug.WriteLine(autoLoginFailed.Message);
+            }
         }
 
         public void CardInfo()

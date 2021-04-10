@@ -10,6 +10,7 @@
         <Grid RowSpacing="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="94"></RowDefinition>
+                <RowDefinition Height="60"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
                 <RowDefinition x:Name="paypalframe" Height="0"></RowDefinition>
             </Grid.RowDefinitions>
@@ -28,40 +29,39 @@
                     <RelativeLayout
                         RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}"
                         RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}">
-                        <Image Margin="0,20,0,0" Source="CartIcon.png" HeightRequest="40">
+                        <Image Margin="0,20,0,0" Source="storeIcon.png" HeightRequest="40">
                             <Image.GestureRecognizers>
-                                <TapGestureRecognizer Tapped="CartClick"></TapGestureRecognizer>
+                                <TapGestureRecognizer Tapped="ReturnToStore"></TapGestureRecognizer>
                             </Image.GestureRecognizers>
                         </Image>
-                        <Frame Margin="30,20,0,0" HeightRequest="20" MinimumWidthRequest="20" CornerRadius="10" Padding="0" HasShadow="False">
+                        <Frame Margin="30,12,0,0" HeightRequest="20" MinimumWidthRequest="20" CornerRadius="10" BorderColor="#136D74" Padding="0" HasShadow="False">
                             <Label x:Name="CartTotal" Margin="5,1,5,0" Text="0"  TextColor="#FF8500" FontSize="14" FontAttributes="Bold"></Label>
                         </Frame>
                     </RelativeLayout>
                 </StackLayout>
             </Grid>
-            <Frame Grid.Row="1" CornerRadius="20" Margin="1,1,1,1"  HasShadow="False">
-                <StackLayout>
-                    <Grid HeightRequest="100">
-                        <StackLayout Grid.Column="0" VerticalOptions="Center">
-                            <Label Text="Cart" TextColor="#136D74" FontAttributes="Bold" FontSize="20" HorizontalTextAlignment="Center"></Label>
-                            <BoxView HeightRequest="1" Color="#136D74" Margin="10,0,10,0"></BoxView>
-                        </StackLayout>
-                        <StackLayout Grid.Column="1" VerticalOptions="Center" Opacity="0.5">
-                            <Label Text="History" TextColor="#136D74" FontSize="20" HorizontalTextAlignment="Center"></Label>
-                            <BoxView HeightRequest="1" Color="#136D74" Margin="10,0,10,0"></BoxView>
-                            <StackLayout.GestureRecognizers>
-                                <TapGestureRecognizer Tapped="openHistory"/>
-                            </StackLayout.GestureRecognizers>
-                        </StackLayout>
-                        <StackLayout Grid.Column="2" VerticalOptions="Center" Opacity="0.5">
-                            <Label Text="Refunds" TextColor="#136D74" FontSize="20" HorizontalTextAlignment="Center"></Label>
-                            <BoxView HeightRequest="1" Color="#136D74" Margin="10,0,10,0"></BoxView>
-                            <StackLayout.GestureRecognizers>
-                                <TapGestureRecognizer Tapped="openRefund"/>
-                            </StackLayout.GestureRecognizers>
-                        </StackLayout>
-                    </Grid>
-                    <StackLayout>
+            <Grid Grid.Row="1" >
+                <StackLayout Grid.Column="0" VerticalOptions="Center">
+                    <Label Text="Cart" TextColor="#136D74" FontAttributes="Bold" FontSize="20" HorizontalTextAlignment="Center"></Label>
+                    <BoxView HeightRequest="1" Color="#136D74" Margin="10,0,10,0"></BoxView>
+                </StackLayout>
+                <StackLayout Grid.Column="1" VerticalOptions="Center" Opacity="0.5">
+                    <Label Text="History" TextColor="#136D74" FontSize="20" HorizontalTextAlignment="Center"></Label>
+                    <BoxView HeightRequest="1" Color="#136D74" Margin="10,0,10,0"></BoxView>
+                    <StackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="openHistory"/>
+                    </StackLayout.GestureRecognizers>
+                </StackLayout>
+                <StackLayout Grid.Column="2" VerticalOptions="Center" Opacity="0.5">
+                    <Label Text="Refunds" TextColor="#136D74" FontSize="20" HorizontalTextAlignment="Center"></Label>
+                    <BoxView HeightRequest="1" Color="#136D74" Margin="10,0,10,0"></BoxView>
+                    <StackLayout.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="openRefund"/>
+                    </StackLayout.GestureRecognizers>
+                </StackLayout>
+            </Grid>
+            <Frame Grid.Row="2" HasShadow="False">
+                <StackLayout Margin="0,-10,0,0">
                         <ScrollView>
                             <StackLayout>
                                 <StackLayout>
@@ -69,28 +69,29 @@
                                     <Label x:Name="expectedDelivery" Text="Wednesday, Aug 20, 2020, between 6pm to 8pm"  FontSize="14" TextColor="Black"></Label>
                                 </StackLayout>
                                 <StackLayout x:Name="customerDeliveryAddressView">
-                                    <Label Text="Delivery Address:" TextColor="#136D74" FontSize="16" FontAttributes="Bold"></Label>
                                     <Grid>
-                                        <StackLayout Grid.Column="0">
-                                            <Label x:Name="DeliveryAddress1" Text="24 Main Street, Apt #5 San Jose, CA 91101" FontSize="14" TextColor="Black"></Label>
-                                            <Label x:Name="DeliveryAddress2" Text="24 Main Street, Apt #5 San Jose, CA 91101" FontSize="14" TextColor="Black"></Label>
-                                        </StackLayout>
-                                        <Label Grid.Column="1" Text="Change delivery address" HorizontalTextAlignment="End" FontSize="12" TextColor="#FF8500">
+                                        <Label Grid.Column="0" Text="Delivery Address:" TextColor="#136D74" FontSize="16" FontAttributes="Bold"></Label>
+                                        <Label Grid.Column="1" Text="Change delivery address" HorizontalTextAlignment="End" VerticalTextAlignment="Center" FontSize="12" TextColor="#FF8500">
                                             <Label.GestureRecognizers>
                                                 <TapGestureRecognizer Tapped="ChangeContactInfoClick"></TapGestureRecognizer>
                                             </Label.GestureRecognizers>
                                         </Label>
                                     </Grid>
+                                    <StackLayout Orientation="Horizontal">
+                                        <Label x:Name="DeliveryAddress1" Text="24 Main Street, Apt #5 San Jose, CA 91101" FontSize="14" TextColor="Black"></Label>
+                                        <Label x:Name="DeliveryAddress2" Text="24 Main Street, Apt #5 San Jose, CA 91101" FontSize="14" TextColor="Black"></Label>
+                                    </StackLayout>
+                                 
                                 </StackLayout>
                                 <StackLayout>
                                     <Label Text="Delivery Instructions:" TextColor="#136D74" FontSize="16" FontAttributes="Bold"></Label>
-                                    <Entry Placeholder="Delivery instructions (just in case)" PlaceholderColor="Gray" FontAttributes="Bold" FontSize="14"  TextColor="black" x:Name="deliveryInstructions"></Entry>
+                                    <Entry Placeholder="Delivery instructions (ex: gate code)" PlaceholderColor="Gray" FontAttributes="Bold" FontSize="14"  TextColor="black" x:Name="deliveryInstructions"></Entry>
                                 </StackLayout>
                                 <BoxView HeightRequest="1" Color="LightGray"></BoxView>
                                 <Grid>
                                     <Label Grid.Column="0" VerticalTextAlignment="Center" Text="Your order" TextColor="Black" FontSize="18" FontAttributes="Bold"></Label>
                                     <StackLayout Grid.Column="1"  HorizontalOptions="End">
-                                        <Button Text="+ Add items" Clicked="AddItems" TextColor="White" BackgroundColor="#FF8500" CornerRadius="10" WidthRequest="100" HeightRequest="30" HorizontalOptions="CenterAndExpand" ></Button>
+                                        <Button Text="+ Add items" Clicked="ReturnToStore" TextColor="White" BackgroundColor="#FF8500" CornerRadius="10" WidthRequest="100" HeightRequest="30" HorizontalOptions="CenterAndExpand" ></Button>
                                     </StackLayout>
                                 </Grid>
                                 <BoxView HeightRequest="1" Color="LightGray"></BoxView>
@@ -197,7 +198,7 @@
                                 </Grid>
                                 <BoxView HeightRequest="1" Color="LightGray"></BoxView>
                                 <StackLayout x:Name="guestAddressInfoView">
-                                    <Label Text="Enter full address" TextColor="Black" FontSize="16" FontAttributes="Bold"></Label>
+                                    <Label Text="Enter your delivery address" TextColor="Black" FontSize="16" FontAttributes="Bold"></Label>
                                     <Entry x:Name="newUserAddress" Placeholder="Street Address (so we can find)" PlaceholderColor="Gray" FontSize="14" FontAttributes="Bold"></Entry>
                                     <Entry x:Name="newUserUnitNumber" Placeholder="Apt number" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
                                     <Grid>
@@ -285,11 +286,6 @@
                                 </Grid>
                                 <BoxView HeightRequest="1" Color="LightGray"></BoxView>
                                 <Grid>
-                                    <Label Grid.Column="0" Text="Subtotal" TextColor="Black" FontSize="20" FontAttributes="Bold"></Label>
-                                    <Label Grid.Column="1" x:Name="GrandTotal" HorizontalTextAlignment="End" Text="$15.49"  TextColor="Black" FontSize="20" FontAttributes="Bold"></Label>
-                                </Grid>
-                                <BoxView HeightRequest="1" Color="LightGray"></BoxView>
-                                <Grid>
                                     <Entry Placeholder="Enter Ambassador Code" PlaceholderColor="Black" TextColor="Black" FontSize="13"></Entry>
                                     <StackLayout Grid.Column="1" Orientation="Horizontal" HorizontalOptions="End" VerticalOptions="Center">
                                         <Label Text="-" TextColor="Black" FontSize="14"></Label>
@@ -299,7 +295,7 @@
                                 <BoxView HeightRequest="1" Color="LightGray"></BoxView>
                                 <Grid>
                                     <Label Grid.Column="0" Text="Total" TextColor="Black" FontSize="20" FontAttributes="Bold"></Label>
-                                    <Label Grid.Column="1" x:Name="viewTotal" HorizontalTextAlignment="End" Text="$0.00"  TextColor="Black" FontSize="20" FontAttributes="Bold"></Label>
+                                    <Label Grid.Column="1" x:Name="GrandTotal" HorizontalTextAlignment="End" Text="$0.00"  TextColor="Black" FontSize="20" FontAttributes="Bold"></Label>
                                 </Grid>
                                 <StackLayout Margin="0,15,0,0" x:Name="guestPaymentsView">
                                     <StackLayout Padding="20,0,20,0">
@@ -323,7 +319,7 @@
                                             <ColumnDefinition Width="*"></ColumnDefinition>
                                             <ColumnDefinition Width="100"></ColumnDefinition>
                                         </Grid.ColumnDefinitions>
-                                        <Entry Grid.Column="0" x:Name="cardHolderNumber" Placeholder="Card Number" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
+                                        <Entry Grid.Column="0" x:Name="cardHolderNumber" MaxLength="16" Placeholder="Card Number" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
                                         <Entry Grid.Column="1" x:Name="cardCVV" Placeholder="CVV" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
                                     </Grid>
                                     <Grid>
@@ -335,14 +331,11 @@
                                 </StackLayout>
                              </StackLayout>
                         </ScrollView>
-                    </StackLayout>
+                   
                 </StackLayout>
             </Frame>
-            <Frame Grid.Row="2" x:Name="PayPalView">
-                <StackLayout >
-                    <WebView x:Name="webViewPage" >
-                    </WebView>
-                </StackLayout>
+            <Frame Grid.Row="3" x:Name="PayPalView">
+               <WebView x:Name="webViewPage"></WebView>
             </Frame>
         </Grid>
     </ContentPage.Content>
