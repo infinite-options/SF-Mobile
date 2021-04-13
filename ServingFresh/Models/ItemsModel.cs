@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using Xamarin.Forms;
 
 namespace ServingFresh.Models
 {
@@ -160,6 +161,97 @@ namespace ServingFresh.Models
             {
                 quantityRight = value;
                 PropertyChanged(this, new PropertyChangedEventArgs("quantityRight"));
+            }
+        }
+    }
+
+    public class SingleItem : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
+        // String Properties
+        public string itemImage{ get; set; }
+        public string itemFavoriteImage { get; set; }
+        public string itemUID { get; set; }
+        public string itemBusinessUID { get; set; }
+        public string itemName { get; set; }
+        public string itemPrice { get; set; }
+        public string itemUnit { get; set; }
+        public string itemPriceWithUnit { get; set; }
+        public string itemDescription { get; set; }
+        public string itemTaxable { get; set; }
+        public string itemType { get; set; }
+
+        // Integer Properties
+        public int itemQuantity { get; set; }
+
+        // Double Properties
+        public double itemBusinessPrice { get; set; }
+        public double itemOpacity { get; set; }
+
+        // Bool Properites
+        public bool isItemVisiable { get; set; }
+        public bool isItemEnable { get; set; }
+        public bool isItemUnavailable { get; set; }
+
+        // Color Properties
+        public Color itemBackgroundColor { get; set; }
+
+        // Properties that can be changed
+        // Propertity: 1
+        public string updateItemFavoriteImage
+        {
+            get { return itemFavoriteImage; }
+            set
+            {
+                itemFavoriteImage = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("itemFavoriteImage"));
+            }
+        }
+        // Propertity: 2
+        public int updateItemQuantity
+        {
+            get { return itemQuantity; }
+            set
+            {
+                itemQuantity = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("itemQuantity"));
+            }
+        }
+        // Propertity: 3
+        public double updateItemOpacity
+        {
+            set
+            {
+                itemOpacity = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("itemOpacity"));
+            }
+        }
+        // Propertity: 4
+        public bool updateIsItemEnable
+        {
+            set
+            {
+                isItemEnable = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("isItemEnable"));
+            }
+        }
+        // Propertity: 5
+        public bool updateIsItemUnavailable
+        {
+            set
+            {
+                isItemUnavailable = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("isItemUnavailable"));
+            }
+        }
+        // Propertity: 6
+        public Color updateItemBackgroundColor
+        {
+            set
+            {
+                itemBackgroundColor = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("itemBackgroundColor"));
             }
         }
     }
