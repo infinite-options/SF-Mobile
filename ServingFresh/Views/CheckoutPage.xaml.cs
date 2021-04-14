@@ -87,6 +87,12 @@ namespace ServingFresh.Views
         public string delivery_instructions { get; set; }
     }
 
+    public class FavoritePost
+    {
+        public string customer_uid { get; set; }
+        public IList<string> favorite { get; set; }
+    }
+
     public class InfoObject
     {
         public string message { get; set; }
@@ -1568,6 +1574,8 @@ namespace ServingFresh.Views
                                 {
                                     //UserDialogs.Instance.HideLoading();
                                     //UserDialogs.Instance.HideLoading();
+                                    var userID = (string)Application.Current.Properties["user_id"];
+                                    await WriteFavorites(GetFavoritesList(), userID);
                                     Application.Current.MainPage = new HistoryPage("SUCCESS");
                                     //await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
                                 }
@@ -2669,6 +2677,9 @@ namespace ServingFresh.Views
                     //cartHeight.Height = 0;
                     if (!(bool)Application.Current.Properties["guest"])
                     {
+                        var userID = (string)Application.Current.Properties["user_id"];
+                        await WriteFavorites(GetFavoritesList(), userID);
+                        RemoveAllFavoriteItems();
                         Application.Current.MainPage = new HistoryPage("SUCCESS");
                         //await DisplayAlert("We appreciate your business", "Thank you for placing an order through Serving Fresh! Our Serving Fresh Team is processing your order!", "OK");
                     }
@@ -3008,6 +3019,29 @@ namespace ServingFresh.Views
             purchaseObject.delivery_instructions = deliveryInstructions.Text;
 
             Application.Current.MainPage = new DeliveryDetailsPage(purchaseObject, this.deliveryInfo);
+        }
+
+        public static async Task<bool> WriteFavorites(List<string> favorites, string userID)
+        {
+            var taskResponse = false;
+            var favoritePost = new FavoritePost()
+            {
+                customer_uid = userID,
+                favorite = favorites
+            };
+
+            var client = new System.Net.Http.HttpClient();
+            var serializedFavoritePostObject = JsonConvert.SerializeObject(favoritePost);
+            var content = new StringContent(serializedFavoritePostObject, Encoding.UTF8, "application/json");
+            var endpointResponse = await client.PostAsync(Constant.PostUserFavorites, content);
+
+            Debug.WriteLine("FAVORITES CONTENT: " + serializedFavoritePostObject);
+
+            if (endpointResponse.IsSuccessStatusCode)
+            {
+                taskResponse = true;
+            }
+            return taskResponse;
         }
 
         //void EntryClick(System.Object sender, System.EventArgs e)

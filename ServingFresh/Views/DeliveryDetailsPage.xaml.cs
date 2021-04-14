@@ -223,6 +223,9 @@ namespace ServingFresh.Views
                             if (Response.IsSuccessStatusCode)
                             {
                                 var RDSResponseContent = await Response.Content.ReadAsStringAsync();
+                                Debug.WriteLine("RESPONSE FROM WRITING PURCHASE DATA AS A GUEST: " + RDSResponseContent);
+
+                                //await WriteFavorites(SelectionPage.GetFavoritesList(), "GUEST");
                                 Application.Current.MainPage = new ConfirmationPage(purchase, deliveryInfo);
                             }
                             

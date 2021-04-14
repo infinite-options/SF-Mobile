@@ -98,6 +98,24 @@ namespace ServingFresh.Views
             public string delivery_time { get; set; }
         }
 
+        public class FavoriteResult
+        {
+            public string favorite_produce { get; set; }
+        }
+
+        public class FavoriteGet
+        {
+            public string message { get; set; }
+            public int code { get; set; }
+            public IList<FavoriteResult> result { get; set; }
+            public string sql { get; set; }
+        }
+
+        public class FavoriteItemByUser
+        {
+            public string customer_uid { get; set; }
+        }
+
         public class ScheduleInfo : INotifyPropertyChanged
         {
             public event PropertyChangedEventHandler PropertyChanged = delegate { };
@@ -181,17 +199,20 @@ namespace ServingFresh.Views
         ObservableCollection<SingleItem> fruitsList = new ObservableCollection<SingleItem>();
         ObservableCollection<SingleItem> othersList = new ObservableCollection<SingleItem>();
         ObservableCollection<SingleItem> dessertsList = new ObservableCollection<SingleItem>();
+        public static List<string> favorites = new List<string>();
 
         public SelectionPage(string accessToken = "", string refreshToken = "", AuthenticatorCompletedEventArgs googleCredentials = null, AppleAccount appleCredentials = null, string platform = "")
         {
             InitializeComponent();
             _ = VerifyUserCredentials(accessToken, refreshToken, googleCredentials, appleCredentials, platform);
+            _ = SetFavoritesList();
         }
 
         public SelectionPage()
         {
             InitializeComponent();
             _ = CheckVersion();
+            _ = SetFavoritesList();
         }
 
         public SelectionPage(Location current, Dictionary<string, ItemPurchased> previousOrder = null)
@@ -216,6 +237,7 @@ namespace ServingFresh.Views
 
             GetPreviousOrder(previousOrder);
             GetBusinesses();
+            _ = SetFavoritesList();
         }
 
         static async Task WaitAndApologizeAsync()
@@ -1153,6 +1175,11 @@ namespace ServingFresh.Views
                     vegetablesList.Clear();
                     foreach (Items produce in listOfItems)
                     {
+                        if (produce.taxable == null || produce.taxable == "NULL")
+                        {
+                            produce.taxable = "FALSE";
+                        }
+
                         var itemToInsert = new SingleItem()
                         {
                             itemType = produce.item_type,
@@ -1175,14 +1202,6 @@ namespace ServingFresh.Views
                             isItemUnavailable = false,
                         };
 
-                        if (produce.taxable == null || produce.taxable == "NULL")
-                        {
-                            produce.taxable = "FALSE";
-                        }
-                        if (produce.taxable == null || produce.taxable == "NULL")
-                        {
-                            produce.taxable = "FALSE";
-                        }
                         if(produce.item_type == "vegetable")
                         {
                             vegetablesList.Add(itemToInsert);
@@ -1353,6 +1372,14 @@ namespace ServingFresh.Views
                     {
                         i.updateItemBackgroundColor = Color.FromHex("#ffce99");
                         i.updateItemQuantity = order[i.itemName].item_quantity;
+                    }
+                }
+
+                if(favorites != null && favorites.Count != 0)
+                {
+                    if (favorites.Contains(i.itemName))
+                    {
+                        i.updateItemFavoriteImage = "selectedFavoritesIcon.png";
                     }
                 }
             }
@@ -2369,17 +2396,129 @@ namespace ServingFresh.Views
                 if (pickedElement.updateItemFavoriteImage != "selectedFavoritesIcon.png")
                 {
                     pickedElement.updateItemFavoriteImage = "selectedFavoritesIcon.png";
+                    AddItemToFavorites(pickedElement.itemName);
                 }
                 else
                 {
                     pickedElement.updateItemFavoriteImage = "unselectedHeartIcon.png";
+                    RemoveItemFromFavorites(pickedElement.itemName);
                 }
             }
         }
 
+        void AddItemToFavorites(string itemName)
+        {
+            if (!favorites.Contains(itemName))
+            {
+                favorites.Add(itemName);
+            }
+        }
+
+        void RemoveItemFromFavorites(string itemName)
+        {
+            if (favorites.Contains(itemName))
+            {
+                favorites.Remove(itemName);
+            }
+        }
+
+        public static async Task<bool> SetFavoritesList()
+        {
+            var taskResponse = false;
+            if (!(bool)Application.Current.Properties["guest"])
+            {
+                var client = new System.Net.Http.HttpClient();
+                var favoriteItemByUser = new FavoriteItemByUser()
+                {
+                    customer_uid = (string)Application.Current.Properties["user_id"],
+                };
+
+                var serializedObject = JsonConvert.SerializeObject(favoriteItemByUser);
+                var content = new StringContent(serializedObject, Encoding.UTF8, "application/json");
+                var endpointResponse = await client.PostAsync(Constant.GetUserFavorites, content);
+
+                Debug.WriteLine("JSON OBJECT (POST) TO GET USER FAVORITES: " + serializedObject);
+
+                if (endpointResponse.IsSuccessStatusCode)
+                {
+                    var data = await endpointResponse.Content.ReadAsStringAsync();
+                    var parseData = JsonConvert.DeserializeObject<FavoriteGet>(data);
+
+                    if (parseData.result.Count != 0)
+                    {
+                        favorites = JsonConvert.DeserializeObject<List<string>>(parseData.result[0].favorite_produce);
+                        foreach (string itemName in favorites)
+                        {
+                            Debug.WriteLine("FAVORITE ITEMS " + itemName);
+                        }
+                    }
+
+                    taskResponse = true;
+                }
+            }
+
+            return taskResponse;
+        }
+
+        public static List<string> GetFavoritesList()
+        {
+            return favorites;
+        }
+
+        public static void RemoveAllFavoriteItems()
+        {
+            favorites.Clear();
+        }
+
         void GetFavoritesClick(System.Object sender, System.EventArgs e)
         {
-            //var heartIcon = (Bu)
+            var client = (ImageButton)sender;
+
+            if(client.Source.ToString().Contains("unselectedHeartIcon.png"))
+            {
+                client.Source = "selectedFavoritesIcon.png";
+
+                vegetablesListView.ItemsSource =  FavoritesFrom(vegetablesList);
+                fruitsListView.ItemsSource = FavoritesFrom(fruitsList);
+                othersListView.ItemsSource = FavoritesFrom(othersList);
+                dessertsListView.ItemsSource = FavoritesFrom(dessertsList);
+            }
+            else
+            {
+                client.Source = "unselectedHeartIcon.png";
+                vegetablesListView.ItemsSource = vegetablesList;
+                fruitsListView.ItemsSource = fruitsList;
+                othersListView.ItemsSource = othersList;
+                dessertsListView.ItemsSource = dessertsList;
+            }
+        }
+
+        ObservableCollection<SingleItem> FavoritesFrom(ObservableCollection<SingleItem> source)
+        {
+            var list = new ObservableCollection<SingleItem>();
+            foreach (SingleItem element in source)
+            {
+                if (favorites.Contains(element.itemName))
+                {
+                    //var item = element;
+                    //item.itemFavoriteImage = "selectedFavoritesIcon.png";
+                    list.Add(element);
+                }
+            }
+            return list;
+        }
+
+        void ShowHideMenu(System.Object sender, System.EventArgs e)
+        {
+            var height = new GridLength(0);
+            if (menuFrame.Height.Equals(height))
+            {
+                menuFrame.Height = this.Height - 180;
+            }
+            else
+            {
+                menuFrame.Height = 0;
+            }
         }
     }
 }
