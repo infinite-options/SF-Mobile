@@ -68,14 +68,47 @@
                                 <StackLayout>
                                     <Label Text="If you have ordered with us before, please put out your old box out before 9am. If you have ordered with us before, please put out your old box out before 9am." TextColor="Gray" FontSize="18" FontAttributes="None" ></Label>
                                 </StackLayout>
+                                 <StackLayout>
+                                    <Label Text="Sign up via social media" TextColor="#136D74" FontSize="18" FontAttributes="Bold" TextDecorations="Underline"></Label>
+                                </StackLayout>
+                                <StackLayout HorizontalOptions="Center">
+                                    <Frame WidthRequest="241" HeightRequest="52" HasShadow="False" CornerRadius="13" Padding="0" BackgroundColor="#466DED">
+                                        <Grid VerticalOptions="Center">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="50"></ColumnDefinition>
+                                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                            </Grid.ColumnDefinitions>
+                                            <Label Grid.Column="1" Text="Sign up with Apple" TextColor="White" FontSize="16" ></Label>
+                                        </Grid>
+                                    </Frame>
+                                    <Frame WidthRequest="241" HeightRequest="52" HasShadow="False" CornerRadius="13" Padding="0" BackgroundColor="#485A95">
+                                        <Grid VerticalOptions="Center">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="50"></ColumnDefinition>
+                                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                            </Grid.ColumnDefinitions>
+                                            <Label Grid.Column="1" Text="Sign up with Facebook" TextColor="White" FontSize="16" ></Label>
+                                        </Grid>
+                                    </Frame>
+                                    <Frame WidthRequest="241" HeightRequest="52" HasShadow="False" CornerRadius="13" Padding="0" BackgroundColor="#5C83F0">
+                                        <Grid VerticalOptions="Center">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="50"></ColumnDefinition>
+                                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                            </Grid.ColumnDefinitions>
+                                            <Label Grid.Column="1" Text="Sign up with Google" TextColor="White" FontSize="16" ></Label>
+                                        </Grid>
+                                    </Frame>
+                                </StackLayout>
                                 <StackLayout>
-                                    <Label Text="Create a password to sign up" TextColor="#136D74" FontSize="20" FontAttributes="Bold" TextDecorations="Underline"></Label>
+                                    <Label Text="Or enter password to sign up" TextColor="#136D74" FontSize="20" FontAttributes="Bold" TextDecorations="Underline"></Label>
                                 </StackLayout>
                                 <StackLayout Margin="0,10,0,0">
                                     <Entry Placeholder="Create Password" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
                                     <Entry Placeholder="Confirm Password" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
                                     <Button Margin="0,15,0,0" Text="Sign up" Font="20" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold"></Button>
-                                    <Button Margin="0,15,0,0" Text="Return to store" Clicked="ReturnToStore" Font="20" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold"></Button>
+                                    <Button Margin="0,15,0,0" Text="Sign in" Font="20" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="SignIn"></Button>
+                                    <Button Margin="0,15,0,0" Text="Skip and return to Home page" Clicked="ReturnToStore" Font="20" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold"></Button>
                                 </StackLayout>
                             </StackLayout>
                         </ScrollView>

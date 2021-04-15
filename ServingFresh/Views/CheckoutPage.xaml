@@ -217,19 +217,24 @@
                                 </StackLayout>
                                 <Label Text="Coupons:" TextColor="Black" FontSize="16" FontAttributes="Bold"></Label>
                                 <StackLayout>
-                                    <CollectionView x:Name="coupon_list" ItemsLayout="HorizontalList" HeightRequest="150" >
+                                    <CollectionView x:Name="coupon_list" ItemsLayout="HorizontalList" HeightRequest="80" >
                                         <CollectionView.ItemTemplate >
                                             <DataTemplate>
-                                                <StackLayout Padding="5,0,5,0" WidthRequest="250" ClassId="{Binding index}">
-                                                    <Image Source="{Binding image}" >
+                                                <RelativeLayout Padding="0,0,5,0" ClassId="{Binding index}">
+                                                    <Image Source="{Binding image}"></Image>
+                                                    <StackLayout HeightRequest="73" WidthRequest="140">
+                                                        <StackLayout HorizontalOptions="Center" VerticalOptions="CenterAndExpand" WidthRequest="105" HeightRequest="55">
+                                                            <Label Text="{Binding couponNote}" FontSize="12" TextColor="Black" FontAttributes="Bold"  ></Label>
+                                                        </StackLayout>
+                                                    </StackLayout>
                                                         <!--<Image.Effects>
                                                             <servingfresh:TintImageEffect TintColor="LightGray"/>
                                                         </Image.Effects>-->
                                                         <!--<Image.GestureRecognizers>
                                                                 <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"/>
                                                         </Image.GestureRecognizers>-->
-                                                    </Image>
-                                                    <Grid Margin="30,-120,50,0" HeightRequest="100">
+                                                   
+                                                    <!--<Grid Margin="30,-120,50,0" HeightRequest="100">
                                                         <StackLayout>
                                                             <Label Grid.Row="0" Grid.Column="0" Text="{Binding couponNote}" TextColor="Black" FontAttributes="Bold"  ></Label>
                                                             <Label Grid.Row="1" Grid.Column="0" Text="{Binding thresholdNote}" TextColor="Black"   ></Label>
@@ -239,8 +244,8 @@
                                                     </Grid>
                                                     <StackLayout.GestureRecognizers>
                                                                 <TapGestureRecognizer Tapped="ApplyActiveCoupon"/>
-                                                    </StackLayout.GestureRecognizers>
-                                                </StackLayout>
+                                                    </StackLayout.GestureRecognizers>-->
+                                                </RelativeLayout>
                                             </DataTemplate>
                                         </CollectionView.ItemTemplate>
                                     </CollectionView>

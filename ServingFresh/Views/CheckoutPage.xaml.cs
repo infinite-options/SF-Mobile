@@ -623,7 +623,7 @@ namespace ServingFresh.Views
                     }
                     else
                     {
-                        coupon.image = "CouponIcon.png";
+                        coupon.image = "nonEligibleCoupon.png";
                     }
 
                     // SET TITLE LABEL OF COUPON
@@ -740,7 +740,7 @@ namespace ServingFresh.Views
                         {
                             if(Value == activeCoupons[j].totalDiscount)
                             {
-                                activeCoupons[j].image = "CouponIconGreen.png";
+                                activeCoupons[j].image = "eligibleCoupon.png";
                                 activeCoupons[j].savingsOrSpendingNote = "You saved: $" + activeCoupons[j].totalDiscount.ToString("N2");
                                 couponsList.Add(activeCoupons[j]);
                                 activeCoupons.RemoveAt(j);
@@ -814,7 +814,7 @@ namespace ServingFresh.Views
                         {
                             if (Value == activeCoupons[j].totalDiscount)
                             {
-                                activeCoupons[j].image = "CouponIconGreen.png";
+                                activeCoupons[j].image = "eligiableCoupon.png";
                                 activeCoupons[j].savingsOrSpendingNote = "You saved: $" + activeCoupons[j].totalDiscount.ToString("N2");
                                 couponsList.Add(activeCoupons[j]);
                                 activeCoupons.RemoveAt(j);
@@ -856,7 +856,7 @@ namespace ServingFresh.Views
                 {
                     if (couponsList[0].status == "ACTIVE")
                     {
-                        couponsList[0].image = "CouponIconOrange.png";
+                        couponsList[0].image = "appliedCoupon.png";
                         Debug.WriteLine("COUPON DISCOUNT: {0}, COUPON SHIPPING: {1}", couponsList[0].discount, couponsList[0].shipping);
                         updateTotals(couponsList[0].discount, couponsList[0].shipping);
                         appliedIndex = 0;
@@ -1893,7 +1893,7 @@ namespace ServingFresh.Views
                 }
                 else
                 {
-                    coupon.image = "CouponIcon.png";
+                    coupon.image = "nonEligiableCoupon.png";
                 }
 
                 // SET TITLE LABEL OF COUPON
@@ -2010,7 +2010,7 @@ namespace ServingFresh.Views
                     {
                         if (Value == activeCoupons[j].totalDiscount)
                         {
-                            activeCoupons[j].image = "CouponIconGreen.png";
+                            activeCoupons[j].image = "eligibleCoupon.png";
                             activeCoupons[j].savingsOrSpendingNote = "You saved: $" + activeCoupons[j].totalDiscount.ToString("N2");
                             TempCouponsList.Add(activeCoupons[j]);
                             activeCoupons.RemoveAt(j);
@@ -2084,7 +2084,7 @@ namespace ServingFresh.Views
                     {
                         if (Value == activeCoupons[j].totalDiscount)
                         {
-                            activeCoupons[j].image = "CouponIconGreen.png";
+                            activeCoupons[j].image = "eligibleCoupon.png";
                             activeCoupons[j].savingsOrSpendingNote = "You saved: $" + activeCoupons[j].totalDiscount.ToString("N2");
                             TempCouponsList.Add(activeCoupons[j]);
                             activeCoupons.RemoveAt(j);
@@ -2136,7 +2136,7 @@ namespace ServingFresh.Views
             {
                 if (couponsList[0].status == "ACTIVE")
                 {
-                    couponsList[0].image = "CouponIconOrange.png";
+                    couponsList[0].image = "appliedCoupon.png";
                     Debug.WriteLine("COUPON DISCOUNT: {0}, COUPON SHIPPING: {1}", couponsList[0].discount, couponsList[0].shipping);
                     updateTotals(couponsList[0].discount, couponsList[0].shipping);
                     appliedIndex = 0;
@@ -3024,22 +3024,26 @@ namespace ServingFresh.Views
         public static async Task<bool> WriteFavorites(List<string> favorites, string userID)
         {
             var taskResponse = false;
-            var favoritePost = new FavoritePost()
+            if(userID != null && userID != "")
             {
-                customer_uid = userID,
-                favorite = favorites
-            };
+                var favoritePost = new FavoritePost()
+                {
+                    customer_uid = userID,
+                    favorite = favorites
+                };
 
-            var client = new System.Net.Http.HttpClient();
-            var serializedFavoritePostObject = JsonConvert.SerializeObject(favoritePost);
-            var content = new StringContent(serializedFavoritePostObject, Encoding.UTF8, "application/json");
-            var endpointResponse = await client.PostAsync(Constant.PostUserFavorites, content);
+                var client = new System.Net.Http.HttpClient();
+                var serializedFavoritePostObject = JsonConvert.SerializeObject(favoritePost);
+                var content = new StringContent(serializedFavoritePostObject, Encoding.UTF8, "application/json");
+                var endpointResponse = await client.PostAsync(Constant.PostUserFavorites, content);
 
-            Debug.WriteLine("FAVORITES CONTENT: " + serializedFavoritePostObject);
+                Debug.WriteLine("FAVORITES CONTENT: " + serializedFavoritePostObject);
 
-            if (endpointResponse.IsSuccessStatusCode)
-            {
-                taskResponse = true;
+                if (endpointResponse.IsSuccessStatusCode)
+                {
+                    taskResponse = true;
+                }
+                return taskResponse;
             }
             return taskResponse;
         }

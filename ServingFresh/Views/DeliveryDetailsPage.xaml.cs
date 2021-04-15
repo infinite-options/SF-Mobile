@@ -9,17 +9,22 @@ using PayPalCheckoutSdk.Core;
 using PayPalCheckoutSdk.Orders;
 using PayPalHttp;
 using ServingFresh.Config;
+using ServingFresh.LogIn.Classes;
 using Stripe;
 using Xamarin.Forms;
 using Xamarin.Forms.Maps;
 using static ServingFresh.Views.CheckoutPage;
 using static ServingFresh.Views.SelectionPage;
+using static ServingFresh.Views.SignUpPage;
 using Application = Xamarin.Forms.Application;
 
 namespace ServingFresh.Views
 {
     public partial class DeliveryDetailsPage : ContentPage
     {
+        // Temporary variable
+        string userID;
+
         string deliveryInstructions;
         static string mode;
         static string clientId;
@@ -63,7 +68,12 @@ namespace ServingFresh.Views
             {
                 button.BackgroundColor = Color.FromHex("#2B6D74");
                 stripeInformationView.HeightRequest = 194;
-                
+
+                purchase.delivery_first_name = firstName.Text;
+                purchase.delivery_last_name = lastName.Text;
+                purchase.delivery_phone_num = phoneNumber.Text;
+                purchase.delivery_email = emailAddress.Text.ToLower();
+
             }
             else
             {
@@ -87,14 +97,29 @@ namespace ServingFresh.Views
             return Int32.Parse(stringAmount);
         }
 
-        void CompletePaymentWithStripe(System.Object sender, System.EventArgs e)
+        async void CompletePaymentWithStripe(System.Object sender, System.EventArgs e)
         {
             var button = (Button)sender;
 
             if (button.BackgroundColor == Color.FromHex("#FF8500"))
             {
                 button.BackgroundColor = Color.FromHex("#2B6D74");
-                _ = PayViaStripe();
+                purchase.payment_type = "STRIPE";
+
+                var userID = await SignUpNewUser(GetUserFrom(purchase));
+                if( userID != "") { purchase.pur_customer_uid = userID; }
+                var paymentIsSuccessful = await PayViaStripe();
+                await WriteFavorites(GetFavoritesList(),userID);
+
+                if (paymentIsSuccessful)
+                {
+                    _ = SendPurchaseToDatabase(purchase);
+                    Application.Current.MainPage = new ConfirmationPage(purchase, deliveryInfo);
+                }
+                else
+                {
+                    await DisplayAlert("Issue with payment via stripe", "", "OK");
+                }
             }
             else
             {
@@ -102,21 +127,27 @@ namespace ServingFresh.Views
             }
         }
 
-        public async Task PayViaStripe()
+        string ReturnStripeApikey(string mode)
+        {
+            var apiKey = "";
+            if(mode != "SFTEST")
+            {
+                apiKey = Constant.LivePK;
+            }
+            else
+            {
+                apiKey = Constant.TestSK;
+            }
+            return apiKey;
+        }
+
+        public async Task<bool> PayViaStripe()
         {
             try
             {
                 if (purchase.delivery_instructions != null)
                 {
-                    //if (deliveryInstructions.Text.Trim() == "SFTEST")
-                    if (purchase.delivery_instructions.Trim() == "SFTEST")
-                    {
-                        //UserDialogs.Instance.Loading("Processing Payment...");
-                        //UserDialogs.Instance.ShowLoading("Processing Payment...");
-                        Debug.Write("STRIPE MODE: " + "TEST");
-                        Debug.WriteLine("SK     : " + Constant.TestSK);
-                        StripeConfiguration.ApiKey = Constant.TestSK;
-
+                        StripeConfiguration.ApiKey = ReturnStripeApikey(purchase.delivery_instructions.Trim());
                         string CardNo = cardHolderNumber.Text.Trim();
                         string expMonth = cardExpMonth.Text.Trim();
                         string expYear = cardExpYear.Text.Trim();
@@ -172,7 +203,7 @@ namespace ServingFresh.Views
                         var chargeOption = new ChargeCreateOptions();
                         chargeOption.Amount = (long)RemoveDecimalFromTotalAmount(purchase.amount_due);
                         chargeOption.Currency = "usd";
-                        chargeOption.ReceiptEmail = emailAddress.Text;
+                        chargeOption.ReceiptEmail = emailAddress.Text.Trim();
                         chargeOption.Customer = cust.Id;
                         chargeOption.Source = source.Id;
                         chargeOption.Description = "";
@@ -182,64 +213,21 @@ namespace ServingFresh.Views
                         Charge charge = chargeService.Create(chargeOption);
                         if (charge.Status == "succeeded")
                         {
-                            //UserDialogs.Instance.ShowLoading("Processing your payment...");
-                            // Successful Payment
-                            //await DisplayAlert("Congratulations", "Payment was successful. We appreciate your business", "OK");
-                            //ClearCardInfo();
-
-                            //if (deliveryInstructions.Text == null)
-                            if (deliveryInstructions == null)
-                            {
-                                Debug.WriteLine("STRIPE");
-                                Debug.WriteLine("DELIVERY INSTRUCTIONS WERE NOT SET");
-                                //purchaseObject.delivery_instructions = "";
-                            }
-                            else
-                            {
-                                //purchaseObject.delivery_instructions = deliveryInstructions.Text;
-                                //purchaseObject.delivery_instructions = "";
-                            }
-                            //purchaseObject.subtotal = GetSubTotal().ToString("N2");
-                            //purchaseObject.service_fee = service_fee.ToString("N2");
-                            //purchaseObject.delivery_fee = delivery_fee_db.ToString("N2");
-                            //purchaseObject.driver_tip = driver_tips.ToString("N2");
-                            //purchaseObject.taxes = GetTaxes().ToString("N2");
-
-                            purchase.payment_type = "STRIPE";
-                            purchase.delivery_first_name = firstName.Text;
-                            purchase.delivery_last_name = lastName.Text;
-                            purchase.delivery_phone_num = phoneNumber.Text;
-                            purchase.delivery_email = emailAddress.Text;
-
-
-                            var purchaseString = JsonConvert.SerializeObject(purchase);
-                            Debug.WriteLine("Purchase: " + purchaseString);
-                            var purchaseMessage = new StringContent(purchaseString, Encoding.UTF8, "application/json");
-                            var client = new System.Net.Http.HttpClient();
-                            var Response = await client.PostAsync(Constant.PurchaseUrl, purchaseMessage);
-
-                            Debug.WriteLine("Order was written to DB: " + Response.IsSuccessStatusCode);
-                            //Debug.WriteLine("Coupon was succesfully updated (subtract)" + RDSCouponResponse);
-                            if (Response.IsSuccessStatusCode)
-                            {
-                                var RDSResponseContent = await Response.Content.ReadAsStringAsync();
-                                Debug.WriteLine("RESPONSE FROM WRITING PURCHASE DATA AS A GUEST: " + RDSResponseContent);
-
-                                //await WriteFavorites(SelectionPage.GetFavoritesList(), "GUEST");
-                                Application.Current.MainPage = new ConfirmationPage(purchase, deliveryInfo);
-                            }
-                            
+                            return true;
                         }
                         else
                         {
                             await DisplayAlert("Oops", "Payment was not successful. Please try again", "OK");
+                            return false;
                         }
-                    }
                 }
+                return false;
+
             }
-            catch (Exception ex)
+            catch (Exception paymentIssueWithStripe)
             {
-                await DisplayAlert("Alert!", ex.Message, "OK");
+                await DisplayAlert("Alert!", paymentIssueWithStripe.Message, "OK");
+                return false;
             }
         }
 
@@ -247,6 +235,11 @@ namespace ServingFresh.Views
         {
             paypalRow.Height = this.Height - 100;
             purchase.payment_type = "PAYPAL";
+            purchase.delivery_first_name = firstName.Text;
+            purchase.delivery_last_name = lastName.Text;
+            purchase.delivery_phone_num = phoneNumber.Text;
+            purchase.delivery_email = emailAddress.Text.ToLower();
+
             var response = await createOrder(purchase.amount_due);
             var content = response.Result<PayPalCheckoutSdk.Orders.Order>();
             var result = response.Result<PayPalCheckoutSdk.Orders.Order>();
@@ -327,7 +320,17 @@ namespace ServingFresh.Views
             return orderId;
         }
 
-        private void WebViewPage_Navigated(object sender, WebNavigatedEventArgs e)
+        void SetUserID(string userID)
+        {
+            this.userID = userID;
+        }
+
+        string GetUserID()
+        {
+            return userID;
+        }
+
+        private async void WebViewPage_Navigated(object sender, WebNavigatedEventArgs e)
         {
             var source = webView.Source as UrlWebViewSource;
             Debug.WriteLine("WEBVIEW SOURCE: " + source.Url);
@@ -335,11 +338,23 @@ namespace ServingFresh.Views
             {
                 paypalRow.Height = 0;
                 Debug.WriteLine("SUCCESSFULL REDIRECT FROM PAYPAL TO SF WEB TO MOBILE APP");
-                _= captureOrder(GetPayPalOrderId());
+                var userID = await SignUpNewUser(GetUserFrom(purchase));
+                if (userID != "") { purchase.pur_customer_uid = userID; }
+                var paymentIsSuccessful = await captureOrder(GetPayPalOrderId());
+                await WriteFavorites(GetFavoritesList(), userID);
+                if (paymentIsSuccessful)
+                {
+                    _ = SendPurchaseToDatabase(purchase);
+                    Application.Current.MainPage = new ConfirmationPage(purchase, deliveryInfo);
+                }
+                else
+                {
+                    await DisplayAlert("Issue with payment via PayPal", "", "OK");
+                }
             }
         }
 
-        public async Task<HttpResponse> captureOrder(string id)
+        public async Task<bool> captureOrder(string id)
         {
             // Construct a request object and set desired parameters
             // Replace ORDER-ID with the approved order id from create order
@@ -359,33 +374,26 @@ namespace ServingFresh.Views
 
             if(result.Status == "COMPLETED")
             {
-                purchase.delivery_first_name = firstName.Text;
-                purchase.delivery_last_name = lastName.Text;
-                purchase.delivery_phone_num = phoneNumber.Text;
-                purchase.delivery_email = emailAddress.Text;
-
-                SendPurchaseToDatabase(purchase);
+                return true;
             }
 
-            return response;
+            return false;
         }
 
-        public async void  SendPurchaseToDatabase(PurchaseDataObject purchase)
+        public async Task<bool> SendPurchaseToDatabase(PurchaseDataObject purchase)
         {
-            
             var purchaseString = JsonConvert.SerializeObject(purchase);
-            Debug.WriteLine("Purchase: " + purchaseString);
             var purchaseMessage = new StringContent(purchaseString, Encoding.UTF8, "application/json");
             var client = new System.Net.Http.HttpClient();
             var Response = await client.PostAsync(Constant.PurchaseUrl, purchaseMessage);
 
-            Debug.WriteLine("Order was written to DB: " + Response.IsSuccessStatusCode);
-            //Debug.WriteLine("Coupon was succesfully updated (subtract)" + RDSCouponResponse);
+            Debug.WriteLine("JSON TO SEND VIA PURCHASE ENDPOINT: " + purchaseString);
+            Debug.WriteLine("PURCHASE WAS WRITTEN TO DATABASE: " + Response.IsSuccessStatusCode);
             if (Response.IsSuccessStatusCode)
             {
-                var RDSResponseContent = await Response.Content.ReadAsStringAsync();
-                Application.Current.MainPage = new ConfirmationPage(purchase, deliveryInfo);
+                return true;
             }
+            return false;
         }
 
         public async void GetPayPalCredentials(string clientMode)
@@ -429,7 +437,6 @@ namespace ServingFresh.Views
                 await DisplayAlert("Oops", "We can't process your request at this moment.", "OK");
             }
         }
-
 
         public static PayPalHttp.HttpClient client()
         {
