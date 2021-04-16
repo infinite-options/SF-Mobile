@@ -75,7 +75,8 @@ namespace ServingFresh.Views
         public string unit { get; set; }
         public string taxable { get; set; }
 
-  
+
+
 
 
         // public string description { get; set;
@@ -162,10 +163,129 @@ namespace ServingFresh.Views
             public double shipping { get; set; }
             public double totalDiscount { get; set; }
             public string couponId { get; set; }
+            public string isCouponEligible { get; set; }
+            public Color textColor { get; set; }
 
             public void update()
             {
                 PropertyChanged(this, new PropertyChangedEventArgs("image"));
+                PropertyChanged(this, new PropertyChangedEventArgs("textColor"));
+                PropertyChanged(this, new PropertyChangedEventArgs("isCouponEligible"));
+            }
+
+            public static List<couponItem> GetActiveCoupons(ObservableCollection<couponItem> source)
+            {
+                var listOfActiveCoupons = new List<couponItem>();
+
+                foreach(couponItem coupon in source)
+                {
+                    if(coupon.status == "ACTIVE")
+                    {
+                        coupon.image = "eligibleCoupon.png";
+                        coupon.savingsOrSpendingNote = "You saved: $" + coupon.totalDiscount.ToString("N2");
+                        coupon.isCouponEligible = "Eligible";
+                        coupon.textColor = Color.Black;
+                        listOfActiveCoupons.Add(coupon);
+                    }
+                }
+
+                return listOfActiveCoupons;
+            }
+
+            public static List<couponItem> GetNonActiveCoupons(ObservableCollection<couponItem> source, double subtotal)
+            {
+                var listOfNonActiveCoupons = new List<couponItem>();
+
+                foreach (couponItem coupon in source)
+                {
+                    if (coupon.status == "NOT-ACTIVE")
+                    {
+                        coupon.savingsOrSpendingNote = "Spend $" + (coupon.threshold - subtotal).ToString("N2") + " more to use";
+                        coupon.isCouponEligible = "Non eligible";
+                        coupon.textColor = Color.Gray;
+                        listOfNonActiveCoupons.Add(coupon);
+                    }
+                }
+
+                return listOfNonActiveCoupons;
+            }
+
+            public static void SortActiveCoupons(List<couponItem> list)
+            {
+                SelectionSortByTotalDiscount(list);
+                var tempList = new List<couponItem>();
+
+                foreach (couponItem coupon in list)
+                {
+                    tempList.Add(coupon);
+                }
+
+                int n = tempList.Count;
+                int j = 0;
+                for(int i = n - 1; i >= 0; i--)
+                {
+                    list[j++] = tempList[i];
+                }
+            }
+
+            public static void SelectionSortByTotalDiscount(List<couponItem> list)
+            {
+                int length = list.Count;
+
+                for (int i = 0; i < length - 1; i++)
+                {
+                    int minimumIndex = i;
+                    for (int j = i + 1; j < length; j++)
+                    {
+                        if (list[j].totalDiscount < list[minimumIndex].totalDiscount)
+                        {
+                            minimumIndex = j;
+                        }
+                    }
+                    var tempCoupon = list[minimumIndex];
+                    list[minimumIndex] = list[i];
+                    list[i] = tempCoupon;
+                }
+            }
+
+            public static void SelectionSortByThreshold(List<couponItem> list)
+            {
+                int length = list.Count;
+
+                for (int i = 0; i < length - 1; i++)
+                {
+                    int minimumIndex = i;
+                    for (int j = i + 1; j < length; j++)
+                    {
+                        if (list[j].threshold < list[minimumIndex].threshold)
+                        {
+                            minimumIndex = j;
+                        }
+                    }
+                    var tempCoupon = list[minimumIndex];
+                    list[minimumIndex] = list[i];
+                    list[i] = tempCoupon;
+                }
+            }
+
+            public static void SortNonActiveCoupons(List<couponItem> list)
+            {
+                SelectionSortByThreshold(list);
+            }
+
+            public static ObservableCollection<couponItem> MergeActiveNonActiveCouponLists(List<couponItem> activeList, List<couponItem> nonActiveList)
+            {
+                var resultList = new ObservableCollection<couponItem>();
+                foreach(couponItem coupon in activeList)
+                {
+                    resultList.Add(coupon);
+                }
+
+                foreach (couponItem coupon in nonActiveList)
+                {
+                    resultList.Add(coupon);
+                }
+                return resultList;
             }
         }
 
@@ -199,6 +319,9 @@ namespace ServingFresh.Views
         public PurchaseDataObject purchaseObject;
         public static ObservableCollection<ItemObject> cartItems = new ObservableCollection<ItemObject>();
         public ObservableCollection<couponItem> couponsList = new ObservableCollection<couponItem>();
+        public ObservableCollection<couponItem> availableCoupons = new ObservableCollection<couponItem>();
+        public couponItem appliedCoupon = null;
+
         public ObservableCollection<couponItem> TempCouponsList = new ObservableCollection<couponItem>();
         public double subtotal;
         public double discount;
@@ -673,207 +796,40 @@ namespace ServingFresh.Views
                     couponsList.Add(coupon);
                 }
 
-                var activeCoupons = new List<couponItem>();
-                var nonactiveCoupons = new List<couponItem>();
 
-                foreach(couponItem a in couponsList)
+
+                //couponsList.Clear();
+                var activeCoupons = couponItem.GetActiveCoupons(couponsList);
+                var nonactiveCoupons = couponItem.GetNonActiveCoupons(couponsList, initialSubTotal);
+                couponItem.SortActiveCoupons(activeCoupons);
+                couponItem.SortNonActiveCoupons(nonactiveCoupons);
+                availableCoupons = ApplyBestAvailableCoupon(couponItem.MergeActiveNonActiveCouponLists(activeCoupons, nonactiveCoupons));
+                coupon_list.ItemsSource = availableCoupons;
+
+            }
+        }
+
+        public ObservableCollection<couponItem> ApplyBestAvailableCoupon(ObservableCollection<couponItem> source)
+        {
+            if (source != null)
+            {
+                if (source.Count != 0)
                 {
-                    if(a.status == "ACTIVE")
+                    if(source[0].status == "ACTIVE")
                     {
-                        activeCoupons.Add(a);
+                        source[0].image = "appliedCoupon.png";
+                        source[0].isCouponEligible = "Applied";
+                        source[0].textColor = Color.White;
+                        updateTotals(source[0].discount, source[0].shipping);
+                        appliedCoupon = source[0];
                     }
                     else
                     {
-                        nonactiveCoupons.Add(a);
+                        updateTotals(0, 0);
                     }
                 }
-
-                // TESTING
-                couponsList.Clear();
-                Debug.WriteLine("");
-                Debug.Write("LIST OF ACTIVE COUPONS: ");
-                foreach(couponItem e in activeCoupons)
-                {
-                    Debug.Write(e.couponId + " ");
-                    
-                }
-                Debug.WriteLine("");
-                Debug.WriteLine("");
-                Debug.Write("List OF NONACTIVE COUPONS: ");
-                foreach (couponItem e in nonactiveCoupons)
-                {
-                    Debug.Write(e.couponId + " ");
-                }
-
-                Debug.WriteLine("");
-                Debug.WriteLine("");
-
-                // ALL COUPOUNS ARE ACTIVE
-                if(nonactiveCoupons.Count == 0)
-                {
-                    // PLACE TOTAL DISCOUNT VALUE IN A ARRAY TO SORT FROM SMALLEST TO LARGEST
-                    var TotalDiscountArray = new List<double>();
-
-                    // TotalDiscountArray IS OUT OF ORDER FOR EXAMPLE = [5,3,6,4,5,2,1,]
-                    foreach (couponItem ActiveCoupon in activeCoupons)
-                    {
-                        TotalDiscountArray.Add(ActiveCoupon.totalDiscount);
-                    }
-
-                    // TotalDiscountArray IS IN ORDER = [1,2,3,4,5,6]
-                    TotalDiscountArray.Sort();
-
-                    Debug.WriteLine("");
-                    Debug.Write("SORTED TOTAL DISCOUNT VALUES: ");
-                    foreach(double Value in TotalDiscountArray)
-                    {
-                        Debug.Write(Value + " ");
-                    }
-
-                    // RECORD REPETITIONS + READING SORTED ARRAY BACKWARDS + WRITING THE RIGHT MESSAGE ON THE COUPON
-                    var Limit = TotalDiscountArray.Count;
-                    var LastIndex = Limit - 1;
-                    for(int i = 0; i < Limit; i++)
-                    {
-                        var Value = TotalDiscountArray[LastIndex];
-                        for(int j = 0; j < activeCoupons.Count; j++)
-                        {
-                            if(Value == activeCoupons[j].totalDiscount)
-                            {
-                                activeCoupons[j].image = "eligibleCoupon.png";
-                                activeCoupons[j].savingsOrSpendingNote = "You saved: $" + activeCoupons[j].totalDiscount.ToString("N2");
-                                couponsList.Add(activeCoupons[j]);
-                                activeCoupons.RemoveAt(j);
-                                break;
-                            }
-                        }
-                        LastIndex--;
-                    }
-                }
-
-                // ALL COUPONS ARE NON-ACTIVE
-                if(activeCoupons.Count == 0)
-                {
-                    // PLACE THRESHOLD VALUE IN A ARRAY TO SORT FROM SMALLEST TO LARGEST
-                    var ThresholdArray = new List<double>();
-                    foreach(couponItem NonActiveCoupon in nonactiveCoupons)
-                    {
-                        ThresholdArray.Add(NonActiveCoupon.threshold);
-                    }
-
-                    ThresholdArray.Sort();
-
-                    var Limit = nonactiveCoupons.Count;
-                    var FirstIndex = 0;
-                    for(int i = 0; i < Limit; i++)
-                    {
-                        var Value = ThresholdArray[FirstIndex];
-                        for(int j = 0; j < nonactiveCoupons.Count; j++)
-                        {
-                            if (Value == nonactiveCoupons[j].threshold)
-                            {
-                                nonactiveCoupons[j].savingsOrSpendingNote = "Spend $" + (nonactiveCoupons[j].threshold - initialSubTotal).ToString("N2") + " more to use";
-                                couponsList.Add(nonactiveCoupons[j]);
-                                nonactiveCoupons.RemoveAt(j);
-                                break;
-                            }
-                        }
-                        FirstIndex++;
-                    }
-                }
-
-                // COUPONS ARE ACTIVE AND NON-ACTIVE
-                if(activeCoupons.Count != 0 && nonactiveCoupons.Count != 0)
-                {
-                    // PLACE TOTAL DISCOUNT VALUE IN A ARRAY TO SORT FROM SMALLEST TO LARGEST
-                    var TotalDiscountArray = new List<double>();
-
-                    // TotalDiscountArray IS OUT OF ORDER FOR EXAMPLE = [5,3,6,4,5,2,1,]
-                    foreach (couponItem ActiveCoupon in activeCoupons)
-                    {
-                        TotalDiscountArray.Add(ActiveCoupon.totalDiscount);
-                    }
-
-                    // TotalDiscountArray IS IN ORDER = [1,2,3,4,5,6]
-                    TotalDiscountArray.Sort();
-
-                    Debug.WriteLine("");
-                    Debug.Write("SORTED TOTAL DISCOUNT VALUES: ");
-                    foreach (double Value in TotalDiscountArray)
-                    {
-                        Debug.Write(Value + " ");
-                    }
-
-                    // RECORD REPETITIONS + READING SORTED ARRAY BACKWARDS + WRITING THE RIGHT MESSAGE ON THE COUPON
-                    var Limit = TotalDiscountArray.Count;
-                    var LastIndex = Limit - 1;
-                    for (int i = 0; i < Limit; i++)
-                    {
-                        var Value = TotalDiscountArray[LastIndex];
-                        for (int j = 0; j < activeCoupons.Count; j++)
-                        {
-                            if (Value == activeCoupons[j].totalDiscount)
-                            {
-                                activeCoupons[j].image = "eligiableCoupon.png";
-                                activeCoupons[j].savingsOrSpendingNote = "You saved: $" + activeCoupons[j].totalDiscount.ToString("N2");
-                                couponsList.Add(activeCoupons[j]);
-                                activeCoupons.RemoveAt(j);
-                                break;
-                            }
-                        }
-                        LastIndex--;
-                    }
-
-                    // PLACE THRESHOLD VALUE IN A ARRAY TO SORT FROM SMALLEST TO LARGEST
-                    var ThresholdArray = new List<double>();
-                    foreach (couponItem NonActiveCoupon in nonactiveCoupons)
-                    {
-                        ThresholdArray.Add(NonActiveCoupon.threshold);
-                    }
-
-                    ThresholdArray.Sort();
-
-                    Limit = nonactiveCoupons.Count;
-                    var FirstIndex = 0;
-                    for (int i = 0; i < Limit; i++)
-                    {
-                        var Value = ThresholdArray[FirstIndex];
-                        for (int j = 0; j < nonactiveCoupons.Count; j++)
-                        {
-                            if (Value == nonactiveCoupons[j].threshold)
-                            {
-                                nonactiveCoupons[j].savingsOrSpendingNote = "Spend $" + (nonactiveCoupons[j].threshold - initialSubTotal).ToString("N2") + " more to use";
-                                couponsList.Add(nonactiveCoupons[j]);
-                                nonactiveCoupons.RemoveAt(j);
-                                break;
-                            }
-                        }
-                        FirstIndex++;
-                    }
-                }
-
-                if (couponsList.Count != 0)
-                {
-                    if (couponsList[0].status == "ACTIVE")
-                    {
-                        couponsList[0].image = "appliedCoupon.png";
-                        Debug.WriteLine("COUPON DISCOUNT: {0}, COUPON SHIPPING: {1}", couponsList[0].discount, couponsList[0].shipping);
-                        updateTotals(couponsList[0].discount, couponsList[0].shipping);
-                        appliedIndex = 0;
-                    }
-                }
-                else
-                {
-                    updateTotals(0, 0);
-                }
-
-                for (int i = 0; i < couponsList.Count; i++)
-                {
-                    couponsList[i].index = i;
-                }
-
-                coupon_list.ItemsSource = couponsList;
             }
+            return source;
         }
 
         void ReturnToStore(System.Object sender, System.EventArgs e)
@@ -930,19 +886,49 @@ namespace ServingFresh.Views
 
         void ApplyActiveCoupon(System.Object sender, System.EventArgs e)
         {
-            var element = (StackLayout)sender;
-            var selectedElement = Int32.Parse(element.ClassId);
-            
-            if(couponsList[selectedElement].image == "CouponIconGreen.png")
+            Debug.WriteLine("APPLY ACTIVE COUPON FUNCTION");
+            var elementUI = (RelativeLayout)sender;
+            var gestureRecognizer = (TapGestureRecognizer)elementUI.GestureRecognizers[0];
+            var selectedElement = (couponItem)gestureRecognizer.CommandParameter;
+
+            if(selectedElement.status == "ACTIVE")
             {
-                couponsList[appliedIndex].image = "CouponIconGreen.png";
-                // couponsList[defaultCouponIndex].image = "CouponIconGray.png";
-                couponsList[appliedIndex].update();
-                couponsList[selectedElement].image = "CouponIconOrange.png";
-                couponsList[selectedElement].update();
-                appliedIndex = selectedElement;
-                updateTotals(couponsList[appliedIndex].discount,couponsList[appliedIndex].shipping);
+                foreach(couponItem coupon in availableCoupons)
+                {
+                    if(coupon.status == "ACTIVE")
+                    {
+                        coupon.image = "eligibleCoupon.png";
+                        coupon.textColor = Color.Black;
+                        coupon.isCouponEligible = "Eligible";
+                        
+                    }
+                    else
+                    {
+                        coupon.image = "nonEligibleCoupon.png";
+                        coupon.textColor = Color.Gray;
+                        coupon.isCouponEligible = "Non eligible";
+                        
+                    }
+                    coupon.update();
+                }
+
+                selectedElement.image = "appliedCoupon.png";
+                selectedElement.textColor = Color.White;
+                selectedElement.isCouponEligible = "Applied";
+                selectedElement.update();
+                appliedCoupon = selectedElement;
+                updateTotals(selectedElement.discount, selectedElement.shipping);
             }
+        }
+
+        public string GetCouponID()
+        {
+            var id = "";
+            if(appliedCoupon != null)
+            {
+                id = appliedCoupon.couponId;
+            }
+            return id;
         }
 
         public void updateTotals(double discount, double discount_delivery_fee)
@@ -1151,30 +1137,7 @@ namespace ServingFresh.Views
             purchaseObject.payment_type = ((Button)sender).Text == "Checkout with Paypal" ? "PAYPAL" : "STRIPE";
             purchaseObject.items = GetOrder(cartItems);
             purchaseObject.start_delivery_date = ((DateTime)Application.Current.Properties["deliveryDate"]).ToString("yyyy-MM-dd HH:mm:ss");
-            if (!(bool)Application.Current.Properties["guest"])
-            {
-                if (appliedIndex != -1)
-                {
-                    Debug.WriteLine("COUPON ID: " + couponsList[appliedIndex].couponId);
-                    if (couponsList[appliedIndex].couponId != null)
-                    {
-                        purchaseObject.pay_coupon_id = couponsList[appliedIndex].couponId;
-                    }
-                    else
-                    {
-                        purchaseObject.pay_coupon_id = "";
-                    }
-                }
-                else
-                {
-                    purchaseObject.pay_coupon_id = "";
-                }
-                //purchaseObject.pay_coupon_id = couponData.result[defaultCouponIndex].coupon_uid;
-            }
-            else
-            {
-                purchaseObject.pay_coupon_id = "";
-            }
+            purchaseObject.pay_coupon_id = GetCouponID();
             purchaseObject.amount_due = total.ToString("N2");
             purchaseObject.amount_discount = discount.ToString("N2"); ;
             purchaseObject.amount_paid = total.ToString("N2"); ;
@@ -1290,31 +1253,7 @@ namespace ServingFresh.Views
                 purchaseObject.payment_type = "PAYPAL";
                 purchaseObject.items = GetOrder(cartItems);
                 purchaseObject.start_delivery_date = ((DateTime)Application.Current.Properties["deliveryDate"]).ToString("yyyy-MM-dd HH:mm:ss");
-                if (!(bool)Application.Current.Properties["guest"])
-                {
-                    if(appliedIndex != -1)
-                    {
-                        Debug.WriteLine("COUPON ID: " + couponsList[appliedIndex].couponId);
-                        if (couponsList[appliedIndex].couponId != null)
-                        {
-                            purchaseObject.pay_coupon_id = couponsList[appliedIndex].couponId;
-                        }
-                        else
-                        {
-                            purchaseObject.pay_coupon_id = "";
-                        }
-                    }
-                    else
-                    {
-                        purchaseObject.pay_coupon_id = "";
-                    }
-                    //purchaseObject.pay_coupon_id = couponData.result[defaultCouponIndex].coupon_uid;
-                }
-                else
-                {
-                    purchaseObject.pay_coupon_id = "";
-                }
-               
+                purchaseObject.pay_coupon_id = GetCouponID();
                 purchaseObject.amount_due = total.ToString("N2"); ;
                 purchaseObject.amount_discount = discount.ToString("N2"); ;
                 purchaseObject.amount_paid = total.ToString("N2"); ;
@@ -1868,290 +1807,90 @@ namespace ServingFresh.Views
 
         public void GetNewDefaltCoupon()
         {
-            couponsList.Clear();
-            TempCouponsList.Clear();
-            double initialSubTotal = GetSubTotal();
-            double initialDeliveryFee = GetDeliveryFee();
-            double initialServiceFee = GetServiceFee();
-            double initialTaxes = GetTaxes();
-            double initialTotal = initialSubTotal + initialDeliveryFee + initialServiceFee + initialTaxes;
+            
+                
+                //couponsList.Clear();
 
-            foreach (Models.Coupon c in couponData.result)
-            {
-                // IF THRESHOLD IS NULL SET IT TO ZERO, OTHERWISE INITIAL VALUE STAYS THE SAME
-                if (c.threshold == null) { c.threshold = 0.0; }
-                double discount = 0;
-                //double newTotal = 0;
+                double initialSubTotal = GetSubTotal();
+                double initialDeliveryFee = GetDeliveryFee();
+                double initialServiceFee = GetServiceFee();
+                double initialTaxes = GetTaxes();
+                double initialTotal = initialSubTotal + initialDeliveryFee + initialServiceFee + initialTaxes;
 
-                var coupon = new couponItem();
-                //Debug.WriteLine("COUPON IDS: " + c.coupon_uid);
-                coupon.couponId = c.coupon_uid;
-                // INITIALLY, THE IMAGE OF EVERY COUPON IS GRAY. (PLATFORM DEPENDENT)
-                if (Device.RuntimePlatform == Device.Android)
+            int j = 0;
+                foreach (Models.Coupon c in couponData.result)
                 {
-                    coupon.image = "CouponIconGray.png";
-                }
-                else
-                {
-                    coupon.image = "nonEligiableCoupon.png";
-                }
+                    // IF THRESHOLD IS NULL SET IT TO ZERO, OTHERWISE INITIAL VALUE STAYS THE SAME
+                    if (c.threshold == null) { c.threshold = 0.0; }
+                    double discount = 0;
+                    //double newTotal = 0;
 
-                // SET TITLE LABEL OF COUPON
-                coupon.couponNote = c.notes;
-                // SET THRESHOLD LABEL BASED ON THRESHOLD VALUE: 0 = NO MINIMUM PURCHASE, GREATER THAN 0 = SPEND THE AMOUNT OF THRESHOLD
-                if ((double)c.threshold == 0)
-                {
-                    coupon.threshold = 0;
-                    coupon.thresholdNote = "No minimum purchase";
-                }
-                else
-                {
-                    coupon.threshold = (double)c.threshold;
-                    coupon.thresholdNote = "$" + coupon.threshold.ToString("N2") + " minimum purchase";
-                }
-
-                // SET EXPIRATION DATE
-                coupon.expNote = "Expires: " + DateTime.Parse(c.expire_date).ToString("MM/dd/yyyy");
-                coupon.index = 0;
-
-                // CALCULATING DISCOUNT, SHIPPING, AND COUPON STATUS
-                if (initialSubTotal >= (double)c.threshold)
-                {
-                    if (initialSubTotal >= c.discount_amount)
+                    var coupon = new couponItem();
+                    //Debug.WriteLine("COUPON IDS: " + c.coupon_uid);
+                    coupon.couponId = c.coupon_uid;
+                    // INITIALLY, THE IMAGE OF EVERY COUPON IS GRAY. (PLATFORM DEPENDENT)
+                    if (Device.RuntimePlatform == Device.Android)
                     {
-                        // All
-                        discount = initialSubTotal - ((initialSubTotal - c.discount_amount) * (1.0 - (c.discount_percent / 100.0)));
+                        coupon.image = "CouponIconGray.png";
                     }
                     else
                     {
-                        // Partly apply coupon: % discount and $ shipping
-                        discount = initialSubTotal;
+                        coupon.image = "nonEligibleCoupon.png";
                     }
-                    //newTotal = initialSubTotal - discount + initialServiceFee + (initialDeliveryFee - c.discount_shipping) + initialTaxes;
-                    coupon.discount = discount;
-                    coupon.shipping = c.discount_shipping;
-                    coupon.status = "ACTIVE";
-                    coupon.totalDiscount = coupon.discount + coupon.shipping;
-                }
-                else
-                {
-                    coupon.discount = 0;
-                    coupon.shipping = 0;
-                    coupon.status = "NOT-ACTIVE";
-                    coupon.totalDiscount = coupon.discount + coupon.shipping;
-                }
-                TempCouponsList.Add(coupon);
-            }
 
-            var activeCoupons = new List<couponItem>();
-            var nonactiveCoupons = new List<couponItem>();
-
-            foreach (couponItem a in TempCouponsList)
-            {
-                if (a.status == "ACTIVE")
-                {
-                    activeCoupons.Add(a);
-                }
-                else
-                {
-                    nonactiveCoupons.Add(a);
-                }
-            }
-
-            TempCouponsList.Clear();
-            // TESTING
-            //Debug.WriteLine("");
-            //Debug.Write("LIST OF ACTIVE COUPONS: ");
-            //foreach (couponItem e in activeCoupons)
-            //{
-            //    Debug.Write(e.couponId + " ");
-
-            //}
-            //Debug.WriteLine("");
-            //Debug.WriteLine("");
-            //Debug.Write("List OF NONACTIVE COUPONS: ");
-            //foreach (couponItem e in nonactiveCoupons)
-            //{
-            //    Debug.Write(e.couponId + " ");
-            //}
-
-            //Debug.WriteLine("");
-            //Debug.WriteLine("");
-
-            // ALL COUPOUNS ARE ACTIVE
-            if (nonactiveCoupons.Count == 0)
-            {
-                // PLACE TOTAL DISCOUNT VALUE IN A ARRAY TO SORT FROM SMALLEST TO LARGEST
-                var TotalDiscountArray = new List<double>();
-
-                // TotalDiscountArray IS OUT OF ORDER FOR EXAMPLE = [5,3,6,4,5,2,1,]
-                foreach (couponItem ActiveCoupon in activeCoupons)
-                {
-                    TotalDiscountArray.Add(ActiveCoupon.totalDiscount);
-                }
-
-                // TotalDiscountArray IS IN ORDER = [1,2,3,4,5,6]
-                TotalDiscountArray.Sort();
-
-                Debug.WriteLine("");
-                Debug.Write("SORTED TOTAL DISCOUNT VALUES: ");
-                foreach (double Value in TotalDiscountArray)
-                {
-                    Debug.Write(Value + " ");
-                }
-
-                // RECORD REPETITIONS + READING SORTED ARRAY BACKWARDS + WRITING THE RIGHT MESSAGE ON THE COUPON
-                var Limit = TotalDiscountArray.Count;
-                var LastIndex = Limit - 1;
-                for (int i = 0; i < Limit; i++)
-                {
-                    var Value = TotalDiscountArray[LastIndex];
-                    for (int j = 0; j < activeCoupons.Count; j++)
+                    // SET TITLE LABEL OF COUPON
+                    coupon.couponNote = c.notes;
+                    // SET THRESHOLD LABEL BASED ON THRESHOLD VALUE: 0 = NO MINIMUM PURCHASE, GREATER THAN 0 = SPEND THE AMOUNT OF THRESHOLD
+                    if ((double)c.threshold == 0)
                     {
-                        if (Value == activeCoupons[j].totalDiscount)
-                        {
-                            activeCoupons[j].image = "eligibleCoupon.png";
-                            activeCoupons[j].savingsOrSpendingNote = "You saved: $" + activeCoupons[j].totalDiscount.ToString("N2");
-                            TempCouponsList.Add(activeCoupons[j]);
-                            activeCoupons.RemoveAt(j);
-                            break;
-                        }
+                        coupon.threshold = 0;
+                        coupon.thresholdNote = "No minimum purchase";
                     }
-                    LastIndex--;
-                }
-            }
-
-            // ALL COUPONS ARE NON-ACTIVE
-            if (activeCoupons.Count == 0)
-            {
-                // PLACE THRESHOLD VALUE IN A ARRAY TO SORT FROM SMALLEST TO LARGEST
-                var ThresholdArray = new List<double>();
-                foreach (couponItem NonActiveCoupon in nonactiveCoupons)
-                {
-                    ThresholdArray.Add(NonActiveCoupon.threshold);
-                }
-
-                ThresholdArray.Sort();
-
-                var Limit = nonactiveCoupons.Count;
-                var FirstIndex = 0;
-                for (int i = 0; i < Limit; i++)
-                {
-                    var Value = ThresholdArray[FirstIndex];
-                    for (int j = 0; j < nonactiveCoupons.Count; j++)
+                    else
                     {
-                        if (Value == nonactiveCoupons[j].threshold)
-                        {
-                            nonactiveCoupons[j].savingsOrSpendingNote = "Spend $" + (nonactiveCoupons[j].threshold - initialSubTotal).ToString("N2") + " more to use";
-                            TempCouponsList.Add(nonactiveCoupons[j]);
-                            nonactiveCoupons.RemoveAt(j);
-                            break;
-                        }
+                        coupon.threshold = (double)c.threshold;
+                        coupon.thresholdNote = "$" + coupon.threshold.ToString("N2") + " minimum purchase";
                     }
-                    FirstIndex++;
-                }
-            }
 
-            // COUPONS ARE ACTIVE AND NON-ACTIVE
-            if (activeCoupons.Count != 0 && nonactiveCoupons.Count != 0)
-            {
-                // PLACE TOTAL DISCOUNT VALUE IN A ARRAY TO SORT FROM SMALLEST TO LARGEST
-                var TotalDiscountArray = new List<double>();
+                    // SET EXPIRATION DATE
+                    coupon.expNote = "Expires: " + DateTime.Parse(c.expire_date).ToString("MM/dd/yyyy");
+                    coupon.index = 0;
 
-                // TotalDiscountArray IS OUT OF ORDER FOR EXAMPLE = [5,3,6,4,5,2,1,]
-                foreach (couponItem ActiveCoupon in activeCoupons)
-                {
-                    TotalDiscountArray.Add(ActiveCoupon.totalDiscount);
-                }
-
-                // TotalDiscountArray IS IN ORDER = [1,2,3,4,5,6]
-                TotalDiscountArray.Sort();
-
-                Debug.WriteLine("");
-                Debug.Write("SORTED TOTAL DISCOUNT VALUES: ");
-                foreach (double Value in TotalDiscountArray)
-                {
-                    Debug.Write(Value + " ");
-                }
-
-                // RECORD REPETITIONS + READING SORTED ARRAY BACKWARDS + WRITING THE RIGHT MESSAGE ON THE COUPON
-                var Limit = TotalDiscountArray.Count;
-                var LastIndex = Limit - 1;
-                for (int i = 0; i < Limit; i++)
-                {
-                    var Value = TotalDiscountArray[LastIndex];
-                    for (int j = 0; j < activeCoupons.Count; j++)
+                    // CALCULATING DISCOUNT, SHIPPING, AND COUPON STATUS
+                    if (initialSubTotal >= (double)c.threshold)
                     {
-                        if (Value == activeCoupons[j].totalDiscount)
+                        if (initialSubTotal >= c.discount_amount)
                         {
-                            activeCoupons[j].image = "eligibleCoupon.png";
-                            activeCoupons[j].savingsOrSpendingNote = "You saved: $" + activeCoupons[j].totalDiscount.ToString("N2");
-                            TempCouponsList.Add(activeCoupons[j]);
-                            activeCoupons.RemoveAt(j);
-                            break;
+                            // All
+                            discount = initialSubTotal - ((initialSubTotal - c.discount_amount) * (1.0 - (c.discount_percent / 100.0)));
                         }
+                        else
+                        {
+                            // Partly apply coupon: % discount and $ shipping
+                            discount = initialSubTotal;
+                        }
+                        //newTotal = initialSubTotal - discount + initialServiceFee + (initialDeliveryFee - c.discount_shipping) + initialTaxes;
+                        coupon.discount = discount;
+                        coupon.shipping = c.discount_shipping;
+                        coupon.status = "ACTIVE";
+                        coupon.totalDiscount = coupon.discount + coupon.shipping;
                     }
-                    LastIndex--;
-                }
-
-                // PLACE THRESHOLD VALUE IN A ARRAY TO SORT FROM SMALLEST TO LARGEST
-                var ThresholdArray = new List<double>();
-                foreach (couponItem NonActiveCoupon in nonactiveCoupons)
-                {
-                    ThresholdArray.Add(NonActiveCoupon.threshold);
-                }
-
-                ThresholdArray.Sort();
-
-                Limit = nonactiveCoupons.Count;
-                var FirstIndex = 0;
-                for (int i = 0; i < Limit; i++)
-                {
-                    var Value = ThresholdArray[FirstIndex];
-                    for (int j = 0; j < nonactiveCoupons.Count; j++)
+                    else
                     {
-                        if (Value == nonactiveCoupons[j].threshold)
-                        {
-                            nonactiveCoupons[j].savingsOrSpendingNote = "Spend $" + (nonactiveCoupons[j].threshold - initialSubTotal).ToString("N2") + " more to use";
-                            TempCouponsList.Add(nonactiveCoupons[j]);
-                            nonactiveCoupons.RemoveAt(j);
-                            break;
-                        }
+                        coupon.discount = 0;
+                        coupon.shipping = 0;
+                        coupon.status = "NOT-ACTIVE";
+                        coupon.totalDiscount = coupon.discount + coupon.shipping;
                     }
-                    FirstIndex++;
+                    couponsList[j++] = coupon;
                 }
-            }
 
-            foreach(couponItem a in TempCouponsList)
-            {
-                couponsList.Add(a);
-            }
-
-            for (int i = 0; i < couponsList.Count; i++)
-            {
-                couponsList[i].index = i;
-            }
-
-            if (couponsList.Count != 0)
-            {
-                if (couponsList[0].status == "ACTIVE")
-                {
-                    couponsList[0].image = "appliedCoupon.png";
-                    Debug.WriteLine("COUPON DISCOUNT: {0}, COUPON SHIPPING: {1}", couponsList[0].discount, couponsList[0].shipping);
-                    updateTotals(couponsList[0].discount, couponsList[0].shipping);
-                    appliedIndex = 0;
-                }
-                else
-                {
-                    updateTotals(0, 0);
-                }
-            }
-            else
-            {
-                updateTotals(0, 0);
-            }
-
-            coupon_list.ItemsSource = couponsList;
+                var activeCoupons = couponItem.GetActiveCoupons(couponsList);
+                var nonactiveCoupons = couponItem.GetNonActiveCoupons(couponsList, initialSubTotal);
+                couponItem.SortActiveCoupons(activeCoupons);
+                couponItem.SortNonActiveCoupons(nonactiveCoupons);
+                availableCoupons = ApplyBestAvailableCoupon(couponItem.MergeActiveNonActiveCouponLists(activeCoupons, nonactiveCoupons));
+                coupon_list.ItemsSource = availableCoupons;
         }
    
         public void openHistory(object sender, EventArgs e)
@@ -3047,6 +2786,84 @@ namespace ServingFresh.Views
             }
             return taskResponse;
         }
+
+        Models.Address addr = new Models.Address();
+
+        private ObservableCollection<AddressAutocomplete> _addresses;
+        public ObservableCollection<AddressAutocomplete> Addresses
+        {
+            get => _addresses ?? (_addresses = new ObservableCollection<AddressAutocomplete>());
+            set
+            {
+                if (_addresses != value)
+                {
+                    _addresses = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private string _addressText;
+        public string AddressText
+        {
+            get => _addressText;
+            set
+            {
+                if (_addressText != value)
+                {
+                    _addressText = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public async Task GetPlacesPredictionsAsync()
+        {
+           await addr.GetPlacesPredictionsAsync(addressList, Addresses, AddressEntry.Text);
+        }
+
+        private void OnAddressChanged(object sender, EventArgs eventArgs)
+        {
+            addr.OnAddressChanged(addressList, Addresses, AddressEntry.Text);
+        }
+
+        private void addressEntryFocused(object sender, EventArgs eventArgs)
+        {
+            //addr.addressEntryFocused(addressList);
+        }
+
+        private void addressEntryUnfocused(object sender, EventArgs eventArgs)
+        {
+            //addr.addressEntryUnfocused(addressList);
+        }
+
+        async void addressSelected(System.Object sender, SelectedItemChangedEventArgs e)
+        {
+            //addr.addressSelected(addressList);
+            var elementUI = (AddressAutocomplete) e.SelectedItem;
+            //AddressEntry.Text = elementUI.Address;
+            Debug.WriteLine("ADDRESS SELECTED :" + elementUI.Address);
+            var address = "";
+            foreach(char a in elementUI.Address)
+            {
+                if(a != ',')
+                {
+                    address += a;
+                }
+                else
+                {
+                    break;
+                }
+
+            }
+            newUserAddress.Text = address;
+            newUserCity.Text = elementUI.City;
+            newUserState.Text = elementUI.State;
+            newUserZipcode.Text = elementUI.ZipCode;
+
+        }
+
+
 
         //void EntryClick(System.Object sender, System.EventArgs e)
         //{
