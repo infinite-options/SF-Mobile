@@ -14,9 +14,9 @@ namespace ServingFresh.Views
         {
             InitializeComponent();
             currentLocation = new Location();
-            //currentLocation.Latitude = 37.227124;
-            //currentLocation.Longitude = -121.886943;
-            GetCurrentLocation();
+            currentLocation.Latitude = 37.227124;
+            currentLocation.Longitude = -121.886943;
+            //GetCurrentLocation();
         }
 
 

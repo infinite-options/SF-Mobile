@@ -25,7 +25,7 @@
                                     <ColumnDefinition Width="*"></ColumnDefinition>
                                 </Grid.ColumnDefinitions>
                                 <Label
-                                    Margin="40,0,0,0"
+                                    Margin="15,0,0,0"
                                     VerticalTextAlignment="Center"
                                     Grid.Column="0"
                                     LineHeight="0.8"
@@ -69,7 +69,7 @@
                                     Margin="20,10,10,0"
                                     Grid.Column="0"
                                     VerticalOptions="Start">
-                                    <Image Source="asGuestIcon.png">
+                                    <Image Source="loginLeafIcon.png">
                                         <Image.GestureRecognizers>
                                             <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"></TapGestureRecognizer>
                                         </Image.GestureRecognizers>

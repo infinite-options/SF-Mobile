@@ -162,27 +162,29 @@ namespace ServingFresh.Views
                         //    Application.Current.Properties["CardCVV"] = cardCvv;
                         //}
 
-                        // Step 1: Create Card
-                        TokenCardOptions stripeOption = new TokenCardOptions();
+                        // Step 1: Create Card 
+                        TokenCardOptions stripeOption = new TokenCardOptions(); 
                         stripeOption.Number = CardNo;
                         stripeOption.ExpMonth = Convert.ToInt64(expMonth);
                         stripeOption.ExpYear = Convert.ToInt64(expYear);
                         stripeOption.Cvc = cardCvv;
 
                         // Step 2: Assign card to token object
-                        TokenCreateOptions stripeCard = new TokenCreateOptions();
+                        TokenCreateOptions stripeCard = new TokenCreateOptions(); 
                         stripeCard.Card = stripeOption;
 
-                        TokenService service = new TokenService();
+
+                        TokenService service = new TokenService(); 
                         Stripe.Token newToken = service.Create(stripeCard);
 
                         // Step 3: Assign the token to the soruce 
-                        var option = new SourceCreateOptions();
-                        option.Type = SourceType.Card;
+                        SourceCreateOptions option = new SourceCreateOptions();
+
+                        option.Type = SourceType.Card; 
                         option.Currency = "usd";
                         option.Token = newToken.Id;
 
-                        var sourceService = new SourceService();
+                        SourceService sourceService = new SourceService();
                         Source source = sourceService.Create(option);
 
                         // Step 4: Create customer
@@ -196,11 +198,11 @@ namespace ServingFresh.Views
                         //}
                         //customer.Address = new AddressOptions { City = cardCity.Text.Trim(), Country = Constant.Contry, Line1 = cardHolderAddress.Text.Trim(), Line2 = cardHolderUnit.Text.Trim(), PostalCode = cardZip.Text.Trim(), State = cardState.Text.Trim() };
 
-                        var customerService = new CustomerService();
-                        var cust = customerService.Create(customer);
+                        CustomerService customerService = new CustomerService();
+                        Customer cust = customerService.Create(customer);
 
                         // Step 5: Charge option
-                        var chargeOption = new ChargeCreateOptions();
+                        ChargeCreateOptions chargeOption = new ChargeCreateOptions();
                         chargeOption.Amount = (long)RemoveDecimalFromTotalAmount(purchase.amount_due);
                         chargeOption.Currency = "usd";
                         chargeOption.ReceiptEmail = emailAddress.Text.Trim();
@@ -209,8 +211,9 @@ namespace ServingFresh.Views
                         chargeOption.Description = "";
 
                         // Step 6: charge the customer
-                        var chargeService = new ChargeService();
+                        ChargeService chargeService = new ChargeService();
                         Charge charge = chargeService.Create(chargeOption);
+
                         if (charge.Status == "succeeded")
                         {
                             return true;

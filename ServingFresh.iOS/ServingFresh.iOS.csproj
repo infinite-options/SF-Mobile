@@ -200,6 +200,9 @@
     <BundleResource Include="Resources\appliedCoupon.png" />
     <BundleResource Include="Resources\eligibleCoupon.png" />
     <BundleResource Include="Resources\nonEligibleCoupon.png" />
+    <BundleResource Include="Resources\triangleIconFilled.png" />
+    <BundleResource Include="Resources\triangleIconEmpty.png" />
+    <BundleResource Include="Resources\loginLeafIcon.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AppleSignIn\" />

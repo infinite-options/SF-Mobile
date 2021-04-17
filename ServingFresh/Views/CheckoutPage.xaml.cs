@@ -1817,7 +1817,7 @@ namespace ServingFresh.Views
                 double initialTaxes = GetTaxes();
                 double initialTotal = initialSubTotal + initialDeliveryFee + initialServiceFee + initialTaxes;
 
-            int j = 0;
+                int j = 0;
                 foreach (Models.Coupon c in couponData.result)
                 {
                     // IF THRESHOLD IS NULL SET IT TO ZERO, OTHERWISE INITIAL VALUE STAYS THE SAME

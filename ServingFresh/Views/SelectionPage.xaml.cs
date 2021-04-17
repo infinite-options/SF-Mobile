@@ -196,6 +196,15 @@ namespace ServingFresh.Views
 
         // New variables for single lists
         ObservableCollection<SingleItem> vegetablesList = new ObservableCollection<SingleItem>();
+        List<Items> vegetableDoubleList = new List<Items>();
+        List<Items> fruitDoubleList = new List<Items>();
+        List<Items> otherDoubleList = new List<Items>();
+        List<Items> dessetDoubleList = new List<Items>();
+
+        public ObservableCollection<ItemsModel> fruitGrid = new ObservableCollection<ItemsModel>();
+        public ObservableCollection<ItemsModel> otherGrid = new ObservableCollection<ItemsModel>();
+        public ObservableCollection<ItemsModel> dessertGrid = new ObservableCollection<ItemsModel>();
+
         ObservableCollection<SingleItem> fruitsList = new ObservableCollection<SingleItem>();
         ObservableCollection<SingleItem> othersList = new ObservableCollection<SingleItem>();
         ObservableCollection<SingleItem> dessertsList = new ObservableCollection<SingleItem>();
@@ -765,10 +774,25 @@ namespace ServingFresh.Views
                         //GetData(data.result);
 
                         GetDataForSingleList(data.result);
+                        //GetDataForVegetables(vegetableDoubleList);
+                        //GetDataForFruits(fruitDoubleList);
+                        //GetDataForOthers(otherDoubleList);
+                        //GetDataForDesserts(dessetDoubleList);
+                        //updateItemsBackgroundColorAndQuantity(vegetablesList, selectedDeliveryDate);
+
+
                         updateItemsBackgroundColorAndQuantity(vegetablesList, selectedDeliveryDate);
                         updateItemsBackgroundColorAndQuantity(fruitsList, selectedDeliveryDate);
                         updateItemsBackgroundColorAndQuantity(dessertsList, selectedDeliveryDate);
                         updateItemsBackgroundColorAndQuantity(othersList, selectedDeliveryDate);
+
+                        SetVerticalView(vegetablesList, itemList);
+                        //updateItemsBackgroundColorAndQuantity(fruitsList, selectedDeliveryDate);
+                        SetVerticalView(fruitsList, fruitsVerticalView);
+                        //updateItemsBackgroundColorAndQuantity(dessertsList, selectedDeliveryDate);
+                        SetVerticalView(dessertsList, dessertsVerticalView);
+                        //updateItemsBackgroundColorAndQuantity(othersList, selectedDeliveryDate);
+                        SetVerticalView(othersList, othersVerticalView);
                         UpdateNumberOfItemsInCart();
                     }
                 }
@@ -786,81 +810,459 @@ namespace ServingFresh.Views
         }
 
 
+        private void SetVerticalView(IList<SingleItem> listOfItems, ListView verticalList)
+        {
+            try
+            {
+                var gridViewLayout = new ObservableCollection<ItemsModel>();
+                if (listOfItems.Count != 0 && listOfItems != null)
+                {
+                    //var gridViewLayout = new ObservableCollection<ItemsModel>();
+                    int n = listOfItems.Count;
+                    int j = 0;
+                    if (n == 0)
+                    {
+
+                        gridViewLayout.Add(new ItemsModel()
+                        {
+                            height = this.Width / 2 - 10,
+                            width = this.Width / 2 - 25,
+                            imageSourceLeft = "",
+                            quantityLeft = 0,
+                            itemNameLeft = "",
+                            itemPriceLeft = "$ " + "",
+                            itemPriceLeftUnit = "",
+                            itemLeftUnit = "",
+                            item_businessPriceLeft = 0,
+                            isItemLeftVisiable = false,
+                            isItemLeftEnable = false,
+                            quantityL = 0,
+                            item_descLeft = "",
+                            itemTaxableLeft = "",
+                            colorLeft = Color.FromHex("#FFFFFF"),
+                            itemTypeLeft = "",
+                            favoriteIconLeft = "unselectedHeartIcon.png",
+                            opacityLeft = 0,
+                            isItemLeftUnavailable = false,
+
+                            imageSourceRight = "",
+                            quantityRight = 0,
+                            itemNameRight = "",
+                            itemPriceRight = "$ " + "",
+                            itemPriceRightUnit = "",
+                            itemRightUnit = "",
+                            item_businessPriceRight = 0,
+                            isItemRightVisiable = false,
+                            isItemRightEnable = false,
+                            quantityR = 0,
+                            item_descRight = "",
+                            itemTaxableRight = "",
+                            colorRight = Color.FromHex("#FFFFFF"),
+                            itemTypeRight = "",
+                            favoriteIconRight = "unselectedHeartIcon.png",
+                            opacityRight = 0,
+                            isItemRightUnavailable = false,
+                        });
+                    }
+                    if (isAmountItemsEven(n))
+                    {
+                        for (int i = 0; i < n / 2; i++)
+                        {
+                            gridViewLayout.Add(new ItemsModel()
+                            {
+                                height = this.Width / 2 - 10,
+                                width = this.Width / 2 - 25,
+                                imageSourceLeft = listOfItems[j].itemImage,
+                                item_uidLeft = listOfItems[j].itemUID,
+                                itm_business_uidLeft = listOfItems[j].itemBusinessUID,
+                                quantityLeft = listOfItems[j].itemQuantity,
+                                itemNameLeft = listOfItems[j].itemName,
+                                itemPriceLeft = listOfItems[j].itemPrice,
+                                itemPriceLeftUnit = listOfItems[j].itemPriceWithUnit,
+                                itemLeftUnit = listOfItems[j].itemUnit,
+                                item_businessPriceLeft = listOfItems[j].itemBusinessPrice,
+                                isItemLeftVisiable = true,
+                                isItemLeftEnable = true,
+                                quantityL = listOfItems[j].itemQuantity,
+                                item_descLeft = listOfItems[j].itemDescription,
+                                itemTaxableLeft = listOfItems[j].itemTaxable,
+                                colorLeft = listOfItems[j].itemBackgroundColor,
+                                itemTypeLeft = listOfItems[j].itemType,
+                                favoriteIconLeft = listOfItems[j].itemFavoriteImage,
+                                opacityLeft = listOfItems[j].itemOpacity,
+                                isItemLeftUnavailable = listOfItems[j].isItemUnavailable,
+
+                                imageSourceRight = listOfItems[j + 1].itemImage,
+                                item_uidRight = listOfItems[j + 1].itemUID,
+                                itm_business_uidRight = listOfItems[j + 1].itemBusinessUID,
+                                quantityRight = listOfItems[j + 1].itemQuantity,
+                                itemNameRight = listOfItems[j + 1].itemName,
+                                itemPriceRight = listOfItems[j + 1].itemPrice,
+                                itemPriceRightUnit = listOfItems[j + 1].itemPriceWithUnit,
+                                itemRightUnit = listOfItems[j + 1].itemUnit,
+                                item_businessPriceRight = listOfItems[j + 1].itemBusinessPrice,
+                                isItemRightVisiable = true,
+                                isItemRightEnable = true,
+                                quantityR = listOfItems[j + 1].itemQuantity,
+                                item_descRight = listOfItems[j + 1].itemDescription,
+                                itemTaxableRight = listOfItems[j + 1].itemTaxable,
+                                colorRight = listOfItems[j + 1].itemBackgroundColor,
+                                itemTypeRight = listOfItems[j + 1].itemType,
+                                favoriteIconRight = listOfItems[j + 1].itemFavoriteImage,
+                                opacityRight = listOfItems[j + 1].itemOpacity,
+                                isItemRightUnavailable = listOfItems[j + 1].isItemUnavailable,
+                            }); ;
+                            j = j + 2;
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < n / 2; i++)
+                        {
+                            gridViewLayout.Add(new ItemsModel()
+                            {
+                                height = this.Width / 2 - 10,
+                                width = this.Width / 2 - 25,
+                                imageSourceLeft = listOfItems[j].itemImage,
+                                item_uidLeft = listOfItems[j].itemUID,
+                                itm_business_uidLeft = listOfItems[j].itemBusinessUID,
+                                quantityLeft = listOfItems[j].itemQuantity,
+                                itemNameLeft = listOfItems[j].itemName,
+                                itemPriceLeft = listOfItems[j].itemPrice,
+                                itemPriceLeftUnit = listOfItems[j].itemPriceWithUnit,
+                                itemLeftUnit = listOfItems[j].itemUnit,
+                                item_businessPriceLeft = listOfItems[j].itemBusinessPrice,
+                                isItemLeftVisiable = true,
+                                isItemLeftEnable = true,
+                                quantityL = listOfItems[j].itemQuantity,
+                                item_descLeft = listOfItems[j].itemDescription,
+                                itemTaxableLeft = listOfItems[j].itemTaxable,
+                                colorLeft = listOfItems[j].itemBackgroundColor,
+                                itemTypeLeft = listOfItems[j].itemType,
+                                favoriteIconLeft = listOfItems[j].itemFavoriteImage,
+                                opacityLeft = listOfItems[j].itemOpacity,
+                                isItemLeftUnavailable = listOfItems[j].isItemUnavailable,
+
+                                imageSourceRight = listOfItems[j + 1].itemImage,
+                                item_uidRight = listOfItems[j + 1].itemUID,
+                                itm_business_uidRight = listOfItems[j + 1].itemBusinessUID,
+                                quantityRight = listOfItems[j + 1].itemQuantity,
+                                itemNameRight = listOfItems[j + 1].itemName,
+                                itemPriceRight = listOfItems[j + 1].itemPrice,
+                                itemPriceRightUnit = listOfItems[j + 1].itemPriceWithUnit,
+                                itemRightUnit = listOfItems[j + 1].itemUnit,
+                                item_businessPriceRight = listOfItems[j + 1].itemBusinessPrice,
+                                isItemRightVisiable = true,
+                                isItemRightEnable = true,
+                                quantityR = listOfItems[j + 1].itemQuantity,
+                                item_descRight = listOfItems[j + 1].itemDescription,
+                                itemTaxableRight = listOfItems[j + 1].itemTaxable,
+                                colorRight = listOfItems[j + 1].itemBackgroundColor,
+                                itemTypeRight = listOfItems[j + 1].itemType,
+                                favoriteIconRight = listOfItems[j + 1].itemFavoriteImage,
+                                opacityRight = listOfItems[j + 1].itemOpacity,
+                                isItemRightUnavailable = listOfItems[j + 1].isItemUnavailable,
+                            });
+                            j = j + 2;
+                        }
+                        gridViewLayout.Add(new ItemsModel()
+                        {
+                            height = this.Width / 2 - 10,
+                            width = this.Width / 2 - 25,
+                            imageSourceLeft = listOfItems[j].itemImage,
+                            item_uidLeft = listOfItems[j].itemUID,
+                            itm_business_uidLeft = listOfItems[j].itemBusinessUID,
+                            quantityLeft = listOfItems[j].itemQuantity,
+                            itemNameLeft = listOfItems[j].itemName,
+                            itemPriceLeft = listOfItems[j].itemPrice,
+                            itemPriceLeftUnit = listOfItems[j].itemPriceWithUnit,
+                            itemLeftUnit = listOfItems[j].itemUnit,
+                            item_businessPriceLeft = listOfItems[j].itemBusinessPrice,
+                            isItemLeftVisiable = true,
+                            isItemLeftEnable = true,
+                            quantityL = listOfItems[j].itemQuantity,
+                            item_descLeft = listOfItems[j].itemDescription,
+                            itemTaxableLeft = listOfItems[j].itemTaxable,
+                            colorLeft = listOfItems[j].itemBackgroundColor,
+                            itemTypeLeft = listOfItems[j].itemType,
+                            favoriteIconLeft = listOfItems[j].itemFavoriteImage,
+                            opacityLeft = listOfItems[j].itemOpacity,
+                            isItemLeftUnavailable = listOfItems[j].isItemUnavailable,
+
+                            imageSourceRight = "",
+                            quantityRight = 0,
+                            itemNameRight = "",
+                            itemPriceRight = "$ " + "",
+                            isItemRightVisiable = false,
+                            isItemRightEnable = false,
+                            quantityR = 0,
+                            colorRight = Color.FromHex("#FFFFFF"),
+                            itemTypeRight = "",
+                            favoriteIconRight = "unselectedHeartIcon.png",
+                            opacityRight = 0,
+                            isItemRightUnavailable = false,
+                        });
+                    }
+                }
+
+                verticalList.ItemsSource = gridViewLayout;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+        }
+
+
         private void GetData(IList<Items> listOfItems)
         {
             try
             {
                 if (listOfItems.Count != 0 && listOfItems != null)
                 {
-                    List<Items> listUniqueItems = new List<Items>();
-                    Dictionary<string, Items> uniqueItems = new Dictionary<string, Items>();
-                    foreach (Items a in listOfItems)
+                    this.datagrid.Clear();
+                    int n = listOfItems.Count;
+                    int j = 0;
+                    if (n == 0)
                     {
-                        string key = a.item_name + a.item_desc + a.item_price;
-                        if (!uniqueItems.ContainsKey(key))
+
+                        this.datagrid.Add(new ItemsModel()
                         {
-                            uniqueItems.Add(key, a);
-                        }
-                        else
+                            height = this.Width / 2 - 10,
+                            width = this.Width / 2 - 25,
+                            imageSourceLeft = "",
+                            quantityLeft = 0,
+                            itemNameLeft = "",
+                            itemPriceLeft = "$ " + "",
+                            itemPriceLeftUnit = "",
+                            itemLeftUnit = "",
+                            item_businessPriceLeft = 0,
+                            isItemLeftVisiable = false,
+                            isItemLeftEnable = false,
+                            quantityL = 0,
+                            item_descLeft = "",
+                            itemTaxableLeft = "",
+                            colorLeft = Color.FromHex("#FFFFFF"),
+                            itemTypeLeft = "",
+                            favoriteIconLeft = "unselectedHeartIcon.png",
+                            opacityLeft = 0,
+                            isItemLeftUnavailable = false,
+
+                            imageSourceRight = "",
+                            quantityRight = 0,
+                            itemNameRight = "",
+                            itemPriceRight = "$ " + "",
+                            itemPriceRightUnit = "",
+                            itemRightUnit = "",
+                            item_businessPriceRight = 0,
+                            isItemRightVisiable = false,
+                            isItemRightEnable = false,
+                            quantityR = 0,
+                            item_descRight = "",
+                            itemTaxableRight = "",
+                            colorRight = Color.FromHex("#FFFFFF"),
+                            itemTypeRight = "",
+                            favoriteIconRight = "unselectedHeartIcon.png",
+                            opacityRight = 0,
+                            isItemRightUnavailable = false,
+                        });
+                    }
+                    if (isAmountItemsEven(n))
+                    {
+                        for (int i = 0; i < n / 2; i++)
                         {
-                            var savedItem = uniqueItems[key];
-
-                            if (savedItem.item_price != a.item_price)
+                            if (listOfItems[j].taxable == null || listOfItems[j].taxable == "NULL")
                             {
-                                if (savedItem.business_price != Math.Min(savedItem.business_price, a.business_price))
-                                {
-                                    savedItem = a;
-                                }
+                                listOfItems[j].taxable = "FALSE";
                             }
-                            else
+                            if (listOfItems[j + 1].taxable == null || listOfItems[j + 1].taxable == "NULL")
                             {
-                                List<DateTime> creationDates = new List<DateTime>();
-                                Debug.WriteLine("NAME {0}, {1}", savedItem.item_name, a.item_name);
-                                Debug.WriteLine("SAVED ITEM UID {0}, SAVED TIME STAMP {1}", savedItem.item_uid, savedItem.created_at);
-                                Debug.WriteLine("NEW ITEM UID {0}, NEW TIME STAMP {1}", a.item_uid, a.created_at);
-
-                                creationDates.Add(DateTime.Parse(savedItem.created_at));
-                                creationDates.Add(DateTime.Parse(a.created_at));
-                                creationDates.Sort();
-
-                                if (creationDates[0] != creationDates[1])
-                                {
-                                    Debug.WriteLine("CREATED FIRST {0}, STRING DATETIME INDEX 0 {1}", creationDates[0], creationDates[0].ToString("yyyy-MM-dd HH:mm:ss"));
-
-                                    if (savedItem.created_at != creationDates[0].ToString("yyyy-MM-dd HH:mm:ss"))
-                                    {
-                                        savedItem = a;
-                                    }
-                                }
-                                else
-                                {
-                                    var itemsIdsList = new List<long>();
-                                    var savedItemId = savedItem.item_uid.Replace('-', '0');
-                                    var newItemId = a.item_uid.Replace('-', '0');
-
-                                    itemsIdsList.Add(long.Parse(savedItemId));
-                                    itemsIdsList.Add(long.Parse(newItemId));
-                                    itemsIdsList.Sort();
-
-                                    if (savedItemId != itemsIdsList[0].ToString())
-                                    {
-                                        //savedItem.item_uid = a.item_uid;
-                                        savedItem = a;
-                                    }
-                                }
-                                Debug.WriteLine("SELECTED ITEM UID: " + savedItem.item_uid);
-                                uniqueItems[key] = savedItem;
+                                listOfItems[j + 1].taxable = "FALSE";
                             }
+                            this.datagrid.Add(new ItemsModel()
+                            {
+                                height = this.Width / 2 - 10,
+                                width = this.Width / 2 - 25,
+                                imageSourceLeft = listOfItems[j].item_photo,
+                                item_uidLeft = listOfItems[j].item_uid,
+                                itm_business_uidLeft = listOfItems[j].itm_business_uid,
+                                quantityLeft = 0,
+                                itemNameLeft = listOfItems[j].item_name,
+                                itemPriceLeft = "$ " + listOfItems[j].item_price.ToString(),
+                                itemPriceLeftUnit = "$ " + listOfItems[j].item_price.ToString("N2") + " / " + (string)listOfItems[j].item_unit.ToString(),
+                                itemLeftUnit = (string)listOfItems[j].item_unit.ToString(),
+                                item_businessPriceLeft = listOfItems[j].business_price,
+                                isItemLeftVisiable = true,
+                                isItemLeftEnable = true,
+                                quantityL = 0,
+                                item_descLeft = listOfItems[j].item_desc,
+                                itemTaxableLeft = listOfItems[j].taxable,
+                                colorLeft = Color.FromHex("#FFFFFF"),
+                                itemTypeLeft = listOfItems[j].item_type,
+                                favoriteIconLeft = "unselectedHeartIcon.png",
+                                opacityLeft = 1,
+                                isItemLeftUnavailable = false,
+
+                                imageSourceRight = listOfItems[j + 1].item_photo,
+                                item_uidRight = listOfItems[j + 1].item_uid,
+                                itm_business_uidRight = listOfItems[j + 1].itm_business_uid,
+                                quantityRight = 0,
+                                itemNameRight = listOfItems[j + 1].item_name,
+                                itemPriceRight = "$ " + listOfItems[j + 1].item_price.ToString(),
+                                itemPriceRightUnit = "$ " + listOfItems[j + 1].item_price.ToString("N2") + " / " + (string)listOfItems[j + 1].item_unit.ToString(),
+                                itemRightUnit = (string)listOfItems[j + 1].item_unit.ToString(),
+                                item_businessPriceRight = listOfItems[j + 1].business_price,
+                                isItemRightVisiable = true,
+                                isItemRightEnable = true,
+                                quantityR = 0,
+                                item_descRight = listOfItems[j + 1].item_desc,
+                                itemTaxableRight = listOfItems[j + 1].taxable,
+                                colorRight = Color.FromHex("#FFFFFF"),
+                                itemTypeRight = listOfItems[j + 1].item_type,
+                                favoriteIconRight = "unselectedHeartIcon.png",
+                                opacityRight = 1,
+                                isItemRightUnavailable = false,
+                            }); ;
+                            j = j + 2;
                         }
                     }
-
-                    foreach (string key in uniqueItems.Keys)
+                    else
                     {
-                        listUniqueItems.Add(uniqueItems[key]);
+                        for (int i = 0; i < n / 2; i++)
+                        {
+                            if (listOfItems[j].taxable == null || listOfItems[j].taxable == "NULL")
+                            {
+                                listOfItems[j].taxable = "FALSE";
+                            }
+                            if (listOfItems[j + 1].taxable == null || listOfItems[j + 1].taxable == "NULL")
+                            {
+                                listOfItems[j + 1].taxable = "FALSE";
+                            }
+                            this.datagrid.Add(new ItemsModel()
+                            {
+                                height = this.Width / 2 - 10,
+                                width = this.Width / 2 - 25,
+                                imageSourceLeft = listOfItems[j].item_photo,
+                                item_uidLeft = listOfItems[j].item_uid,
+                                itm_business_uidLeft = listOfItems[j].itm_business_uid,
+                                quantityLeft = 0,
+                                itemNameLeft = listOfItems[j].item_name,
+                                itemPriceLeft = "$ " + listOfItems[j].item_price.ToString(),
+                                itemPriceLeftUnit = "$ " + listOfItems[j].item_price.ToString("N2") + " / " + (string)listOfItems[j].item_unit.ToString(),
+                                itemLeftUnit = (string)listOfItems[j].item_unit.ToString(),
+                                item_businessPriceLeft = listOfItems[j].business_price,
+                                isItemLeftVisiable = true,
+                                isItemLeftEnable = true,
+                                quantityL = 0,
+                                item_descLeft = listOfItems[j].item_desc,
+                                itemTaxableLeft = listOfItems[j].taxable,
+                                colorLeft = Color.FromHex("#FFFFFF"),
+                                itemTypeLeft = listOfItems[j].item_type,
+                                favoriteIconLeft = "unselectedHeartIcon.png",
+                                opacityLeft = 1,
+                                isItemLeftUnavailable = false,
+
+                                imageSourceRight = listOfItems[j + 1].item_photo,
+                                item_uidRight = listOfItems[j + 1].item_uid,
+                                itm_business_uidRight = listOfItems[j + 1].itm_business_uid,
+                                quantityRight = 0,
+                                itemNameRight = listOfItems[j + 1].item_name,
+                                itemPriceRight = "$ " + listOfItems[j + 1].item_price.ToString(),
+                                itemPriceRightUnit = "$ " + listOfItems[j + 1].item_price.ToString("N2") + " / " + (string)listOfItems[j + 1].item_unit.ToString(),
+                                itemRightUnit = (string)listOfItems[j + 1].item_unit.ToString(),
+                                item_businessPriceRight = listOfItems[j + 1].business_price,
+                                isItemRightVisiable = true,
+                                isItemRightEnable = true,
+                                quantityR = 0,
+                                item_descRight = listOfItems[j + 1].item_desc,
+                                itemTaxableRight = listOfItems[j + 1].taxable,
+                                colorRight = Color.FromHex("#FFFFFF"),
+                                itemTypeRight = listOfItems[j + 1].item_type,
+                                favoriteIconRight = "unselectedHeartIcon.png",
+                                opacityRight = 1,
+                                isItemRightUnavailable = false,
+
+                            });
+                            j = j + 2;
+                        }
+                        if (listOfItems[j].taxable == null || listOfItems[j].taxable == "NULL")
+                        {
+                            listOfItems[j].taxable = "FALSE";
+                        }
+                        this.datagrid.Add(new ItemsModel()
+                        {
+                            height = this.Width / 2 - 10,
+                            width = this.Width / 2 - 25,
+                            imageSourceLeft = listOfItems[j].item_photo,
+                            item_uidLeft = listOfItems[j].item_uid,
+                            itm_business_uidLeft = listOfItems[j].itm_business_uid,
+                            quantityLeft = 0,
+                            itemNameLeft = listOfItems[j].item_name,
+                            itemPriceLeft = "$ " + listOfItems[j].item_price.ToString(),
+                            itemPriceLeftUnit = "$ " + listOfItems[j].item_price.ToString("N2") + " / " + (string)listOfItems[j].item_unit.ToString(),
+                            itemLeftUnit = (string)listOfItems[j].item_unit.ToString(),
+                            item_businessPriceLeft = listOfItems[j].business_price,
+                            isItemLeftVisiable = true,
+                            isItemLeftEnable = true,
+                            quantityL = 0,
+                            item_descLeft = listOfItems[j].item_desc,
+                            itemTaxableLeft = listOfItems[j].taxable,
+                            colorLeft = Color.FromHex("#FFFFFF"),
+                            itemTypeLeft = listOfItems[j].item_type,
+                            favoriteIconLeft = "unselectedHeartIcon.png",
+                            opacityLeft = 1,
+                            isItemLeftUnavailable = false,
+
+                            imageSourceRight = "",
+                            quantityRight = 0,
+                            itemNameRight = "",
+                            itemPriceRight = "$ " + "",
+                            isItemRightVisiable = false,
+                            isItemRightEnable = false,
+                            quantityR = 0,
+                            colorRight = Color.FromHex("#FFFFFF"),
+                            itemTypeRight = "",
+                            favoriteIconRight = "unselectedHeartIcon.png",
+                            opacityRight = 0,
+                            isItemRightUnavailable = false,
+                        });
                     }
+                }
 
-                    listOfItems = listUniqueItems;
+                itemList.ItemsSource = datagrid;
 
+                //foreach (string key in order.Keys)
+                //{
+
+                //    foreach (ItemsModel a in datagrid)
+                //    {
+                //        if (order[key].item_name == a.itemNameLeft)
+                //        {
+                //            Debug.WriteLine(order[key].item_name);
+                //            a.quantityLeft = order[key].item_quantity;
+                //            break;
+                //        }
+                //        else if (order[key].item_name == a.itemNameRight)
+                //        {
+                //            Debug.WriteLine(order[key].item_name);
+                //            a.quantityRight = order[key].item_quantity;
+                //            break;
+                //        }
+                //    }
+                //}
+
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+        }
+        private void GetDataForVegetables(IList<Items> listOfItems)
+        {
+            try
+            {
+                if (listOfItems.Count != 0 && listOfItems != null)
+                {
                     this.datagrid.Clear();
                     int n = listOfItems.Count;
                     int j = 0;
@@ -1070,26 +1472,757 @@ namespace ServingFresh.Views
                     }
                 }
 
-                foreach (string key in order.Keys)
-                {
+                itemList.ItemsSource = datagrid;
 
-                    foreach (ItemsModel a in datagrid)
+                //foreach (string key in order.Keys)
+                //{
+
+                //    foreach (ItemsModel a in datagrid)
+                //    {
+                //        if (order[key].item_name == a.itemNameLeft)
+                //        {
+                //            Debug.WriteLine(order[key].item_name);
+                //            a.quantityLeft = order[key].item_quantity;
+                //            break;
+                //        }
+                //        else if (order[key].item_name == a.itemNameRight)
+                //        {
+                //            Debug.WriteLine(order[key].item_name);
+                //            a.quantityRight = order[key].item_quantity;
+                //            break;
+                //        }
+                //    }
+                //}
+
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+        }
+        private void GetDataForFruits(IList<Items> listOfItems)
+        {
+            try
+            {
+                if (listOfItems.Count != 0 && listOfItems != null)
+                {
+                    this.fruitGrid.Clear();
+                    int n = listOfItems.Count;
+                    int j = 0;
+                    if (n == 0)
                     {
-                        if (order[key].item_name == a.itemNameLeft)
+
+                        this.fruitGrid.Add(new ItemsModel()
                         {
-                            Debug.WriteLine(order[key].item_name);
-                            a.quantityLeft = order[key].item_quantity;
-                            break;
-                        }
-                        else if (order[key].item_name == a.itemNameRight)
+                            height = this.Width / 2 - 10,
+                            width = this.Width / 2 - 25,
+                            imageSourceLeft = "",
+                            quantityLeft = 0,
+                            itemNameLeft = "",
+                            itemPriceLeft = "$ " + "",
+                            itemPriceLeftUnit = "",
+                            itemLeftUnit = "",
+                            item_businessPriceLeft = 0,
+                            isItemLeftVisiable = false,
+                            isItemLeftEnable = false,
+                            quantityL = 0,
+                            item_descLeft = "",
+                            itemTaxableLeft = "",
+                            colorLeft = Color.FromHex("#FFFFFF"),
+                            itemTypeLeft = "",
+                            favoriteIconLeft = "unselectedHeartIcon.png",
+                            opacityLeft = 0,
+                            isItemLeftUnavailable = false,
+
+                            imageSourceRight = "",
+                            quantityRight = 0,
+                            itemNameRight = "",
+                            itemPriceRight = "$ " + "",
+                            itemPriceRightUnit = "",
+                            itemRightUnit = "",
+                            item_businessPriceRight = 0,
+                            isItemRightVisiable = false,
+                            isItemRightEnable = false,
+                            quantityR = 0,
+                            item_descRight = "",
+                            itemTaxableRight = "",
+                            colorRight = Color.FromHex("#FFFFFF"),
+                            itemTypeRight = "",
+                            favoriteIconRight = "unselectedHeartIcon.png",
+                            opacityRight = 0,
+                            isItemRightUnavailable = false,
+                        });
+                    }
+                    if (isAmountItemsEven(n))
+                    {
+                        for (int i = 0; i < n / 2; i++)
                         {
-                            Debug.WriteLine(order[key].item_name);
-                            a.quantityRight = order[key].item_quantity;
-                            break;
+                            if (listOfItems[j].taxable == null || listOfItems[j].taxable == "NULL")
+                            {
+                                listOfItems[j].taxable = "FALSE";
+                            }
+                            if (listOfItems[j + 1].taxable == null || listOfItems[j + 1].taxable == "NULL")
+                            {
+                                listOfItems[j + 1].taxable = "FALSE";
+                            }
+                            this.fruitGrid.Add(new ItemsModel()
+                            {
+                                height = this.Width / 2 - 10,
+                                width = this.Width / 2 - 25,
+                                imageSourceLeft = listOfItems[j].item_photo,
+                                item_uidLeft = listOfItems[j].item_uid,
+                                itm_business_uidLeft = listOfItems[j].itm_business_uid,
+                                quantityLeft = 0,
+                                itemNameLeft = listOfItems[j].item_name,
+                                itemPriceLeft = "$ " + listOfItems[j].item_price.ToString(),
+                                itemPriceLeftUnit = "$ " + listOfItems[j].item_price.ToString("N2") + " / " + (string)listOfItems[j].item_unit.ToString(),
+                                itemLeftUnit = (string)listOfItems[j].item_unit.ToString(),
+                                item_businessPriceLeft = listOfItems[j].business_price,
+                                isItemLeftVisiable = true,
+                                isItemLeftEnable = true,
+                                quantityL = 0,
+                                item_descLeft = listOfItems[j].item_desc,
+                                itemTaxableLeft = listOfItems[j].taxable,
+                                colorLeft = Color.FromHex("#FFFFFF"),
+                                itemTypeLeft = listOfItems[j].item_type,
+                                favoriteIconLeft = "unselectedHeartIcon.png",
+                                opacityLeft = 1,
+                                isItemLeftUnavailable = false,
+
+                                imageSourceRight = listOfItems[j + 1].item_photo,
+                                item_uidRight = listOfItems[j + 1].item_uid,
+                                itm_business_uidRight = listOfItems[j + 1].itm_business_uid,
+                                quantityRight = 0,
+                                itemNameRight = listOfItems[j + 1].item_name,
+                                itemPriceRight = "$ " + listOfItems[j + 1].item_price.ToString(),
+                                itemPriceRightUnit = "$ " + listOfItems[j + 1].item_price.ToString("N2") + " / " + (string)listOfItems[j + 1].item_unit.ToString(),
+                                itemRightUnit = (string)listOfItems[j + 1].item_unit.ToString(),
+                                item_businessPriceRight = listOfItems[j + 1].business_price,
+                                isItemRightVisiable = true,
+                                isItemRightEnable = true,
+                                quantityR = 0,
+                                item_descRight = listOfItems[j + 1].item_desc,
+                                itemTaxableRight = listOfItems[j + 1].taxable,
+                                colorRight = Color.FromHex("#FFFFFF"),
+                                itemTypeRight = listOfItems[j + 1].item_type,
+                                favoriteIconRight = "unselectedHeartIcon.png",
+                                opacityRight = 1,
+                                isItemRightUnavailable = false,
+                            }); ;
+                            j = j + 2;
                         }
                     }
+                    else
+                    {
+                        for (int i = 0; i < n / 2; i++)
+                        {
+                            if (listOfItems[j].taxable == null || listOfItems[j].taxable == "NULL")
+                            {
+                                listOfItems[j].taxable = "FALSE";
+                            }
+                            if (listOfItems[j + 1].taxable == null || listOfItems[j + 1].taxable == "NULL")
+                            {
+                                listOfItems[j + 1].taxable = "FALSE";
+                            }
+                            this.fruitGrid.Add(new ItemsModel()
+                            {
+                                height = this.Width / 2 - 10,
+                                width = this.Width / 2 - 25,
+                                imageSourceLeft = listOfItems[j].item_photo,
+                                item_uidLeft = listOfItems[j].item_uid,
+                                itm_business_uidLeft = listOfItems[j].itm_business_uid,
+                                quantityLeft = 0,
+                                itemNameLeft = listOfItems[j].item_name,
+                                itemPriceLeft = "$ " + listOfItems[j].item_price.ToString(),
+                                itemPriceLeftUnit = "$ " + listOfItems[j].item_price.ToString("N2") + " / " + (string)listOfItems[j].item_unit.ToString(),
+                                itemLeftUnit = (string)listOfItems[j].item_unit.ToString(),
+                                item_businessPriceLeft = listOfItems[j].business_price,
+                                isItemLeftVisiable = true,
+                                isItemLeftEnable = true,
+                                quantityL = 0,
+                                item_descLeft = listOfItems[j].item_desc,
+                                itemTaxableLeft = listOfItems[j].taxable,
+                                colorLeft = Color.FromHex("#FFFFFF"),
+                                itemTypeLeft = listOfItems[j].item_type,
+                                favoriteIconLeft = "unselectedHeartIcon.png",
+                                opacityLeft = 1,
+                                isItemLeftUnavailable = false,
+
+                                imageSourceRight = listOfItems[j + 1].item_photo,
+                                item_uidRight = listOfItems[j + 1].item_uid,
+                                itm_business_uidRight = listOfItems[j + 1].itm_business_uid,
+                                quantityRight = 0,
+                                itemNameRight = listOfItems[j + 1].item_name,
+                                itemPriceRight = "$ " + listOfItems[j + 1].item_price.ToString(),
+                                itemPriceRightUnit = "$ " + listOfItems[j + 1].item_price.ToString("N2") + " / " + (string)listOfItems[j + 1].item_unit.ToString(),
+                                itemRightUnit = (string)listOfItems[j + 1].item_unit.ToString(),
+                                item_businessPriceRight = listOfItems[j + 1].business_price,
+                                isItemRightVisiable = true,
+                                isItemRightEnable = true,
+                                quantityR = 0,
+                                item_descRight = listOfItems[j + 1].item_desc,
+                                itemTaxableRight = listOfItems[j + 1].taxable,
+                                colorRight = Color.FromHex("#FFFFFF"),
+                                itemTypeRight = listOfItems[j + 1].item_type,
+                                favoriteIconRight = "unselectedHeartIcon.png",
+                                opacityRight = 1,
+                                isItemRightUnavailable = false,
+
+                            });
+                            j = j + 2;
+                        }
+                        if (listOfItems[j].taxable == null || listOfItems[j].taxable == "NULL")
+                        {
+                            listOfItems[j].taxable = "FALSE";
+                        }
+                        this.fruitGrid.Add(new ItemsModel()
+                        {
+                            height = this.Width / 2 - 10,
+                            width = this.Width / 2 - 25,
+                            imageSourceLeft = listOfItems[j].item_photo,
+                            item_uidLeft = listOfItems[j].item_uid,
+                            itm_business_uidLeft = listOfItems[j].itm_business_uid,
+                            quantityLeft = 0,
+                            itemNameLeft = listOfItems[j].item_name,
+                            itemPriceLeft = "$ " + listOfItems[j].item_price.ToString(),
+                            itemPriceLeftUnit = "$ " + listOfItems[j].item_price.ToString("N2") + " / " + (string)listOfItems[j].item_unit.ToString(),
+                            itemLeftUnit = (string)listOfItems[j].item_unit.ToString(),
+                            item_businessPriceLeft = listOfItems[j].business_price,
+                            isItemLeftVisiable = true,
+                            isItemLeftEnable = true,
+                            quantityL = 0,
+                            item_descLeft = listOfItems[j].item_desc,
+                            itemTaxableLeft = listOfItems[j].taxable,
+                            colorLeft = Color.FromHex("#FFFFFF"),
+                            itemTypeLeft = listOfItems[j].item_type,
+                            favoriteIconLeft = "unselectedHeartIcon.png",
+                            opacityLeft = 1,
+                            isItemLeftUnavailable = false,
+
+                            imageSourceRight = "",
+                            quantityRight = 0,
+                            itemNameRight = "",
+                            itemPriceRight = "$ " + "",
+                            isItemRightVisiable = false,
+                            isItemRightEnable = false,
+                            quantityR = 0,
+                            colorRight = Color.FromHex("#FFFFFF"),
+                            itemTypeRight = "",
+                            favoriteIconRight = "unselectedHeartIcon.png",
+                            opacityRight = 0,
+                            isItemRightUnavailable = false,
+                        });
+                    }
                 }
-                //itemList.ItemsSource = datagrid;
+
+                fruitsVerticalView.ItemsSource = fruitGrid;
+
+                //foreach (string key in order.Keys)
+                //{
+
+                //    foreach (ItemsModel a in datagrid)
+                //    {
+                //        if (order[key].item_name == a.itemNameLeft)
+                //        {
+                //            Debug.WriteLine(order[key].item_name);
+                //            a.quantityLeft = order[key].item_quantity;
+                //            break;
+                //        }
+                //        else if (order[key].item_name == a.itemNameRight)
+                //        {
+                //            Debug.WriteLine(order[key].item_name);
+                //            a.quantityRight = order[key].item_quantity;
+                //            break;
+                //        }
+                //    }
+                //}
+
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+        }
+        private void GetDataForOthers(IList<Items> listOfItems)
+        {
+            try
+            {
+                if (listOfItems.Count != 0 && listOfItems != null)
+                {
+                    this.otherGrid.Clear();
+                    int n = listOfItems.Count;
+                    int j = 0;
+                    if (n == 0)
+                    {
+
+                        this.otherGrid.Add(new ItemsModel()
+                        {
+                            height = this.Width / 2 - 10,
+                            width = this.Width / 2 - 25,
+                            imageSourceLeft = "",
+                            quantityLeft = 0,
+                            itemNameLeft = "",
+                            itemPriceLeft = "$ " + "",
+                            itemPriceLeftUnit = "",
+                            itemLeftUnit = "",
+                            item_businessPriceLeft = 0,
+                            isItemLeftVisiable = false,
+                            isItemLeftEnable = false,
+                            quantityL = 0,
+                            item_descLeft = "",
+                            itemTaxableLeft = "",
+                            colorLeft = Color.FromHex("#FFFFFF"),
+                            itemTypeLeft = "",
+                            favoriteIconLeft = "unselectedHeartIcon.png",
+                            opacityLeft = 0,
+                            isItemLeftUnavailable = false,
+
+                            imageSourceRight = "",
+                            quantityRight = 0,
+                            itemNameRight = "",
+                            itemPriceRight = "$ " + "",
+                            itemPriceRightUnit = "",
+                            itemRightUnit = "",
+                            item_businessPriceRight = 0,
+                            isItemRightVisiable = false,
+                            isItemRightEnable = false,
+                            quantityR = 0,
+                            item_descRight = "",
+                            itemTaxableRight = "",
+                            colorRight = Color.FromHex("#FFFFFF"),
+                            itemTypeRight = "",
+                            favoriteIconRight = "unselectedHeartIcon.png",
+                            opacityRight = 0,
+                            isItemRightUnavailable = false,
+                        });
+                    }
+                    if (isAmountItemsEven(n))
+                    {
+                        for (int i = 0; i < n / 2; i++)
+                        {
+                            if (listOfItems[j].taxable == null || listOfItems[j].taxable == "NULL")
+                            {
+                                listOfItems[j].taxable = "FALSE";
+                            }
+                            if (listOfItems[j + 1].taxable == null || listOfItems[j + 1].taxable == "NULL")
+                            {
+                                listOfItems[j + 1].taxable = "FALSE";
+                            }
+                            this.otherGrid.Add(new ItemsModel()
+                            {
+                                height = this.Width / 2 - 10,
+                                width = this.Width / 2 - 25,
+                                imageSourceLeft = listOfItems[j].item_photo,
+                                item_uidLeft = listOfItems[j].item_uid,
+                                itm_business_uidLeft = listOfItems[j].itm_business_uid,
+                                quantityLeft = 0,
+                                itemNameLeft = listOfItems[j].item_name,
+                                itemPriceLeft = "$ " + listOfItems[j].item_price.ToString(),
+                                itemPriceLeftUnit = "$ " + listOfItems[j].item_price.ToString("N2") + " / " + (string)listOfItems[j].item_unit.ToString(),
+                                itemLeftUnit = (string)listOfItems[j].item_unit.ToString(),
+                                item_businessPriceLeft = listOfItems[j].business_price,
+                                isItemLeftVisiable = true,
+                                isItemLeftEnable = true,
+                                quantityL = 0,
+                                item_descLeft = listOfItems[j].item_desc,
+                                itemTaxableLeft = listOfItems[j].taxable,
+                                colorLeft = Color.FromHex("#FFFFFF"),
+                                itemTypeLeft = listOfItems[j].item_type,
+                                favoriteIconLeft = "unselectedHeartIcon.png",
+                                opacityLeft = 1,
+                                isItemLeftUnavailable = false,
+
+                                imageSourceRight = listOfItems[j + 1].item_photo,
+                                item_uidRight = listOfItems[j + 1].item_uid,
+                                itm_business_uidRight = listOfItems[j + 1].itm_business_uid,
+                                quantityRight = 0,
+                                itemNameRight = listOfItems[j + 1].item_name,
+                                itemPriceRight = "$ " + listOfItems[j + 1].item_price.ToString(),
+                                itemPriceRightUnit = "$ " + listOfItems[j + 1].item_price.ToString("N2") + " / " + (string)listOfItems[j + 1].item_unit.ToString(),
+                                itemRightUnit = (string)listOfItems[j + 1].item_unit.ToString(),
+                                item_businessPriceRight = listOfItems[j + 1].business_price,
+                                isItemRightVisiable = true,
+                                isItemRightEnable = true,
+                                quantityR = 0,
+                                item_descRight = listOfItems[j + 1].item_desc,
+                                itemTaxableRight = listOfItems[j + 1].taxable,
+                                colorRight = Color.FromHex("#FFFFFF"),
+                                itemTypeRight = listOfItems[j + 1].item_type,
+                                favoriteIconRight = "unselectedHeartIcon.png",
+                                opacityRight = 1,
+                                isItemRightUnavailable = false,
+                            }); ;
+                            j = j + 2;
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < n / 2; i++)
+                        {
+                            if (listOfItems[j].taxable == null || listOfItems[j].taxable == "NULL")
+                            {
+                                listOfItems[j].taxable = "FALSE";
+                            }
+                            if (listOfItems[j + 1].taxable == null || listOfItems[j + 1].taxable == "NULL")
+                            {
+                                listOfItems[j + 1].taxable = "FALSE";
+                            }
+                            this.otherGrid.Add(new ItemsModel()
+                            {
+                                height = this.Width / 2 - 10,
+                                width = this.Width / 2 - 25,
+                                imageSourceLeft = listOfItems[j].item_photo,
+                                item_uidLeft = listOfItems[j].item_uid,
+                                itm_business_uidLeft = listOfItems[j].itm_business_uid,
+                                quantityLeft = 0,
+                                itemNameLeft = listOfItems[j].item_name,
+                                itemPriceLeft = "$ " + listOfItems[j].item_price.ToString(),
+                                itemPriceLeftUnit = "$ " + listOfItems[j].item_price.ToString("N2") + " / " + (string)listOfItems[j].item_unit.ToString(),
+                                itemLeftUnit = (string)listOfItems[j].item_unit.ToString(),
+                                item_businessPriceLeft = listOfItems[j].business_price,
+                                isItemLeftVisiable = true,
+                                isItemLeftEnable = true,
+                                quantityL = 0,
+                                item_descLeft = listOfItems[j].item_desc,
+                                itemTaxableLeft = listOfItems[j].taxable,
+                                colorLeft = Color.FromHex("#FFFFFF"),
+                                itemTypeLeft = listOfItems[j].item_type,
+                                favoriteIconLeft = "unselectedHeartIcon.png",
+                                opacityLeft = 1,
+                                isItemLeftUnavailable = false,
+
+                                imageSourceRight = listOfItems[j + 1].item_photo,
+                                item_uidRight = listOfItems[j + 1].item_uid,
+                                itm_business_uidRight = listOfItems[j + 1].itm_business_uid,
+                                quantityRight = 0,
+                                itemNameRight = listOfItems[j + 1].item_name,
+                                itemPriceRight = "$ " + listOfItems[j + 1].item_price.ToString(),
+                                itemPriceRightUnit = "$ " + listOfItems[j + 1].item_price.ToString("N2") + " / " + (string)listOfItems[j + 1].item_unit.ToString(),
+                                itemRightUnit = (string)listOfItems[j + 1].item_unit.ToString(),
+                                item_businessPriceRight = listOfItems[j + 1].business_price,
+                                isItemRightVisiable = true,
+                                isItemRightEnable = true,
+                                quantityR = 0,
+                                item_descRight = listOfItems[j + 1].item_desc,
+                                itemTaxableRight = listOfItems[j + 1].taxable,
+                                colorRight = Color.FromHex("#FFFFFF"),
+                                itemTypeRight = listOfItems[j + 1].item_type,
+                                favoriteIconRight = "unselectedHeartIcon.png",
+                                opacityRight = 1,
+                                isItemRightUnavailable = false,
+
+                            });
+                            j = j + 2;
+                        }
+                        if (listOfItems[j].taxable == null || listOfItems[j].taxable == "NULL")
+                        {
+                            listOfItems[j].taxable = "FALSE";
+                        }
+                        this.otherGrid.Add(new ItemsModel()
+                        {
+                            height = this.Width / 2 - 10,
+                            width = this.Width / 2 - 25,
+                            imageSourceLeft = listOfItems[j].item_photo,
+                            item_uidLeft = listOfItems[j].item_uid,
+                            itm_business_uidLeft = listOfItems[j].itm_business_uid,
+                            quantityLeft = 0,
+                            itemNameLeft = listOfItems[j].item_name,
+                            itemPriceLeft = "$ " + listOfItems[j].item_price.ToString(),
+                            itemPriceLeftUnit = "$ " + listOfItems[j].item_price.ToString("N2") + " / " + (string)listOfItems[j].item_unit.ToString(),
+                            itemLeftUnit = (string)listOfItems[j].item_unit.ToString(),
+                            item_businessPriceLeft = listOfItems[j].business_price,
+                            isItemLeftVisiable = true,
+                            isItemLeftEnable = true,
+                            quantityL = 0,
+                            item_descLeft = listOfItems[j].item_desc,
+                            itemTaxableLeft = listOfItems[j].taxable,
+                            colorLeft = Color.FromHex("#FFFFFF"),
+                            itemTypeLeft = listOfItems[j].item_type,
+                            favoriteIconLeft = "unselectedHeartIcon.png",
+                            opacityLeft = 1,
+                            isItemLeftUnavailable = false,
+
+                            imageSourceRight = "",
+                            quantityRight = 0,
+                            itemNameRight = "",
+                            itemPriceRight = "$ " + "",
+                            isItemRightVisiable = false,
+                            isItemRightEnable = false,
+                            quantityR = 0,
+                            colorRight = Color.FromHex("#FFFFFF"),
+                            itemTypeRight = "",
+                            favoriteIconRight = "unselectedHeartIcon.png",
+                            opacityRight = 0,
+                            isItemRightUnavailable = false,
+                        });
+                    }
+                }
+
+                othersVerticalView.ItemsSource = otherGrid;
+
+                //foreach (string key in order.Keys)
+                //{
+
+                //    foreach (ItemsModel a in datagrid)
+                //    {
+                //        if (order[key].item_name == a.itemNameLeft)
+                //        {
+                //            Debug.WriteLine(order[key].item_name);
+                //            a.quantityLeft = order[key].item_quantity;
+                //            break;
+                //        }
+                //        else if (order[key].item_name == a.itemNameRight)
+                //        {
+                //            Debug.WriteLine(order[key].item_name);
+                //            a.quantityRight = order[key].item_quantity;
+                //            break;
+                //        }
+                //    }
+                //}
+
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+        }
+        private void GetDataForDesserts(IList<Items> listOfItems)
+        {
+            try
+            {
+                if (listOfItems.Count != 0 && listOfItems != null)
+                {
+                    this.dessertGrid.Clear();
+                    int n = listOfItems.Count;
+                    int j = 0;
+                    if (n == 0)
+                    {
+
+                        this.dessertGrid.Add(new ItemsModel()
+                        {
+                            height = this.Width / 2 - 10,
+                            width = this.Width / 2 - 25,
+                            imageSourceLeft = "",
+                            quantityLeft = 0,
+                            itemNameLeft = "",
+                            itemPriceLeft = "$ " + "",
+                            itemPriceLeftUnit = "",
+                            itemLeftUnit = "",
+                            item_businessPriceLeft = 0,
+                            isItemLeftVisiable = false,
+                            isItemLeftEnable = false,
+                            quantityL = 0,
+                            item_descLeft = "",
+                            itemTaxableLeft = "",
+                            colorLeft = Color.FromHex("#FFFFFF"),
+                            itemTypeLeft = "",
+                            favoriteIconLeft = "unselectedHeartIcon.png",
+                            opacityLeft = 0,
+                            isItemLeftUnavailable = false,
+
+                            imageSourceRight = "",
+                            quantityRight = 0,
+                            itemNameRight = "",
+                            itemPriceRight = "$ " + "",
+                            itemPriceRightUnit = "",
+                            itemRightUnit = "",
+                            item_businessPriceRight = 0,
+                            isItemRightVisiable = false,
+                            isItemRightEnable = false,
+                            quantityR = 0,
+                            item_descRight = "",
+                            itemTaxableRight = "",
+                            colorRight = Color.FromHex("#FFFFFF"),
+                            itemTypeRight = "",
+                            favoriteIconRight = "unselectedHeartIcon.png",
+                            opacityRight = 0,
+                            isItemRightUnavailable = false,
+                        });
+                    }
+                    if (isAmountItemsEven(n))
+                    {
+                        for (int i = 0; i < n / 2; i++)
+                        {
+                            if (listOfItems[j].taxable == null || listOfItems[j].taxable == "NULL")
+                            {
+                                listOfItems[j].taxable = "FALSE";
+                            }
+                            if (listOfItems[j + 1].taxable == null || listOfItems[j + 1].taxable == "NULL")
+                            {
+                                listOfItems[j + 1].taxable = "FALSE";
+                            }
+                            this.dessertGrid.Add(new ItemsModel()
+                            {
+                                height = this.Width / 2 - 10,
+                                width = this.Width / 2 - 25,
+                                imageSourceLeft = listOfItems[j].item_photo,
+                                item_uidLeft = listOfItems[j].item_uid,
+                                itm_business_uidLeft = listOfItems[j].itm_business_uid,
+                                quantityLeft = 0,
+                                itemNameLeft = listOfItems[j].item_name,
+                                itemPriceLeft = "$ " + listOfItems[j].item_price.ToString(),
+                                itemPriceLeftUnit = "$ " + listOfItems[j].item_price.ToString("N2") + " / " + (string)listOfItems[j].item_unit.ToString(),
+                                itemLeftUnit = (string)listOfItems[j].item_unit.ToString(),
+                                item_businessPriceLeft = listOfItems[j].business_price,
+                                isItemLeftVisiable = true,
+                                isItemLeftEnable = true,
+                                quantityL = 0,
+                                item_descLeft = listOfItems[j].item_desc,
+                                itemTaxableLeft = listOfItems[j].taxable,
+                                colorLeft = Color.FromHex("#FFFFFF"),
+                                itemTypeLeft = listOfItems[j].item_type,
+                                favoriteIconLeft = "unselectedHeartIcon.png",
+                                opacityLeft = 1,
+                                isItemLeftUnavailable = false,
+
+                                imageSourceRight = listOfItems[j + 1].item_photo,
+                                item_uidRight = listOfItems[j + 1].item_uid,
+                                itm_business_uidRight = listOfItems[j + 1].itm_business_uid,
+                                quantityRight = 0,
+                                itemNameRight = listOfItems[j + 1].item_name,
+                                itemPriceRight = "$ " + listOfItems[j + 1].item_price.ToString(),
+                                itemPriceRightUnit = "$ " + listOfItems[j + 1].item_price.ToString("N2") + " / " + (string)listOfItems[j + 1].item_unit.ToString(),
+                                itemRightUnit = (string)listOfItems[j + 1].item_unit.ToString(),
+                                item_businessPriceRight = listOfItems[j + 1].business_price,
+                                isItemRightVisiable = true,
+                                isItemRightEnable = true,
+                                quantityR = 0,
+                                item_descRight = listOfItems[j + 1].item_desc,
+                                itemTaxableRight = listOfItems[j + 1].taxable,
+                                colorRight = Color.FromHex("#FFFFFF"),
+                                itemTypeRight = listOfItems[j + 1].item_type,
+                                favoriteIconRight = "unselectedHeartIcon.png",
+                                opacityRight = 1,
+                                isItemRightUnavailable = false,
+                            }); ;
+                            j = j + 2;
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < n / 2; i++)
+                        {
+                            if (listOfItems[j].taxable == null || listOfItems[j].taxable == "NULL")
+                            {
+                                listOfItems[j].taxable = "FALSE";
+                            }
+                            if (listOfItems[j + 1].taxable == null || listOfItems[j + 1].taxable == "NULL")
+                            {
+                                listOfItems[j + 1].taxable = "FALSE";
+                            }
+                            this.dessertGrid.Add(new ItemsModel()
+                            {
+                                height = this.Width / 2 - 10,
+                                width = this.Width / 2 - 25,
+                                imageSourceLeft = listOfItems[j].item_photo,
+                                item_uidLeft = listOfItems[j].item_uid,
+                                itm_business_uidLeft = listOfItems[j].itm_business_uid,
+                                quantityLeft = 0,
+                                itemNameLeft = listOfItems[j].item_name,
+                                itemPriceLeft = "$ " + listOfItems[j].item_price.ToString(),
+                                itemPriceLeftUnit = "$ " + listOfItems[j].item_price.ToString("N2") + " / " + (string)listOfItems[j].item_unit.ToString(),
+                                itemLeftUnit = (string)listOfItems[j].item_unit.ToString(),
+                                item_businessPriceLeft = listOfItems[j].business_price,
+                                isItemLeftVisiable = true,
+                                isItemLeftEnable = true,
+                                quantityL = 0,
+                                item_descLeft = listOfItems[j].item_desc,
+                                itemTaxableLeft = listOfItems[j].taxable,
+                                colorLeft = Color.FromHex("#FFFFFF"),
+                                itemTypeLeft = listOfItems[j].item_type,
+                                favoriteIconLeft = "unselectedHeartIcon.png",
+                                opacityLeft = 1,
+                                isItemLeftUnavailable = false,
+
+                                imageSourceRight = listOfItems[j + 1].item_photo,
+                                item_uidRight = listOfItems[j + 1].item_uid,
+                                itm_business_uidRight = listOfItems[j + 1].itm_business_uid,
+                                quantityRight = 0,
+                                itemNameRight = listOfItems[j + 1].item_name,
+                                itemPriceRight = "$ " + listOfItems[j + 1].item_price.ToString(),
+                                itemPriceRightUnit = "$ " + listOfItems[j + 1].item_price.ToString("N2") + " / " + (string)listOfItems[j + 1].item_unit.ToString(),
+                                itemRightUnit = (string)listOfItems[j + 1].item_unit.ToString(),
+                                item_businessPriceRight = listOfItems[j + 1].business_price,
+                                isItemRightVisiable = true,
+                                isItemRightEnable = true,
+                                quantityR = 0,
+                                item_descRight = listOfItems[j + 1].item_desc,
+                                itemTaxableRight = listOfItems[j + 1].taxable,
+                                colorRight = Color.FromHex("#FFFFFF"),
+                                itemTypeRight = listOfItems[j + 1].item_type,
+                                favoriteIconRight = "unselectedHeartIcon.png",
+                                opacityRight = 1,
+                                isItemRightUnavailable = false,
+
+                            });
+                            j = j + 2;
+                        }
+                        if (listOfItems[j].taxable == null || listOfItems[j].taxable == "NULL")
+                        {
+                            listOfItems[j].taxable = "FALSE";
+                        }
+                        this.dessertGrid.Add(new ItemsModel()
+                        {
+                            height = this.Width / 2 - 10,
+                            width = this.Width / 2 - 25,
+                            imageSourceLeft = listOfItems[j].item_photo,
+                            item_uidLeft = listOfItems[j].item_uid,
+                            itm_business_uidLeft = listOfItems[j].itm_business_uid,
+                            quantityLeft = 0,
+                            itemNameLeft = listOfItems[j].item_name,
+                            itemPriceLeft = "$ " + listOfItems[j].item_price.ToString(),
+                            itemPriceLeftUnit = "$ " + listOfItems[j].item_price.ToString("N2") + " / " + (string)listOfItems[j].item_unit.ToString(),
+                            itemLeftUnit = (string)listOfItems[j].item_unit.ToString(),
+                            item_businessPriceLeft = listOfItems[j].business_price,
+                            isItemLeftVisiable = true,
+                            isItemLeftEnable = true,
+                            quantityL = 0,
+                            item_descLeft = listOfItems[j].item_desc,
+                            itemTaxableLeft = listOfItems[j].taxable,
+                            colorLeft = Color.FromHex("#FFFFFF"),
+                            itemTypeLeft = listOfItems[j].item_type,
+                            favoriteIconLeft = "unselectedHeartIcon.png",
+                            opacityLeft = 1,
+                            isItemLeftUnavailable = false,
+
+                            imageSourceRight = "",
+                            quantityRight = 0,
+                            itemNameRight = "",
+                            itemPriceRight = "$ " + "",
+                            isItemRightVisiable = false,
+                            isItemRightEnable = false,
+                            quantityR = 0,
+                            colorRight = Color.FromHex("#FFFFFF"),
+                            itemTypeRight = "",
+                            favoriteIconRight = "unselectedHeartIcon.png",
+                            opacityRight = 0,
+                            isItemRightUnavailable = false,
+                        });
+                    }
+                }
+
+                dessertsListView.ItemsSource = dessertGrid;
+
+                //foreach (string key in order.Keys)
+                //{
+
+                //    foreach (ItemsModel a in datagrid)
+                //    {
+                //        if (order[key].item_name == a.itemNameLeft)
+                //        {
+                //            Debug.WriteLine(order[key].item_name);
+                //            a.quantityLeft = order[key].item_quantity;
+                //            break;
+                //        }
+                //        else if (order[key].item_name == a.itemNameRight)
+                //        {
+                //            Debug.WriteLine(order[key].item_name);
+                //            a.quantityRight = order[key].item_quantity;
+                //            break;
+                //        }
+                //    }
+                //}
+
             }
             catch (Exception ex)
             {
@@ -1205,18 +2338,22 @@ namespace ServingFresh.Views
                         if(produce.item_type == "vegetable")
                         {
                             vegetablesList.Add(itemToInsert);
+                            vegetableDoubleList.Add(produce);
                         }
                         else if (produce.item_type == "fruit")
                         {
                             fruitsList.Add(itemToInsert);
+                            fruitDoubleList.Add(produce);
                         }
                         else if (produce.item_type == "dessert")
                         {
                             dessertsList.Add(itemToInsert);
+                            dessetDoubleList.Add(produce);
                         }
                         else
                         {
                             othersList.Add(itemToInsert);
+                            otherDoubleList.Add(produce);
                         }
                     }
                 }
@@ -2134,37 +3271,15 @@ namespace ServingFresh.Views
             Application.Current.Properties["delivery_time"] = dm.delivery_time;
             Application.Current.Properties["deliveryDate"] = dm.deliveryTimeStamp;
 
-            //foreach (ItemsModel i in datagrid)
-            //{
-            //    //i.colorLeftUpdate = Color.FromHex("#FFFFFF");
-            //    //i.colorRightUpdate = Color.FromHex("#FFFFFF");
-            //    i.opacityLeftUpdate = 1;
-            //    i.opacityRightUpdate = 1;
-            //    i.isItemLeftEnableUpdate = true;
-            //    i.isItemRightEnableUpdate = true;
-            //    i.isItemLeftUnavailableUpdate = false;
-            //    i.isItemRightUnavailableUpdate = false;
-
-            //    if (!dm.business_uids.Contains(i.itm_business_uidLeft))
-            //    {
-            //        i.opacityLeftUpdate = 0.5;
-            //        i.isItemLeftEnableUpdate = false;
-            //        i.isItemLeftUnavailableUpdate = true;
-            //    }
-            //    else if (!dm.business_uids.Contains(i.itm_business_uidRight))
-            //    {
-            //        i.opacityRightUpdate = 0.5;
-            //        i.isItemRightEnableUpdate = false;
-            //        i.isItemRightUnavailableUpdate = true;
-            //    }
-            //}
             updateItemsBackgroundColorAndQuantity(vegetablesList, selectedDeliveryDate);
             updateItemsBackgroundColorAndQuantity(fruitsList, selectedDeliveryDate);
             updateItemsBackgroundColorAndQuantity(dessertsList, selectedDeliveryDate);
             updateItemsBackgroundColorAndQuantity(othersList, selectedDeliveryDate);
+            SetVerticalView(vegetablesList, itemList);
+            SetVerticalView(fruitsList, fruitsVerticalView);
+            SetVerticalView(dessertsList, dessertsVerticalView);
+            SetVerticalView(othersList, othersVerticalView);
             UpdateNumberOfItemsInCart();
-            //ItemsPage businessItemPage = new ItemsPage(types, dm.business_uids, weekday);
-            //Application.Current.MainPage = businessItemPage;
         }
 
         void Change_Border_Color(Object sender, EventArgs e)
@@ -2519,6 +3634,63 @@ namespace ServingFresh.Views
             {
                 menuFrame.Height = 0;
             }
+        }
+
+        void SeeAllItemsHorizontallyVertically(System.Object sender, System.EventArgs e)
+        {
+            var stacklayout = (StackLayout)sender;
+            var label = (Label)stacklayout.Children[0];
+            var image = (Image)stacklayout.Children[1];
+
+            if(stacklayout.ClassId == "vegetablesView")
+            {
+
+                SwitchLayoutViews(vegetablesList, vegetablesListView, itemList, label, image, "vegetables");
+            }
+            else if (stacklayout.ClassId == "fruitsView")
+            {
+                SwitchLayoutViews(fruitsList, fruitsListView, fruitsVerticalView, label, image, "fruits");
+            }
+            else if (stacklayout.ClassId == "othersView")
+            {
+                SwitchLayoutViews(othersList, othersListView, othersVerticalView, label, image, "others");
+            }
+            else if (stacklayout.ClassId == "dessertsView")
+            {
+                SwitchLayoutViews(dessertsList, dessertsListView, dessertsVerticalView, label, image, "desserts");
+            }
+        }
+
+        void SwitchLayoutViews(ObservableCollection<SingleItem> source ,CollectionView horizontalView, ListView verticalView, Label viewLabel, Image viewIcon, string category)
+        {
+            if (viewIcon.Source.ToString() == "File: triangleIconFilled.png")
+            {
+                viewLabel.Text = "See horizontal view";
+                viewIcon.Rotation = 180;
+                viewIcon.Source = "triangleIconEmpty.png";
+                SetImageColor(viewIcon);
+                SetVerticalView(source, verticalView);
+                horizontalView.HeightRequest = 0;
+                var rowHeight = source.Count;
+                if(rowHeight % 2 != 0) { rowHeight++; }
+                verticalView.HeightRequest = 190 * rowHeight / 2;
+            }
+            else
+            {
+                viewLabel.Text = "See all " + category;
+                viewIcon.Rotation = 0;
+                viewIcon.Source = "triangleIconFilled.png";
+                SetImageColor(viewIcon);
+                updateItemsBackgroundColorAndQuantity(source, selectedDeliveryDate);
+                horizontalView.HeightRequest = 190;
+                verticalView.HeightRequest = 0;
+                
+            }
+        }
+
+        void SetImageColor(Image image)
+        {
+            image.Effects[0] = new TintImageEffect() { TintColor = Color.FromHex("#FF8500") };
         }
     }
 }
