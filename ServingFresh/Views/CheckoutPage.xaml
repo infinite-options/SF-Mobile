@@ -13,6 +13,7 @@
                 <RowDefinition Height="60"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
                 <RowDefinition x:Name="paypalframe" Height="0"></RowDefinition>
+                <RowDefinition x:Name="loginRow" Height="0"></RowDefinition>
             </Grid.RowDefinitions>
             <Grid.GestureRecognizers>
                <TapGestureRecognizer Tapped="UpdateTotalAmount"></TapGestureRecognizer>
@@ -328,9 +329,9 @@
                                     <StackLayout Padding="20,0,20,0">
                                         <Button Text="Proceed as guest" Clicked="ProceedAsGuest"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold"></Button>
                                         <Label Text="Already have an account?" TextColor="#2B6D74" FontSize="14" HorizontalTextAlignment="Center"></Label>
-                                        <Button Text="Login"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold"></Button>
+                                        <Button Text="Login"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="ShowLoginUI"></Button>
                                         <Label Text="Save time and create an account" FontSize="14" TextColor="#2B6D74" HorizontalTextAlignment="Center"></Label>
-                                        <Button Text="Sign up"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold"></Button>
+                                        <Button Text="Sign up"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="ShowSignUpUI"></Button>
                                     </StackLayout>
                                 </StackLayout>
                                 <StackLayout Margin="0,15,0,0" x:Name="customerPaymentsView">
@@ -363,6 +364,89 @@
             </Frame>
             <Frame Grid.Row="3" x:Name="PayPalView">
                <WebView x:Name="webViewPage"></WebView>
+            </Frame>
+            <Frame Grid.Row="4" CornerRadius="10" BackgroundColor="#E0E6E6F2">
+
+            <StackLayout Padding="21,0,21,0">
+                <StackLayout HeightRequest="50">
+                                            <Label Text="Log In" TextColor="#136D74" FontSize="32" FontAttributes="Bold" TextDecorations="Underline" HorizontalTextAlignment="Center" ></Label>
+                </StackLayout>
+                <Entry
+                    x:Name="userEmailAddress"
+                    Placeholder="Email address"
+                    HorizontalTextAlignment="Start"
+                    Keyboard="Email"
+                    PlaceholderColor="Gray"
+                    TextColor="Gray"
+                    FontSize="18"
+                    FontAttributes="Bold">
+                </Entry>
+                <Entry
+                    x:Name="userPassword"
+                    Placeholder="Enter Password"
+                    IsPassword="True"
+                    HorizontalTextAlignment="Start"
+                    Keyboard="Email"
+                    PlaceholderColor="Gray"
+                    TextColor="Gray"
+                    FontSize="18"
+                    FontAttributes="Bold">
+                </Entry>
+                <Button
+                    x:Name="logInButton"
+                    Margin="50,20,50,0"
+                    Text="Login"
+                    FontSize="20"
+                    FontAttributes="Bold"
+                    TextColor="White"
+                    BackgroundColor="#FF8500"
+                    >
+                </Button>
+                <Label
+                    Text="Reset password"
+                    TextColor="#6D7278"
+                    FontSize="14"
+                    FontAttributes="Bold"
+                    HorizontalOptions="Center"
+                    Margin="0,20,0,20">
+                </Label>
+                <Label
+                    Text="Or login with"
+                    TextColor="#136D74"
+                    FontSize="24"
+                    FontAttributes="Bold"
+                    HorizontalOptions="Center"
+                    Margin="0,0,0,20">
+                </Label>
+                <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
+                    <StackLayout >
+                        <ImageButton
+                            HeightRequest="40"
+                            Source="facebookIcon.png"
+                            BackgroundColor="Transparent"
+                            >
+                        </ImageButton>
+                    </StackLayout>
+                    <StackLayout Margin="50,0,50,0">
+                        <ImageButton
+                            HeightRequest="40"
+                            Source="googleIcon.png"
+                            BackgroundColor="Transparent"
+                            >
+                        </ImageButton>
+                    </StackLayout>
+                    <StackLayout>
+                        <ImageButton
+                            HeightRequest="40"
+                            x:Name="appleLogInButton"
+                            Source="appleIcon.png"
+                            BackgroundColor="Transparent"
+                            
+                            Command = "{Binding SignInWithAppleCommand}">
+                        </ImageButton>
+                    </StackLayout>
+                </StackLayout>
+            </StackLayout>
             </Frame>
         </Grid>
     </ContentPage.Content>

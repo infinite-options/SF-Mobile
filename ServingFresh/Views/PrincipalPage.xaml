@@ -79,7 +79,7 @@
                                     Margin="10,20,20,0"
                                     Grid.Column="1"
                                     VerticalOptions="Center">
-                                    <Image Source="signUpIcon.png"></Image>
+                                    <Image Source="signUpLeafIcon.png"></Image>
                                 </StackLayout>
                             </Grid>
                         </RelativeLayout>

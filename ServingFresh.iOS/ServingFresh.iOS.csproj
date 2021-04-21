@@ -203,6 +203,14 @@
     <BundleResource Include="Resources\triangleIconFilled.png" />
     <BundleResource Include="Resources\triangleIconEmpty.png" />
     <BundleResource Include="Resources\loginLeafIcon.png" />
+    <BundleResource Include="Resources\cartMenuIcon.png" />
+    <BundleResource Include="Resources\historyIcon.png" />
+    <BundleResource Include="Resources\infoIcon.png" />
+    <BundleResource Include="Resources\logoutIcon.png" />
+    <BundleResource Include="Resources\profileIcon.png" />
+    <BundleResource Include="Resources\refundIcon.png" />
+    <BundleResource Include="Resources\signIn.png" />
+    <BundleResource Include="Resources\signUpLeafIcon.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AppleSignIn\" />

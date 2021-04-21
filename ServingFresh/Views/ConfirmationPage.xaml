@@ -24,7 +24,7 @@
                         RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}">
                         <Image Margin="0,20,0,0" Source="CartIcon.png" HeightRequest="40">
                             <Image.GestureRecognizers>
-                                <TapGestureRecognizer ></TapGestureRecognizer>
+                                <TapGestureRecognizer Tapped="NavigateToCartFromConfirmation"></TapGestureRecognizer>
                             </Image.GestureRecognizers>
                         </Image>
                         <Frame Margin="30,20,0,0" HeightRequest="20" MinimumWidthRequest="20" CornerRadius="10" Padding="0" HasShadow="False">

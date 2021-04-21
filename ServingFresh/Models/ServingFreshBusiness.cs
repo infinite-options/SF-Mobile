@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using static ServingFresh.Views.ItemsPage;
+
 
 namespace ServingFresh.Models
 {
@@ -136,6 +136,42 @@ namespace ServingFresh.Models
         public string z_accepting_day { get; set; }
         public string z_accepting_time { get; set; }
         public string status { get; set; }
+    }
+
+    public class Items
+    {
+        public string item_uid { get; set; }
+        public string created_at { get; set; }
+        public string itm_business_uid { get; set; }
+        public string item_name { get; set; }
+        public object item_status { get; set; }
+        public string item_type { get; set; }
+        public string item_desc { get; set; }
+        public object item_unit { get; set; }
+        public double item_price { get; set; }
+        public double business_price { get; set; }
+        public string item_sizes { get; set; }
+        public string favorite { get; set; }
+        public string item_photo { get; set; }
+        public object exp_date { get; set; }
+        public string business_delivery_hours { get; set; }
+        public string taxable { get; set; }
+    }
+
+    public class ItemPurchased
+    {
+        public string pur_business_uid { get; set; }
+        public string item_uid { get; set; }
+        public string item_name { get; set; }
+        public int item_quantity { get; set; }
+        public double item_price { get; set; }
+        // Additional fields 
+        public string img { get; set; }
+        public string description { get; set; }
+        public string unit { get; set; }
+        public double business_price { get; set; }
+        public string taxable { get; set; }
+        public bool isItemAvailable { get; set; }
     }
 
     public class ServingFreshBusiness

@@ -9,77 +9,9 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="94"></RowDefinition>
                 <RowDefinition Height="60"></RowDefinition>
-                <!--<RowDefinition Height="1"></RowDefinition>
-                <RowDefinition Height="65"></RowDefinition>-->
                 <RowDefinition Height="*"></RowDefinition>
-                <RowDefinition Height="80"></RowDefinition>
             </Grid.RowDefinitions>
-            <!--<Label Grid.Row="0" BackgroundColor="#136D74"></Label>-->
-            <!--<Grid Grid.Row="1" BackgroundColor="#136D74">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="70"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="70"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-                <Label
-                    Grid.Column="1"
-                    HeightRequest="136"
-                    HorizontalTextAlignment="Center"
-                    VerticalTextAlignment="Center"
-                    Text="Orders"
-                    TextColor="White"
-                    FontSize="34"
-                    FontAttributes="Bold">
-                </Label>
-                
-                <ImageButton
-                    Grid.Column="2"
-                    HorizontalOptions="Center"
-                    VerticalOptions="Center"
-                    HeightRequest="40"
-                    Source="CartIcon"
-                    BackgroundColor="Transparent">
-                    <ImageButton.Effects>
-                        <servingfresh:TintImageEffect TintColor="White"/>
-                    </ImageButton.Effects>
-                </ImageButton>
-                <Label
-                    Grid.Column="2"
-                    x:Name="CartTotal"
-                    StyleClass="secondary"
-                    FontAttributes="Bold"
-                    TranslationX="-14"
-                    TranslationY="-12"
-                    VerticalOptions="Center"
-                    HorizontalOptions="End"/>
-            </Grid>-->
-            <!--<BoxView Grid.Row="2" HeightRequest="1" BackgroundColor="Black"></BoxView>-->
-            <!--<Grid
-                Grid.Row="1"
-                ColumnSpacing="0.5"
-                BackgroundColor="#136D74">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="1"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="1"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Label Text="Checkout" StyleClass="h3, white, center" Grid.Column="0" VerticalTextAlignment="Center">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="openCheckout"/>
-                    </Label.GestureRecognizers>
-                </Label>
-                <BoxView WidthRequest="1" BackgroundColor="Black" VerticalOptions="FillAndExpand" Grid.Column="1"/>
-                <Label Text="History" StyleClass="h3, white, center" Grid.Column="2" VerticalTextAlignment="Center">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="openHistory"/>
-                    </Label.GestureRecognizers>
-                </Label>
-                <BoxView WidthRequest="1" BackgroundColor="Black" VerticalOptions="FillAndExpand" Grid.Column="3"/>
-                <Label Text="Refund" StyleClass="h3, secondary, center" Grid.Column="4" VerticalTextAlignment="Center"/>
-            </Grid>-->
-                        <Grid Grid.Row="0" ColumnSpacing="0" BackgroundColor="#136D74">
+            <Grid Grid.Row="0" ColumnSpacing="0" BackgroundColor="#136D74">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"></ColumnDefinition>
                     <ColumnDefinition Width="100"></ColumnDefinition>
@@ -93,7 +25,7 @@
                         RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}">
                         <Image Margin="0,20,0,0" Source="CartIcon.png" HeightRequest="40">
                             <Image.GestureRecognizers>
-                                <TapGestureRecognizer></TapGestureRecognizer>
+                                <TapGestureRecognizer Tapped="NavigateToCartFromRefunds"></TapGestureRecognizer>
                             </Image.GestureRecognizers>
                         </Image>
                         <Frame Margin="30,20,0,0" HeightRequest="20" MinimumWidthRequest="20" CornerRadius="10"  Padding="0" HasShadow="False">
@@ -107,14 +39,14 @@
                     <Label Text="Cart" TextColor="#136D74"  FontSize="20" HorizontalTextAlignment="Center"></Label>
                     <BoxView HeightRequest="1" Color="#136D74" Margin="10,0,10,0"></BoxView>
                     <StackLayout.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="openCheckout"/>
+                        <TapGestureRecognizer Tapped="NavigateToCartFromRefunds"/>
                     </StackLayout.GestureRecognizers>
                 </StackLayout>
                 <StackLayout Grid.Column="1" VerticalOptions="Center" Opacity="0.5">
                     <Label Text="History" TextColor="#136D74" FontSize="20" HorizontalTextAlignment="Center"></Label>
                     <BoxView HeightRequest="1" Color="#136D74" Margin="10,0,10,0"></BoxView>
                     <StackLayout.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="openHistory"/>
+                        <TapGestureRecognizer Tapped="NavigateToHistoryFromRefunds"/>
                     </StackLayout.GestureRecognizers>
                 </StackLayout>
                 <StackLayout Grid.Column="2" VerticalOptions="Center" Opacity="1">
@@ -147,36 +79,6 @@
                     </StackLayout>
                 </ScrollView>
             </StackLayout>
-            <Grid Grid.Row="3" BackgroundColor="WhiteSmoke" >
-                <StackLayout Grid.Column="0" VerticalOptions="Center" Spacing="0">
-                    <Frame Padding="0" BackgroundColor="Transparent" HasShadow="False"  HeightRequest="46" WidthRequest="46">
-                        <ImageButton Grid.Row="0" Grid.Column="0" BackgroundColor="Transparent" Source="CalendarI" Padding="6" Clicked="DeliveryDaysClick"></ImageButton>
-                    </Frame>
-                    <Label Margin="0,-3,0,0" Text="Days" TextColor="#979797" FontSize="12" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
-                </StackLayout>
-                <StackLayout Grid.Column="1" VerticalOptions="Center" Spacing="0">
-                    <Frame Padding="0" BackgroundColor="Transparent" HasShadow="False"  HeightRequest="46" WidthRequest="46">
-                        <ImageButton Grid.Row="0" Grid.Column="1" BackgroundColor="Transparent" Source="RefundIcon" Padding="6" Clicked="OrdersClick">
-                            <ImageButton.Effects>
-                                <servingfresh:TintImageEffect TintColor="#FF8500"/>
-                            </ImageButton.Effects>
-                        </ImageButton>
-                    </Frame>
-                    <Label Margin="0,-3,0,0" Text="Orders" TextColor="#979797" FontSize="12" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
-                </StackLayout>
-                <StackLayout Grid.Column="2" VerticalOptions="Center" Spacing="0">
-                    <Frame Padding="0" BackgroundColor="Transparent" HasShadow="False"  HeightRequest="46" WidthRequest="46">
-                        <ImageButton Grid.Row="0" Grid.Column="2" BackgroundColor="Transparent" Source="InfoIcon" Padding="6" Clicked="InfoClick"></ImageButton>
-                    </Frame>
-                    <Label Margin="0,-3,0,0" Text="Info" TextColor="#979797" FontSize="12" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
-                </StackLayout>
-                <StackLayout Grid.Column="3" VerticalOptions="Center" Spacing="0">
-                    <Frame Padding="0" BackgroundColor="Transparent" HasShadow="False"  HeightRequest="46" WidthRequest="46">
-                        <ImageButton Grid.Row="0" Grid.Column="3" BackgroundColor="Transparent" Source="UserIcon" Padding="6" Clicked="ProfileClick"></ImageButton>
-                    </Frame>
-                    <Label Margin="0,-3,0,0" Text="Profile" TextColor="#979797" FontSize="12" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
-                </StackLayout>
-            </Grid>
         </Grid>
     </ContentPage.Content>
 </ContentPage>

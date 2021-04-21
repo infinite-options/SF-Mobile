@@ -844,8 +844,8 @@ namespace ServingFresh.Views
             Application.Current.Properties["guest"] = true;
             
             
-            GuestItemsPage businessItemPage = new GuestItemsPage(types, businessId, weekDay);
-            Application.Current.MainPage = businessItemPage;
+            //GuestItemsPage businessItemPage = new GuestItemsPage(types, businessId, weekDay);
+            //Application.Current.MainPage = businessItemPage;
             //Application.Current.MainPage = new GuestPage();
 
             //await DisplayAlert("", "Additional feature coming soon", "Thanks");

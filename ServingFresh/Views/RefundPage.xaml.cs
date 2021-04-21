@@ -7,6 +7,7 @@ using Xamarin.Forms;
 using Xamarin.Essentials;
 using Acr.UserDialogs;
 using System.Text;
+using static ServingFresh.Views.SelectionPage;
 
 namespace ServingFresh.Views
 {
@@ -146,50 +147,14 @@ namespace ServingFresh.Views
             }
         }
 
-        public void onTap(object sender, EventArgs e)
+        void NavigateToCartFromRefunds(System.Object sender, System.EventArgs e)
         {
-
+            NavigateToCart(sender, e);
         }
 
-        public void openCheckout(object sender, EventArgs e)
+        void NavigateToHistoryFromRefunds(System.Object sender, System.EventArgs e)
         {
-            Application.Current.MainPage = new CheckoutPage("refund");
-        }
-
-        public void openHistory(object sender, EventArgs e)
-        {
-            if (!(bool)Application.Current.Properties["guest"])
-            {
-                Application.Current.MainPage = new HistoryPage();
-            }
-        }
-
-        void DeliveryDaysClick(System.Object sender, System.EventArgs e)
-        {
-            Application.Current.MainPage = new SelectionPage();
-        }
-
-        void OrdersClick(System.Object sender, System.EventArgs e)
-        {
-            Application.Current.MainPage = new CheckoutPage("refund");
-        }
-
-        void InfoClick(System.Object sender, System.EventArgs e)
-        {
-            if (!(bool)Application.Current.Properties["guest"])
-            {
-                Application.Current.MainPage = new InfoPage();
-            }
-            
-        }
-
-        void ProfileClick(System.Object sender, System.EventArgs e)
-        {
-            if (!(bool)Application.Current.Properties["guest"])
-            {
-                Application.Current.MainPage = new ProfilePage();
-            }
-            
+            NavigateToHistory(sender, e);
         }
     }
 }

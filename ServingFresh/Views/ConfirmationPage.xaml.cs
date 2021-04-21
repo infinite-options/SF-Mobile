@@ -47,5 +47,10 @@ namespace ServingFresh.Views
         {
             Application.Current.MainPage = new LogInPage();
         }
+
+        void NavigateToCartFromConfirmation(System.Object sender, System.EventArgs e)
+        {
+            NavigateToCart(sender, e);
+        }
     }  
 }

@@ -16,7 +16,6 @@ using Acr.UserDialogs;
 using ServingFresh.LogIn.Classes;
 using System.Text;
 using System.Threading.Tasks;
-using static ServingFresh.Views.ItemsPage;
 using System.IO;
 using System.ComponentModel;
 
@@ -546,7 +545,7 @@ namespace ServingFresh.Views
                             element.delivery_shortname = deliveryDate.DayOfWeek.ToString().Substring(0, 3).ToUpper();
                             element.delivery_time = a.z_delivery_time;
                             element.deliveryTimeStamp = deliveryDate;
-                            element.orderExpTime = "Order by " + acceptingDate.ToString("ddd") + " " + acceptingDate.ToString("htt").ToLower();
+                            element.orderExpTime = "Order by " + acceptingDate.ToString("dddd") + ", " + acceptingDate.ToString("htt").ToLower();
 
                             //Debug.WriteLine("element.delivery_date: " + element.delivery_date);
                             //Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
@@ -3665,7 +3664,7 @@ namespace ServingFresh.Views
         {
             if (viewIcon.Source.ToString() == "File: triangleIconFilled.png")
             {
-                viewLabel.Text = "See horizontal view";
+                viewLabel.Text = "Switch to scroll view";
                 viewIcon.Rotation = 180;
                 viewIcon.Source = "triangleIconEmpty.png";
                 SetImageColor(viewIcon);
@@ -3691,6 +3690,51 @@ namespace ServingFresh.Views
         void SetImageColor(Image image)
         {
             image.Effects[0] = new TintImageEffect() { TintColor = Color.FromHex("#FF8500") };
+        }
+
+        public static void NavigateToStore(System.Object sender, System.EventArgs e)
+        {
+            Application.Current.MainPage = new SelectionPage();
+        }
+
+        public static void NavigateToCart(System.Object sender, System.EventArgs e)
+        {
+            Application.Current.MainPage = new CheckoutPage("From Selection Page");
+        }
+
+        public static void NavigateToHistory(System.Object sender, System.EventArgs e)
+        {
+            Application.Current.MainPage = new HistoryPage("selection", "page");
+        }
+
+        public static void NavigateToRefunds(System.Object sender, System.EventArgs e)
+        {
+            Application.Current.MainPage = new RefundPage();
+        }
+
+        public static void NavigateToInfo(System.Object sender, System.EventArgs e)
+        {
+            Application.Current.MainPage = new InfoPage();
+        }
+
+        public static void NavigateToProfile(System.Object sender, System.EventArgs e)
+        {
+            Application.Current.MainPage = new ProfilePage();
+        }
+
+        public static void NavigateToSignIn(System.Object sender, System.EventArgs e)
+        {
+            Application.Current.MainPage = new LogInPage();
+        }
+
+        public static void NavigateToSignUp(System.Object sender, System.EventArgs e)
+        {
+            Application.Current.MainPage = new SignUpPage();
+        }
+
+        public static void NavigateToLogOut(System.Object sender, System.EventArgs e)
+        {
+            Application.Current.MainPage = new PrincipalPage();
         }
     }
 }

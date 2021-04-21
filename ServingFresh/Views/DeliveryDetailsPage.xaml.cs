@@ -460,5 +460,10 @@ namespace ServingFresh.Views
             }
             return null;
         }
+
+        void NavigateToCartFromDeliveryDetails(System.Object sender, System.EventArgs e)
+        {
+            NavigateToCart(sender, e);
+        }
     }
 }

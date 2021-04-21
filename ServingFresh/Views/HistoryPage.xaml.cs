@@ -7,7 +7,7 @@ using Acr.UserDialogs;
 using Newtonsoft.Json;
 using ServingFresh.Config;
 using Xamarin.Forms;
-
+using static ServingFresh.Views.SelectionPage;
 namespace ServingFresh.Views
 {
     public partial class HistoryPage : ContentPage
@@ -141,6 +141,11 @@ namespace ServingFresh.Views
             
         }
 
+        public HistoryPage(string source, string s)
+        {
+            InitializeComponent();
+        }
+
         //public HistoryPage()
         //{
         //    InitializeComponent();
@@ -154,6 +159,7 @@ namespace ServingFresh.Views
         {
             await DisplayAlert("Congratulations", "Payment was successful. We appreciate your business", "OK");
         }
+
         public async void LoadHistory()
         {
             string userId = (string)Application.Current.Properties["user_id"];
@@ -256,6 +262,7 @@ namespace ServingFresh.Views
             catch (Exception history)
             {
                 Debug.WriteLine(history.Message);
+                
             }
 
             HistoryList.ItemsSource = historyList;
@@ -292,6 +299,11 @@ namespace ServingFresh.Views
         async void Button_Clicked(System.Object sender, System.EventArgs e)
         {
             await DisplayAlert("", "Additional feature coming soon", "Thanks");
+        }
+
+        void NavigateToCartFromHistory(System.Object sender, System.EventArgs e)
+        {
+            NavigateToCart(sender,e);
         }
     }
 }

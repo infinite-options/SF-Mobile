@@ -13,7 +13,6 @@ using Xamarin.Forms;
 using Xamarin.Forms.Maps;
 using ServingFresh.Models;
 using System.Diagnostics;
-using static ServingFresh.Views.ItemsPage;
 using Application = Xamarin.Forms.Application;
 using Stripe;
 using ServingFresh.Effects;
@@ -74,9 +73,6 @@ namespace ServingFresh.Views
         public string img { get; set; }
         public string unit { get; set; }
         public string taxable { get; set; }
-
-
-
 
 
         // public string description { get; set;
@@ -2863,6 +2859,15 @@ namespace ServingFresh.Views
 
         }
 
+        void ShowLoginUI(System.Object sender, System.EventArgs e)
+        {
+            loginRow.Height = this.Height - 94;
+        }
+
+        void ShowSignUpUI(System.Object sender, System.EventArgs e)
+        {
+
+        }
 
 
         //void EntryClick(System.Object sender, System.EventArgs e)

@@ -6,313 +6,10 @@
     xmlns:servingfresh="clr-namespace:ServingFresh.Effects" xmlns:f9p="clr-namespace:Forms9Patch;assembly=Forms9Patch"
     x:Class="ServingFresh.Views.SelectionPage">
     <ContentPage.Content>
-        <!--<Grid RowSpacing="0" x:Name="myGrid">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="35"></RowDefinition>
-                <RowDefinition Height="95"></RowDefinition>
-                <RowDefinition Height="0"></RowDefinition>
-                <RowDefinition Height="auto"></RowDefinition>
-                <RowDefinition Height="80"></RowDefinition>
-            </Grid.RowDefinitions>
-            <Label Grid.Row="0" BackgroundColor="#136D74"></Label>
-            <Grid Grid.Row="1" BackgroundColor="#136D74">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="70"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="70"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-                <Label
-                    x:Name="title"
-                    Grid.Column="1"
-                    HeightRequest="136"
-                    HorizontalTextAlignment="Center"
-                    VerticalTextAlignment="Center"
-                    Text="Delivery Days"
-                    TextColor="White"
-                    FontSize="34"
-                    FontAttributes="Bold">
-                </Label>
-                <ImageButton
-                    Grid.Column="2"
-                    HorizontalOptions="Center"
-                    VerticalOptions="Center"
-                    HeightRequest="40"
-                    Source="CartIcon"
-                    BackgroundColor="Transparent"
-                    Clicked="Open_Checkout">
-                    <ImageButton.Effects>
-                        <servingfresh:TintImageEffect TintColor="White"/>
-                    </ImageButton.Effects>
-                </ImageButton>
-                <Label
-                    Grid.Column="2"
-                    x:Name="CartTotal"
-                    StyleClass="secondary"
-                    FontAttributes="Bold"
-                    TranslationX="-14"
-                    TranslationY="-12"
-                    VerticalOptions="Center"
-                    HorizontalOptions="End"/>
-            </Grid>
-            <BoxView Grid.Row="2" BackgroundColor="Black"></BoxView>
-            <StackLayout Grid.Row="3" Padding="0" BackgroundColor="White">
-                <Label Margin="20,10,0,0" Text="Delivery dates available" TextColor="#136D74" FontSize="Small" FontAttributes="Bold"></Label>
-              <ScrollView Orientation="Horizontal" HeightRequest="120" MinimumHeightRequest="120" BackgroundColor="#136D74">
-                  <StackLayout HeightRequest="120" MinimumHeightRequest="120" BackgroundColor="White">
-                      <CollectionView x:Name="delivery_list" ItemsLayout="HorizontalList">
-                          <CollectionView.ItemTemplate>
-                              <DataTemplate>
-                                  <StackLayout Padding="10">
-                                      <Frame Padding="0" CornerRadius="10" HasShadow="False" BackgroundColor="{Binding colorSchedule}" HeightRequest="100" WidthRequest="100">
-                                          <StackLayout Spacing="0">
-                                              <StackLayout.GestureRecognizers>
-                                                  <TapGestureRecognizer Tapped="Open_Farm" CommandParameter="{Binding .}"/>
-                                              </StackLayout.GestureRecognizers>
-                                              <Frame BackgroundColor="#136D74" HasShadow="False" CornerRadius="10" Padding="0, 5">
-                                                  <Label Text="{Binding delivery_shortname}" StyleClass="h2, white, center"/>
-                                              </Frame>
-                                              <Label Text="{Binding delivery_date}" StyleClass="h2, primary, center" VerticalTextAlignment="Center" VerticalOptions="FillAndExpand"/>
-                                              <Label Text="{Binding delivery_time}" HorizontalOptions="Center" VerticalTextAlignment="Center" VerticalOptions="FillAndExpand"/>
-                                              <Label Text="Order by Tue 1pm" TextColor="#FF8500" FontSize="10"  HorizontalOptions="Center" VerticalTextAlignment="Center" VerticalOptions="FillAndExpand"/>
-                                              <Label Text="{Binding orderExpTime}" FontSize="10" TextColor="#FF8500"  HorizontalOptions="Center" VerticalTextAlignment="Center" VerticalOptions="FillAndExpand"/>
-                                          </StackLayout>
-                                      </Frame>
-                                  </StackLayout>
-                              </DataTemplate>
-                          </CollectionView.ItemTemplate>
-                      </CollectionView>
-                  </StackLayout>
-
-                    <FlexLayout Grid.Row="3" JustifyContent="SpaceBetween" Padding="15" BackgroundColor="#136D74">
-                        <StackLayout Spacing="0">
-                            <ImageButton x:Name="fruit" Source="OrangeIcon" Clicked="Change_Color" StyleClass="imgbtn" ClassId="fruit">
-                                <ImageButton.Effects>
-                                    <servingfresh:TintImageEffect TintColor="White"/>
-                                </ImageButton.Effects>
-                            </ImageButton>
-                            <Label Text="Fruits" StyleClass="white, center"/>
-                        </StackLayout>
-                        <StackLayout Spacing="0">
-                            <ImageButton x:Name="vegetable" Source="VegIcon" Clicked="Change_Color" StyleClass="imgbtn" ClassId="vegetable">
-                                <ImageButton.Effects>
-                                    <servingfresh:TintImageEffect TintColor="White"/>
-                                </ImageButton.Effects>
-                            </ImageButton>
-                            <Label Text="Vegetables" StyleClass="white, center"/>
-                        </StackLayout>
-                        <StackLayout Spacing="0">
-                            <ImageButton x:Name="dessert" Source="Donut_Icon" Clicked="Change_Color" StyleClass="imgbtn" ClassId="dessert">
-                                <ImageButton.Effects>
-                                    <servingfresh:TintImageEffect TintColor="White"/>
-                                </ImageButton.Effects>
-                            </ImageButton>
-                            <Label Text="Desserts" StyleClass="white, center"/>
-                        </StackLayout>
-                        <StackLayout Spacing="0">
-                            <ImageButton x:Name="other" Source="Bread_Icon" Clicked="Change_Color" StyleClass="imgbtn" ClassId="other">
-                                <ImageButton.Effects>
-                                    <servingfresh:TintImageEffect TintColor="White"/>
-                                </ImageButton.Effects>
-                            </ImageButton>
-                            <Label Text="Other" StyleClass="white, center"/>
-                        </StackLayout>
-                    </FlexLayout>
-
-                    
-                  <StackLayout >
-                      <ListView x:Name="itemList" HasUnevenRows="True" >
-                          <ListView.ItemTemplate>
-                              <DataTemplate>
-                                  <ViewCell Height="180">
-                                      <Grid HeightRequest="180" ColumnSpacing="0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"></ColumnDefinition>
-                                <ColumnDefinition Width="*"></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
-                            <StackLayout Margin="20,0,5,0" Grid.Column="0" Spacing="0">
-                                <Frame HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" >
-                                    <RelativeLayout>
-                                        <Frame
-                                            HasShadow="False"
-                                            HeightRequest="120"
-                                            Padding="0"
-                                            RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
-                                            <Image Source="{Binding imageSourceLeft}" Aspect="AspectFill"></Image>
-                                        </Frame>
-
-                                        <Grid
-                                            ColumnSpacing="0"
-                                            HeightRequest="120"
-                                            RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="40"></ColumnDefinition>
-                                                <ColumnDefinition Width="*"></ColumnDefinition>
-                                                <ColumnDefinition Width="40"></ColumnDefinition>
-                                            </Grid.ColumnDefinitions>
-                                            <StackLayout Grid.Column="0">
-                                                <Frame Margin="10,10,0,0" WidthRequest="31" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
-                                                    <Image Source="heartIcon.png"></Image>
-                                                </Frame>
-                                            </StackLayout>
-                                            <StackLayout Grid.Column="1" ></StackLayout>
-                                            <StackLayout Grid.Column="2">
-                                                <Frame Margin="0,10,10,0" WidthRequest="31" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
-                                                    <Label Text="i" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="#136D74" FontSize="20" FontAttributes="Bold"></Label>
-                                                </Frame>
-                                            </StackLayout>
-                                        </Grid>
-
-                                    </RelativeLayout>
-                                </Frame>
-                                <Frame HasShadow="false" Padding="0" HeightRequest="55" CornerRadius="10" BorderColor="#FF8500" BackgroundColor="{Binding colorLeft}">
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="*"></RowDefinition>
-                                            <RowDefinition Height="20"></RowDefinition>
-                                        </Grid.RowDefinitions>
-                                        <f9p:Label Grid.Row="0" AutoFit="Width" MaxLines="2" FontSize="12" Text="{Binding itemNameLeft}" TextColor="Black" ></f9p:Label>
-                                        <Grid Grid.Row="1">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="AUTO"></ColumnDefinition>
-                                                    <ColumnDefinition Width="*"></ColumnDefinition>
-                                                </Grid.ColumnDefinitions>
-                                                <StackLayout Grid.Column="0" Orientation="Horizontal">
-                                                    <Button Text="-" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="SubtractItemLeft" CommandParameter="{Binding .}"></Button>
-                                                    <Label Text="{Binding quantityLeft}" TextColor="Black" WidthRequest="30"></Label>
-                                                    <Button Text="+" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="AddItemLeft" CommandParameter="{Binding .}"></Button>
-                                                </StackLayout>
-                                                <Label Grid.Column="1" HorizontalOptions="End" Text="{Binding itemPriceLeftUnit}" TextColor="Black"></Label>
-                                            </Grid>
-                                        </Grid>
-                                    </Grid>
-                                </Frame>
-                            </StackLayout>
-                            <StackLayout Margin="5,0,20,0" Grid.Column="1" Spacing="0">
-                                <Frame HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10">
-                                    <RelativeLayout>
-                                        <Frame
-                                            HasShadow="False"
-                                            HeightRequest="120"
-                                            Padding="0"
-                                            RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
-                                            <Image Source="{Binding imageSourceRight}" Aspect="AspectFill"></Image>
-                                        </Frame>
-
-                                        <Grid
-                                            ColumnSpacing="0"
-                                            HeightRequest="120"
-                                            RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="40"></ColumnDefinition>
-                                                <ColumnDefinition Width="*"></ColumnDefinition>
-                                                <ColumnDefinition Width="40"></ColumnDefinition>
-                                            </Grid.ColumnDefinitions>
-                                            <StackLayout Grid.Column="0">
-                                                <Frame Margin="10,10,0,0" WidthRequest="31" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
-                                                    <Image Source="heartIcon.png"></Image>
-                                                </Frame>
-                                            </StackLayout>
-                                            <StackLayout Grid.Column="1" ></StackLayout>
-                                            <StackLayout Grid.Column="2">
-                                                <Frame Margin="0,10,10,0" WidthRequest="31" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
-                                                    <Label Text="i" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" TextColor="#136D74" FontSize="20" FontAttributes="Bold"></Label>
-                                                </Frame>
-                                            </StackLayout>
-                                        </Grid>
-
-                                    </RelativeLayout>
-                                </Frame>
-                                <Frame  HasShadow="false" Padding="0" HeightRequest="55" CornerRadius="10" BorderColor="#FF8500" BackgroundColor="{Binding colorRight}">
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="*"></RowDefinition>
-                                            <RowDefinition Height="20"></RowDefinition>
-                                        </Grid.RowDefinitions>
-                                        <Label Grid.Row="0" Text="{Binding itemNameRight}" FontSize="12" TextColor="Black"></Label>
-                                        <Grid Grid.Row="1">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="AUTO"></ColumnDefinition>
-                                                    <ColumnDefinition Width="*"></ColumnDefinition>
-                                                </Grid.ColumnDefinitions>
-                                                <StackLayout Grid.Column="0" Orientation="Horizontal">
-                                                    <Button Text="-" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="SubtractItemRight" CommandParameter="{Binding .}"></Button>
-                                                    <Label Text="{Binding quantityRight}" TextColor="Black" WidthRequest="30" ></Label>
-                                                    <Button Text="+" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="AddItemRight" CommandParameter="{Binding .}"></Button>
-                                                </StackLayout>
-                                                <Label Grid.Column="1" HorizontalOptions="End" Text="{Binding itemPriceRightUnit}" TextColor="Black"></Label>
-                                            </Grid>
-                                        </Grid>
-                                    </Grid>
-                                </Frame>
-                            </StackLayout>
-                        </Grid>
-                                  </ViewCell>
-                              </DataTemplate>
-                          </ListView.ItemTemplate>
-                      </ListView>
-
-
-                      <Label Margin="10">
-                          <Label.FormattedText>
-                              <FormattedString>
-                                  <Span Text="Filter by " TextColor="Black" FontAttributes="Bold" FontSize="Small"/>
-                                  <Span Text="Farms" TextColor="#136D74" FontAttributes="Bold" FontSize="Small"/>
-                              </FormattedString>
-                          </Label.FormattedText>
-                      </Label>
-                      <CollectionView x:Name="farm_list"  >
-                            <CollectionView.ItemsLayout>
-                                <GridItemsLayout Orientation="Vertical" Span="3" />               
-                            </CollectionView.ItemsLayout>
-                            <CollectionView.ItemTemplate >
-                                <DataTemplate >
-                                    <StackLayout Padding="10" WidthRequest="100">
-                                        <Frame Padding="1" CornerRadius="10" HasShadow="False" BorderColor="{Binding border_color}" HeightRequest="100" WidthRequest="100">
-                                        <Frame Padding="1" CornerRadius="10" HasShadow="False" BorderColor="{Binding border_color}">
-                                            <Frame.GestureRecognizers>
-                                                <TapGestureRecognizer Tapped="Change_Border_Color" CommandParameter="{Binding .}"/>
-                                            </Frame.GestureRecognizers>
-                                            <Image Source="{Binding business_image}" HeightRequest="100" Aspect="Fill"/>
-                                        </Frame>
-                                        </Frame>
-                                        <Label Text="{Binding business_name}" HeightRequest="30" StyleClass="black, center"/>
-                                    </StackLayout>
-                                </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
-                  </StackLayout>
-            </StackLayout>
-            <Grid Grid.Row="4" BackgroundColor="WhiteSmoke">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="45"></RowDefinition>
-                    <RowDefinition Height="*"></RowDefinition>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-                <ImageButton Grid.Row="0" Grid.Column="0" BackgroundColor="Transparent" Source="CalendarI" Clicked="DeliveryDaysClick" Padding="6">
-                    <ImageButton.Effects>
-                        <servingfresh:TintImageEffect TintColor="#FF8500"/>
-                    </ImageButton.Effects>
-                </ImageButton>
-                <Label Grid.Row="1" Grid.Column="0" Text="Days" HorizontalTextAlignment="Center"></Label>
-                <ImageButton Grid.Row="0" Grid.Column="1" BackgroundColor="Transparent" Source="RefundIcon" Clicked="OrdersClick" Padding="6"></ImageButton>
-                <Label Grid.Row="1" Grid.Column="1" Text="Orders" HorizontalTextAlignment="Center"></Label>
-                <ImageButton Grid.Row="0" Grid.Column="2" BackgroundColor="Transparent" Source="InfoIcon" Clicked="InfoClick" Padding="6"></ImageButton>
-                <Label Grid.Row="1" Grid.Column="2" Text="Info" HorizontalTextAlignment="Center"></Label>
-                <ImageButton Grid.Row="0" Grid.Column="3" BackgroundColor="Transparent" Source="UserIcon" Clicked="ProfileClick" Padding="6"></ImageButton>
-                <Label Grid.Row="1" Grid.Column="3" Text="Profile" HorizontalTextAlignment="Center"></Label>
-            </Grid>
-        </Grid>-->
         <Grid RowSpacing="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="94"></RowDefinition>
-                <RowDefinition Height="80"></RowDefinition>
+                <RowDefinition Height="105"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
                 <RowDefinition x:Name="menuFrame" Height="0"></RowDefinition>
             </Grid.RowDefinitions>
@@ -395,7 +92,6 @@
                             </CollectionView.ItemTemplate>
                         </CollectionView>
                     </Grid>
-
                 </Grid>
                 <Grid Grid.Column="1" RowSpacing="0">
                     <Grid.RowDefinitions>
@@ -403,8 +99,8 @@
                         <RowDefinition Height="*"></RowDefinition>
                     </Grid.RowDefinitions>
                     <StackLayout Grid.Row="0" Orientation="Horizontal">
-                        <Label Margin="15,5,0,0" Text="Delivery dates available" TextColor="#136D74" FontSize="10"></Label>
-                        <Label Margin="0,5,0,0" x:Name="orderBy" Text="" TextColor="#136D74" FontSize="10"></Label>
+                        <Label Margin="15,5,0,0" Text="Delivery dates available" TextColor="#FF8500" FontSize="12"></Label>
+                        <Label Margin="0,5,0,0" x:Name="orderBy" Text="" TextColor="#136D74" FontSize="12"></Label>
                     </StackLayout>
                     <Grid Margin="15,0,15,0" Grid.Row="1" ColumnSpacing="0">
                         <Grid.ColumnDefinitions>
@@ -415,12 +111,12 @@
                             <CollectionView.ItemTemplate>
                                 <DataTemplate>
                                     <StackLayout Padding="5" >
-                                        <Frame Padding="0" HeightRequest="50" WidthRequest="50" HasShadow="False" BackgroundColor="{Binding colorSchedule}">
+                                        <Frame Padding="0" HeightRequest="72" WidthRequest="72" HasShadow="False" BackgroundColor="{Binding colorSchedule}">
                                             <StackLayout Spacing="0">
-                                                <Frame Padding="0" BackgroundColor="#136D74" HasShadow="False" >
-                                                    <Label Text="{Binding delivery_shortname}" TextColor="#FFFFFF" FontSize="12" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
+                                                <Frame Padding="0" BackgroundColor="#136D74" HasShadow="False" HeightRequest="22">
+                                                    <Label Text="{Binding delivery_shortname}" VerticalTextAlignment="Center" TextColor="#FFFFFF" FontSize="14" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
                                                 </Frame>
-                                                <Label Margin="10,0,10,0" Text="{Binding delivery_date}" TextColor="{Binding textColor}" FontSize="12" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
+                                                <Label Margin="10,0,10,0" Text="{Binding delivery_date}" TextColor="{Binding textColor}" FontSize="18" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
                                             </StackLayout>
                                         </Frame>
                                         <StackLayout.GestureRecognizers>
@@ -453,7 +149,7 @@
                 <ScrollView>
                     <StackLayout Spacing="0">
                  <FlexLayout JustifyContent="SpaceBetween" >
-                     <Label Margin="20,10,0,10" Text="Vegetables" TextColor="#FF8500" FontAttributes="Bold" FontSize="16"></Label>
+                     <Label Margin="20,10,0,10" Text="Vegetables" TextColor="#136D74" FontAttributes="Bold" FontSize="16"></Label>
                      <StackLayout Margin="0,10,20,10" Orientation="Horizontal" ClassId="vegetablesView" >
                          <Label Text="See all vegetables" VerticalTextAlignment="Center" TextColor="#FF8500" FontAttributes="Bold" FontSize="10"></Label>
                          <Image HeightRequest="12" Rotation="0" Source="triangleIconFilled.png" >
@@ -469,7 +165,7 @@
                  <CollectionView Grid.Column="1" x:Name="vegetablesListView" Margin="5,0,0,0" ItemsLayout="HorizontalList" HeightRequest="190">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Frame Padding="15,0,0,0" WidthRequest="160" HasShadow="False" BackgroundColor="Transparent">
+                            <Frame Padding="0,0,15,0" WidthRequest="160" HasShadow="False" BackgroundColor="Transparent">
                                 <StackLayout Spacing="0">
                                     <Frame HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding itemOpacity}">
                                         <RelativeLayout>
@@ -494,7 +190,7 @@
                                                     <ColumnDefinition Width="40"></ColumnDefinition>
                                                 </Grid.ColumnDefinitions>
                                                 <StackLayout Grid.Column="0">
-                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
+                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
                                                         <StackLayout Padding="5">
                                                             <ImageButton Margin="0,-7,0,0" Source="{Binding itemFavoriteImage}" Clicked="FavoriteClick"  CommandParameter="{Binding .}"></ImageButton>
                                                         </StackLayout>
@@ -502,7 +198,7 @@
                                                 </StackLayout>
                                                 <StackLayout Grid.Column="1"></StackLayout>
                                                 <StackLayout Grid.Column="2">
-                                                    <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
+                                                    <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
                                                         <Image Source="informationIcon.png"></Image>
                                                     </Frame>
                                                 </StackLayout>
@@ -571,7 +267,7 @@
                                                     <ColumnDefinition Width="40"></ColumnDefinition>
                                                 </Grid.ColumnDefinitions>
                                                 <StackLayout Grid.Column="0">
-                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
+                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
                                                         <StackLayout Padding="5">
                                                             <ImageButton Margin="0,-7,0,0" Source="{Binding favoriteIconLeft}" Clicked="ImageButton_Clicked"  CommandParameter="{Binding .}"></ImageButton>
                                                         </StackLayout>
@@ -579,7 +275,7 @@
                                                 </StackLayout>
                                                 <StackLayout Grid.Column="1" ></StackLayout>
                                                 <StackLayout Grid.Column="2">
-                                                    <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
+                                                    <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
                                                         <Image Source="informationIcon.png"></Image>
                                                     </Frame>
                                                 </StackLayout>
@@ -635,7 +331,7 @@
                                                     <ColumnDefinition Width="40"></ColumnDefinition>
                                                 </Grid.ColumnDefinitions>
                                                 <StackLayout Grid.Column="0">
-                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
+                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
                                                         <StackLayout Padding="5">
                                                             <ImageButton Margin="0,-7,0,0" Source="{Binding favoriteIconRight}" Clicked="ImageButton_Clicked" CommandParameter="{Binding .}"></ImageButton>
                                                         </StackLayout>
@@ -643,7 +339,7 @@
                                                 </StackLayout>
                                                 <StackLayout Grid.Column="1"></StackLayout>
                                                 <StackLayout Grid.Column="2">
-                                                    <Frame Margin="7,3,3,0"  WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
+                                                    <Frame Margin="7,3,3,0"  WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
                                                         <Image Source="informationIcon.png"></Image>
                                                     </Frame>
                                                 </StackLayout>
@@ -679,9 +375,10 @@
                                 </ViewCell>
                             </DataTemplate>
                         </ListView.ItemTemplate>
-                    </ListView> 
+                    </ListView>
+                <BoxView Margin="20,0,20,0" HeightRequest="1" Color="#FF8500"></BoxView>
                  <FlexLayout JustifyContent="SpaceBetween">
-                     <Label Margin="20,10,0,10" Text="Fruits" TextColor="#FF8500" FontAttributes="Bold" FontSize="16"></Label>
+                     <Label Margin="20,10,0,10" Text="Fruits" TextColor="#136D74" FontAttributes="Bold" FontSize="16"></Label>
                      <StackLayout Margin="0,10,20,10" Orientation="Horizontal" ClassId="fruitsView" >
                          <Label Text="See all fruits" VerticalTextAlignment="Center" TextColor="#FF8500" FontAttributes="Bold" FontSize="10"></Label>
                          <Image HeightRequest="12" Rotation="0" Source="triangleIconFilled.png">
@@ -697,7 +394,7 @@
                  <CollectionView Grid.Column="1" x:Name="fruitsListView" Margin="5,0,0,0" ItemsLayout="HorizontalList" HeightRequest="190">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Frame Padding="15,0,0,0" WidthRequest="160" HasShadow="False" BackgroundColor="Transparent">
+                            <Frame Padding="0,0,15,0" WidthRequest="160" HasShadow="False" BackgroundColor="Transparent">
                                 <StackLayout Spacing="0">
                                     <Frame HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding itemOpacity}">
                                         <RelativeLayout>
@@ -722,7 +419,7 @@
                                                     <ColumnDefinition Width="40"></ColumnDefinition>
                                                 </Grid.ColumnDefinitions>
                                                 <StackLayout Grid.Column="0">
-                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
+                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
                                                         <StackLayout Padding="5">
                                                             <ImageButton Margin="0,-7,0,0" Source="{Binding itemFavoriteImage}" Clicked="FavoriteClick"  CommandParameter="{Binding .}"></ImageButton>
                                                         </StackLayout>
@@ -730,7 +427,7 @@
                                                 </StackLayout>
                                                 <StackLayout Grid.Column="1"></StackLayout>
                                                 <StackLayout Grid.Column="2">
-                                                    <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
+                                                    <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
                                                         <Image Source="informationIcon.png"></Image>
                                                     </Frame>
                                                 </StackLayout>
@@ -799,7 +496,7 @@
                                                     <ColumnDefinition Width="40"></ColumnDefinition>
                                                 </Grid.ColumnDefinitions>
                                                 <StackLayout Grid.Column="0">
-                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
+                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
                                                         <StackLayout Padding="5">
                                                             <ImageButton Margin="0,-7,0,0" Source="{Binding favoriteIconLeft}" Clicked="ImageButton_Clicked"  CommandParameter="{Binding .}"></ImageButton>
                                                         </StackLayout>
@@ -807,7 +504,7 @@
                                                 </StackLayout>
                                                 <StackLayout Grid.Column="1" ></StackLayout>
                                                 <StackLayout Grid.Column="2">
-                                                    <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
+                                                    <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
                                                         <Image Source="informationIcon.png"></Image>
                                                     </Frame>
                                                 </StackLayout>
@@ -863,7 +560,7 @@
                                                     <ColumnDefinition Width="40"></ColumnDefinition>
                                                 </Grid.ColumnDefinitions>
                                                 <StackLayout Grid.Column="0">
-                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
+                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
                                                         <StackLayout Padding="5">
                                                             <ImageButton Margin="0,-7,0,0" Source="{Binding favoriteIconRight}" Clicked="ImageButton_Clicked" CommandParameter="{Binding .}"></ImageButton>
                                                         </StackLayout>
@@ -871,7 +568,7 @@
                                                 </StackLayout>
                                                 <StackLayout Grid.Column="1"></StackLayout>
                                                 <StackLayout Grid.Column="2">
-                                                    <Frame Margin="7,3,3,0"  WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
+                                                    <Frame Margin="7,3,3,0"  WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
                                                         <Image Source="informationIcon.png"></Image>
                                                     </Frame>
                                                 </StackLayout>
@@ -907,9 +604,10 @@
                                 </ViewCell>
                             </DataTemplate>
                         </ListView.ItemTemplate>
-                    </ListView> 
+                    </ListView>
+                         <BoxView Margin="20,0,20,0" HeightRequest="1" Color="#FF8500"></BoxView>
                  <FlexLayout JustifyContent="SpaceBetween" >
-                     <Label Margin="20,10,0,10" Text="Others" TextColor="#FF8500" FontAttributes="Bold" FontSize="16"></Label>
+                     <Label Margin="20,10,0,10" Text="Others" TextColor="#136D74" FontAttributes="Bold" FontSize="16"></Label>
                      <StackLayout Margin="0,10,20,10" Orientation="Horizontal" ClassId="othersView">
                          <Label Text="See all others" VerticalTextAlignment="Center" TextColor="#FF8500" FontAttributes="Bold" FontSize="10"></Label>
                          <Image HeightRequest="12" Rotation="0" Source="triangleIconFilled.png">
@@ -925,7 +623,7 @@
                  <CollectionView Grid.Column="1" x:Name="othersListView" Margin="5,0,0,0" ItemsLayout="HorizontalList" HeightRequest="190">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
-                            <Frame Padding="15,0,0,0" WidthRequest="160" HasShadow="False" BackgroundColor="Transparent">
+                            <Frame Padding="0,0,15,0" WidthRequest="160" HasShadow="False" BackgroundColor="Transparent">
                                 <StackLayout Spacing="0">
                                     <Frame HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding itemOpacity}">
                                         <RelativeLayout>
@@ -950,7 +648,7 @@
                                                     <ColumnDefinition Width="40"></ColumnDefinition>
                                                 </Grid.ColumnDefinitions>
                                                 <StackLayout Grid.Column="0">
-                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
+                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
                                                         <StackLayout Padding="5">
                                                             <ImageButton Margin="0,-7,0,0" Source="{Binding itemFavoriteImage}" Clicked="FavoriteClick"  CommandParameter="{Binding .}"></ImageButton>
                                                         </StackLayout>
@@ -958,7 +656,7 @@
                                                 </StackLayout>
                                                 <StackLayout Grid.Column="1"></StackLayout>
                                                 <StackLayout Grid.Column="2">
-                                                    <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
+                                                    <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
                                                         <Image Source="informationIcon.png"></Image>
                                                     </Frame>
                                                 </StackLayout>
@@ -1027,7 +725,7 @@
                                                     <ColumnDefinition Width="40"></ColumnDefinition>
                                                 </Grid.ColumnDefinitions>
                                                 <StackLayout Grid.Column="0">
-                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
+                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
                                                         <StackLayout Padding="5">
                                                             <ImageButton Margin="0,-7,0,0" Source="{Binding favoriteIconLeft}" Clicked="ImageButton_Clicked"  CommandParameter="{Binding .}"></ImageButton>
                                                         </StackLayout>
@@ -1035,7 +733,7 @@
                                                 </StackLayout>
                                                 <StackLayout Grid.Column="1" ></StackLayout>
                                                 <StackLayout Grid.Column="2">
-                                                    <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
+                                                    <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
                                                         <Image Source="informationIcon.png"></Image>
                                                     </Frame>
                                                 </StackLayout>
@@ -1091,7 +789,7 @@
                                                     <ColumnDefinition Width="40"></ColumnDefinition>
                                                 </Grid.ColumnDefinitions>
                                                 <StackLayout Grid.Column="0">
-                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
+                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
                                                         <StackLayout Padding="5">
                                                             <ImageButton Margin="0,-7,0,0" Source="{Binding favoriteIconRight}" Clicked="ImageButton_Clicked" CommandParameter="{Binding .}"></ImageButton>
                                                         </StackLayout>
@@ -1099,7 +797,7 @@
                                                 </StackLayout>
                                                 <StackLayout Grid.Column="1"></StackLayout>
                                                 <StackLayout Grid.Column="2">
-                                                    <Frame Margin="7,3,3,0"  WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
+                                                    <Frame Margin="7,3,3,0"  WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
                                                         <Image Source="informationIcon.png"></Image>
                                                     </Frame>
                                                 </StackLayout>
@@ -1135,9 +833,10 @@
                                 </ViewCell>
                             </DataTemplate>
                         </ListView.ItemTemplate>
-                    </ListView> 
+                    </ListView>
+                 <BoxView Margin="20,0,20,0" HeightRequest="1" Color="#FF8500"></BoxView>
                  <FlexLayout JustifyContent="SpaceBetween">
-                     <Label Margin="20,10,0,10" Text="Desserts" TextColor="#FF8500" FontAttributes="Bold" FontSize="16"></Label>
+                     <Label Margin="20,10,0,10" Text="Desserts" TextColor="#136D74" FontAttributes="Bold" FontSize="16"></Label>
                      <StackLayout Margin="0,10,20,10" Orientation="Horizontal" ClassId="dessertsView">
                          <Label Text="See all desserts" VerticalTextAlignment="Center" TextColor="#FF8500" FontAttributes="Bold" FontSize="10"></Label>
                          <Image HeightRequest="12" Rotation="0" Source="triangleIconFilled.png">
@@ -1364,172 +1063,104 @@
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView> 
-                <!--<ListView x:Name="itemList" Margin="0,15,0,0" HasUnevenRows="True" BackgroundColor="#E0E6E6" SeparatorVisibility="None" SeparatorColor="Transparent">
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <ViewCell>
-                                <Grid HeightRequest="190" ColumnSpacing="0">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"></ColumnDefinition>
-                                        <ColumnDefinition Width="*"></ColumnDefinition>
-                                    </Grid.ColumnDefinitions>
-                                <StackLayout Margin="20,0,7,0" Grid.Column="0" Spacing="0" >
-                                    <Frame HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding opacityLeft}">
-                                        <RelativeLayout>
-                                            <Frame
-                                                BackgroundColor="Transparent"
-                                                HasShadow="False"
-                                                HeightRequest="120"
-                                                Padding="0"
-                                                CornerRadius="10"
-                                                IsClippedToBounds="True"
-                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
-                                                <Image Source="{Binding imageSourceLeft}" Aspect="Fill"></Image>
-                                            </Frame>
 
-                                            <Grid
-                                                ColumnSpacing="0"
-                                                HeightRequest="120"
-                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="40"></ColumnDefinition>
-                                                    <ColumnDefinition Width="*"></ColumnDefinition>
-                                                    <ColumnDefinition Width="40"></ColumnDefinition>
-                                                </Grid.ColumnDefinitions>
-                                                <StackLayout Grid.Column="0">
-                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
-                                                        <StackLayout Padding="5">
-                                                            <ImageButton Margin="0,-7,0,0" Source="{Binding favoriteIconLeft}" Clicked="ImageButton_Clicked"  CommandParameter="{Binding .}"></ImageButton>
-                                                        </StackLayout>
-                                                    </Frame>
-                                                </StackLayout>
-                                                <StackLayout Grid.Column="1" ></StackLayout>
-                                                <StackLayout Grid.Column="2">
-                                                    <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
-                                                        <Image Source="informationIcon.png"></Image>
-                                                    </Frame>
-                                                </StackLayout>
-                                            </Grid>
-                                         
-                                        </RelativeLayout>
-                                    </Frame>
-                                    <Frame HasShadow="false" Padding="5" HeightRequest="40" CornerRadius="10"  IsEnabled="{Binding isItemLeftEnable}" BackgroundColor="{Binding colorLeft}" Opacity="{Binding opacityLeft}">
-                                        <Grid>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="*"></RowDefinition>
-                                                <RowDefinition Height="20"></RowDefinition>
-                                            </Grid.RowDefinitions>
-                                            <Label Grid.Row="0" FontSize="9" Text="{Binding itemNameLeft}" TextColor="Black" LineBreakMode="CharacterWrap"></Label>
-                                            <Grid Grid.Row="1">
-                                                <Grid>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="AUTO"></ColumnDefinition>
-                                                        <ColumnDefinition Width="*"></ColumnDefinition>
-                                                    </Grid.ColumnDefinitions>
-                                                    <StackLayout Grid.Column="0" Orientation="Horizontal">
-                                                        <Button Padding="0,-2,0,0" WidthRequest="20" Text="-" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="SubtractItemLeft" CommandParameter="{Binding .}"></Button>
-                                                        <Label Text="{Binding quantityLeft}" VerticalTextAlignment="Center" HorizontalTextAlignment="Center" FontSize="10" FontAttributes="Bold" TextColor="Black" WidthRequest="15"></Label>
-                                                        <Button Padding="0,-2,0,0" WidthRequest="20" Text="+" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="AddItemLeft" CommandParameter="{Binding .}"></Button>
-                                                    </StackLayout>
-                                                    <Label Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceLeftUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
-                                                </Grid>
-                                            </Grid>
-                                        </Grid>
-                                    </Frame>
-                                    <Label Margin="0,-110,0,0" IsVisible="{Binding isItemLeftUnavailable}" Text="Not available on this day" TextColor="Black" FontSize="11" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
-                                </StackLayout>
-                                <StackLayout Margin="7,0,20,0" Grid.Column="1" Spacing="0">
-                                    <Frame HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding opacityRight}">
-                                        <RelativeLayout>
-                                            <Frame
-                                                BackgroundColor="Transparent"
-                                                HasShadow="False"
-                                                HeightRequest="120"
-                                                Padding="0"
-                                                CornerRadius="10"
-                                                IsClippedToBounds="True"
-                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
-                                                <Image Source="{Binding imageSourceRight}" Aspect="Fill"></Image>
-                                            </Frame>
-                                            <Grid
-                                                ColumnSpacing="0"
-                                                HeightRequest="120"
-                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="40"></ColumnDefinition>
-                                                    <ColumnDefinition Width="*"></ColumnDefinition>
-                                                    <ColumnDefinition Width="40"></ColumnDefinition>
-                                                </Grid.ColumnDefinitions>
-                                                <StackLayout Grid.Column="0">
-                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
-                                                        <StackLayout Padding="5">
-                                                            <ImageButton Margin="0,-7,0,0" Source="{Binding favoriteIconRight}" Clicked="ImageButton_Clicked" CommandParameter="{Binding .}"></ImageButton>
-                                                        </StackLayout>
-                                                    </Frame>
-                                                </StackLayout>
-                                                <StackLayout Grid.Column="1"></StackLayout>
-                                                <StackLayout Grid.Column="2">
-                                                    <Frame Margin="7,3,3,0"  WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
-                                                        <Image Source="informationIcon.png"></Image>
-                                                    </Frame>
-                                                </StackLayout>
-                                            </Grid>
-                                        </RelativeLayout>
-                                    </Frame>
-                                    <Frame  HasShadow="false" Padding="5" HeightRequest="40" CornerRadius="10" IsEnabled="{Binding isItemRightEnable}" BackgroundColor="{Binding colorRight}" Opacity="{Binding opacityRight}">
-                                        <Grid>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="*"></RowDefinition>
-                                                <RowDefinition Height="20"></RowDefinition>
-                                            </Grid.RowDefinitions>
-                                            <Label Grid.Row="0" Text="{Binding itemNameRight}" FontSize="9" TextColor="Black" LineBreakMode="CharacterWrap"></Label>
-                                            <Grid Grid.Row="1">
-                                                <Grid>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="AUTO"></ColumnDefinition>
-                                                        <ColumnDefinition Width="*"></ColumnDefinition>
-                                                    </Grid.ColumnDefinitions>
-                                                    <StackLayout Grid.Column="0" Orientation="Horizontal">
-                                                        <Button WidthRequest="20" Padding="0,-2,0,0" Text="-" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="SubtractItemRight" CommandParameter="{Binding .}"></Button>
-                                                        <Label Text="{Binding quantityRight}" VerticalTextAlignment="Center" HorizontalTextAlignment="Center" FontSize="10" FontAttributes="Bold" TextColor="Black" WidthRequest="15"></Label>
-                                                        <Button WidthRequest="20" Padding="0,-2,0,0" Text="+" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="AddItemRight" CommandParameter="{Binding .}"></Button>
-                                                    </StackLayout>
-                                                    <Label Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceRightUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
-                                                </Grid>
-                                            </Grid>
-                                        </Grid>
-                                    </Frame>
-                                    <Label Margin="0,-110,0,0" IsVisible="{Binding isItemRightUnavailable}" Text="Not available on this day" TextColor="Black" FontSize="11" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
-                                </StackLayout>
-                                </Grid>
-                                </ViewCell>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>-->    
                          </StackLayout>
                     </ScrollView>
             </StackLayout>
-            <Frame Grid.Row="3" BackgroundColor="WhiteSmoke" CornerRadius="20">
+            <Frame Grid.Row="3" BackgroundColor="#136D74" CornerRadius="20" Margin="0,0,0,-20">
                 <StackLayout>
                     <StackLayout HorizontalOptions="Center">
-                        <Frame WidthRequest="50" HeightRequest="5" Padding="0" BackgroundColor="Gray" HasShadow="False"></Frame>
+                        <Frame WidthRequest="50" HeightRequest="5" CornerRadius="2"  Padding="0" BackgroundColor="Gray" HasShadow="False"></Frame>
                     </StackLayout>
-                    <Label Text="Store" TextColor="#136D74" FontSize="20" FontAttributes="Bold"></Label>
-                    <BoxView HeightRequest="1" Color="Gray"></BoxView>
-                    <Label Text="Cart" TextColor="#136D74" FontSize="20" FontAttributes="Bold"></Label>
-                    <BoxView HeightRequest="1" Color="Gray"></BoxView>
-                    <Label Text="History" TextColor="#136D74" FontSize="20" FontAttributes="Bold"></Label>
-                    <BoxView HeightRequest="1" Color="Gray"></BoxView>
-                    <Label Text="Refunds" TextColor="#136D74" FontSize="20" FontAttributes="Bold"></Label>
-                    <BoxView HeightRequest="1" Color="Gray"></BoxView>
-                    <Label Text="Info" TextColor="#136D74" FontSize="20" FontAttributes="Bold"></Label>
-                    <BoxView HeightRequest="1" Color="Gray"></BoxView>
-                    <Label Text="Profile" TextColor="#136D74" FontSize="20" FontAttributes="Bold"></Label>
-                    <BoxView HeightRequest="1" Color="Gray"></BoxView>
-                    <Label Text="Sign in" TextColor="#136D74" FontSize="20" FontAttributes="Bold"></Label>
-                    <BoxView HeightRequest="1" Color="Gray"></BoxView>
-                    <Label Text="Sign out" TextColor="#136D74" FontSize="20" FontAttributes="Bold"></Label>
-                    <BoxView HeightRequest="1" Color="Gray"></BoxView>
+                    <StackLayout Orientation="Horizontal" Spacing="20">
+                        <StackLayout  HeightRequest="32" WidthRequest="32">
+                            <Image VerticalOptions="CenterAndExpand" Source="storeIcon.png"></Image>
+                        </StackLayout>
+                        <Label VerticalOptions="Center" Text="Store" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
+                        <StackLayout.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="NavigateToStore"></TapGestureRecognizer>
+                        </StackLayout.GestureRecognizers>
+                    </StackLayout>
+                    <StackLayout Orientation="Horizontal" Spacing="20">
+                        <StackLayout HeightRequest="32" WidthRequest="32">
+                            <Image VerticalOptions="CenterAndExpand" Source="cartMenuIcon.png"></Image>
+                        </StackLayout>
+                        <Label VerticalOptions="Center" Text="Cart" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
+                        <StackLayout.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="NavigateToCart"></TapGestureRecognizer>
+                        </StackLayout.GestureRecognizers>
+                    </StackLayout>
+
+                    <StackLayout Orientation="Horizontal" Spacing="20">
+                        <StackLayout  HeightRequest="32" WidthRequest="32">
+                            <Image VerticalOptions="CenterAndExpand" Source="historyIcon.png"></Image>
+                        </StackLayout>
+                        <Label VerticalOptions="Center" Text="History" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
+                        <StackLayout.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="NavigateToHistory"></TapGestureRecognizer>
+                        </StackLayout.GestureRecognizers>
+                    </StackLayout>
+
+                    <StackLayout Orientation="Horizontal" Spacing="20">
+                        <StackLayout  HeightRequest="32" WidthRequest="32">
+                            <Image VerticalOptions="CenterAndExpand" Source="refundIcon.png"></Image>
+                        </StackLayout>
+                        <Label VerticalOptions="Center" Text="Refunds" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
+                        <StackLayout.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="NavigateToRefunds"></TapGestureRecognizer>
+                        </StackLayout.GestureRecognizers>
+                    </StackLayout>
+
+                    <StackLayout Orientation="Horizontal" Spacing="20">
+                        <StackLayout  HeightRequest="32" WidthRequest="32">
+                            <Image VerticalOptions="CenterAndExpand" Source="infoIcon.png"></Image>
+                        </StackLayout>
+                        <Label VerticalOptions="Center" Text="Info" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
+                        <StackLayout.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="NavigateToInfo"></TapGestureRecognizer>
+                        </StackLayout.GestureRecognizers>
+                    </StackLayout>
+
+                    <StackLayout Orientation="Horizontal" Spacing="20">
+                        <StackLayout  HeightRequest="32" WidthRequest="32">
+                            <Image VerticalOptions="CenterAndExpand" Source="profileIcon.png"></Image>
+                        </StackLayout>
+                        <Label VerticalOptions="Center" Text="Profile" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
+                        <StackLayout.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="NavigateToProfile"></TapGestureRecognizer>
+                        </StackLayout.GestureRecognizers>
+                    </StackLayout>
+
+                    <StackLayout Orientation="Horizontal" Spacing="20">
+                        <StackLayout  HeightRequest="32" WidthRequest="32">
+                            <Image VerticalOptions="CenterAndExpand" Source="signIn.png"></Image>
+                        </StackLayout>
+                        <Label VerticalOptions="Center" Text="Sign in" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
+                        <StackLayout.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="NavigateToSignIn"></TapGestureRecognizer>
+                        </StackLayout.GestureRecognizers>
+                    </StackLayout>
+
+                    <StackLayout Orientation="Horizontal" Spacing="20">
+                        <StackLayout  HeightRequest="32" WidthRequest="32">
+                            <Image VerticalOptions="CenterAndExpand" Source="signUpIcon.png"></Image>
+                        </StackLayout>
+                        <Label VerticalOptions="Center" Text="Sign up" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
+                        <StackLayout.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="NavigateToSignUp"></TapGestureRecognizer>
+                        </StackLayout.GestureRecognizers>
+                    </StackLayout>
+
+                    <StackLayout Orientation="Horizontal" Spacing="20">
+                        <StackLayout  HeightRequest="32" WidthRequest="32">
+                            <Image VerticalOptions="CenterAndExpand" Source="logoutIcon.png"></Image>
+                        </StackLayout>
+                        <Label VerticalOptions="Center" Text="Logout" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
+                        <StackLayout.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="NavigateToLogOut"></TapGestureRecognizer>
+                        </StackLayout.GestureRecognizers>
+                    </StackLayout>
+
                     <!--<StackLayout Grid.Column="0" VerticalOptions="Center" Spacing="0">
                     <Frame Padding="0" BackgroundColor="Transparent" HasShadow="False"  HeightRequest="46" WidthRequest="46">
                         <ImageButton Grid.Row="0" Grid.Column="0" BackgroundColor="Transparent" Source="CalendarI" Padding="6" Clicked="DeliveryDaysClick">
