@@ -426,6 +426,7 @@ namespace ServingFresh.Views
                                 user.setUserID(RDSData.result.customer_uid);
                                 user.setUserSessionTime(expDate);
                                 user.setUserPlatform("DIRECT");
+                                user.setUserType("CUSTOMER");
                                 user.setUserEmail(directSignUp.email);
                                 user.setUserFirstName(directSignUp.first_name);
                                 user.setUserLastName(directSignUp.last_name);
@@ -533,6 +534,7 @@ namespace ServingFresh.Views
                                 user.setUserID(RDSData.result.customer_uid);
                                 user.setUserSessionTime(expDate);
                                 user.setUserPlatform("DIRECT");
+                                user.setUserType("CUSTOMER");
                                 user.setUserEmail(directSignUp.email);
                                 user.setUserFirstName(directSignUp.first_name);
                                 user.setUserLastName(directSignUp.last_name);

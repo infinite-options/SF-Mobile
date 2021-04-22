@@ -325,6 +325,7 @@ namespace ServingFresh.Views
                             user.setUserID(RDSData.result.customer_uid);
                             user.setUserSessionTime(expDate);
                             user.setUserPlatform(socialSignUp.social);
+                            user.setUserType("CUSTOMER");
                             user.setUserEmail(socialSignUp.email);
                             user.setUserFirstName(socialSignUp.first_name);
                             user.setUserLastName(socialSignUp.last_name);
@@ -468,6 +469,7 @@ namespace ServingFresh.Views
                         user.setUserID(RDSData.result.customer_uid);
                         user.setUserSessionTime(expDate);
                         user.setUserPlatform(socialSignUp.social);
+                        user.setUserType("CUSTOMER");
                         user.setUserEmail(socialSignUp.email);
                         user.setUserFirstName(socialSignUp.first_name);
                         user.setUserLastName(socialSignUp.last_name);

@@ -109,6 +109,7 @@ namespace ServingFresh.Views
                                 user.setUserID(userData.result[0].customer_uid);
                                 user.setUserSessionTime(expDate);
                                 user.setUserPlatform("DIRECT");
+                                user.setUserType("CUSTOMER");
                                 user.setUserEmail(userData.result[0].customer_email);
                                 user.setUserFirstName(userData.result[0].customer_first_name);
                                 user.setUserLastName(userData.result[0].customer_last_name);

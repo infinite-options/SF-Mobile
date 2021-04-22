@@ -10,16 +10,25 @@
                 <RowDefinition Height="94"></RowDefinition>
                 <RowDefinition Height="60"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition x:Name="menuFrame" Height="0"></RowDefinition>
             </Grid.RowDefinitions>
             <Grid Grid.Row="0" ColumnSpacing="0" BackgroundColor="#136D74">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"></ColumnDefinition>
                     <ColumnDefinition Width="*"></ColumnDefinition>
                     <ColumnDefinition Width="100"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <StackLayout Grid.Column="0" Margin="100,40,0,0" Spacing="0" >
+                <StackLayout Grid.Column="0" Margin="0,40,0,0" Spacing="0">
+                     <ImageButton Source="menuIcon.png" >
+                         <ImageButton.Effects>
+                            <servingfresh:TintImageEffect TintColor="White"/>
+                         </ImageButton.Effects>
+                     </ImageButton>
+                </StackLayout>
+                <StackLayout Grid.Column="1" Margin="0,40,0,0" Spacing="0" >
                      <Label x:Name="title" HorizontalOptions="CenterAndExpand" VerticalOptions="Center" Text="Refunds" FontSize="30" TextColor="#FFFFFF" FontAttributes="Bold"></Label>
                 </StackLayout>
-                <StackLayout Grid.Column="1" Margin="0,15,0,0" VerticalOptions="Center" HorizontalOptions="Center">
+                <StackLayout Grid.Column="2" Margin="0,15,0,0" VerticalOptions="Center" HorizontalOptions="Center">
                     <RelativeLayout
                         RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}"
                         RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}">

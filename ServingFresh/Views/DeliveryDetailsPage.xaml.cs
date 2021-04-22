@@ -30,6 +30,7 @@ namespace ServingFresh.Views
         public DeliveryDetailsPage()
         {
             InitializeComponent();
+            SelectionPage.SetMenu(guestMenuSection, customerMenuSection, historyLabel, profileLabel);
             paymentClient = new Payments(purchase.getPurchaseDeliveryInstructions());
             cartItemsNumber.Text = purchase.getPurchaseItems().Count.ToString();
             PlaceLocationOnMap(double.Parse(purchase.getPurchaseLatitude()), double.Parse(purchase.getPurchaseLatitude()));
@@ -146,10 +147,63 @@ namespace ServingFresh.Views
             }
         }
 
+        void ShowMenuFromDeliveryDetails(System.Object sender, System.EventArgs e)
+        {
+            var height = new GridLength(0);
+            if (menuFrame.Height.Equals(height))
+            {
+                menuFrame.Height = this.Height - 180;
+            }
+            else
+            {
+                menuFrame.Height = 0;
+            }
+        }
 
         void NavigateToCartFromDeliveryDetails(System.Object sender, System.EventArgs e)
         {
             NavigateToCart(sender, e);
+        }
+
+
+        void NavigateToStoreFromDeliveryDetails(System.Object sender, System.EventArgs e)
+        {
+            NavigateToStore(sender, e);
+        }
+
+        void NavigateToHistoryFromDeliveryDetails(System.Object sender, System.EventArgs e)
+        {
+            NavigateToHistory(sender, e);
+        }
+
+        void NavigateToRefundsFromDeliveryDetails(System.Object sender, System.EventArgs e)
+        {
+            NavigateToRefunds(sender, e);
+        }
+
+        void NavigateToInfoFromDeliveryDetails(System.Object sender, System.EventArgs e)
+        {
+            NavigateToInfo(sender, e);
+        }
+
+        void NavigateToProfileFromDeliveryDetails(System.Object sender, System.EventArgs e)
+        {
+            NavigateToProfile(sender, e);
+        }
+
+        void NavigateToSignInFromDeliveryDetails(System.Object sender, System.EventArgs e)
+        {
+            NavigateToSignIn(sender, e);
+        }
+
+        void NavigateToSignUpFromDeliveryDetails(System.Object sender, System.EventArgs e)
+        {
+            NavigateToSignUp(sender, e);
+        }
+
+        void NavigateToMainFromDeliveryDetails(System.Object sender, System.EventArgs e)
+        {
+            NavigateToMain(sender, e);
         }
     }
 }

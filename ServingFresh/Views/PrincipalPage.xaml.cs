@@ -73,6 +73,15 @@ namespace ServingFresh.Views
                 user.setUserLatitude(currentLocation.Latitude.ToString());
                 user.setUserLongitude(currentLocation.Longitude.ToString());
             }
+            else
+            {
+                if(user.getUserID() == "")
+                {
+                    user.setUserType("GUEST");
+                    user.setUserLatitude(currentLocation.Latitude.ToString());
+                    user.setUserLongitude(currentLocation.Longitude.ToString());
+                }
+            }
 
             Application.Current.MainPage = new SelectionPage();
         }

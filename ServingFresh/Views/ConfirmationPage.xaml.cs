@@ -14,6 +14,7 @@ namespace ServingFresh.Views
         public ConfirmationPage()
         {
             InitializeComponent();
+            SelectionPage.SetMenu(guestMenuSection, customerMenuSection, historyLabel, profileLabel);
             cartItemsNumber.Text = purchase.getPurchaseItems().Count.ToString();
             contactMessage.Text = "If we have question. We will contact you at " + purchase.getPurchaseEmail() + " or " + purchase.getPurchasePhoneNumber();
             expectedDeliveryMessage.Text = "Your order will be delivered on: " + selectedDeliveryDate.deliveryTimeStamp.ToString("dddd, MMM dd, yyyy");
@@ -49,9 +50,62 @@ namespace ServingFresh.Views
             Application.Current.MainPage = new LogInPage();
         }
 
+        void ShowMenuFromConfirmation(System.Object sender, System.EventArgs e)
+        {
+            var height = new GridLength(0);
+            if (menuFrame.Height.Equals(height))
+            {
+                menuFrame.Height = this.Height - 180;
+            }
+            else
+            {
+                menuFrame.Height = 0;
+            }
+        }
+
         void NavigateToCartFromConfirmation(System.Object sender, System.EventArgs e)
         {
             NavigateToCart(sender, e);
+        }
+
+        void NavigateToStoreFromConfirmation(System.Object sender, System.EventArgs e)
+        {
+            NavigateToStore(sender, e);
+        }
+
+        void NavigateToHistoryFromConfirmation(System.Object sender, System.EventArgs e)
+        {
+            NavigateToHistory(sender, e);
+        }
+
+        void NavigateToRefudsFromConfirmation(System.Object sender, System.EventArgs e)
+        {
+            NavigateToRefunds(sender, e);
+        }
+
+        void NavigateToInfoFromConfirmation(System.Object sender, System.EventArgs e)
+        {
+            NavigateToInfo(sender, e);
+        }
+
+        void NavigateToProfileFromConfirmation(System.Object sender, System.EventArgs e)
+        {
+            NavigateToProfile(sender, e);
+        }
+
+        void NavigateToSignInFromConfirmation(System.Object sender, System.EventArgs e)
+        {
+            NavigateToSignIn(sender, e);
+        }
+
+        void NavigateToSignUpFromConfirmation(System.Object sender, System.EventArgs e)
+        {
+            NavigateToSignUp(sender, e);
+        }
+
+        void NavigateToMainFromConfirmation(System.Object sender, System.EventArgs e)
+        {
+            NavigateToMain(sender, e);
         }
     }  
 }

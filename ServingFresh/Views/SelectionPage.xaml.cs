@@ -29,7 +29,7 @@ namespace ServingFresh.Views
             public string business_image { get; set; }
             public string business_name { get; set; }
             public string business_uid { get; set; }
-            public IDictionary<string,IList<string>> list_delivery_days { get; set; }
+            public IDictionary<string, IList<string>> list_delivery_days { get; set; }
             public Color border_color { get; set; }
         }
 
@@ -130,7 +130,7 @@ namespace ServingFresh.Views
             public Xamarin.Forms.Color textColor { get; set; }
 
             public Xamarin.Forms.Color colorScheduleUpdate {
-                 set
+                set
                 {
                     colorSchedule = value;
                     PropertyChanged(this, new PropertyChangedEventArgs("colorSchedule"));
@@ -196,7 +196,7 @@ namespace ServingFresh.Views
         public static string zone = "";
         public int totalCount = 0;
 
-        
+
         // New variables for single lists
         ObservableCollection<SingleItem> vegetablesList = new ObservableCollection<SingleItem>();
         List<Items> vegetableDoubleList = new List<Items>();
@@ -218,7 +218,7 @@ namespace ServingFresh.Views
             InitializeComponent();
             _ = VerifyUserCredentials(accessToken, refreshToken, googleCredentials, appleCredentials, platform);
             _ = SetFavoritesList();
-            SetMenu(guestMenuSection, customerMenuSection, historyLabel, profileLabel);
+            _ = CheckVersion();
         }
 
         public SelectionPage()
@@ -229,13 +229,13 @@ namespace ServingFresh.Views
             SetMenu(guestMenuSection, customerMenuSection, historyLabel, profileLabel);
         }
 
-        void SetMenu(StackLayout guest, StackLayout customer, Label history, Label profile)
+        public static void SetMenu(StackLayout guest, StackLayout customer, Label history, Label profile)
         {
-            if(user.getUserType() == "GUEST")
+            if (user.getUserType() == "GUEST")
             {
                 customer.HeightRequest = 0;
-                SetMenuLabel(history);
-                SetMenuLabel(profile);
+                SetMenuLabel(history, "History (sign in required)");
+                SetMenuLabel(profile, "Profile (sing in required)");
             }
             else if (user.getUserType() == "CUSTOMER")
             {
@@ -258,7 +258,7 @@ namespace ServingFresh.Views
             await Task.Delay(2000);
         }
 
-        public async Task VerifyUserCredentials(string accessToken = "", string refreshToken = "", AuthenticatorCompletedEventArgs googleAccount = null, AppleAccount appleCredentials = null, string platform= "")
+        public async Task VerifyUserCredentials(string accessToken = "", string refreshToken = "", AuthenticatorCompletedEventArgs googleAccount = null, AppleAccount appleCredentials = null, string platform = "")
         {
             try
             {
@@ -313,7 +313,7 @@ namespace ServingFresh.Views
                         if (authetication.code.ToString() == Constant.EmailNotFound)
                         {
                             test.Hide();
-                            if(platform == "GOOGLE")
+                            if (platform == "GOOGLE")
                             {
                                 Application.Current.MainPage = new SocialSignUp(googleData.id, googleData.given_name, googleData.family_name, googleData.email, accessToken, refreshToken, "GOOGLE");
                             }
@@ -344,7 +344,7 @@ namespace ServingFresh.Views
                                 {
                                     updateTokesPost.mobile_access_token = accessToken;
                                     updateTokesPost.mobile_refresh_token = accessToken;
-                                }else if (platform == "APPLE")
+                                } else if (platform == "APPLE")
                                 {
                                     updateTokesPost.mobile_access_token = appleCredentials.Token;
                                     updateTokesPost.mobile_refresh_token = appleCredentials.Token;
@@ -378,6 +378,7 @@ namespace ServingFresh.Views
                                         user.setUserID(data.result[0].customer_uid);
                                         user.setUserSessionTime(expDate);
                                         user.setUserPlatform(platform);
+                                        user.setUserType("CUSTOMER");
                                         user.setUserEmail(userProfile.result[0].customer_email);
                                         user.setUserFirstName(userProfile.result[0].customer_first_name);
                                         user.setUserLastName(userProfile.result[0].customer_last_name);
@@ -390,7 +391,7 @@ namespace ServingFresh.Views
                                         user.setUserLatitude(userProfile.result[0].customer_lat);
                                         user.setUserLongitude(userProfile.result[0].customer_long);
 
-                                        await CheckVersion();
+                                        SetMenu(guestMenuSection, customerMenuSection, historyLabel, profileLabel);
 
                                         if (Device.RuntimePlatform == Device.iOS)
                                         {
@@ -476,7 +477,7 @@ namespace ServingFresh.Views
         public async Task CheckVersion()
         {
             var isLatest = await CrossLatestVersion.Current.IsUsingLatestVersion();
-            
+
             if (!isLatest)
             {
                 await DisplayAlert("Serving Fresh\nhas gotten even better!", "Please visit the App Store to get the latest version.", "OK");
@@ -754,7 +755,7 @@ namespace ServingFresh.Views
                         }
                     }
 
-                    foreach(ScheduleInfo i in displaySchedule)
+                    foreach (ScheduleInfo i in displaySchedule)
                     {
                         i.colorSchedule = Color.FromHex("#E0E6E6");
                         i.textColor = Color.FromHex("#136D74");
@@ -771,8 +772,8 @@ namespace ServingFresh.Views
                         var day = DateTime.Parse(displaySchedule[0].deliveryTimeStamp.ToString());
 
                         title.Text = day.ToString("ddd") + ", " + displaySchedule[0].delivery_date.ToString();
-                        deliveryTime.Text = displaySchedule[0].delivery_time;
-                        orderBy.Text = "(" +  displaySchedule[0].orderExpTime + ")";
+                        deliveryTime.Text = "Delivery time: " + displaySchedule[0].delivery_time;
+                        orderBy.Text = "(" + displaySchedule[0].orderExpTime + ")";
 
                         //GetData(data.result);
 
@@ -1121,7 +1122,7 @@ namespace ServingFresh.Views
                             isItemUnavailable = false,
                         };
 
-                        if(produce.item_type == "vegetable")
+                        if (produce.item_type == "vegetable")
                         {
                             vegetablesList.Add(itemToInsert);
                             vegetableDoubleList.Add(produce);
@@ -1298,7 +1299,7 @@ namespace ServingFresh.Views
                     }
                 }
 
-                if(favorites != null && favorites.Count != 0)
+                if (favorites != null && favorites.Count != 0)
                 {
                     if (favorites.Contains(i.itemName))
                     {
@@ -1321,7 +1322,7 @@ namespace ServingFresh.Views
                     itemModelObject.quantityL -= 1;
                     totalCount -= 1;
                     //CartTotal.Text = totalCount.ToString();
-                    
+
                     if (order != null)
                     {
                         if (order.ContainsKey(itemModelObject.itemNameLeft))
@@ -1347,7 +1348,7 @@ namespace ServingFresh.Views
                         }
                     }
 
-                    if(itemModelObject.quantityL == 0)
+                    if (itemModelObject.quantityL == 0)
                     {
                         itemModelObject.colorLeft = Color.FromHex("#FFFFFF");
                         itemModelObject.colorLeftUpdate = Color.FromHex("#FFFFFF");
@@ -1377,7 +1378,7 @@ namespace ServingFresh.Views
                 itemModelObject.quantityL += 1;
                 totalCount += 1;
                 //CartTotal.Text = totalCount.ToString();
-                
+
                 if (order != null)
                 {
                     if (order.ContainsKey(itemModelObject.itemNameLeft))
@@ -1420,7 +1421,7 @@ namespace ServingFresh.Views
                     itemModelObject.quantityR -= 1;
                     totalCount -= 1;
                     //CartTotal.Text = totalCount.ToString();
-                    
+
                     if (order.ContainsKey(itemModelObject.itemNameRight))
                     {
                         var itemToUpdate = order[itemModelObject.itemNameRight];
@@ -1443,7 +1444,7 @@ namespace ServingFresh.Views
                         order.Add(itemModelObject.itemNameRight, itemSelected);
                     }
 
-                    if(itemModelObject.quantityR == 0)
+                    if (itemModelObject.quantityR == 0)
                     {
                         itemModelObject.colorRight = Color.FromHex("#FFFFFF");
                         itemModelObject.colorRightUpdate = Color.FromHex("#FFFFFF");
@@ -1473,7 +1474,7 @@ namespace ServingFresh.Views
                 itemModelObject.quantityR += 1;
                 totalCount += 1;
                 //CartTotal.Text = totalCount.ToString();
-                
+
                 if (order.ContainsKey(itemModelObject.itemNameRight))
                 {
                     var itemToUpdate = order[itemModelObject.itemNameRight];
@@ -1550,7 +1551,7 @@ namespace ServingFresh.Views
 
             foreach (Business a in data.business_details)
             {
-                if(businessID == a.z_biz_id)
+                if (businessID == a.z_biz_id)
                 {
                     var acceptingDate = LastAcceptingOrdersDate(tempDateTable, a.z_accepting_day, a.z_accepting_time);
                     var deliveryDate = new DateTime();
@@ -1560,9 +1561,9 @@ namespace ServingFresh.Views
                     if (currentDate < acceptingDate)
                     {
                         //Debug.WriteLine("ONTIME");
-                        
+
                         deliveryDate = bussinesDeliveryDate(a.z_delivery_day, a.z_delivery_time);
-                        if(deliveryDate < acceptingDate)
+                        if (deliveryDate < acceptingDate)
                         {
                             deliveryDate = deliveryDate.AddDays(7);
                         }
@@ -1771,7 +1772,7 @@ namespace ServingFresh.Views
         {
             var date = DateTime.Parse(acceptingTime);
 
-            foreach(DateTime element in table)
+            foreach (DateTime element in table)
             {
                 if (element.DayOfWeek.ToString().ToUpper() == acceptingDay)
                 {
@@ -1883,16 +1884,16 @@ namespace ServingFresh.Views
             selectedDeliveryDate = dm;
             var day = DateTime.Parse(selectedDeliveryDate.deliveryTimeStamp.ToString());
             title.Text = day.ToString("ddd") + ", " + selectedDeliveryDate.delivery_date.ToString();
-            deliveryTime.Text = selectedDeliveryDate.delivery_time;
+            deliveryTime.Text = "Delivery time: " + selectedDeliveryDate.delivery_time;
             orderBy.Text = "(" + selectedDeliveryDate.orderExpTime + ")";
 
             Debug.WriteLine(weekday);
-            foreach(string b_uid in dm.business_uids)
+            foreach (string b_uid in dm.business_uids)
             {
                 Debug.WriteLine(b_uid);
             }
 
-            foreach(ScheduleInfo i in displaySchedule)
+            foreach (ScheduleInfo i in displaySchedule)
             {
                 i.colorScheduleUpdate = Color.FromHex("#E0E6E6");
                 i.textColorUpdate = Color.FromHex("#136D74");
@@ -1914,7 +1915,7 @@ namespace ServingFresh.Views
 
         void Change_Border_Color(Object sender, EventArgs e)
         {
-            
+
             var f = (Frame)sender;
             var tgr = (TapGestureRecognizer)f.GestureRecognizers[0];
             var bc = (BusinessCard)tgr.CommandParameter;
@@ -1930,11 +1931,11 @@ namespace ServingFresh.Views
                 var businessDeliveryDates = GetBusinessSchedule(data, bc.business_uid);
                 List<ScheduleInfo> businessDisplaySchedule = new List<ScheduleInfo>();
 
-                foreach(DateTime deliveryElement in businessDeliveryDates)
+                foreach (DateTime deliveryElement in businessDeliveryDates)
                 {
-                    foreach(ScheduleInfo scheduleElement in displaySchedule)
+                    foreach (ScheduleInfo scheduleElement in displaySchedule)
                     {
-                        if(deliveryElement == scheduleElement.deliveryTimeStamp)
+                        if (deliveryElement == scheduleElement.deliveryTimeStamp)
                         {
                             businessDisplaySchedule.Add(scheduleElement);
                             break;
@@ -2071,11 +2072,11 @@ namespace ServingFresh.Views
         {
             var client = (ImageButton)sender;
 
-            if(client.Source.ToString().Contains("unselectedHeartIcon.png"))
+            if (client.Source.ToString().Contains("unselectedHeartIcon.png"))
             {
                 client.Source = "selectedFavoritesIcon.png";
 
-                vegetablesListView.ItemsSource =  FavoritesFrom(vegetablesList);
+                vegetablesListView.ItemsSource = FavoritesFrom(vegetablesList);
                 fruitsListView.ItemsSource = FavoritesFrom(fruitsList);
                 othersListView.ItemsSource = FavoritesFrom(othersList);
                 dessertsListView.ItemsSource = FavoritesFrom(dessertsList);
@@ -2124,7 +2125,7 @@ namespace ServingFresh.Views
             var label = (Label)stacklayout.Children[0];
             var image = (Image)stacklayout.Children[1];
 
-            if(stacklayout.ClassId == "vegetablesView")
+            if (stacklayout.ClassId == "vegetablesView")
             {
                 SwitchLayoutViews(vegetablesList, vegetablesListView, itemList, label, image, "vegetables");
             }
@@ -2142,7 +2143,7 @@ namespace ServingFresh.Views
             }
         }
 
-        void SwitchLayoutViews(ObservableCollection<SingleItem> source ,CollectionView horizontalView, ListView verticalView, Label viewLabel, Image viewIcon, string category)
+        void SwitchLayoutViews(ObservableCollection<SingleItem> source, CollectionView horizontalView, ListView verticalView, Label viewLabel, Image viewIcon, string category)
         {
             if (viewIcon.Source.ToString() == "File: triangleIconFilled.png")
             {
@@ -2153,7 +2154,7 @@ namespace ServingFresh.Views
                 SetVerticalView(source, verticalView);
                 horizontalView.HeightRequest = 0;
                 var rowHeight = source.Count;
-                if(rowHeight % 2 != 0) { rowHeight++; }
+                if (rowHeight % 2 != 0) { rowHeight++; }
                 verticalView.HeightRequest = 190 * rowHeight / 2;
             }
             else
@@ -2165,7 +2166,7 @@ namespace ServingFresh.Views
                 updateItemsBackgroundColorAndQuantity(source, selectedDeliveryDate);
                 horizontalView.HeightRequest = 190;
                 verticalView.HeightRequest = 0;
-                
+
             }
         }
 
@@ -2174,13 +2175,16 @@ namespace ServingFresh.Views
             image.Effects[0] = new TintImageEffect() { TintColor = Color.FromHex("#FF8500") };
         }
 
-        void SetMenuLabel(Label section)
+        public static void SetMenuLabel(Label section, string title)
         {
-            section.Text = "History (sign in required)";
+            section.Text = title;
             section.TextColor = Color.FromHex("#FF8500");
         }
 
-
+        public static void SetCartLabel(Label cart)
+        {
+            cart.Text = order.Count.ToString();
+        }
 
         public static void NavigateToStore(System.Object sender, System.EventArgs e)
         {
@@ -2212,7 +2216,7 @@ namespace ServingFresh.Views
 
         public static void NavigateToProfile(System.Object sender, System.EventArgs e)
         {
-            if(user.getUserType() == "CUSTOMER")
+            if (user.getUserType() == "CUSTOMER")
             {
                 Application.Current.MainPage = new ProfilePage();
             }
@@ -2228,9 +2232,30 @@ namespace ServingFresh.Views
             Application.Current.MainPage = new SignUpPage();
         }
 
-        public static void NavigateToLogOut(System.Object sender, System.EventArgs e)
+        public static void NavigateToMain(System.Object sender, System.EventArgs e)
         {
+            ResetUser(user);
+            order.Clear();
             Application.Current.MainPage = new PrincipalPage();
+        }
+
+        static void ResetUser(Models.User user)
+        {
+            user.setUserType("");
+            user.setUserID("");
+            user.setUserFirstName("");
+            user.setUserLastName("");
+            user.setUserAddress("");
+            user.setUserUnit("");
+            user.setUserCity("");
+            user.setUserState("");
+            user.setUserZipcode("");
+            user.setUserPhoneNumber("");
+            user.setUserLatitude("");
+            user.setUserLongitude("");
+            user.setUserPlatform("");
+            user.setUserDeviceID("");
+            user.setUserSessionTime(new DateTime());
         }
     }
 }

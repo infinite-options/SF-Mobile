@@ -124,6 +124,7 @@ namespace ServingFresh.Views
         public HistoryPage()
         {
             InitializeComponent();
+            SelectionPage.SetMenu(guestMenuSection, customerMenuSection, historyLabel, profileLabel);
             historyList = new ObservableCollection<HistoryDisplayObject>();
             CartTotal.Text = CheckoutPage.total_qty.ToString();
             LoadHistory();
@@ -242,6 +243,19 @@ namespace ServingFresh.Views
             HistoryList.ItemsSource = historyList;
         }
 
+        void ShowMenuFromHistory(System.Object sender, System.EventArgs e)
+        {
+            var height = new GridLength(0);
+            if (menuFrame.Height.Equals(height))
+            {
+                menuFrame.Height = this.Height - 180;
+            }
+            else
+            {
+                menuFrame.Height = 0;
+            }
+        }
+
         void NavigateToCartFromHistory(System.Object sender, System.EventArgs e)
         {
             NavigateToCart(sender,e);
@@ -250,6 +264,41 @@ namespace ServingFresh.Views
         void NavigateToRefundsFromHistory(System.Object sender, System.EventArgs e)
         {
             NavigateToRefunds(sender, e);
+        }
+
+        void NavigateToStoreFromHistory(System.Object sender, System.EventArgs e)
+        {
+            NavigateToStore(sender, e);
+        }
+
+        void NavigateToInfoFromHistory(System.Object sender, System.EventArgs e)
+        {
+            NavigateToInfo(sender, e);
+        }
+
+        void NavigateToProfileFromHistory(System.Object sender, System.EventArgs e)
+        {
+            NavigateToProfile(sender, e);
+        }
+
+        void NavigateToSignInFromHistory(System.Object sender, System.EventArgs e)
+        {
+            NavigateToSignIn(sender, e);
+        }
+
+        void NavigateToSignUpFromHistory(System.Object sender, System.EventArgs e)
+        {
+            NavigateToSignUp(sender, e);
+        }
+
+        void NavigateToMainFromHistory(System.Object sender, System.EventArgs e)
+        {
+            NavigateToMain(sender, e);
+        }
+
+        void NavigateToHistoryFromHistory(System.Object sender, System.EventArgs e)
+        {
+            NavigateToHistory(sender, e);
         }
     }
 }
