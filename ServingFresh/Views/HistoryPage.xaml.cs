@@ -241,43 +241,15 @@ namespace ServingFresh.Views
 
             HistoryList.ItemsSource = historyList;
         }
-        public void openCheckout(object sender, EventArgs e)
-        {
-            //Application.Current.MainPage = new CheckoutPage(null,day);
-            Application.Current.MainPage = new CheckoutPage();
-        }
-        public void openRefund(object sender, EventArgs e)
-        {
-            Application.Current.MainPage = new RefundPage();
-        }
-        void DeliveryDaysClick(System.Object sender, System.EventArgs e)
-        {
-            Application.Current.MainPage = new SelectionPage();
-        }
-
-        void OrdersClick(System.Object sender, System.EventArgs e)
-        {
-            // Already on orders page
-        }
-
-        void InfoClick(System.Object sender, System.EventArgs e)
-        {
-            Application.Current.MainPage = new InfoPage();
-        }
-
-        void ProfileClick(System.Object sender, System.EventArgs e)
-        {
-            Application.Current.MainPage = new ProfilePage();
-        }
-
-        async void Button_Clicked(System.Object sender, System.EventArgs e)
-        {
-            await DisplayAlert("", "Additional feature coming soon", "Thanks");
-        }
 
         void NavigateToCartFromHistory(System.Object sender, System.EventArgs e)
         {
             NavigateToCart(sender,e);
+        }
+
+        void NavigateToRefundsFromHistory(System.Object sender, System.EventArgs e)
+        {
+            NavigateToRefunds(sender, e);
         }
     }
 }

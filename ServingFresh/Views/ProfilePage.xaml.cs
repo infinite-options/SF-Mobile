@@ -13,6 +13,7 @@ using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Maps;
 using Switch = Xamarin.Forms.Switch;
+using static ServingFresh.Views.SignUpPage;
 
 namespace ServingFresh.Views
 {
@@ -63,11 +64,11 @@ namespace ServingFresh.Views
             InitializeComponent();
             InitializeProfile();
 
-            userEmailAddress.Text = (string)Application.Current.Properties["user_email"];
+            userEmailAddress.Text = user.getUserEmail();
             userEmailAddress.TextColor = Color.Black;
-            userFirstName.Text = (string)Application.Current.Properties["user_first_name"];
-            userLastName.Text = (string)Application.Current.Properties["user_last_name"];
-            if((string)Application.Current.Properties["platform"] != "DIRECT")
+            userFirstName.Text = user.getUserFirstName();
+            userLastName.Text = user.getUserLastName();
+            if(user.getUserPlatform() != "DIRECT")
             {
                 passwordCredentials.HeightRequest = 0;
             }
@@ -80,12 +81,12 @@ namespace ServingFresh.Views
             {
                 notificationButton.IsToggled = false;
             }
-            userAddress.Text = (string)Application.Current.Properties["user_address"];
-            userUnitNumber.Text = (string)Application.Current.Properties["user_unit"];
-            userCity.Text = (string)Application.Current.Properties["user_city"];
-            userState.Text = (string)Application.Current.Properties["user_state"];
-            userZipcode.Text = (string)Application.Current.Properties["user_zip_code"];
-            userPhoneNumber.Text = (string)Application.Current.Properties["user_phone_num"];
+            userAddress.Text = user.getUserAddress();
+            userUnitNumber.Text = user.getUserUnit();
+            userCity.Text = user.getUserCity();
+            userState.Text = user.getUserState();
+            userZipcode.Text = user.getUserZipcode();
+            userPhoneNumber.Text = user.getUserPhoneNumber();
 
             Position position = new Position(Double.Parse(Application.Current.Properties["user_latitude"].ToString()), Double.Parse(Application.Current.Properties["user_longitude"].ToString()));
             map.MapType = MapType.Street;

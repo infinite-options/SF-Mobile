@@ -108,7 +108,7 @@
                     <Label Text="Cart" TextColor="#136D74"  FontSize="20" HorizontalTextAlignment="Center"></Label>
                     <BoxView HeightRequest="1" Color="#136D74" Margin="10,0,10,0"></BoxView>
                     <StackLayout.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="openCheckout"/>
+                        <TapGestureRecognizer Tapped="NavigateToCartFromHistory"/>
                     </StackLayout.GestureRecognizers>
                 </StackLayout>
                 <StackLayout Grid.Column="1" VerticalOptions="Center" Opacity="1">
@@ -119,7 +119,7 @@
                     <Label Text="Refunds" TextColor="#136D74" FontSize="20" HorizontalTextAlignment="Center"></Label>
                     <BoxView HeightRequest="1" Color="#136D74" Margin="10,0,10,0"></BoxView>
                     <StackLayout.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="openRefund"/>
+                        <TapGestureRecognizer Tapped="NavigateToRefundsFromHistory"/>
                     </StackLayout.GestureRecognizers>
                 </StackLayout>
             </Grid>
@@ -132,7 +132,7 @@
                                         <StackLayout >
                                             <FlexLayout JustifyContent="SpaceBetween">
                                                 <Label Text="{Binding purchase_status}" StyleClass="h2, primary" VerticalTextAlignment="Center"/>
-                                                <Button Margin="0,0,10,0" Text="Rate Order" HeightRequest="31" StyleClass="btn, primary" Clicked="Button_Clicked"/>
+                                                <Button Margin="0,0,10,0" Text="Rate Order" HeightRequest="31" StyleClass="btn, primary"/>
                                             </FlexLayout>
                                             <Label Text="{Binding delivery_date}" TextColor="Black" FontSize="16"/>
                                             <Label Text="{Binding purchase_id}" TextColor="Black" FontSize="16"/>
