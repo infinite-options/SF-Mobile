@@ -6,7 +6,7 @@ using ServingFresh.Config;
 using Xamarin.Essentials;
 using ServingFresh.LogIn.Apple;
 using System.Diagnostics;
-
+using static ServingFresh.Views.SignUpPage;
 namespace ServingFresh
 {
     public partial class App : Application
@@ -17,66 +17,50 @@ namespace ServingFresh
         
         public App()
         {
-            InitializeComponent();
-            //Application.Current.Properties.Clear();
-            //SecureStorage.RemoveAll();
-            //Preferences.Clear();
-
-            //Application.Current.MainPage = new PrincipalPage();
-
-            CardInfo();
-
-            
+            InitializeComponent();            
             try
             {
-                if (Application.Current.Properties.ContainsKey("user_id"))
+
+                if(user == null)
                 {
-                    if (Application.Current.Properties.ContainsKey("time_stamp"))
-                    {
-                        DateTime today = DateTime.Now;
-                        DateTime expTime = (DateTime)Application.Current.Properties["time_stamp"];
-
-                        if (today <= expTime)
-                        {
-                            //Console.WriteLine("guid: " + Preferences.Get("guid", null));
-                            MainPage = new SelectionPage();
-                        }
-                        else
-                        {
-                            LogInPage client = new LogInPage();
-                            MainPage = client;
-
-                            if (Application.Current.Properties.ContainsKey("time_stamp"))
-                            {
-                                string socialPlatform = (string)Application.Current.Properties["platform"];
-
-                                if (socialPlatform.Equals(Constant.Facebook))
-                                {
-                                    client.FacebookLogInClick(new object(), new EventArgs());
-                                }
-                                else if (socialPlatform.Equals(Constant.Google))
-                                {
-                                    client.GoogleLogInClick(new object(), new EventArgs());
-                                }
-                                else if (socialPlatform.Equals(Constant.Apple))
-                                {
-                                    client.AppleLogInClick(new object(), new EventArgs());
-                                }
-                                else
-                                {
-                                    MainPage = new LogInPage();
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        MainPage = new LogInPage();
-                    }
+                    MainPage = new PrincipalPage();
                 }
                 else
                 {
-                    MainPage = new PrincipalPage();
+                    DateTime today = DateTime.Now;
+                    var expTime = user.getUserSessionTime();
+
+                    if (today <= expTime)
+                    {
+                        //Console.WriteLine("guid: " + Preferences.Get("guid", null));
+                        MainPage = new SelectionPage();
+                    }
+                    else
+                    {
+                        LogInPage client = new LogInPage();
+                        MainPage = client;
+
+                        
+                        string socialPlatform = user.getUserPlatform();
+
+                        if (socialPlatform.Equals(Constant.Facebook))
+                        {
+                            client.FacebookLogInClick(new object(), new EventArgs());
+                        }
+                        else if (socialPlatform.Equals(Constant.Google))
+                        {
+                            client.GoogleLogInClick(new object(), new EventArgs());
+                        }
+                        else if (socialPlatform.Equals(Constant.Apple))
+                        {
+                            client.AppleLogInClick(new object(), new EventArgs());
+                        }
+                        else
+                        {
+                            MainPage = new LogInPage();
+                        }
+                        
+                    }
                 }
             }
             catch (Exception autoLoginFailed)
@@ -85,14 +69,6 @@ namespace ServingFresh
                 Debug.WriteLine("ERROR ON AUTO LOGIN");
                 Debug.WriteLine(autoLoginFailed.Message);
             }
-        }
-
-        public void CardInfo()
-        {
-            Application.Current.Properties["CardNumber"] = "";
-            Application.Current.Properties["CardExpMonth"] = "";
-            Application.Current.Properties["CardExpYear"] = "";
-            Application.Current.Properties["CardCVV"] = "";
         }
 
         protected override async void OnStart()

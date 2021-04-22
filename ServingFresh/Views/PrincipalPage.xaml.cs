@@ -51,9 +51,6 @@ namespace ServingFresh.Views
                             $"Thoroughfare:    {placemark.Thoroughfare}\n";
 
                         Debug.WriteLine(geocodeAddress);
-                        //Application.Current.Properties["location"] = "";
-
-                        //Application.Current.Properties["location"] = placemark.Locality + ", " + placemark.AdminArea;
                     }
                     Debug.WriteLine($"Latitude: {location.Latitude}, Longitude: {location.Longitude}, Altitude: {location.Altitude}");
                 }
@@ -77,19 +74,6 @@ namespace ServingFresh.Views
                 user.setUserLongitude(currentLocation.Longitude.ToString());
             }
 
-            Application.Current.Properties["guest"] = true;
-            Application.Current.Properties["user_email"] = "";
-            Application.Current.Properties["user_first_name"] = "";
-            Application.Current.Properties["user_last_name"] = "";
-            Application.Current.Properties["user_phone_num"] = "";
-            Application.Current.Properties["user_address"] = "";
-            Application.Current.Properties["user_unit"] = "";
-            Application.Current.Properties["user_city"] = "";
-            Application.Current.Properties["user_state"] = "";
-            Application.Current.Properties["user_zip_code"] = "";
-            Application.Current.Properties["user_latitude"] = "";
-            Application.Current.Properties["user_longitude"] = "";
-            Application.Current.Properties["user_delivery_instructions"] = "";
             Application.Current.MainPage = new SelectionPage();
         }
 

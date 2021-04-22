@@ -14,13 +14,6 @@ using Xamarin.Forms.Maps;
 using ServingFresh.Models;
 using System.Diagnostics;
 using Application = Xamarin.Forms.Application;
-using Stripe;
-using ServingFresh.Effects;
-using Xamarin.Essentials;
-
-using PayPalCheckoutSdk.Core;
-using PayPalCheckoutSdk.Orders;
-using PayPalHttp;
 
 using System.Threading.Tasks;
 using Acr.UserDialogs;

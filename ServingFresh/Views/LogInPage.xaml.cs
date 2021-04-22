@@ -16,6 +16,7 @@ using ServingFresh.Notifications;
 using System.Diagnostics;
 using ServingFresh.Models;
 using Acr.UserDialogs;
+using static ServingFresh.Views.SignUpPage;
 
 namespace ServingFresh.Views
 {
@@ -29,7 +30,6 @@ namespace ServingFresh.Views
         public LogInPage()
         {
             InitializeComponent();
-            InitializeAppProperties();
             
             if (Device.RuntimePlatform == Device.Android)
             {
@@ -55,56 +55,12 @@ namespace ServingFresh.Views
             }
         }
 
-        public LogInPage(string title, string message)
-        {
-            InitializeComponent();
-            InitializeAppProperties();
-
-            if (Device.RuntimePlatform == Device.Android)
-            {
-                System.Diagnostics.Debug.WriteLine("Running on Android: Line 32");
-                Console.WriteLine("guid: " + Preferences.Get("guid", null));
-                appleLogInButton.IsEnabled = false;
-            }
-            else
-            {
-                InitializedAppleLogin();
-                appleNotification.IsNotifications();
-            }
-
-            if (Device.RuntimePlatform == Device.iOS)
-            {
-                deviceId = Preferences.Get("guid", null);
-                if (deviceId != null) { Debug.WriteLine("This is the iOS GUID from Log in: " + deviceId); }
-            }
-            else
-            {
-                deviceId = Preferences.Get("guid", null);
-                if (deviceId != null) { Debug.WriteLine("This is the Android GUID from Log in " + deviceId); }
-            }
-            MessageFromSelectionPage(title,message);
-        }
 
         public async void MessageFromSelectionPage(string title, string message)
         {
             await DisplayAlert(title, message, "OK");
         }
 
-        public void InitializeAppProperties()
-        {
-            Application.Current.Properties["user_email"] = "";
-            Application.Current.Properties["user_first_name"] = "";
-            Application.Current.Properties["user_last_name"] = "";
-            Application.Current.Properties["user_phone_num"] = "";
-            Application.Current.Properties["user_address"] = "";
-            Application.Current.Properties["user_unit"] = "";
-            Application.Current.Properties["user_city"] = "";
-            Application.Current.Properties["user_state"] = "";
-            Application.Current.Properties["user_zip_code"] = "";
-            Application.Current.Properties["user_latitude"] = "";
-            Application.Current.Properties["user_longitude"] = "";
-            Application.Current.Properties["user_delivery_instructions"] = "";
-        }
 
         public void InitializedAppleLogin()
         {
@@ -150,23 +106,20 @@ namespace ServingFresh.Views
                                 DateTime today = DateTime.Now;
                                 DateTime expDate = today.AddDays(Constant.days);
 
-                                Application.Current.Properties["user_id"] = userData.result[0].customer_uid;
-                                Application.Current.Properties["time_stamp"] = expDate;
-                                Application.Current.Properties["platform"] = "DIRECT";
-                                Application.Current.Properties["user_email"] = userData.result[0].customer_email;
-                                Application.Current.Properties["user_first_name"] = userData.result[0].customer_first_name;
-                                Application.Current.Properties["user_last_name"] = userData.result[0].customer_last_name;
-                                Application.Current.Properties["user_phone_num"] = userData.result[0].customer_phone_num;
-                                Application.Current.Properties["user_address"] = userData.result[0].customer_address;
-                                Application.Current.Properties["user_unit"] = userData.result[0].customer_unit;
-                                Application.Current.Properties["user_city"] = userData.result[0].customer_city;
-                                Application.Current.Properties["user_state"] = userData.result[0].customer_state;
-                                Application.Current.Properties["user_zip_code"] = userData.result[0].customer_zip;
-                                Application.Current.Properties["user_latitude"] = userData.result[0].customer_lat;
-                                Application.Current.Properties["user_longitude"] = userData.result[0].customer_long;
-                                Application.Current.Properties["user_delivery_instructions"] = "";
-
-                                _ = Application.Current.SavePropertiesAsync();
+                                user.setUserID(userData.result[0].customer_uid);
+                                user.setUserSessionTime(expDate);
+                                user.setUserPlatform("DIRECT");
+                                user.setUserEmail(userData.result[0].customer_email);
+                                user.setUserFirstName(userData.result[0].customer_first_name);
+                                user.setUserLastName(userData.result[0].customer_last_name);
+                                user.setUserPhoneNumber(userData.result[0].customer_phone_num);
+                                user.setUserAddress(userData.result[0].customer_address);
+                                user.setUserUnit(userData.result[0].customer_unit);
+                                user.setUserCity(userData.result[0].customer_city);
+                                user.setUserState(userData.result[0].customer_state);
+                                user.setUserZipcode(userData.result[0].customer_zip);
+                                user.setUserLatitude(userData.result[0].customer_lat);
+                                user.setUserLongitude(userData.result[0].customer_long);
 
                                 if (Device.RuntimePlatform == Device.iOS)
                                 {
@@ -183,9 +136,9 @@ namespace ServingFresh.Views
                                 {
                                     NotificationPost notificationPost = new NotificationPost();
 
-                                    notificationPost.uid = (string)Application.Current.Properties["user_id"];
+                                    notificationPost.uid = user.getUserID();
                                     notificationPost.guid = deviceId.Substring(5);
-                                    Application.Current.Properties["guid"] = deviceId.Substring(5);
+                                    user.setUserDeviceID(deviceId.Substring(5));
                                     notificationPost.notification = "TRUE";
 
                                     var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
@@ -384,170 +337,7 @@ namespace ServingFresh.Views
             }
         }
 
-        public async void FacebookUserProfileAsync(string accessToken)
-        {
-
-            try
-            {
-                var client = new HttpClient();
-                var socialLogInPost = new SocialLogInPost();
-
-                var facebookResponse = client.GetStringAsync(Constant.FacebookUserInfoUrl + accessToken);
-                var userData = facebookResponse.Result;
-
-                System.Diagnostics.Debug.WriteLine(userData);
-
-                FacebookResponse facebookData = JsonConvert.DeserializeObject<FacebookResponse>(userData);
-
-                socialLogInPost.email = facebookData.email;
-                socialLogInPost.password = "";
-                socialLogInPost.social_id = facebookData.id;
-                socialLogInPost.signup_platform = "FACEBOOK";
-
-                var socialLogInPostSerialized = JsonConvert.SerializeObject(socialLogInPost);
-                var postContent = new StringContent(socialLogInPostSerialized, Encoding.UTF8, "application/json");
-
-                System.Diagnostics.Debug.WriteLine(socialLogInPostSerialized);
-
-                var RDSResponse = await client.PostAsync(Constant.LogInUrl, postContent);
-                var responseContent = await RDSResponse.Content.ReadAsStringAsync();
-
-                System.Diagnostics.Debug.WriteLine(responseContent);
-                System.Diagnostics.Debug.WriteLine(RDSResponse.IsSuccessStatusCode);
-
-                if (RDSResponse.IsSuccessStatusCode)
-                {
-                    if (responseContent != null)
-                    {
-                        if (responseContent.Contains(Constant.EmailNotFound))
-                        {
-                            var signUp = await DisplayAlert("Message", "It looks like you don't have a Serving Fresh account. Please sign up!", "OK", "Cancel");
-                            if (signUp)
-                            {
-                                Application.Current.MainPage = new SocialSignUp(facebookData.id, facebookData.name, "", facebookData.email, accessToken, accessToken, "FACEBOOK");
-                            }
-                        }
-
-                        if (responseContent.Contains(Constant.AutheticatedSuccesful))
-                        {
-                            var data = JsonConvert.DeserializeObject<SuccessfulSocialLogIn>(responseContent);
-                            Application.Current.Properties["user_id"] = data.result[0].customer_uid;
-
-                            UpdateTokensPost updateTokesPost = new UpdateTokensPost();
-                            updateTokesPost.uid = data.result[0].customer_uid;
-                            updateTokesPost.mobile_access_token = accessToken;
-                            updateTokesPost.mobile_refresh_token = accessToken;
-
-                            var updateTokesPostSerializedObject = JsonConvert.SerializeObject(updateTokesPost);
-                            var updateTokesContent = new StringContent(updateTokesPostSerializedObject, Encoding.UTF8, "application/json");
-                            var updateTokesResponse = await client.PostAsync(Constant.UpdateTokensUrl, updateTokesContent);
-                            var updateTokenResponseContent = await updateTokesResponse.Content.ReadAsStringAsync();
-                            System.Diagnostics.Debug.WriteLine(updateTokenResponseContent);
-
-                            if (updateTokesResponse.IsSuccessStatusCode)
-                            {
-                                var request = new RequestUserInfo();
-                                request.uid = data.result[0].customer_uid;
-
-                                var requestSelializedObject = JsonConvert.SerializeObject(request);
-                                var requestContent = new StringContent(requestSelializedObject, Encoding.UTF8, "application/json");
-
-                                var clientRequest = await client.PostAsync(Constant.GetUserInfoUrl, requestContent);
-
-                                if (clientRequest.IsSuccessStatusCode)
-                                {
-                                    var SFUser = await clientRequest.Content.ReadAsStringAsync();
-                                    var FacebookUserData = JsonConvert.DeserializeObject<UserInfo>(SFUser);
-
-                                    DateTime today = DateTime.Now;
-                                    DateTime expDate = today.AddDays(Constant.days);
-
-                                    Application.Current.Properties["user_id"] = data.result[0].customer_uid;
-                                    Application.Current.Properties["time_stamp"] = expDate;
-                                    Application.Current.Properties["platform"] = "FACEBOOK";
-                                    Application.Current.Properties["user_email"] = FacebookUserData.result[0].customer_email;
-                                    Application.Current.Properties["user_first_name"] = FacebookUserData.result[0].customer_first_name;
-                                    Application.Current.Properties["user_last_name"] = FacebookUserData.result[0].customer_last_name;
-                                    Application.Current.Properties["user_phone_num"] = FacebookUserData.result[0].customer_phone_num;
-                                    Application.Current.Properties["user_address"] = FacebookUserData.result[0].customer_address;
-                                    Application.Current.Properties["user_unit"] = FacebookUserData.result[0].customer_unit;
-                                    Application.Current.Properties["user_city"] = FacebookUserData.result[0].customer_city;
-                                    Application.Current.Properties["user_state"] = FacebookUserData.result[0].customer_state;
-                                    Application.Current.Properties["user_zip_code"] = FacebookUserData.result[0].customer_zip;
-                                    Application.Current.Properties["user_latitude"] = FacebookUserData.result[0].customer_lat;
-                                    Application.Current.Properties["user_longitude"] = FacebookUserData.result[0].customer_long;
-
-                                    _ = Application.Current.SavePropertiesAsync();
-
-                                    if (Device.RuntimePlatform == Device.iOS)
-                                    {
-                                        deviceId = Preferences.Get("guid", null);
-                                        if (deviceId != null) { Debug.WriteLine("This is the iOS GUID from Log in: " + deviceId); }
-                                    }
-                                    else
-                                    {
-                                        deviceId = Preferences.Get("guid", null);
-                                        if (deviceId != null) { Debug.WriteLine("This is the Android GUID from Log in " + deviceId); }
-                                    }
-                                    
-                                    if (deviceId != null)
-                                    {
-                                        NotificationPost notificationPost = new NotificationPost();
-
-                                        notificationPost.uid = (string)Application.Current.Properties["user_id"];
-                                        notificationPost.guid = deviceId.Substring(5);
-                                        Application.Current.Properties["guid"] = deviceId.Substring(5);
-                                        notificationPost.notification = "TRUE";
-
-                                        var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
-                                        Debug.WriteLine("Notification JSON Object to send: " + notificationSerializedObject);
-
-                                        var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
-
-                                        var clientResponse = await client.PostAsync(Constant.NotificationsUrl, notificationContent);
-
-                                        Debug.WriteLine("Status code: " + clientResponse.IsSuccessStatusCode);
-
-                                        if (clientResponse.IsSuccessStatusCode)
-                                        {
-                                            System.Diagnostics.Debug.WriteLine("We have post the guid to the database");
-                                        }
-                                        else
-                                        {
-                                            await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
-                                        }
-                                    }
-
-                                    Application.Current.MainPage = new SelectionPage();
-                                }
-                                else
-                                {
-                                    await DisplayAlert("Alert!", "Our internal system was not able to retrieve your user information. We are working to solve this issue.", "OK");
-                                }
-                            }
-                            else
-                            {
-                                await DisplayAlert("Oops", "We are facing some problems with our internal system. We weren't able to update your credentials", "OK");
-                            }
-                        }
-
-                        if (responseContent.Contains(Constant.ErrorPlatform))
-                        {
-                            var RDSCode = JsonConvert.DeserializeObject<RDSLogInMessage>(responseContent);
-                            await DisplayAlert("Message", RDSCode.message, "OK");
-                        }
-
-                        if (responseContent.Contains(Constant.ErrorUserDirectLogIn))
-                        {
-                            await DisplayAlert("Oops!", "You have an existing Serving Fresh account. Please use direct login", "OK");
-                        }
-                    }
-                }
-            }catch (Exception facebook)
-            {
-                Debug.WriteLine(facebook.Message);
-            }
-        }
+        
 
         private async void FacebookAutheticatorError(object sender, AuthenticatorErrorEventArgs e)
         {
@@ -619,180 +409,7 @@ namespace ServingFresh.Views
             }
         }
 
-        public async void GoogleUserProfileAsync(string accessToken, string refreshToken, AuthenticatorCompletedEventArgs e)
-        {
-            try
-            {
-                var progress = UserDialogs.Instance.Loading("Sending your request...");
-                
-                var client = new HttpClient();
-                var socialLogInPost = new SocialLogInPost();
-
-                var request = new OAuth2Request("GET", new Uri(Constant.GoogleUserInfoUrl), null, e.Account);
-                var GoogleResponse = await request.GetResponseAsync();
-                var userData = GoogleResponse.GetResponseText();
-
-                System.Diagnostics.Debug.WriteLine(userData);
-                GoogleResponse googleData = JsonConvert.DeserializeObject<GoogleResponse>(userData);
-
-                socialLogInPost.email = googleData.email;
-                socialLogInPost.password = "";
-                socialLogInPost.social_id = googleData.id;
-                socialLogInPost.signup_platform = "GOOGLE";
-
-                var socialLogInPostSerialized = JsonConvert.SerializeObject(socialLogInPost);
-                var postContent = new StringContent(socialLogInPostSerialized, Encoding.UTF8, "application/json");
-
-                System.Diagnostics.Debug.WriteLine(socialLogInPostSerialized);
-
-                var RDSResponse = await client.PostAsync(Constant.LogInUrl, postContent);
-                var responseContent = await RDSResponse.Content.ReadAsStringAsync();
-
-                System.Diagnostics.Debug.WriteLine(responseContent);
-                System.Diagnostics.Debug.WriteLine(RDSResponse.IsSuccessStatusCode);
-
-                if (RDSResponse.IsSuccessStatusCode)
-                {
-                    if (responseContent != null)
-                    {
-                        if (responseContent.Contains(Constant.EmailNotFound))
-                        {
-                            var signUp = await DisplayAlert("Message", "It looks like you don't have a Serving Fresh account. Please sign up!", "OK", "Cancel");
-                            if (signUp)
-                            {
-                                Application.Current.MainPage = new SocialSignUp(googleData.id, googleData.given_name, googleData.family_name, googleData.email, accessToken, refreshToken, "GOOGLE");
-                            }
-                        }
-                        if (responseContent.Contains(Constant.AutheticatedSuccesful))
-                        {
-                            try
-                            {
-
-
-                                var data = JsonConvert.DeserializeObject<SuccessfulSocialLogIn>(responseContent);
-                                Application.Current.Properties["user_id"] = data.result[0].customer_uid;
-
-                                UpdateTokensPost updateTokesPost = new UpdateTokensPost();
-                                updateTokesPost.uid = data.result[0].customer_uid;
-                                updateTokesPost.mobile_access_token = accessToken;
-                                updateTokesPost.mobile_refresh_token = refreshToken;
-
-                                var updateTokesPostSerializedObject = JsonConvert.SerializeObject(updateTokesPost);
-                                var updateTokesContent = new StringContent(updateTokesPostSerializedObject, Encoding.UTF8, "application/json");
-                                var updateTokesResponse = await client.PostAsync(Constant.UpdateTokensUrl, updateTokesContent);
-                                var updateTokenResponseContent = await updateTokesResponse.Content.ReadAsStringAsync();
-                                System.Diagnostics.Debug.WriteLine(updateTokenResponseContent);
-
-                                if (updateTokesResponse.IsSuccessStatusCode)
-                                {
-                                    var GoogleRequest = new RequestUserInfo();
-                                    GoogleRequest.uid = data.result[0].customer_uid;
-
-                                    var requestSelializedObject = JsonConvert.SerializeObject(GoogleRequest);
-                                    var requestContent = new StringContent(requestSelializedObject, Encoding.UTF8, "application/json");
-
-                                    var clientRequest = await client.PostAsync(Constant.GetUserInfoUrl, requestContent);
-
-                                    if (clientRequest.IsSuccessStatusCode)
-                                    {
-                                        var SFUser = await clientRequest.Content.ReadAsStringAsync();
-                                        var GoogleUserData = JsonConvert.DeserializeObject<UserInfo>(SFUser);
-
-                                        DateTime today = DateTime.Now;
-                                        DateTime expDate = today.AddDays(Constant.days);
-
-                                        Application.Current.Properties["user_id"] = data.result[0].customer_uid;
-                                        Application.Current.Properties["time_stamp"] = expDate;
-                                        Application.Current.Properties["platform"] = "GOOGLE";
-                                        Application.Current.Properties["user_email"] = GoogleUserData.result[0].customer_email;
-                                        Application.Current.Properties["user_first_name"] = GoogleUserData.result[0].customer_first_name;
-                                        Application.Current.Properties["user_last_name"] = GoogleUserData.result[0].customer_last_name;
-                                        Application.Current.Properties["user_phone_num"] = GoogleUserData.result[0].customer_phone_num;
-                                        Application.Current.Properties["user_address"] = GoogleUserData.result[0].customer_address;
-                                        Application.Current.Properties["user_unit"] = GoogleUserData.result[0].customer_unit;
-                                        Application.Current.Properties["user_city"] = GoogleUserData.result[0].customer_city;
-                                        Application.Current.Properties["user_state"] = GoogleUserData.result[0].customer_state;
-                                        Application.Current.Properties["user_zip_code"] = GoogleUserData.result[0].customer_zip;
-                                        Application.Current.Properties["user_latitude"] = GoogleUserData.result[0].customer_lat;
-                                        Application.Current.Properties["user_longitude"] = GoogleUserData.result[0].customer_long;
-
-                                        _ = Application.Current.SavePropertiesAsync();
-
-                                        if (Device.RuntimePlatform == Device.iOS)
-                                        {
-                                            deviceId = Preferences.Get("guid", null);
-                                            if (deviceId != null) { Debug.WriteLine("This is the iOS GUID from Log in: " + deviceId); }
-                                        }
-                                        else
-                                        {
-                                            deviceId = Preferences.Get("guid", null);
-                                            if (deviceId != null) { Debug.WriteLine("This is the Android GUID from Log in " + deviceId); }
-                                        }
-
-                                        if (deviceId != null)
-                                        {
-                                            NotificationPost notificationPost = new NotificationPost();
-
-                                            notificationPost.uid = (string)Application.Current.Properties["user_id"];
-                                            notificationPost.guid = deviceId.Substring(5);
-                                            Application.Current.Properties["guid"] = deviceId.Substring(5);
-                                            notificationPost.notification = "TRUE";
-
-                                            var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
-                                            Debug.WriteLine("Notification JSON Object to send: " + notificationSerializedObject);
-
-                                            var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
-
-                                            var clientResponse = await client.PostAsync(Constant.NotificationsUrl, notificationContent);
-
-                                            Debug.WriteLine("Status code: " + clientResponse.IsSuccessStatusCode);
-
-                                            if (clientResponse.IsSuccessStatusCode)
-                                            {
-                                                System.Diagnostics.Debug.WriteLine("We have post the guid to the database");
-                                            }
-                                            else
-                                            {
-                                                await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
-                                            }
-                                        }
-
-                                        Application.Current.MainPage = new SelectionPage();
-                                    }
-                                    else
-                                    {
-                                        await DisplayAlert("Alert!", "Our internal system was not able to retrieve your user information. We are working to solve this issue.", "OK");
-                                    }
-                                }
-                                else
-                                {
-                                    await DisplayAlert("Oops", "We are facing some problems with our internal system. We weren't able to update your credentials", "OK");
-                                }
-                            }
-                            catch (Exception second)
-                            {
-                                Debug.WriteLine(second.Message);
-                            }
-                        }
-                        if (responseContent.Contains(Constant.ErrorPlatform))
-                        {
-                            var RDSCode = JsonConvert.DeserializeObject<RDSLogInMessage>(responseContent);
-                            await DisplayAlert("Message", RDSCode.message, "OK");
-                        }
-
-                        if (responseContent.Contains(Constant.ErrorUserDirectLogIn))
-                        {
-                            await DisplayAlert("Oops!", "You have an existing Serving Fresh account. Please use direct login", "OK");
-                        }
-                    }
-                }
-                progress.Hide();
-            }
-            catch (Exception first)
-            {
-                Debug.WriteLine(first.Message);
-            }
-        }
+        
 
         private async void GoogleAuthenticatorError(object sender, AuthenticatorErrorEventArgs e)
         {
@@ -822,39 +439,6 @@ namespace ServingFresh.Views
             await DisplayAlert("Error", "We weren't able to set an account for you", "OK");
         }
 
-        async void ProceedAsGuestClick(System.Object sender, System.EventArgs e)
-        {
-            Application.Current.Properties["user_latitude"] = "0";
-            Application.Current.Properties["user_longitude"] = "0";
-
-            List<string> types = new List<string>();
-            List<string> businessId = new List<string>();
-
-            types.Add("fruit");
-            types.Add("vegetable");
-            types.Add("dessert");
-            types.Add("other");
-
-            businessId.Add("200-000016");
-            businessId.Add("200-000017");
-            businessId.Add("200-000018");
-            businessId.Add("200-000019");
-
-            var weekDay = DateTime.Now.DayOfWeek.ToString();
-            Application.Current.Properties["guest"] = true;
-            
-            
-            //GuestItemsPage businessItemPage = new GuestItemsPage(types, businessId, weekDay);
-            //Application.Current.MainPage = businessItemPage;
-            //Application.Current.MainPage = new GuestPage();
-
-            //await DisplayAlert("", "Additional feature coming soon", "Thanks");
-        }
-
-        void SignUpClick(System.Object sender, System.EventArgs e)
-        {
-            Application.Current.MainPage = new SignUpPage();
-        }
 
         void ReturnBackToPrincipalPage(System.Object sender, System.EventArgs e)
         {

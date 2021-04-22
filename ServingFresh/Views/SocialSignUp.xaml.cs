@@ -13,7 +13,7 @@ using Xamarin.Forms.Maps;
 using Xamarin.Essentials;
 using ServingFresh.Models;
 using System.Diagnostics;
-
+using static ServingFresh.Views.SignUpPage;
 namespace ServingFresh.Views
 {
     public partial class SocialSignUp : ContentPage
@@ -32,7 +32,7 @@ namespace ServingFresh.Views
             InitializeComponent();
             ShowSignUpMessage();
             InitializeSignUpPost();
-            InitializeAppProperties();
+
             InitializeMap();
 
             userFirstName.Text = firstName;
@@ -108,21 +108,6 @@ namespace ServingFresh.Views
             socialSignUp.social_id = "";
         }
 
-        public void InitializeAppProperties()
-        {
-            Application.Current.Properties["user_email"] = "";
-            Application.Current.Properties["user_first_name"] = "";
-            Application.Current.Properties["user_last_name"] = "";
-            Application.Current.Properties["user_phone_num"] = "";
-            Application.Current.Properties["user_address"] = "";
-            Application.Current.Properties["user_unit"] = "";
-            Application.Current.Properties["user_city"] = "";
-            Application.Current.Properties["user_state"] = "";
-            Application.Current.Properties["user_zip_code"] = "";
-            Application.Current.Properties["user_latitude"] = "";
-            Application.Current.Properties["user_longitude"] = "";
-            Application.Current.Properties["user_delivery_instructions"] = "";
-        }
 
         public void InitializeMap()
         {
@@ -300,8 +285,7 @@ namespace ServingFresh.Views
                 else
                 {
                     isAddessValidated = true;
-                    await DisplayAlert("We validated your address", "Please click on the Sign up button to create your account!", "OK");
-                    await Application.Current.SavePropertiesAsync();
+
                     validateAddressButton.Text = "Sign up";
                     validateAddressButton.TextColor = Color.White;
                     validateAddressButton.BackgroundColor = Color.FromHex("#FF8500");
@@ -337,23 +321,21 @@ namespace ServingFresh.Views
                             DateTime today = DateTime.Now;
                             DateTime expDate = today.AddDays(Constant.days);
 
-                            Application.Current.Properties["user_id"] = RDSData.result.customer_uid;
-                            Application.Current.Properties["time_stamp"] = expDate;
-                            Application.Current.Properties["platform"] = socialSignUp.social;
-                            Application.Current.Properties["user_email"] = socialSignUp.email;
-                            Application.Current.Properties["user_first_name"] = socialSignUp.first_name;
-                            Application.Current.Properties["user_last_name"] = socialSignUp.last_name;
-                            Application.Current.Properties["user_phone_num"] = socialSignUp.phone_number;
-                            Application.Current.Properties["user_address"] = socialSignUp.address;
-                            Application.Current.Properties["user_unit"] = socialSignUp.unit;
-                            Application.Current.Properties["user_city"] = socialSignUp.city;
-                            Application.Current.Properties["user_state"] = socialSignUp.state;
-                            Application.Current.Properties["user_zip_code"] = socialSignUp.zip_code;
-                            Application.Current.Properties["user_latitude"] = socialSignUp.latitude;
-                            Application.Current.Properties["user_longitude"] = socialSignUp.longitude;
-                            //Application.Current.Properties["user_delivery_instructions"] = userDeliveryInstructions.Text;
 
-                            _ = Application.Current.SavePropertiesAsync();
+                            user.setUserID(RDSData.result.customer_uid);
+                            user.setUserSessionTime(expDate);
+                            user.setUserPlatform(socialSignUp.social);
+                            user.setUserEmail(socialSignUp.email);
+                            user.setUserFirstName(socialSignUp.first_name);
+                            user.setUserLastName(socialSignUp.last_name);
+                            user.setUserPhoneNumber(socialSignUp.phone_number);
+                            user.setUserAddress(socialSignUp.address);
+                            user.setUserUnit(socialSignUp.unit);
+                            user.setUserCity(socialSignUp.city);
+                            user.setUserState(socialSignUp.state);
+                            user.setUserZipcode(socialSignUp.zip_code);
+                            user.setUserLatitude(socialSignUp.latitude);
+                            user.setUserLongitude(socialSignUp.longitude);
 
                             //EmailVerificationObject user = new EmailVerificationObject();
 
@@ -377,9 +359,9 @@ namespace ServingFresh.Views
                             {
                                 NotificationPost notificationPost = new NotificationPost();
 
-                                notificationPost.uid = (string)Application.Current.Properties["user_id"];
+                                notificationPost.uid = user.getUserID();
                                 notificationPost.guid = deviceId.Substring(5);
-                                Application.Current.Properties["guid"] = deviceId.Substring(5);
+                                user.setUserDeviceID(deviceId.Substring(5));
                                 notificationPost.notification = "TRUE";
 
                                 var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
@@ -483,49 +465,29 @@ namespace ServingFresh.Views
                         DateTime today = DateTime.Now;
                         DateTime expDate = today.AddDays(Constant.days);
 
-                        Application.Current.Properties["user_id"] = RDSData.result.customer_uid;
-                        Application.Current.Properties["time_stamp"] = expDate;
-                        Application.Current.Properties["platform"] = socialSignUp.social;
-                        Application.Current.Properties["user_email"] = socialSignUp.email;
-                        Application.Current.Properties["user_first_name"] = socialSignUp.first_name;
-                        Application.Current.Properties["user_last_name"] = socialSignUp.last_name;
-                        Application.Current.Properties["user_phone_num"] = socialSignUp.phone_number;
-                        Application.Current.Properties["user_address"] = socialSignUp.address;
-                        Application.Current.Properties["user_unit"] = socialSignUp.unit;
-                        Application.Current.Properties["user_city"] = socialSignUp.city;
-                        Application.Current.Properties["user_state"] = socialSignUp.state;
-                        Application.Current.Properties["user_zip_code"] = socialSignUp.zip_code;
-                        Application.Current.Properties["user_latitude"] = socialSignUp.latitude;
-                        Application.Current.Properties["user_longitude"] = socialSignUp.longitude;
-                        //Application.Current.Properties["user_delivery_instructions"] = userDeliveryInstructions.Text;
-
-                        _ = Application.Current.SavePropertiesAsync();
-
-                        //EmailVerificationObject user = new EmailVerificationObject();
-
-                        //user.email = socialSignUp.email;
-
-                        //var userSerializedObject = JsonConvert.SerializeObject(user);
-                        //var userContent = new StringContent(userSerializedObject, Encoding.UTF8, "application/json");
-
-                        //Debug.WriteLine("Email Verification JSON Object to send: " + userSerializedObject);
-
-                        //var response = await client.PostAsync(Constant.EmailVerificationUrl, userContent);
-
-                        //Debug.WriteLine("Status code: " + response.IsSuccessStatusCode);
-
-                        //if (!response.IsSuccessStatusCode)
-                        //{
-                        //    await DisplayAlert("Ooops!", "We weren't able to send you a verification link to your email.", "OK");
-                        //}
+                        user.setUserID(RDSData.result.customer_uid);
+                        user.setUserSessionTime(expDate);
+                        user.setUserPlatform(socialSignUp.social);
+                        user.setUserEmail(socialSignUp.email);
+                        user.setUserFirstName(socialSignUp.first_name);
+                        user.setUserLastName(socialSignUp.last_name);
+                        user.setUserPhoneNumber(socialSignUp.phone_number);
+                        user.setUserAddress(socialSignUp.address);
+                        user.setUserUnit(socialSignUp.unit);
+                        user.setUserCity(socialSignUp.city);
+                        user.setUserState(socialSignUp.state);
+                        user.setUserZipcode(socialSignUp.zip_code);
+                        user.setUserLatitude(socialSignUp.latitude);
+                        user.setUserLongitude(socialSignUp.longitude);
+    
 
                         if (deviceId != null)
                         {
                             NotificationPost notificationPost = new NotificationPost();
 
-                            notificationPost.uid = (string)Application.Current.Properties["user_id"];
+                            notificationPost.uid = user.getUserID();
                             notificationPost.guid = deviceId.Substring(5);
-                            Application.Current.Properties["guid"] = deviceId.Substring(5);
+                            user.setUserDeviceID(deviceId.Substring(5));
                             notificationPost.notification = "TRUE";
 
                             var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);

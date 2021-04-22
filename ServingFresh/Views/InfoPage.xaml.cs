@@ -22,30 +22,5 @@ namespace ServingFresh.Views
             // Debug.WriteLine("Running App version #: " + version);
             // Debug.WriteLine("Running App build #: " + build);
         }
-
-        void DeliveryDaysClick(System.Object sender, System.EventArgs e)
-        {
-            Application.Current.MainPage = new SelectionPage();
-        }
-
-        void OrderscClick(System.Object sender, System.EventArgs e)
-        {
-            Application.Current.MainPage = new CheckoutPage("info");
-        }
-
-        void InfoClick(System.Object sender, System.EventArgs e)
-        {
-            // NO ACTION NEEDED
-        }
-
-        void ProfileClick(System.Object sender, System.EventArgs e)
-        {
-            Application.Current.MainPage = new ProfilePage();
-        }
-
-        async void Button_Clicked(System.Object sender, System.EventArgs e)
-        {
-            await DisplayAlert("", "Additional feature coming soon", "Thanks");
-        }
     }
 }

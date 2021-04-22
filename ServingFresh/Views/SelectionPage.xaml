@@ -1052,7 +1052,7 @@
                         <StackLayout  HeightRequest="32" WidthRequest="32">
                             <Image VerticalOptions="CenterAndExpand" Source="historyIcon.png"></Image>
                         </StackLayout>
-                        <Label VerticalOptions="Center" Text="History" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
+                        <Label VerticalOptions="Center" x:Name="historyLabel" Text="History" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
                         <StackLayout.GestureRecognizers>
                             <TapGestureRecognizer Tapped="NavigateToHistory"></TapGestureRecognizer>
                         </StackLayout.GestureRecognizers>
@@ -1082,33 +1082,35 @@
                         <StackLayout  HeightRequest="32" WidthRequest="32">
                             <Image VerticalOptions="CenterAndExpand" Source="profileIcon.png"></Image>
                         </StackLayout>
-                        <Label VerticalOptions="Center" Text="Profile" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
+                        <Label VerticalOptions="Center" x:Name="profileLabel" Text="Profile" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
                         <StackLayout.GestureRecognizers>
                             <TapGestureRecognizer Tapped="NavigateToProfile"></TapGestureRecognizer>
                         </StackLayout.GestureRecognizers>
                     </StackLayout>
 
-                    <StackLayout Orientation="Horizontal" Spacing="20">
-                        <StackLayout  HeightRequest="32" WidthRequest="32">
-                            <Image VerticalOptions="CenterAndExpand" Source="signIn.png"></Image>
+                    <StackLayout x:Name="guestMenuSection">
+                        <StackLayout Orientation="Horizontal" Spacing="20">
+                            <StackLayout  HeightRequest="32" WidthRequest="32">
+                                <Image VerticalOptions="CenterAndExpand" Source="signIn.png"></Image>
+                            </StackLayout>
+                            <Label VerticalOptions="Center" Text="Sign in" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
+                            <StackLayout.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="NavigateToSignIn"></TapGestureRecognizer>
+                            </StackLayout.GestureRecognizers>
                         </StackLayout>
-                        <Label VerticalOptions="Center" Text="Sign in" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
-                        <StackLayout.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="NavigateToSignIn"></TapGestureRecognizer>
-                        </StackLayout.GestureRecognizers>
+
+                        <StackLayout Orientation="Horizontal" Spacing="20">
+                            <StackLayout  HeightRequest="32" WidthRequest="32">
+                                <Image VerticalOptions="CenterAndExpand" Source="signUpIcon.png"></Image>
+                            </StackLayout>
+                            <Label VerticalOptions="Center" Text="Sign up" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
+                            <StackLayout.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="NavigateToSignUp"></TapGestureRecognizer>
+                            </StackLayout.GestureRecognizers>
+                        </StackLayout>
                     </StackLayout>
 
-                    <StackLayout Orientation="Horizontal" Spacing="20">
-                        <StackLayout  HeightRequest="32" WidthRequest="32">
-                            <Image VerticalOptions="CenterAndExpand" Source="signUpIcon.png"></Image>
-                        </StackLayout>
-                        <Label VerticalOptions="Center" Text="Sign up" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
-                        <StackLayout.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="NavigateToSignUp"></TapGestureRecognizer>
-                        </StackLayout.GestureRecognizers>
-                    </StackLayout>
-
-                    <StackLayout Orientation="Horizontal" Spacing="20">
+                    <StackLayout Orientation="Horizontal" Spacing="20" x:Name="customerMenuSection">
                         <StackLayout  HeightRequest="32" WidthRequest="32">
                             <Image VerticalOptions="CenterAndExpand" Source="logoutIcon.png"></Image>
                         </StackLayout>
@@ -1117,35 +1119,6 @@
                             <TapGestureRecognizer Tapped="NavigateToLogOut"></TapGestureRecognizer>
                         </StackLayout.GestureRecognizers>
                     </StackLayout>
-
-                    <!--<StackLayout Grid.Column="0" VerticalOptions="Center" Spacing="0">
-                    <Frame Padding="0" BackgroundColor="Transparent" HasShadow="False"  HeightRequest="46" WidthRequest="46">
-                        <ImageButton Grid.Row="0" Grid.Column="0" BackgroundColor="Transparent" Source="CalendarI" Padding="6" Clicked="DeliveryDaysClick">
-                            <ImageButton.Effects>
-                                <servingfresh:TintImageEffect TintColor="#FF8500"/>
-                            </ImageButton.Effects>
-                        </ImageButton>
-                    </Frame>
-                    <Label Margin="0,-3,0,0" Text="Days" TextColor="#979797" FontSize="12" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
-                </StackLayout>
-                <StackLayout Grid.Column="1" VerticalOptions="Center" Spacing="0">
-                    <Frame Padding="0" BackgroundColor="Transparent" HasShadow="False"  HeightRequest="46" WidthRequest="46">
-                        <ImageButton Grid.Row="0" Grid.Column="1" BackgroundColor="Transparent" Source="RefundIcon" Padding="6" Clicked="OrdersClick"></ImageButton>
-                    </Frame>
-                    <Label Margin="0,-3,0,0" Text="Orders" TextColor="#979797" FontSize="12" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
-                </StackLayout>
-                <StackLayout Grid.Column="2" VerticalOptions="Center" Spacing="0">
-                    <Frame Padding="0" BackgroundColor="Transparent" HasShadow="False"  HeightRequest="46" WidthRequest="46">
-                        <ImageButton Grid.Row="0" Grid.Column="2" BackgroundColor="Transparent" Source="InfoIcon" Padding="6" Clicked="InfoClick"></ImageButton>
-                    </Frame>
-                    <Label Margin="0,-3,0,0" Text="Info" TextColor="#979797" FontSize="12" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
-                </StackLayout>
-                <StackLayout Grid.Column="3" VerticalOptions="Center" Spacing="0">
-                    <Frame Padding="0" BackgroundColor="Transparent" HasShadow="False"  HeightRequest="46" WidthRequest="46">
-                        <ImageButton Grid.Row="0" Grid.Column="3" BackgroundColor="Transparent" Source="UserIcon" Padding="6" Clicked="ProfileClick"></ImageButton>
-                    </Frame>
-                    <Label Margin="0,-3,0,0" Text="Profile" TextColor="#979797" FontSize="12" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
-                </StackLayout>-->
                 </StackLayout>
             </Frame>
         </Grid>

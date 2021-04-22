@@ -17,7 +17,9 @@ namespace ServingFresh.Models
         private string latitude;
         private string longitude;
         private string platform;
+        private string deviceID;
         private DateTime sessionTime;
+
 
         public User()
         {
@@ -35,6 +37,7 @@ namespace ServingFresh.Models
             latitude = "";
             longitude = "";
             platform = "";
+            deviceID = "";
             sessionTime = new DateTime();
         }
 
@@ -108,6 +111,11 @@ namespace ServingFresh.Models
             return platform;
         }
 
+        public string getUserDeviceID()
+        {
+            return deviceID;
+        }
+
         public DateTime getUserSessionTime()
         {
             return sessionTime;
@@ -163,9 +171,19 @@ namespace ServingFresh.Models
             this.city = city;
         }
 
+        public void setUserZipcode(string zipcode)
+        {
+            this.zipcode = zipcode;
+        }
+
         public void setUserState(string state)
         {
             this.state = state;
+        }
+
+        public void setUserPhoneNumber(string phoneNumber)
+        {
+            this.phoneNumber = phoneNumber;
         }
 
         public void setUserLatitude(string latitude)
@@ -181,6 +199,16 @@ namespace ServingFresh.Models
         public void setUserPlatform(string platform)
         {
             this.platform = platform;
+        }
+
+        public void  setUserDeviceID(string deviceID)
+        {
+            this.deviceID = deviceID;
+        }
+
+        public void setUserEmail(string email)
+        {
+            this.email = email;
         }
 
         public void setUserSessionTime(DateTime sessionTime)

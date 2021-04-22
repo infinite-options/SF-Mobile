@@ -101,64 +101,6 @@
                                         <CollectionView.ItemTemplate>
                                             <DataTemplate>
                                                 <StackLayout>
-                                                    <!--<Grid Padding="15,0,15,0">
-                                                        <Grid.RowDefinitions>
-                                                            <RowDefinition Height="*"></RowDefinition>
-                                                        </Grid.RowDefinitions>
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="*"></ColumnDefinition>
-                                                            <ColumnDefinition Width="*"></ColumnDefinition>
-                                                        </Grid.ColumnDefinitions>
-                                                        <Grid Grid.Row="0" Grid.Column="0">
-                                                            <Grid.RowDefinitions>
-                                                                <RowDefinition></RowDefinition>
-                                                            </Grid.RowDefinitions>
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="50"></ColumnDefinition>
-                                                                <ColumnDefinition Width="*"></ColumnDefinition>
-                                                            </Grid.ColumnDefinitions>
-                                                            <Image Grid.Row="0" Grid.Column="0" Source="{Binding img}" ></Image>
-                                                            <Grid Grid.Row="0" Grid.Column="1" RowSpacing="0">
-                                                                <Label Grid.Row="0" Text="{Binding name}"  StyleClass="p, black" VerticalOptions="End" />
-                                                                <Label Grid.Row="1" Text="{Binding priceUnit}"  StyleClass="p, black" />
-                                                            </Grid>
-                                                        </Grid>
-                                                
-                                                        <Grid Grid.Row="0" Grid.Column="1" >
-                                                             <Grid.RowDefinitions>
-                                                            <RowDefinition Height="50"></RowDefinition>
-                                                            </Grid.RowDefinitions>
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="*"></ColumnDefinition>
-                                                                <ColumnDefinition Width="*"></ColumnDefinition>
-                                                            </Grid.ColumnDefinitions>
-                                                            <Grid Grid.Row="0" Grid.Column="0" >
-                                                                <Grid.RowDefinitions>
-                                                                    <RowDefinition Height="50"></RowDefinition>
-                                                                </Grid.RowDefinitions>
-                                                                <Grid.ColumnDefinitions>
-                                                                    <ColumnDefinition Width="10"></ColumnDefinition>
-                                                                    <ColumnDefinition Width="*"></ColumnDefinition>
-                                                                    <ColumnDefinition Width="10"></ColumnDefinition>
-                                                                </Grid.ColumnDefinitions>
-                                                                 <Label Grid.Row="0" Grid.Column="0" Text="-" Scale="1.2" FontSize="Medium"  HorizontalTextAlignment="Start" VerticalTextAlignment="Center" FontAttributes="Bold" WidthRequest="30" StyleClass="p, secondary">
-                                                                    <Label.GestureRecognizers>
-                                                                        <TapGestureRecognizer Tapped="decrease_qty" CommandParameter="{Binding .}"/>
-                                                                    </Label.GestureRecognizers>
-                                                                </Label>
-                                                       
-                                                                <Label Grid.Row="0" Grid.Column="1"  Text="{Binding qty}" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" StyleClass="p, secondary"/>
-                                                                <Label Grid.Row="0" Grid.Column="2"  Text="+" HorizontalTextAlignment="End" VerticalTextAlignment="Center" FontSize="Medium" FontAttributes="Bold" WidthRequest="30"  StyleClass="p, secondary">
-                                                                    <Label.GestureRecognizers>
-                                                                        <TapGestureRecognizer Tapped="increase_qty" CommandParameter="{Binding .}"/>
-                                                                    </Label.GestureRecognizers>
-                                                                </Label>
-                                                            </Grid>
-                                                            <Label Grid.Row="0" Grid.Column="1"  StyleClass="p, black" HorizontalTextAlignment="End" VerticalTextAlignment="Center" Text="{Binding total_price}"/>
-                                                        </Grid>
-                                                    </Grid>
-                                                    <BoxView StyleClass="spacer"/>-->
-
                                                     <Grid ColumnSpacing="0">
                                                         <Grid.RowDefinitions>
                                                             <RowDefinition Height="40"></RowDefinition>
@@ -247,24 +189,6 @@
                                                             </StackLayout>
                                                         </StackLayout>
                                                     </StackLayout>
-                                                        <!--<Image.Effects>
-                                                            <servingfresh:TintImageEffect TintColor="LightGray"/>
-                                                        </Image.Effects>-->
-                                                        <!--<Image.GestureRecognizers>
-                                                                <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"/>
-                                                        </Image.GestureRecognizers>-->
-                                                   
-                                                    <!--<Grid Margin="30,-120,50,0" HeightRequest="100">
-                                                        <StackLayout>
-                                                            <Label Grid.Row="0" Grid.Column="0" Text="{Binding couponNote}" TextColor="Black" FontAttributes="Bold"  ></Label>
-                                                            <Label Grid.Row="1" Grid.Column="0" Text="{Binding thresholdNote}" TextColor="Black"   ></Label>
-                                                            <Label Grid.Row="2" Grid.Column="0" Text="{Binding expNote}" TextColor="Black"    ></Label>
-                                                            <Label Grid.Row="3" Grid.Column="0" Text="{Binding savingsOrSpendingNote}" TextColor="Black"   ></Label>
-                                                        </StackLayout>
-                                                    </Grid>
-                                                    <StackLayout.GestureRecognizers>
-                                                                <TapGestureRecognizer Tapped="ApplyActiveCoupon"/>
-                                                    </StackLayout.GestureRecognizers>-->
                                                     <RelativeLayout.GestureRecognizers>
                                                                 <TapGestureRecognizer Tapped="ApplyActiveCoupon" CommandParameter="{Binding .}"/>
                                                     </RelativeLayout.GestureRecognizers>

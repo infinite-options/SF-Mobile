@@ -72,7 +72,7 @@
                     </Entry>
                     <Grid>
                         <servingfresh:CustomEntry Placeholder="Push Notification" PlaceholderColor="Gray" IsReadOnly="True" Margin="7,0,0,0"></servingfresh:CustomEntry>
-                        <Switch x:Name="localNotificationButton" HorizontalOptions="End" Grid.Column="1" Toggled="Switch_Toggled"></Switch>
+                        <Switch x:Name="localNotificationButton" HorizontalOptions="End" Grid.Column="1" ></Switch>
                     </Grid>
                     <Entry
                         x:Name="userFirstName"

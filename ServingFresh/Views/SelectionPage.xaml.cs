@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.ComponentModel;
 using static ServingFresh.Views.SignUpPage;
+
 namespace ServingFresh.Views
 {
     public partial class SelectionPage : ContentPage
@@ -217,22 +218,35 @@ namespace ServingFresh.Views
             InitializeComponent();
             _ = VerifyUserCredentials(accessToken, refreshToken, googleCredentials, appleCredentials, platform);
             _ = SetFavoritesList();
+            SetMenu(guestMenuSection, customerMenuSection, historyLabel, profileLabel);
         }
 
         public SelectionPage()
         {
             InitializeComponent();
             _ = CheckVersion();
-            //_ = SetFavoritesList();
+            _ = SetFavoritesList();
+            SetMenu(guestMenuSection, customerMenuSection, historyLabel, profileLabel);
+        }
+
+        void SetMenu(StackLayout guest, StackLayout customer, Label history, Label profile)
+        {
+            if(user.getUserType() == "GUEST")
+            {
+                customer.HeightRequest = 0;
+                SetMenuLabel(history);
+                SetMenuLabel(profile);
+            }
+            else if (user.getUserType() == "CUSTOMER")
+            {
+                guest.HeightRequest = 0;
+            }
         }
 
         public SelectionPage(Location current, Dictionary<string, ItemPurchased> previousOrder = null)
         {
             InitializeComponent();
 
-
-            //Application.Current.Properties["user_latitude"] = current.Latitude.ToString();
-            //Application.Current.Properties["user_longitude"] = current.Longitude.ToString();
 
             GetPreviousOrder(previousOrder);
             GetBusinesses();
@@ -317,7 +331,7 @@ namespace ServingFresh.Views
                             try
                             {
                                 var data = JsonConvert.DeserializeObject<SuccessfulSocialLogIn>(responseContent);
-                                Application.Current.Properties["user_id"] = data.result[0].customer_uid;
+                                user.setUserID(data.result[0].customer_uid);
 
                                 UpdateTokensPost updateTokesPost = new UpdateTokensPost();
                                 updateTokesPost.uid = data.result[0].customer_uid;
@@ -343,10 +357,10 @@ namespace ServingFresh.Views
 
                                 if (updateTokesResponse.IsSuccessStatusCode)
                                 {
-                                    var user = new RequestUserInfo();
-                                    user.uid = data.result[0].customer_uid;
+                                    var user1 = new RequestUserInfo();
+                                    user1.uid = data.result[0].customer_uid;
 
-                                    var requestSelializedObject = JsonConvert.SerializeObject(user);
+                                    var requestSelializedObject = JsonConvert.SerializeObject(user1);
                                     var requestContent = new StringContent(requestSelializedObject, Encoding.UTF8, "application/json");
 
                                     var clientRequest = await client.PostAsync(Constant.GetUserInfoUrl, requestContent);
@@ -359,22 +373,23 @@ namespace ServingFresh.Views
                                         DateTime today = DateTime.Now;
                                         DateTime expDate = today.AddDays(Constant.days);
 
-                                        Application.Current.Properties["user_id"] = data.result[0].customer_uid;
-                                        Application.Current.Properties["time_stamp"] = expDate;
-                                        Application.Current.Properties["platform"] = platform;
-                                        Application.Current.Properties["user_email"] = userProfile.result[0].customer_email;
-                                        Application.Current.Properties["user_first_name"] = userProfile.result[0].customer_first_name;
-                                        Application.Current.Properties["user_last_name"] = userProfile.result[0].customer_last_name;
-                                        Application.Current.Properties["user_phone_num"] = userProfile.result[0].customer_phone_num;
-                                        Application.Current.Properties["user_address"] = userProfile.result[0].customer_address;
-                                        Application.Current.Properties["user_unit"] = userProfile.result[0].customer_unit;
-                                        Application.Current.Properties["user_city"] = userProfile.result[0].customer_city;
-                                        Application.Current.Properties["user_state"] = userProfile.result[0].customer_state;
-                                        Application.Current.Properties["user_zip_code"] = userProfile.result[0].customer_zip;
-                                        Application.Current.Properties["user_latitude"] = userProfile.result[0].customer_lat;
-                                        Application.Current.Properties["user_longitude"] = userProfile.result[0].customer_long;
-                                        Application.Current.Properties["guest"] = false;
-                                        _ = Application.Current.SavePropertiesAsync();
+
+
+                                        user.setUserID(data.result[0].customer_uid);
+                                        user.setUserSessionTime(expDate);
+                                        user.setUserPlatform(platform);
+                                        user.setUserEmail(userProfile.result[0].customer_email);
+                                        user.setUserFirstName(userProfile.result[0].customer_first_name);
+                                        user.setUserLastName(userProfile.result[0].customer_last_name);
+                                        user.setUserPhoneNumber(userProfile.result[0].customer_phone_num);
+                                        user.setUserAddress(userProfile.result[0].customer_address);
+                                        user.setUserUnit(userProfile.result[0].customer_unit);
+                                        user.setUserCity(userProfile.result[0].customer_city);
+                                        user.setUserState(userProfile.result[0].customer_state);
+                                        user.setUserZipcode(userProfile.result[0].customer_zip);
+                                        user.setUserLatitude(userProfile.result[0].customer_lat);
+                                        user.setUserLongitude(userProfile.result[0].customer_long);
+
                                         await CheckVersion();
 
                                         if (Device.RuntimePlatform == Device.iOS)
@@ -392,9 +407,9 @@ namespace ServingFresh.Views
                                         {
                                             NotificationPost notificationPost = new NotificationPost();
 
-                                            notificationPost.uid = (string)Application.Current.Properties["user_id"];
+                                            notificationPost.uid = user.getUserID();
                                             notificationPost.guid = deviceId.Substring(5);
-                                            Application.Current.Properties["guid"] = deviceId.Substring(5);
+                                            user.setUserDeviceID(deviceId.Substring(5));
                                             notificationPost.notification = "TRUE";
 
                                             var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
@@ -440,13 +455,13 @@ namespace ServingFresh.Views
                         {
                             var RDSCode = JsonConvert.DeserializeObject<RDSLogInMessage>(responseContent);
                             test.Hide();
-                            Application.Current.MainPage = new LogInPage("Message", RDSCode.message);
+                            Application.Current.MainPage = new LogInPage();
                         }
 
                         if (authetication.code.ToString() == Constant.ErrorUserDirectLogIn)
                         {
                             test.Hide();
-                            Application.Current.MainPage = new LogInPage("Oops!", "You have an existing Serving Fresh account. Please use direct login");
+                            Application.Current.MainPage = new LogInPage();
                         }
                     }
                 }
@@ -1885,9 +1900,6 @@ namespace ServingFresh.Views
             dm.colorScheduleUpdate = Color.FromHex("#FF8500");
             dm.textColorUpdate = Color.FromHex("#FFFFFF");
 
-            Application.Current.Properties["delivery_date"] = dm.delivery_date;
-            Application.Current.Properties["delivery_time"] = dm.delivery_time;
-            Application.Current.Properties["deliveryDate"] = dm.deliveryTimeStamp;
 
             updateItemsBackgroundColorAndQuantity(vegetablesList, selectedDeliveryDate);
             updateItemsBackgroundColorAndQuantity(fruitsList, selectedDeliveryDate);
@@ -1964,32 +1976,6 @@ namespace ServingFresh.Views
 
         }
 
-        void DeliveryDaysClick(System.Object sender, System.EventArgs e)
-        {
-            // SHOULDN'T MOVE SINCE YOU ARE IN THIS PAGE
-        }
-
-        void OrdersClick(System.Object sender, System.EventArgs e)
-        {
-            CheckOutClickBusinessPage(sender,e);
-        }
-
-        void InfoClick(System.Object sender, System.EventArgs e)
-        {
-            if (!(bool)Application.Current.Properties["guest"])
-            {
-                Application.Current.MainPage = new InfoPage();
-            }
-        }
-
-        void ProfileClick(System.Object sender, System.EventArgs e)
-        {
-            if (!(bool)Application.Current.Properties["guest"])
-            {
-                Application.Current.MainPage = new ProfilePage();
-            }
-        }
-
         void ImageButton_Clicked(System.Object sender, System.EventArgs e)
         {
             var selectedImage = (ImageButton)sender;
@@ -2036,12 +2022,12 @@ namespace ServingFresh.Views
         public static async Task<bool> SetFavoritesList()
         {
             var taskResponse = false;
-            if (!(bool)Application.Current.Properties["guest"])
+            if (user.getUserType() == "CUSTOMER")
             {
                 var client = new System.Net.Http.HttpClient();
                 var favoriteItemByUser = new FavoriteItemByUser()
                 {
-                    customer_uid = (string)Application.Current.Properties["user_id"],
+                    customer_uid = user.getUserID(),
                 };
 
                 var serializedObject = JsonConvert.SerializeObject(favoriteItemByUser);
@@ -2188,6 +2174,14 @@ namespace ServingFresh.Views
             image.Effects[0] = new TintImageEffect() { TintColor = Color.FromHex("#FF8500") };
         }
 
+        void SetMenuLabel(Label section)
+        {
+            section.Text = "History (sign in required)";
+            section.TextColor = Color.FromHex("#FF8500");
+        }
+
+
+
         public static void NavigateToStore(System.Object sender, System.EventArgs e)
         {
             Application.Current.MainPage = new SelectionPage();
@@ -2200,7 +2194,10 @@ namespace ServingFresh.Views
 
         public static void NavigateToHistory(System.Object sender, System.EventArgs e)
         {
-            Application.Current.MainPage = new HistoryPage();
+            if (user.getUserType() == "CUSTOMER")
+            {
+                Application.Current.MainPage = new HistoryPage();
+            }
         }
 
         public static void NavigateToRefunds(System.Object sender, System.EventArgs e)
@@ -2215,7 +2212,10 @@ namespace ServingFresh.Views
 
         public static void NavigateToProfile(System.Object sender, System.EventArgs e)
         {
-            Application.Current.MainPage = new ProfilePage();
+            if(user.getUserType() == "CUSTOMER")
+            {
+                Application.Current.MainPage = new ProfilePage();
+            }
         }
 
         public static void NavigateToSignIn(System.Object sender, System.EventArgs e)

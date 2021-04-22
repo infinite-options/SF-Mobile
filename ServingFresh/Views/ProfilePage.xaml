@@ -10,55 +10,10 @@
         <Grid RowSpacing="0" BackgroundColor="White">
             <Grid.RowDefinitions>
                 <RowDefinition Height="94"></RowDefinition>
-                <!--<RowDefinition Height="95"></RowDefinition>
-                <RowDefinition Height="1"></RowDefinition>
-                <RowDefinition Height="65"></RowDefinition>-->
                 <RowDefinition Height="*"></RowDefinition>
-                <RowDefinition Height="80"></RowDefinition>
+                <RowDefinition Height="0"></RowDefinition>
             </Grid.RowDefinitions>
-            <!--<Label Grid.Row="0" BackgroundColor="#136D74"></Label>-->
-            <!--<Grid Grid.Row="1" BackgroundColor="#136D74">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="70"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="70"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-                <Label
-                    Grid.Column="1"
-                    HeightRequest="136"
-                    HorizontalTextAlignment="Center"
-                    VerticalTextAlignment="Center"
-                    Text="Profile"
-                    TextColor="White"
-                    FontSize="34"
-                    FontAttributes="Bold">
-                </Label>
-            </Grid>
-            <BoxView Grid.Row="2" HeightRequest="1" BackgroundColor="Black"></BoxView>
-            <Grid
-                Grid.Row="3"
-                ColumnSpacing="0.5"
-                BackgroundColor="Black">
-                <Button
-                    Grid.Row="0"
-                    Grid.Column="0"
-                    Text="Delivery Info"
-                    TextColor="#FF8500"
-                    FontAttributes="Bold"
-                    BackgroundColor="#136D74"
-                    CornerRadius="0">
-                </Button>
-                <Button
-                    Grid.Row="0"
-                    Grid.Column="1"
-                    Text="Rewards"
-                    TextColor="White"
-                    FontAttributes="Bold"
-                    BackgroundColor="#136D74"
-                    CornerRadius="0"
-                    Clicked="Button_Clicked">
-                </Button>
-            </Grid>-->
+
             <Grid Grid.Row="0" ColumnSpacing="0" BackgroundColor="#136D74">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"></ColumnDefinition>
@@ -73,7 +28,7 @@
                         RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}">
                         <Image Margin="0,20,0,0" Source="CartIcon.png" HeightRequest="40">
                             <Image.GestureRecognizers>
-                                <TapGestureRecognizer></TapGestureRecognizer>
+                                <TapGestureRecognizer Tapped="NavigateToCartFromProfile"></TapGestureRecognizer>
                             </Image.GestureRecognizers>
                              <Image.Effects>
                                 <servingfresh:TintImageEffect TintColor="White"/>
@@ -188,7 +143,7 @@
                     </maps:Map>
                 </Frame>
                 <Button
-                    Text="Validate Address"
+                    Text="Save Changes"
                     TextColor="#FF8500"
                     CornerRadius="5"
                     BorderColor="LightGray"
@@ -198,7 +153,7 @@
                     Clicked="SaveChangesClick">
                 </Button>
                 <Button
-                    Text="Sign Out"
+                    Text="Log out"
                     TextColor="#FF8500"
                     CornerRadius="5"
                     BorderColor="LightGray"
@@ -210,60 +165,8 @@
             </StackLayout>
         </ScrollView>
         </StackLayout>
-        <Grid Grid.Row="2" BackgroundColor="WhiteSmoke">
-                <!--<Grid.RowDefinitions>
-                    <RowDefinition Height="45"></RowDefinition>
-                    <RowDefinition Height="*"></RowDefinition>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-                <ImageButton Grid.Row="0" Grid.Column="0" BackgroundColor="Transparent" Source="CalendarI" Clicked="DeliveryDaysClick" Padding="6"></ImageButton>
-                <Label Grid.Row="1" Grid.Column="0" Text="Days" HorizontalTextAlignment="Center"></Label>
-                <ImageButton Grid.Row="0" Grid.Column="1" BackgroundColor="Transparent" Source="RefundIcon" Clicked="OrdersClick" Padding="6"></ImageButton>
-                <Label Grid.Row="1" Grid.Column="1" Text="Orders" HorizontalTextAlignment="Center"></Label>
-                <ImageButton Grid.Row="0" Grid.Column="2" BackgroundColor="Transparent" Source="InfoIcon" Clicked="InfoClick" Padding="6"></ImageButton>
-                <Label Grid.Row="1" Grid.Column="2" Text="Info" HorizontalTextAlignment="Center"></Label>
-                <ImageButton Grid.Row="0" Grid.Column="3" BackgroundColor="Transparent" Source="UserIcon" Clicked="ProfileClick" Padding="6">
-                    <ImageButton.Effects>
-                        <servingfresh:TintImageEffect TintColor="#FF8500"/>
-                    </ImageButton.Effects>
-                </ImageButton>
-                <Label Grid.Row="1" Grid.Column="3" Text="Profile" HorizontalTextAlignment="Center"></Label>-->
-                <StackLayout Grid.Column="0" VerticalOptions="Center" Spacing="0">
-                    <Frame Padding="0" BackgroundColor="Transparent" HasShadow="False"  HeightRequest="46" WidthRequest="46">
-                        <ImageButton Grid.Row="0" Grid.Column="0" BackgroundColor="Transparent" Source="CalendarI" Padding="6" Clicked="DeliveryDaysClick"></ImageButton>
-                    </Frame>
-                    <Label Margin="0,-3,0,0" Text="Days" TextColor="#979797" FontSize="12" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
-                </StackLayout>
-                <StackLayout Grid.Column="1" VerticalOptions="Center" Spacing="0">
-                    <Frame Padding="0" BackgroundColor="Transparent" HasShadow="False"  HeightRequest="46" WidthRequest="46">
-                        <ImageButton Grid.Row="0" Grid.Column="1" BackgroundColor="Transparent" Source="RefundIcon" Padding="6" Clicked="OrdersClick"></ImageButton>
-                    </Frame>
-                    <Label Margin="0,-3,0,0" Text="Orders" TextColor="#979797" FontSize="12" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
-                </StackLayout>
-                <StackLayout Grid.Column="2" VerticalOptions="Center" Spacing="0">
-                    <Frame Padding="0" BackgroundColor="Transparent" HasShadow="False"  HeightRequest="46" WidthRequest="46">
-                        <ImageButton Grid.Row="0" Grid.Column="2" BackgroundColor="Transparent" Source="InfoIcon" Padding="6" Clicked="InfoClick">
-                            
-                        </ImageButton>
-                    </Frame>
-                    <Label Margin="0,-3,0,0" Text="Info" TextColor="#979797" FontSize="12" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
-                </StackLayout>
-                <StackLayout Grid.Column="3" VerticalOptions="Center" Spacing="0">
-                    <Frame Padding="0" BackgroundColor="Transparent" HasShadow="False"  HeightRequest="46" WidthRequest="46">
-                        <ImageButton Grid.Row="0" Grid.Column="3" BackgroundColor="Transparent" Source="UserIcon" Padding="6" Clicked="ProfileClick">
-                            <ImageButton.Effects>
-                                <servingfresh:TintImageEffect TintColor="#FF8500"/>
-                            </ImageButton.Effects>
-                        </ImageButton>
-                    </Frame>
-                    <Label Margin="0,-3,0,0" Text="Profile" TextColor="#979797" FontSize="12" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
-                </StackLayout>
-            </Grid>
+        <Grid Grid.Row="2" BackgroundColor="WhiteSmoke"></Grid>
+
         </Grid>
     </ContentPage.Content>
 </ContentPage>
