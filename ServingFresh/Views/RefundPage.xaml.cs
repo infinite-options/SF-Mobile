@@ -8,7 +8,7 @@ using Xamarin.Essentials;
 using Acr.UserDialogs;
 using System.Text;
 using static ServingFresh.Views.SelectionPage;
-
+using static ServingFresh.Views.SignUpPage;
 namespace ServingFresh.Views
 {
     public partial class RefundPage : ContentPage
@@ -21,7 +21,7 @@ namespace ServingFresh.Views
             refundItemImage.Source = "refund.png";
             refundItemImage.Scale = 0.7;
             CartTotal.Text = CheckoutPage.total_qty.ToString();
-            refundEmail.Text = (string)Application.Current.Properties["user_email"];
+            refundEmail.Text = user.getUserEmail();
         }
 
         async void TakePictureClick(System.Object sender, System.EventArgs e)
@@ -90,7 +90,7 @@ namespace ServingFresh.Views
             try
             {
 
-                var userEmail = (string)Application.Current.Properties["user_email"];
+                var userEmail = user.getUserEmail();
                 // var userMessage = message.Text;
                 // var userPhone = "4158329643";
                 // var userImage = PhotoImage.Source;

@@ -255,4 +255,51 @@ namespace ServingFresh.Models
             }
         }
     }
+
+    public class ItemObject : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        public TextDecorations decorationType
+        {
+            get
+            {
+                if (isItemAvailable)
+                {
+                    return TextDecorations.None;
+                }
+                else
+                {
+                    return TextDecorations.Strikethrough;
+                }
+            }
+        }
+        public bool isItemAvailable { get; set; }
+        public bool isUnavailableItem { get { return !isItemAvailable; } }
+        public string description { get; set; }
+        public double business_price { get; set; }
+        public string item_uid { get; set; }
+        public string business_uid { get; set; }
+        public string name { get; set; }
+        public string priceUnit { get; set; }
+        public int qty { get; set; }
+        public double price { get; set; }
+        public string total_price { get { return "$ " + (qty * price).ToString("N2"); } }
+        public void increase_qty()
+        {
+            qty++;
+            PropertyChanged(this, new PropertyChangedEventArgs("qty"));
+            PropertyChanged(this, new PropertyChangedEventArgs("total_price"));
+        }
+        public void decrease_qty()
+        {
+            if (qty == 0) return;
+            qty--;
+            PropertyChanged(this, new PropertyChangedEventArgs("qty"));
+            PropertyChanged(this, new PropertyChangedEventArgs("total_price"));
+        }
+
+        public string img { get; set; }
+        public string unit { get; set; }
+        public string taxable { get; set; }
+    }
 }

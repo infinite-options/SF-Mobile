@@ -25,6 +25,8 @@ namespace ServingFresh
             //Application.Current.MainPage = new PrincipalPage();
 
             CardInfo();
+
+            
             try
             {
                 if (Application.Current.Properties.ContainsKey("user_id"))

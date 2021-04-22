@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using ServingFresh.Config;
 using Xamarin.Forms;
 using static ServingFresh.Views.SelectionPage;
+using static ServingFresh.Views.SignUpPage;
 namespace ServingFresh.Views
 {
     public partial class HistoryPage : ContentPage
@@ -119,41 +120,14 @@ namespace ServingFresh.Views
                    
 
         public ObservableCollection<HistoryDisplayObject> historyList;
-        public string day = "";
-        public HistoryPage(string day = "")
+
+        public HistoryPage()
         {
-            
             InitializeComponent();
-            
-            if (day != "" && day != "SUCCESS")
-            {
-                this.day = day;
-            }
             historyList = new ObservableCollection<HistoryDisplayObject>();
             CartTotal.Text = CheckoutPage.total_qty.ToString();
             LoadHistory();
-
-            if(day == "SUCCESS")
-            {
-                //UserDialogs.Instance.HideLoading();
-                ShowSuccessfullPayment();
-            }
-            
         }
-
-        public HistoryPage(string source, string s)
-        {
-            InitializeComponent();
-        }
-
-        //public HistoryPage()
-        //{
-        //    InitializeComponent();
-        //    this.day = day;
-        //    historyList = new ObservableCollection<HistoryDisplayObject>();
-        //    CartTotal.Text = CheckoutPage.total_qty.ToString();
-        //    LoadHistory();
-        //}
 
         public async void ShowSuccessfullPayment()
         {
@@ -162,7 +136,7 @@ namespace ServingFresh.Views
 
         public async void LoadHistory()
         {
-            string userId = (string)Application.Current.Properties["user_id"];
+            string userId = user.getUserID();
             var client = new HttpClient();
             var response = await client.GetAsync(Constant.GetHistoryUrl + userId);
             Debug.WriteLine("HISTORY: " + Constant.GetHistoryUrl + userId);
@@ -270,7 +244,7 @@ namespace ServingFresh.Views
         public void openCheckout(object sender, EventArgs e)
         {
             //Application.Current.MainPage = new CheckoutPage(null,day);
-            Application.Current.MainPage = new CheckoutPage("history");
+            Application.Current.MainPage = new CheckoutPage();
         }
         public void openRefund(object sender, EventArgs e)
         {

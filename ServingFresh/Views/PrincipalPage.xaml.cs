@@ -4,7 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using Xamarin.Essentials;
 using Xamarin.Forms;
-
+using static ServingFresh.Views.SignUpPage;
+using ServingFresh.Models;
 namespace ServingFresh.Views
 {
     public partial class PrincipalPage : ContentPage
@@ -68,8 +69,14 @@ namespace ServingFresh.Views
 
         void Button_Clicked(System.Object sender, System.EventArgs e)
         {
-            Debug.WriteLine("LATITUDE: " + currentLocation.Latitude);
-            Debug.WriteLine("LONGITUDE: " + currentLocation.Longitude);
+            if(user == null)
+            {
+                user = new User();
+                user.setUserType("GUEST");
+                user.setUserLatitude(currentLocation.Latitude.ToString());
+                user.setUserLongitude(currentLocation.Longitude.ToString());
+            }
+
             Application.Current.Properties["guest"] = true;
             Application.Current.Properties["user_email"] = "";
             Application.Current.Properties["user_first_name"] = "";
@@ -83,7 +90,7 @@ namespace ServingFresh.Views
             Application.Current.Properties["user_latitude"] = "";
             Application.Current.Properties["user_longitude"] = "";
             Application.Current.Properties["user_delivery_instructions"] = "";
-            Application.Current.MainPage = new SelectionPage(currentLocation);
+            Application.Current.MainPage = new SelectionPage();
         }
 
         void TapGestureRecognizer_Tapped(System.Object sender, System.EventArgs e)
