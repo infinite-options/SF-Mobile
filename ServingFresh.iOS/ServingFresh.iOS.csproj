@@ -211,6 +211,10 @@
     <BundleResource Include="Resources\refundIcon.png" />
     <BundleResource Include="Resources\signIn.png" />
     <BundleResource Include="Resources\signUpLeafIcon.png" />
+    <BundleResource Include="Resources\appleWhiteIcon.png" />
+    <BundleResource Include="Resources\closeFrameIcon.png" />
+    <BundleResource Include="Resources\facebookWhiteIcon.png" />
+    <BundleResource Include="Resources\googleWhiteIcon.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AppleSignIn\" />
