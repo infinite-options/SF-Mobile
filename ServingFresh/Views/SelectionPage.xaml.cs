@@ -235,7 +235,7 @@ namespace ServingFresh.Views
             {
                 customer.HeightRequest = 0;
                 SetMenuLabel(history, "History (sign in required)");
-                SetMenuLabel(profile, "Profile (sing in required)");
+                SetMenuLabel(profile, "Profile (sign in required)");
             }
             else if (user.getUserType() == "CUSTOMER")
             {
@@ -246,8 +246,6 @@ namespace ServingFresh.Views
         public SelectionPage(Location current, Dictionary<string, ItemPurchased> previousOrder = null)
         {
             InitializeComponent();
-
-
             GetPreviousOrder(previousOrder);
             GetBusinesses();
             _ = SetFavoritesList();

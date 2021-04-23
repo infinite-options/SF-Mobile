@@ -215,6 +215,7 @@
     <BundleResource Include="Resources\closeFrameIcon.png" />
     <BundleResource Include="Resources\facebookWhiteIcon.png" />
     <BundleResource Include="Resources\googleWhiteIcon.png" />
+    <BundleResource Include="Resources\backArrow.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AppleSignIn\" />

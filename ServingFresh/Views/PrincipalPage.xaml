@@ -44,7 +44,7 @@
                                 <Entry Margin="50,0,50,0" Placeholder="Search for your address" PlaceholderColor="Gray" HorizontalTextAlignment="Center"></Entry>
                                 <Label Text="OR" TextColor="White"  FontSize="Medium" HorizontalTextAlignment="Center" FontAttributes="Bold" ></Label>
                                 <Entry Margin="70,0,70,0" Placeholder="Enter Zip Code" PlaceholderColor="Gray"  HorizontalTextAlignment="Center"></Entry>
-                                <Button Margin="50,10,50,0" HeightRequest="40" TextColor="white" Text="Find Local Produce" FontSize="Medium"  BackgroundColor="#136D74" Clicked="Button_Clicked"></Button>
+                                <Button Margin="50,10,50,0" HeightRequest="40" TextColor="white" Text="Find Local Produce" FontSize="Medium"  BackgroundColor="#136D74" Clicked="FindLocalProduceBaseOnLocation"></Button>
                             </StackLayout>
                     </StackLayout>
                     <StackLayout Grid.Row="2">
@@ -69,17 +69,13 @@
                                     Margin="20,10,10,0"
                                     Grid.Column="0"
                                     VerticalOptions="Start">
-                                    <Image Source="loginLeafIcon.png">
-                                        <Image.GestureRecognizers>
-                                            <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"></TapGestureRecognizer>
-                                        </Image.GestureRecognizers>
-                                    </Image>
+                                    <ImageButton Source="loginLeafIcon.png" Clicked="NavigateToLogIn" ></ImageButton>
                                 </StackLayout>
                                 <StackLayout
                                     Margin="10,20,20,0"
                                     Grid.Column="1"
                                     VerticalOptions="Center">
-                                    <Image Source="signUpLeafIcon.png"></Image>
+                                    <ImageButton Source="signUpLeafIcon.png" Clicked="NavigateToSignUp"></ImageButton>
                                 </StackLayout>
                             </Grid>
                         </RelativeLayout>

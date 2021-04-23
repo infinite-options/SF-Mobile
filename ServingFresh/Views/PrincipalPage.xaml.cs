@@ -64,7 +64,7 @@ namespace ServingFresh.Views
 
         }
 
-        void Button_Clicked(System.Object sender, System.EventArgs e)
+        void FindLocalProduceBaseOnLocation(System.Object sender, System.EventArgs e)
         {
             if(user == null)
             {
@@ -86,9 +86,14 @@ namespace ServingFresh.Views
             Application.Current.MainPage = new SelectionPage();
         }
 
-        void TapGestureRecognizer_Tapped(System.Object sender, System.EventArgs e)
+        void NavigateToLogIn(System.Object sender, System.EventArgs e)
         {
             Application.Current.MainPage = new LogInPage();
+        }
+
+        void NavigateToSignUp(System.Object sender, System.EventArgs e)
+        {
+            Application.Current.MainPage = new SignUpPage();
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="ServingFresh.Views.LogInPage">
-    <ContentPage.Content>
-        <Grid RowSpacing="0" BackgroundColor="#E0E6E6F2">
+    <ContentPage.Content><!--#E0E6E6F2-->
+        <Grid RowSpacing="0" BackgroundColor="WhiteSmoke">
             <Grid.RowDefinitions>
                 <RowDefinition Height="94"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
@@ -13,40 +13,50 @@
                         <ColumnDefinition Width="*"></ColumnDefinition>
                         <ColumnDefinition Width="100"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
-                    <StackLayout Grid.Column="0" Spacing="0" VerticalOptions="Center" HorizontalOptions="Center" Orientation="Horizontal">
-                        <Label Text="^" TextColor="#136D74" Rotation="270" FontSize="30" FontAttributes="Bold" HorizontalTextAlignment="End"></Label>
-                        <Label Text="Back" TextColor="#136D74" FontSize="17" VerticalTextAlignment="Center" FontAttributes="Bold"></Label>
+                    <StackLayout Grid.Column="0"  VerticalOptions="Center" HorizontalOptions="Center" Orientation="Horizontal">
+                        <Image Source="backArrow.png"></Image>
+                        <Label Text="Back" TextColor="#136D74" FontSize="17"></Label>
                         <StackLayout.GestureRecognizers>
                             <TapGestureRecognizer Tapped="ReturnBackToPrincipalPage"></TapGestureRecognizer>
                         </StackLayout.GestureRecognizers>
+
                     </StackLayout>
                     <StackLayout Grid.Column="1" VerticalOptions="Center">
                         <Label Text="Log In" TextColor="#136D74" FontSize="32" FontAttributes="Bold" TextDecorations="Underline" HorizontalTextAlignment="Center" ></Label>
                     </StackLayout>
                 </Grid>
             </Grid>
-            <StackLayout Grid.Row="1" Padding="21,121,21,0" >
+            <StackLayout Grid.Row="1" Padding="21,50,21,0" >
                 <Entry
                     x:Name="userEmailAddress"
+                    HeightRequest="52"
                     Placeholder="Email address"
                     HorizontalTextAlignment="Start"
                     Keyboard="Email"
-                    PlaceholderColor="Gray"
+                    PlaceholderColor="#6D7278"
                     TextColor="Gray"
                     FontSize="18"
                     FontAttributes="Bold">
                 </Entry>
-                <Entry
-                    x:Name="userPassword"
-                    Placeholder="Enter Password"
-                    IsPassword="True"
-                    HorizontalTextAlignment="Start"
-                    Keyboard="Email"
-                    PlaceholderColor="Gray"
-                    TextColor="Gray"
-                    FontSize="18"
-                    FontAttributes="Bold">
-                </Entry>
+                <Grid>
+                    <Entry
+                        x:Name="userPassword"
+                        HeightRequest="52"
+                        Placeholder="Enter Password"
+                        IsPassword="True"
+                        HorizontalTextAlignment="Start"
+                        Keyboard="Email"
+                        PlaceholderColor="#6D7278"
+                        TextColor="Gray"
+                        FontSize="18"
+                        FontAttributes="Bold">
+                    </Entry>
+                    <Label Text="Show password" Margin="0,0,26,0" TextColor="#6D7278" FontSize="14"  VerticalOptions="Center" HorizontalOptions="End">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="ShowHidePassword"></TapGestureRecognizer>
+                        </Label.GestureRecognizers>
+                    </Label>
+                </Grid>
                 <Button
                     x:Name="logInButton"
                     Margin="50,20,50,0"

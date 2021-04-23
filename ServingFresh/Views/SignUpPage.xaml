@@ -6,30 +6,23 @@
     xmlns:servingfresh="clr-namespace:ServingFresh.Models"
     x:Class="ServingFresh.Views.SignUpPage">
     <ContentPage.Content>
-        <StackLayout Padding="0,0,0,0" BackgroundColor="White">
-            <Grid BackgroundColor="#136D74">
+        <StackLayout Padding="0,0,0,0" BackgroundColor="WhiteSmoke">
+            <Grid BackgroundColor="WhiteSmoke">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="136"></RowDefinition>
+                    <RowDefinition Height="96"></RowDefinition>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100"></ColumnDefinition>
                     <ColumnDefinition Width="*"></ColumnDefinition>
                     <ColumnDefinition Width="100"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <Label
-                    Grid.Row="0"
-                    Grid.Column="0"
-                    HeightRequest="50"
-                    HorizontalTextAlignment="Center"
-                    VerticalTextAlignment="Center"
-                    Text="Back"
-                    TextColor="White"
-                    FontSize="Default"
-                    FontAttributes="Bold">
-                    <Label.GestureRecognizers>
+                <StackLayout Grid.Row="0" Orientation="Horizontal" VerticalOptions="Center" HorizontalOptions="Center">
+                    <Image Source="backArrow.png"></Image>
+                    <Label Text="Back" TextColor="#136D74" FontSize="17"></Label>
+                    <StackLayout.GestureRecognizers>
                         <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"></TapGestureRecognizer>
-                    </Label.GestureRecognizers>
-                </Label>
+                    </StackLayout.GestureRecognizers>
+                </StackLayout>
                 <Label
                     Grid.Row="0"
                     Grid.Column="1"
@@ -37,15 +30,49 @@
                     HorizontalTextAlignment="Center"
                     VerticalTextAlignment="Center"
                     Text="Sign Up"
-                    TextColor="White"
+                    TextColor="#136D74"
+                    TextDecorations="Underline"
                     FontSize="34"
                     FontAttributes="Bold"
-                    BackgroundColor="#136D74">
+                    BackgroundColor="WhiteSmoke">
                 </Label>
             </Grid>
             <ScrollView>
+
+              
+
                 <StackLayout
                     Margin="10,10,10,0">
+
+                    <StackLayout>
+                        <StackLayout Margin="0,0,0,13">
+                            <Grid>
+                                <Button CornerRadius="13" HorizontalOptions="CenterAndExpand" WidthRequest="241" HeightRequest="52" Padding="25,0,0,0" Text="Sign up with Apple" TextColor="White" FontSize="16" BackgroundColor="#466DED"></Button>
+                                <Image Margin="80,0,0,0" Source="appleWhiteIcon.png" HorizontalOptions="Start"></Image>
+                            </Grid>
+                            <Grid>
+                                <Button CornerRadius="13" HorizontalOptions="CenterAndExpand" WidthRequest="241" HeightRequest="52" Padding="50,0,0,0" Text="Sign up with Facebook" TextColor="White" FontSize="16" BackgroundColor="#485A95"></Button>
+                                <Image Margin="80,0,0,0" Source="facebookWhiteIcon.png" HorizontalOptions="Start"></Image>
+                            </Grid>
+                            <Grid>
+                                <Button CornerRadius="13" HorizontalOptions="CenterAndExpand" WidthRequest="241" HeightRequest="52" Padding="27,0,0,0" Text="Sign up with Google" TextColor="White" FontSize="16" BackgroundColor="#5C83F0"></Button>
+                                <Image Margin="80,0,0,0" Source="googleWhiteIcon.png" HorizontalOptions="Start"></Image>
+                            </Grid>
+                        </StackLayout>
+                        <BoxView Margin="0,0,0,13" HeightRequest="1" Color="#136D74"></BoxView>
+                        <Label Margin="0,0,0,13" Text="Or continue with email" TextColor="Black" FontSize="19" HorizontalTextAlignment="Center" ></Label>
+                        <StackLayout Spacing="10" Margin="0,0,0,20">
+                            <Entry WidthRequest="372" HeightRequest="44" Placeholder="First name (so we can address you)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                            <Entry WidthRequest="372" HeightRequest="44" Placeholder="Last name (in case you want to be formal)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                            <Entry WidthRequest="372" HeightRequest="44" Placeholder="Email address (for order confirmation)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                            <Entry WidthRequest="372" HeightRequest="44" Placeholder="Confirm Email address" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                            <Entry WidthRequest="372" HeightRequest="44" Placeholder="Create Password" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                            <Entry WidthRequest="372" HeightRequest="44" Placeholder="Confirm Password" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                        </StackLayout>
+                        <Button CornerRadius="13" HorizontalOptions="CenterAndExpand" WidthRequest="287" HeightRequest="48" Text="Sign Up" FontAttributes="Bold" TextColor="White" FontSize="20" BackgroundColor="#FF8500"></Button>
+                    </StackLayout>
+
+                    <StackLayout IsVisible="false">
                     <Entry
                         x:Name="userEmailAddress"
                         Placeholder="Email Address"
@@ -159,6 +186,7 @@
                         BackgroundColor="#FF8500"
                         Clicked="SignUpNewUser">
                     </Button>-->
+                        </StackLayout>
                 </StackLayout>
             </ScrollView>
         </StackLayout>

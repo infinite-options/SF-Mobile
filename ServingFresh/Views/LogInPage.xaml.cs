@@ -445,5 +445,20 @@ namespace ServingFresh.Views
         {
             Application.Current.MainPage = new PrincipalPage();
         }
+
+        void ShowHidePassword(System.Object sender, System.EventArgs e)
+        {
+            Label label = (Label)sender;
+            if (label.Text == "Show password")
+            {
+                userPassword.IsPassword = false;
+                label.Text = "Hide password";
+            }
+            else
+            {
+                userPassword.IsPassword = true;
+                label.Text = "Show password";
+            }
+        }
     }
 }
