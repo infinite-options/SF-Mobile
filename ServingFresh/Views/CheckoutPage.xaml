@@ -14,6 +14,7 @@
                 <RowDefinition Height="*"></RowDefinition>
                 <RowDefinition x:Name="paypalRow" Height="0"></RowDefinition>
                 <RowDefinition x:Name="loginRow" Height="0"></RowDefinition>
+                <RowDefinition x:Name="signUpRow" Height="0"></RowDefinition>
                 <RowDefinition x:Name="menuFrame" Height="0"></RowDefinition>
             </Grid.RowDefinitions>
             <Grid.GestureRecognizers>
@@ -266,7 +267,7 @@
                                     <StackLayout Padding="20,0,20,0">
                                         <Button Text="Proceed as guest" Clicked="ProceedAsGuest"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold"></Button>
                                         <Label Text="Already have an account?" TextColor="#2B6D74" FontSize="14" HorizontalTextAlignment="Center"></Label>
-                                        <Button Text="Login"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="ShowLoginUI"></Button>
+                                        <Button Text="Login"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="ShowLogInUI"></Button>
                                         <Label Text="Save time and create an account" FontSize="14" TextColor="#2B6D74" HorizontalTextAlignment="Center"></Label>
                                         <Button Text="Sign up"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="ShowSignUpUI"></Button>
                                     </StackLayout>
@@ -302,33 +303,50 @@
             <Frame Grid.Row="3">
                <WebView x:Name="webView"></WebView>
             </Frame>
-            <Frame Grid.Row="4" CornerRadius="10" BackgroundColor="#E0E6E6F2">
+            <Frame Grid.Row="4" Margin="5,0,5,0" CornerRadius="20" BackgroundColor="WhiteSmoke">
 
-            <StackLayout Padding="21,0,21,0">
-                <StackLayout HeightRequest="50">
-                                            <Label Text="Log In" TextColor="#136D74" FontSize="32" FontAttributes="Bold" TextDecorations="Underline" HorizontalTextAlignment="Center" ></Label>
+            <StackLayout Padding="5,0,5,0">
+                 <StackLayout HeightRequest="36" WidthRequest="36"  HorizontalOptions="End">
+                    <Frame HasShadow="False" HeightRequest="36" WidthRequest="36" BackgroundColor="#2B6D74" Padding="0" IsClippedToBounds="True" CornerRadius="18">
+                        <Label Margin="0,-4,0,0" Text="x" FontSize="30" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold" TextColor="#E0E6E6F2"></Label>
+                    </Frame>
+                     <StackLayout.GestureRecognizers>
+                         <TapGestureRecognizer Tapped="HideLogInUI"></TapGestureRecognizer>
+                     </StackLayout.GestureRecognizers>
+                 </StackLayout>
+                <StackLayout HeightRequest="60" Margin="0,-10,0,0">
+                    <Label Text="Log In" TextColor="#136D74" FontSize="32" FontAttributes="Bold" TextDecorations="Underline" HorizontalTextAlignment="Center" ></Label>
                 </StackLayout>
                 <Entry
                     x:Name="userEmailAddress"
+                    HeightRequest="52"
                     Placeholder="Email address"
                     HorizontalTextAlignment="Start"
                     Keyboard="Email"
-                    PlaceholderColor="Gray"
+                    PlaceholderColor="#6D7278"
                     TextColor="Gray"
                     FontSize="18"
                     FontAttributes="Bold">
                 </Entry>
-                <Entry
-                    x:Name="userPassword"
-                    Placeholder="Enter Password"
-                    IsPassword="True"
-                    HorizontalTextAlignment="Start"
-                    Keyboard="Email"
-                    PlaceholderColor="Gray"
-                    TextColor="Gray"
-                    FontSize="18"
-                    FontAttributes="Bold">
-                </Entry>
+                <Grid>
+                    <Entry
+                        x:Name="userPassword"
+                        HeightRequest="52"
+                        Placeholder="Enter Password"
+                        IsPassword="True"
+                        HorizontalTextAlignment="Start"
+                        Keyboard="Email"
+                        PlaceholderColor="#6D7278"
+                        TextColor="Gray"
+                        FontSize="18"
+                        FontAttributes="Bold">
+                    </Entry>
+                    <Label Text="Show password" Margin="0,0,26,0" TextColor="#6D7278" FontSize="14"  VerticalOptions="Center" HorizontalOptions="End">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="ShowHidePassword"></TapGestureRecognizer>
+                        </Label.GestureRecognizers>
+                    </Label>
+                </Grid>
                 <Button
                     x:Name="logInButton"
                     Margin="50,20,50,0"
@@ -385,7 +403,24 @@
                 </StackLayout>
             </StackLayout>
             </Frame>
-            <Frame Grid.Row="5" BackgroundColor="#136D74" CornerRadius="20" Margin="0,0,0,-20">
+            <Frame Grid.Row="5" Margin="5,0,5,0" CornerRadius="20" BackgroundColor="WhiteSmoke">
+
+            <StackLayout Padding="5,0,5,0">
+                 <StackLayout HeightRequest="36" WidthRequest="36"  HorizontalOptions="End">
+                    <Frame HasShadow="False" HeightRequest="36" WidthRequest="36" BackgroundColor="#2B6D74" Padding="0" IsClippedToBounds="True" CornerRadius="18">
+                        <Label Margin="0,-4,0,0" Text="x" FontSize="30" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontAttributes="Bold" TextColor="#E0E6E6F2"></Label>
+                    </Frame>
+                     <StackLayout.GestureRecognizers>
+                         <TapGestureRecognizer Tapped="HideSignUpUI"></TapGestureRecognizer>
+                     </StackLayout.GestureRecognizers>
+                 </StackLayout>
+                <StackLayout HeightRequest="60" Margin="0,-10,0,0">
+                    <Label Text="Log In" TextColor="#136D74" FontSize="32" FontAttributes="Bold" TextDecorations="Underline" HorizontalTextAlignment="Center" ></Label>
+                </StackLayout>
+
+            </StackLayout>
+            </Frame>
+            <Frame Grid.Row="6" BackgroundColor="#136D74" CornerRadius="20" Margin="0,0,0,-20">
                 <StackLayout Spacing="10">
                     <StackLayout HorizontalOptions="Center">
                         <Frame WidthRequest="50" HeightRequest="5" CornerRadius="2"  Padding="0" BackgroundColor="Gray" HasShadow="False"></Frame>

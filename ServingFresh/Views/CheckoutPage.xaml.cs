@@ -1138,14 +1138,24 @@ namespace ServingFresh.Views
 
         }
 
-        void ShowLoginUI(System.Object sender, System.EventArgs e)
+        void ShowLogInUI(System.Object sender, System.EventArgs e)
         {
             loginRow.Height = this.Height - 94;
         }
 
         void ShowSignUpUI(System.Object sender, System.EventArgs e)
         {
+            signUpRow.Height = this.Height - 94;
+        }
 
+        void HideLogInUI(System.Object sender, System.EventArgs e)
+        {
+            loginRow.Height = 0;
+        }
+
+        void HideSignUpUI(System.Object sender, System.EventArgs e)
+        {
+            signUpRow.Height = 0;
         }
 
         void NavigateToInfoFromCheckout(System.Object sender, System.EventArgs e)
@@ -1183,6 +1193,21 @@ namespace ServingFresh.Views
             else
             {
                 menuFrame.Height = 0;
+            }
+        }
+
+        void ShowHidePassword(System.Object sender, System.EventArgs e)
+        {
+            Label label = (Label)sender;
+            if(label.Text == "Show password")
+            {
+                userPassword.IsPassword = false;
+                label.Text = "Hide password";
+            }
+            else
+            {
+                userPassword.IsPassword = true;
+                label.Text = "Show password";
             }
         }
     }

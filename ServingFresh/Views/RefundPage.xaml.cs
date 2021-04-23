@@ -18,6 +18,7 @@ namespace ServingFresh.Views
         public RefundPage()
         {
             InitializeComponent();
+            SelectionPage.SetMenu(guestMenuSection, customerMenuSection, historyLabel, profileLabel);
             refundItemImage.Source = "refund.png";
             refundItemImage.Scale = 0.7;
             CartTotal.Text = CheckoutPage.total_qty.ToString();
@@ -147,6 +148,19 @@ namespace ServingFresh.Views
             }
         }
 
+        void ShowMenuFromRefunds(System.Object sender, System.EventArgs e)
+        {
+            var height = new GridLength(0);
+            if (menuFrame.Height.Equals(height))
+            {
+                menuFrame.Height = this.Height - 180;
+            }
+            else
+            {
+                menuFrame.Height = 0;
+            }
+        }
+
         void NavigateToCartFromRefunds(System.Object sender, System.EventArgs e)
         {
             NavigateToCart(sender, e);
@@ -155,6 +169,41 @@ namespace ServingFresh.Views
         void NavigateToHistoryFromRefunds(System.Object sender, System.EventArgs e)
         {
             NavigateToHistory(sender, e);
+        }
+
+        void NavigateToStoreFromRefunds(System.Object sender, System.EventArgs e)
+        {
+            NavigateToStore(sender, e);
+        }
+
+        void NavigateToRefundsFromRefunds(System.Object sender, System.EventArgs e)
+        {
+            NavigateToRefunds(sender, e);
+        }
+
+        void NavigateToInfoFromRefunds(System.Object sender, System.EventArgs e)
+        {
+            NavigateToInfo(sender, e);
+        }
+
+        void NavigateToProfileFromRefunds(System.Object sender, System.EventArgs e)
+        {
+            NavigateToProfile(sender, e);
+        }
+
+        void NavigateToSignInFromRefunds(System.Object sender, System.EventArgs e)
+        {
+            NavigateToSignIn(sender, e);
+        }
+
+        void NavigateToSignUpFromRefunds(System.Object sender, System.EventArgs e)
+        {
+            NavigateToSignUp(sender, e);
+        }
+
+        void NavigateToMainFromRefunds(System.Object sender, System.EventArgs e)
+        {
+            NavigateToMain(sender, e);
         }
     }
 }
