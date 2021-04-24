@@ -25,13 +25,13 @@ namespace ServingFresh.Views
     public partial class DeliveryDetailsPage : ContentPage
     {
 
-        private Payments paymentClient;
+        private Payments paymentClient = null;
 
         public DeliveryDetailsPage()
         {
             InitializeComponent();
             SelectionPage.SetMenu(guestMenuSection, customerMenuSection, historyLabel, profileLabel);
-            paymentClient = new Payments(purchase.getPurchaseDeliveryInstructions());
+
             cartItemsNumber.Text = purchase.getPurchaseItems().Count.ToString();
             PlaceLocationOnMap(double.Parse(purchase.getPurchaseLatitude()), double.Parse(purchase.getPurchaseLatitude()));
         }
@@ -82,6 +82,9 @@ namespace ServingFresh.Views
                 button.BackgroundColor = Color.FromHex("#2B6D74");
                 purchase.setPurchasePaymentType("STRIPE");
 
+                string mode = Payments.getMode(purchase.getPurchaseDeliveryInstructions(), "STRIPE");
+                paymentClient = new Payments(mode);
+
                 var userID = await SignUpNewUser(GetUserFrom(purchase));
                 if( userID != "") { purchase.setPurchaseCustomerUID(userID); }
                 var paymentIsSuccessful = paymentClient.PayViaStripe(
@@ -117,6 +120,8 @@ namespace ServingFresh.Views
         async void CheckoutWithPayPal(System.Object sender, System.EventArgs e)
         {
             paypalRow.Height = this.Height - 100;
+            string mode = Payments.getMode(purchase.getPurchaseDeliveryInstructions(), "PAYPAL");
+            paymentClient = new Payments(mode);
             webView.Source = await paymentClient.PayViaPayPal(purchase.getPurchaseAmountDue());
             webView.Navigated += WebViewPage_Navigated;
         }
@@ -131,7 +136,9 @@ namespace ServingFresh.Views
             {
                 paypalRow.Height = 0;
                 Debug.WriteLine("SUCCESSFULL REDIRECT FROM PAYPAL TO SF WEB TO MOBILE APP");
-                purchase.setPurchasePaymentType("STRIPE");
+                purchase.setPurchasePaymentType("PAYPAL");
+
+
                 var userID = await SignUpNewUser(GetUserFrom(purchase));
                 if (userID != "") { purchase.setPurchaseCustomerUID(userID); }
                 var paymentIsSuccessful = await paymentClient.captureOrder(paymentClient.getTransactionID());

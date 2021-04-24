@@ -1,4 +1,6 @@
 ﻿using System;
+using Xamarin.Forms;
+
 namespace ServingFresh.Models
 {
     public class SignUp
@@ -6,6 +8,11 @@ namespace ServingFresh.Models
         public SignUp()
         {
 
+        }
+
+        public void SignUpUser(User user)
+        {
+            // takes a user object and sign it as customer
         }
     }
 }

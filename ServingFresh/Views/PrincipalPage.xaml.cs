@@ -345,5 +345,10 @@ namespace ServingFresh.Views
         {
             var client = new SignIn();
         }
+
+        void SignUpUserFromPrincipal(System.Object sender, System.EventArgs e)
+        {
+
+        }
     }
 }

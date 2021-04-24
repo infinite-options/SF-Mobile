@@ -763,7 +763,10 @@ namespace ServingFresh.Views
 
                     if (displaySchedule.Count != 0)
                     {
-                        selectedDeliveryDate = displaySchedule[0];
+                        if(selectedDeliveryDate == null)
+                        {
+                            selectedDeliveryDate = displaySchedule[0];
+                        }
                         displaySchedule[0].colorScheduleUpdate = Color.FromHex("#FF8500");
                         displaySchedule[0].textColorUpdate = Color.FromHex("#FFFFFF");
 
@@ -2235,6 +2238,11 @@ namespace ServingFresh.Views
             user.setUserPlatform("");
             user.setUserDeviceID("");
             user.setUserSessionTime(new DateTime());
+        }
+
+        void NavigateToMainFromSelection(System.Object sender, System.EventArgs e)
+        {
+            NavigateToMain(sender, e);
         }
     }
 }

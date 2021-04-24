@@ -10,6 +10,7 @@ using PayPalCheckoutSdk.Orders;
 using PayPalHttp;
 using ServingFresh.Config;
 using Stripe;
+using static ServingFresh.Views.CheckoutPage;
 
 namespace ServingFresh.Models
 {
@@ -81,6 +82,59 @@ namespace ServingFresh.Models
         }
 
 
+        public static string getMode(string mode, string paymentType)
+        {
+            string result = "";
+            var credentials = new Credentials();
+
+            if (paymentType == "STRIPE")
+            {
+                if (mode == "SFTEST")
+                {
+                    credentials.key = Constant.TestSK;
+                    result = "TEST";
+                }
+                else
+                {
+                    credentials.key = Constant.LivePK;
+                    result = "LIVE";
+                }
+            }
+            else if (paymentType == "PAYPAL")
+            {
+                if (mode == "SFTEST")
+                {
+                    credentials.key = Constant.TestSecret;
+                    result = "TEST";
+                }
+                else
+                {
+                    credentials.key = Constant.LiveSecret;
+                    result = "LIVE";
+                }
+            }
+            //var client = new System.Net.Http.HttpClient();
+            //var serializeObject = JsonConvert.SerializeObject(credentials);
+            //var content = new StringContent(serializeObject, Encoding.UTF8, "application/json");
+            //var endpointCall = await client.PostAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/Paypal_Payment_key_checker", content);
+
+
+            //if (endpointCall.IsSuccessStatusCode)
+            //{
+            //    var endpointContent = await endpointCall.Content.ReadAsStringAsync();
+            //    if (endpointContent.Contains("Test"))
+            //    {
+            //        result = "TEST";
+            //    }
+            //    else if (endpointContent.Contains("Live"))
+            //    {
+            //        result = "LIVE";
+            //    }
+            //}
+
+            return result;
+        }
+
         public async static Task<HttpResponse> createOrder(string amount)
         {
             HttpResponse response;
@@ -126,7 +180,7 @@ namespace ServingFresh.Models
             else if (mode == "LIVE")
             {
                 Debug.WriteLine("PAYPAL LIVE ENVIROMENT");
-                environment = new LiveEnvironment(Constant.TestClientId, Constant.TestSecret);
+                environment = new LiveEnvironment(Constant.LiveClientId, Constant.LiveSecret);
             }
             return new PayPalHttpClient(environment); ;
         }

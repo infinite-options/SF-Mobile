@@ -47,7 +47,7 @@
                         RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
                         RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
                         <Label Text="Local produce delivered to your doorstep" TextColor="White" FontSize="Medium" HorizontalTextAlignment="Center" FontAttributes="Bold"></Label>
-                        <Entry Margin="50,0,50,0" HorizontalTextAlignment="Center" x:Name="AddressEntry" FontSize="14" Placeholder="Search for your address" Keyboard="Text" FontAttributes="Bold" TextColor="Black" Text="{Binding AddressText}" TextChanged="OnAddressChanged" Focused="addressEntryFocused" Unfocused="addressEntryUnfocused"/>
+                        <Entry Margin="50,0,50,0" HorizontalTextAlignment="Center" x:Name="AddressEntry" FontSize="14" Placeholder="Search for your address" PlaceholderColor="Gray"  Keyboard="Text" TextColor="Black" Text="{Binding AddressText}" TextChanged="OnAddressChanged" Focused="addressEntryFocused" Unfocused="addressEntryUnfocused"/>
                         <Label Text="OR" TextColor="White"  FontSize="Medium" HorizontalTextAlignment="Center" FontAttributes="Bold" ></Label>
                         <Entry Margin="70,0,70,0" x:Name="zipcodeEntry" Placeholder="Enter Zip Code" FontSize="14" PlaceholderColor="Gray"  HorizontalTextAlignment="Center"></Entry>
                         <Button Margin="50,10,50,0" HeightRequest="40" TextColor="white" Text="Find Local Produce" FontSize="Medium"  BackgroundColor="#136D74" Clicked="FindLocalProduceBaseOnLocation"></Button>
@@ -225,7 +225,7 @@
                             <Entry WidthRequest="372" HeightRequest="44" Placeholder="Create Password" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
                             <Entry WidthRequest="372" HeightRequest="44" Placeholder="Confirm Password" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
                         </StackLayout>
-                        <Button CornerRadius="13" HorizontalOptions="CenterAndExpand" WidthRequest="287" HeightRequest="48" Text="Sign Up" FontAttributes="Bold" TextColor="White" FontSize="20" BackgroundColor="#FF8500"></Button>
+                        <Button CornerRadius="13" HorizontalOptions="CenterAndExpand" WidthRequest="287" HeightRequest="48" Text="Sign Up" Clicked="SignUpUserFromPrincipal" FontAttributes="Bold" TextColor="White" FontSize="20" BackgroundColor="#FF8500"></Button>
                     </StackLayout>
                 </ScrollView>
             </StackLayout>

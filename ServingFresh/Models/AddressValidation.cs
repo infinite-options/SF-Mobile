@@ -44,7 +44,6 @@ namespace ServingFresh.Models
             var url = "http://production.shippingapis.com/ShippingAPI.dll?API=Verify&XML=" + requestDoc;
             var client = new WebClient();
             var response = client.DownloadString(url);
-
             var xdoc = XDocument.Parse(response.ToString());
 
             foreach (XElement element in xdoc.Descendants("Address"))

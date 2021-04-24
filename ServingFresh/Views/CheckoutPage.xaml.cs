@@ -111,7 +111,7 @@ namespace ServingFresh.Views
         public Dictionary<string, ItemPurchased> orderCopy = new Dictionary<string,ItemPurchased>();
         public string cartEmpty = "";
 
-        private Payments paymentClient = new Payments("TEST");
+        private Payments paymentClient = null;
 
         // =========================
 
@@ -963,6 +963,10 @@ namespace ServingFresh.Views
                 FinalizePurchase(purchase,selectedDeliveryDate);
                 purchase.setPurchasePaymentType("STRIPE");
 
+
+                string mode = Payments.getMode(purchase.getPurchaseDeliveryInstructions(), "STRIPE");
+                paymentClient = new Payments(mode);
+
                 var paymentIsSuccessful = paymentClient.PayViaStripe(
                     purchase.getPurchaseEmail(),
                     cardHolderName.Text,
@@ -1030,6 +1034,8 @@ namespace ServingFresh.Views
             {
                 paypalRow.Height = 0;
                 FinalizePurchase(purchase, selectedDeliveryDate);
+                string mode = Payments.getMode(purchase.getPurchaseDeliveryInstructions(), "PAYPAL");
+                paymentClient = new Payments(mode);
                 purchase.setPurchasePaymentType("PAYPAL");
                 var paymentIsSuccessful = await paymentClient.captureOrder(paymentClient.getTransactionID());
                 await WriteFavorites(GetFavoritesList(), purchase.getPurchaseCustomerUID());
