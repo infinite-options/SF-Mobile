@@ -9,6 +9,7 @@ namespace ServingFresh.Models
     public class CouponItem : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        public string title { get; set; }
         public string image { get; set; }
         public string couponNote { get; set; }
         public string thresholdNote { get; set; }
@@ -29,6 +30,25 @@ namespace ServingFresh.Models
             PropertyChanged(this, new PropertyChangedEventArgs("image"));
             PropertyChanged(this, new PropertyChangedEventArgs("textColor"));
             PropertyChanged(this, new PropertyChangedEventArgs("isCouponEligible"));
+        }
+
+        public CouponItem()
+        {
+            title = "";
+            image = "";
+            couponNote = "";
+            thresholdNote = "";
+            expNote = "";
+            savingsOrSpendingNote = "";
+            index = -1;
+            status = "";
+            threshold = 0;
+            discount = 0;
+            shipping = 0;
+            totalDiscount = 0;
+            couponId = "";
+            isCouponEligible = "";
+            textColor = Color.White;
         }
 
         public static List<CouponItem> GetActiveCoupons(ObservableCollection<CouponItem> source)

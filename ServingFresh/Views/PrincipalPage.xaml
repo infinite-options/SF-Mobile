@@ -1,87 +1,236 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="ServingFresh.Views.PrincipalPage">
     <ContentPage.Content>
-        <ScrollView>
-            <StackLayout>
-                <Grid VerticalOptions="FillAndExpand" RowSpacing="0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"></RowDefinition>
-                        <RowDefinition Height="*"></RowDefinition>
-                        <RowDefinition Height="*"></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <StackLayout Grid.Row="0" >
-                        <RelativeLayout>
-                            <Frame
-                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}"
-                                RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
-                                Padding="0">
-                                <Image Source="produceIcon.png" Aspect="AspectFill"></Image>
+        <Grid RowSpacing="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="220"></RowDefinition>
+                <RowDefinition Height="220"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition x:Name="logInRow" Height="0"></RowDefinition>
+                <RowDefinition x:Name="signUpRow" Height="0"></RowDefinition>
+            </Grid.RowDefinitions>
+            <StackLayout Grid.Row="0" >
+                <RelativeLayout>
+                    <Frame
+                        RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}"
+                        RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
+                        Padding="0">
+                        <Image Source="produceIcon.png" Aspect="AspectFill"></Image>
+                    </Frame>
+                    <Grid
+                        RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}"
+                        RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Label
+                            Margin="15,0,0,0"
+                            VerticalTextAlignment="Center"
+                            Grid.Column="0"
+                            LineHeight="0.8"
+                            Text="Fresh, Organic Produce Delivered" TextColor="White" FontAttributes="Bold" FontSize="35" ></Label>
+                        <StackLayout Grid.Column="1" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
+                            <Frame HeightRequest="100" WidthRequest="100" HasShadow="False" CornerRadius="20" Padding="5">
+                                <Image Source="servingFreshIcon.png"></Image>
                             </Frame>
-                            <Grid
-                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}"
-                                RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"></ColumnDefinition>
-                                    <ColumnDefinition Width="*"></ColumnDefinition>
-                                </Grid.ColumnDefinitions>
-                                <Label
-                                    Margin="15,0,0,0"
-                                    VerticalTextAlignment="Center"
-                                    Grid.Column="0"
-                                    LineHeight="0.8"
-                                    Text="Fresh, Organic Produce Delivered" TextColor="White" FontAttributes="Bold" FontSize="35" ></Label>
-                                <StackLayout Grid.Column="1" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
-                                    <Frame HeightRequest="100" WidthRequest="100" HasShadow="False" CornerRadius="20" Padding="5">
-                                        <Image Source="servingFreshIcon.png"></Image>
-                                    </Frame>
-                                </StackLayout>
-                            </Grid>
-                        </RelativeLayout>
-                    </StackLayout>
-                    <StackLayout Grid.Row="1" BackgroundColor="#FF8500">
-                            <StackLayout VerticalOptions="CenterAndExpand">
-                                <Label Margin="0,0,0,20" Text="Local produce delivered to your doorstep" TextColor="White" FontSize="Medium" HorizontalTextAlignment="Center" FontAttributes="Bold"></Label>
-                                <Entry Margin="50,0,50,0" Placeholder="Search for your address" PlaceholderColor="Gray" HorizontalTextAlignment="Center"></Entry>
-                                <Label Text="OR" TextColor="White"  FontSize="Medium" HorizontalTextAlignment="Center" FontAttributes="Bold" ></Label>
-                                <Entry Margin="70,0,70,0" Placeholder="Enter Zip Code" PlaceholderColor="Gray"  HorizontalTextAlignment="Center"></Entry>
-                                <Button Margin="50,10,50,0" HeightRequest="40" TextColor="white" Text="Find Local Produce" FontSize="Medium"  BackgroundColor="#136D74" Clicked="FindLocalProduceBaseOnLocation"></Button>
-                            </StackLayout>
-                    </StackLayout>
-                    <StackLayout Grid.Row="2">
-                        <RelativeLayout>
-                            <Frame
-                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}"
-                                RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
-                                Padding="0"
-                                HasShadow="False">
-                                <Image Source="welcomeBackground.png" Aspect="AspectFill"></Image>
-                            </Frame>
-                            <Grid
-                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}"
-                                RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
-                                Padding="0"
-                                ColumnSpacing="0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"></ColumnDefinition>
-                                    <ColumnDefinition Width="*"></ColumnDefinition>
-                                </Grid.ColumnDefinitions>
-                                <StackLayout
-                                    Margin="20,10,10,0"
-                                    Grid.Column="0"
-                                    VerticalOptions="Start">
-                                    <ImageButton Source="loginLeafIcon.png" Clicked="NavigateToLogIn" ></ImageButton>
-                                </StackLayout>
-                                <StackLayout
-                                    Margin="10,20,20,0"
-                                    Grid.Column="1"
-                                    VerticalOptions="Center">
-                                    <ImageButton Source="signUpLeafIcon.png" Clicked="NavigateToSignUp"></ImageButton>
-                                </StackLayout>
-                            </Grid>
-                        </RelativeLayout>
-                    </StackLayout>
-                </Grid>
+                        </StackLayout>
+                    </Grid>
+                </RelativeLayout>
             </StackLayout>
-        </ScrollView>
+            <StackLayout Grid.Row="1" BackgroundColor="#FF8500">
+                <RelativeLayout
+                    RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
+                    RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                    <StackLayout
+                        Spacing="10"
+                        RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
+                        RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                        <Label Text="Local produce delivered to your doorstep" TextColor="White" FontSize="Medium" HorizontalTextAlignment="Center" FontAttributes="Bold"></Label>
+                        <Entry Margin="50,0,50,0" HorizontalTextAlignment="Center" x:Name="AddressEntry" FontSize="14" Placeholder="Search for your address" Keyboard="Text" FontAttributes="Bold" TextColor="Black" Text="{Binding AddressText}" TextChanged="OnAddressChanged" Focused="addressEntryFocused" Unfocused="addressEntryUnfocused"/>
+                        <Label Text="OR" TextColor="White"  FontSize="Medium" HorizontalTextAlignment="Center" FontAttributes="Bold" ></Label>
+                        <Entry Margin="70,0,70,0" x:Name="zipcodeEntry" Placeholder="Enter Zip Code" FontSize="14" PlaceholderColor="Gray"  HorizontalTextAlignment="Center"></Entry>
+                        <Button Margin="50,10,50,0" HeightRequest="40" TextColor="white" Text="Find Local Produce" FontSize="Medium"  BackgroundColor="#136D74" Clicked="FindLocalProduceBaseOnLocation"></Button>
+                        <Frame Margin="0,-135,0,0" Padding="2" HorizontalOptions="CenterAndExpand" CornerRadius="5" x:Name="addressFrame" IsVisible="false">
+                            <ListView x:Name="addressList" IsVisible="false" HorizontalOptions="CenterAndExpand" WidthRequest="220" HeightRequest="100"  ItemsSource="{Binding Addresses}" ItemSelected="addressSelected">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <ViewCell>
+                                                <Label Text="{Binding Address}" FontSize="12" TextColor="Black"/>
+                                        </ViewCell>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </Frame>
+                    </StackLayout>
+                </RelativeLayout>
+            </StackLayout>
+            <StackLayout Grid.Row="2">
+                <RelativeLayout>
+                    <Frame
+                        RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}"
+                        RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
+                        Padding="0"
+                        HasShadow="False">
+                        <Image Source="welcomeBackground.png" Aspect="AspectFill"></Image>
+                    </Frame>
+                    <Grid
+                        RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}"
+                        RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
+                        Padding="0"
+                        ColumnSpacing="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <StackLayout
+                            Margin="20,10,10,0"
+                            Grid.Column="0"
+                            VerticalOptions="Start">
+                            <ImageButton Source="loginLeafIcon.png" Clicked="NavigateToLogIn" ></ImageButton>
+                        </StackLayout>
+                        <StackLayout
+                            Margin="10,20,20,0"
+                            Grid.Column="1"
+                            VerticalOptions="Center">
+                            <ImageButton Source="signUpLeafIcon.png" Clicked="NavigateToSignUp"></ImageButton>
+                        </StackLayout>
+                    </Grid>
+                </RelativeLayout>
+            </StackLayout>
+            <Frame Grid.Row="3" x:Name="logInFrame" Margin="5,0,5,0" CornerRadius="20" BackgroundColor="WhiteSmoke">
+                <StackLayout Padding="5,0,5,0">
+                 <ImageButton Source="closeFrameIcon.png" HorizontalOptions="End" Clicked="HideLogInUI"></ImageButton>
+                <StackLayout HeightRequest="60" Margin="0,-10,0,0">
+                    <Label Text="Log In" TextColor="#136D74" FontSize="32" FontAttributes="Bold" TextDecorations="Underline" HorizontalTextAlignment="Center" ></Label>
+                </StackLayout>
+                <Entry
+                    x:Name="userEmailAddress"
+                    HeightRequest="52"
+                    Placeholder="Email address"
+                    HorizontalTextAlignment="Start"
+                    Keyboard="Email"
+                    PlaceholderColor="#6D7278"
+                    TextColor="Gray"
+                    FontSize="18"
+                    FontAttributes="Bold">
+                </Entry>
+                <Grid>
+                    <Entry
+                        x:Name="userPassword"
+                        HeightRequest="52"
+                        Placeholder="Enter Password"
+                        IsPassword="True"
+                        HorizontalTextAlignment="Start"
+                        Keyboard="Email"
+                        PlaceholderColor="#6D7278"
+                        TextColor="Gray"
+                        FontSize="18"
+                        FontAttributes="Bold">
+                    </Entry>
+                    <Label Text="Show password" Margin="0,0,26,0" TextColor="#6D7278" FontSize="14"  VerticalOptions="Center" HorizontalOptions="End">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="ShowHidePassword"></TapGestureRecognizer>
+                        </Label.GestureRecognizers>
+                    </Label>
+                </Grid>
+                <Button
+                    x:Name="logInButton"
+                    Margin="50,20,50,0"
+                    Text="Login"
+                    FontSize="20"
+                    FontAttributes="Bold"
+                    TextColor="White"
+                    Clicked="SignInDirectUser"
+                    BackgroundColor="#FF8500"
+                    >
+                </Button>
+                <Label
+                    Text="Reset password"
+                    TextColor="#6D7278"
+                    FontSize="14"
+                    FontAttributes="Bold"
+                    HorizontalOptions="Center"
+                    Margin="0,20,0,20">
+                </Label>
+                <Label
+                    Text="Or login with"
+                    TextColor="#136D74"
+                    FontSize="24"
+                    FontAttributes="Bold"
+                    HorizontalOptions="Center"
+                    Margin="0,0,0,20">
+                </Label>
+                <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
+                    <StackLayout >
+                        <ImageButton
+                            HeightRequest="40"
+                            Source="facebookIcon.png"
+                            BackgroundColor="Transparent"
+                            Clicked="SignInWithFacebookFromPrincipal"
+                            >
+                        </ImageButton>
+                    </StackLayout>
+                    <StackLayout Margin="50,0,50,0">
+                        <ImageButton
+                            HeightRequest="40"
+                            Source="googleIcon.png"
+                            BackgroundColor="Transparent"
+                            Clicked="SignInWithGoogleFromPrincipal"
+                            >
+                        </ImageButton>
+                    </StackLayout>
+                    <StackLayout>
+                        <ImageButton
+                            HeightRequest="40"
+                            x:Name="appleLogInButton"
+                            Source="appleIcon.png"
+                            BackgroundColor="Transparent"
+                            Clicked="SignInWithAppleFromPricipal"
+                            Command = "{Binding SignInWithAppleCommand}">
+                        </ImageButton>
+                    </StackLayout>
+                </StackLayout>
+            </StackLayout>
+            </Frame>
+            <Frame Grid.Row="4" x:Name="signUpFrame" Margin="5,0,5,0" CornerRadius="20" BackgroundColor="WhiteSmoke">
+                <StackLayout Padding="5,0,5,0">
+                <ImageButton Source="closeFrameIcon.png" HorizontalOptions="End" Clicked="HideSignUpUI"></ImageButton>
+                <StackLayout HeightRequest="60" Margin="0,-10,0,0">
+                    <Label Text="Sign Up" TextColor="#136D74" FontSize="32" FontAttributes="Bold" TextDecorations="Underline" HorizontalTextAlignment="Center" ></Label>
+                </StackLayout>
+                <ScrollView Margin="0,0,0,250" HorizontalScrollBarVisibility="Always">
+                    <StackLayout>
+                        <StackLayout Margin="0,0,0,13">
+                            <Grid>
+                                <Button CornerRadius="13" HorizontalOptions="CenterAndExpand" WidthRequest="241" HeightRequest="52" Padding="25,0,0,0" Text="Sign up with Apple" TextColor="White" FontSize="16" BackgroundColor="#466DED"></Button>
+                                <Image Margin="55,0,0,0" Source="appleWhiteIcon.png" HorizontalOptions="Start"></Image>
+                            </Grid>
+                            <Grid>
+                                <Button CornerRadius="13" HorizontalOptions="CenterAndExpand" WidthRequest="241" HeightRequest="52" Padding="50,0,0,0" Text="Sign up with Facebook" TextColor="White" FontSize="16" BackgroundColor="#485A95"></Button>
+                                <Image Margin="55,0,0,0" Source="facebookWhiteIcon.png" HorizontalOptions="Start"></Image>
+                            </Grid>
+                            <Grid>
+                                <Button CornerRadius="13" HorizontalOptions="CenterAndExpand" WidthRequest="241" HeightRequest="52" Padding="27,0,0,0" Text="Sign up with Google" TextColor="White" FontSize="16" BackgroundColor="#5C83F0"></Button>
+                                <Image Margin="55,0,0,0" Source="googleWhiteIcon.png" HorizontalOptions="Start"></Image>
+                            </Grid>
+                        </StackLayout>
+                        <BoxView Margin="0,0,0,13" HeightRequest="1" Color="#136D74"></BoxView>
+                        <Label Margin="0,0,0,13" Text="Or continue with email" TextColor="Black" FontSize="19" HorizontalTextAlignment="Center" ></Label>
+                        <StackLayout Spacing="10" Margin="0,0,0,20">
+                            <Entry WidthRequest="372" HeightRequest="44" Placeholder="First name (so we can address you)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                            <Entry WidthRequest="372" HeightRequest="44" Placeholder="Last name (in case you want to be formal)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                            <Entry WidthRequest="372" HeightRequest="44" Placeholder="Email address (for order confirmation)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                            <Entry WidthRequest="372" HeightRequest="44" Placeholder="Confirm Email address" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                            <Entry WidthRequest="372" HeightRequest="44" Placeholder="Create Password" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                            <Entry WidthRequest="372" HeightRequest="44" Placeholder="Confirm Password" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                        </StackLayout>
+                        <Button CornerRadius="13" HorizontalOptions="CenterAndExpand" WidthRequest="287" HeightRequest="48" Text="Sign Up" FontAttributes="Bold" TextColor="White" FontSize="20" BackgroundColor="#FF8500"></Button>
+                    </StackLayout>
+                </ScrollView>
+            </StackLayout>
+            </Frame>
+        </Grid>
+            
     </ContentPage.Content>
 </ContentPage>

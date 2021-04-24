@@ -1107,6 +1107,16 @@
                                 <TapGestureRecognizer Tapped="NavigateToSignUp"></TapGestureRecognizer>
                             </StackLayout.GestureRecognizers>
                         </StackLayout>
+
+                       <StackLayout Orientation="Horizontal" Spacing="20">
+                            <Frame HasShadow="False" BackgroundColor="Transparent" Padding="0"  HeightRequest="32" WidthRequest="32">
+                                <Image VerticalOptions="CenterAndExpand" Source="signUpIcon.png"  Scale="0.9"></Image>
+                            </Frame>
+                            <Label VerticalOptions="Center" Text="Return to Main Page" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
+                            <StackLayout.GestureRecognizers>
+                                <TapGestureRecognizer></TapGestureRecognizer>
+                            </StackLayout.GestureRecognizers>
+                        </StackLayout>
                     </StackLayout>
 
                     <StackLayout Orientation="Horizontal" Spacing="20" x:Name="customerMenuSection">

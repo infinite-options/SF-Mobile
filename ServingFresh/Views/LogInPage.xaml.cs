@@ -69,6 +69,11 @@ namespace ServingFresh.Views
             BindingContext = vm;
         }
 
+        public async void AddMessage(string body)
+        {
+            await DisplayAlert("Aler!", body, "OK");
+        }
+
         private async void DirectLogInClick(System.Object sender, System.EventArgs e)
         {
             logInButton.IsEnabled = false;
@@ -181,10 +186,6 @@ namespace ServingFresh.Views
             }
         }
 
-        public async void AddMessage(string body)
-        {
-            await DisplayAlert("Aler!", body, "OK");
-        }
 
         private async Task<AccountSalt> RetrieveAccountSalt(string userEmail)
         {
@@ -410,7 +411,6 @@ namespace ServingFresh.Views
             }
         }
 
-        
 
         private async void GoogleAuthenticatorError(object sender, AuthenticatorErrorEventArgs e)
         {

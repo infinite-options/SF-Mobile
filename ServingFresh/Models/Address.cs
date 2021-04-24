@@ -112,7 +112,7 @@ namespace ServingFresh.Models
 
         public void addressEntryFocused(ListView addressList)
         {
-            //addressList.IsVisible = true;
+            addressList.IsVisible = true;
             //foreach (Grid g in grids)
             //{
             //    g.IsVisible = false;
@@ -121,16 +121,47 @@ namespace ServingFresh.Models
 
         public void addressEntryUnfocused(ListView addressList)
         {
-            //addressList.IsVisible = false;
+            addressList.IsVisible = false;
+
             //foreach (Grid g in grids)
             //{
             //    g.IsVisible = true;
             //}
         }
 
-        public void addressSelected(ListView addressList)
+        public void addressEntryFocused(ListView addressList, Frame frame)
         {
-            ///addressList.IsVisible = false;
+            addressList.IsVisible = true;
+            frame.IsVisible = true;
+            //foreach (Grid g in grids)
+            //{
+            //    g.IsVisible = false;
+            //}
+        }
+
+        public void addressEntryUnfocused(ListView addressList, Frame frame)
+        {
+            addressList.IsVisible = false;
+            frame.IsVisible = false;
+            //foreach (Grid g in grids)
+            //{
+            //    g.IsVisible = true;
+            //}
+        }
+
+        public AddressAutocomplete addressSelected(ListView addressList, Entry entry, Frame frame)
+        {
+            AddressAutocomplete selectedAddress = new AddressAutocomplete();
+            addressList.IsVisible = false;
+            frame.IsVisible = false; 
+            entry.Text = ((AddressAutocomplete)addressList.SelectedItem).Street +", " + ((AddressAutocomplete)addressList.SelectedItem).City + ", " + ((AddressAutocomplete)addressList.SelectedItem).State + ", " + ((AddressAutocomplete)addressList.SelectedItem).ZipCode;
+
+            selectedAddress.Street = ((AddressAutocomplete)addressList.SelectedItem).Street;
+            selectedAddress.City = ((AddressAutocomplete)addressList.SelectedItem).City;
+            selectedAddress.State = ((AddressAutocomplete)addressList.SelectedItem).State;
+            selectedAddress.ZipCode = ((AddressAutocomplete)addressList.SelectedItem).ZipCode;
+
+            return selectedAddress;
             //foreach (Grid g in grids)
             //{
             //    g.IsVisible = true;
@@ -142,6 +173,8 @@ namespace ServingFresh.Models
             //ZipEntry.Text = ((AddressAutocomplete)addressList.SelectedItem).ZipCode;
 
         }
+
+   
 
         protected void OnPropertyChanged(string propertyName)
         {

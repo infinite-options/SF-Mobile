@@ -275,7 +275,7 @@ namespace ServingFresh.Views
             {
                 var result = await RDSResponse.Content.ReadAsStringAsync();
                 couponData = JsonConvert.DeserializeObject<CouponResponse>(result);
-
+                
                 couponsList.Clear();
 
                 Debug.WriteLine(result);
@@ -308,6 +308,10 @@ namespace ServingFresh.Views
                     }
 
                     // SET TITLE LABEL OF COUPON
+                    if(c.coupon_title != null)
+                    {
+                        coupon.title = (string)c.coupon_title;
+                    }
                     coupon.couponNote = c.notes;
                     // SET THRESHOLD LABEL BASED ON THRESHOLD VALUE: 0 = NO MINIMUM PURCHASE, GREATER THAN 0 = SPEND THE AMOUNT OF THRESHOLD
                     if((double)c.threshold == 0)
@@ -691,6 +695,12 @@ namespace ServingFresh.Views
 
                     var coupon = new CouponItem();
                     //Debug.WriteLine("COUPON IDS: " + c.coupon_uid);
+
+                    if (c.coupon_title != null)
+                    {
+                        coupon.title = (string)c.coupon_title;
+                    }
+
                     coupon.couponId = c.coupon_uid;
                     // INITIALLY, THE IMAGE OF EVERY COUPON IS GRAY. (PLATFORM DEPENDENT)
                     if (Device.RuntimePlatform == Device.Android)
@@ -966,6 +976,7 @@ namespace ServingFresh.Views
                 if (paymentIsSuccessful)
                 {
                     _ = paymentClient.SendPurchaseToDatabase(purchase);
+                    order.Clear();
                     await WriteFavorites(GetFavoritesList(), purchase.getPurchaseCustomerUID());
                     Application.Current.MainPage = new HistoryPage();
                 }
@@ -1025,6 +1036,7 @@ namespace ServingFresh.Views
                 if (paymentIsSuccessful)
                 {
                     _ = paymentClient.SendPurchaseToDatabase(purchase);
+                    order.Clear();
                     Application.Current.MainPage = new HistoryPage();
                 }
                 else

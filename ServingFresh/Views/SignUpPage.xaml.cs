@@ -20,7 +20,7 @@ namespace ServingFresh.Views
 {
     public partial class SignUpPage : ContentPage
     {
-        public static Models.User user = null;
+        public readonly static Models.User user = new Models.User();
         public SignUpPost directSignUp = new SignUpPost();
         public bool isAddessValidated = false;
         INotifications appleNotification = DependencyService.Get<INotifications>();
@@ -57,10 +57,7 @@ namespace ServingFresh.Views
             {
                 localNotificationButton.IsToggled = false;
             }
-            if(user == null)
-            {
-                user = new Models.User();
-            }
+            
         }
         public string userType = null;
 

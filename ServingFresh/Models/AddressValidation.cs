@@ -80,6 +80,50 @@ namespace ServingFresh.Models
             return result;
         }
 
+        public async Task<Location> ConvertAddressToGeoCoordiantes(string address)
+        {
+            Location result = null;
+
+            try
+            {
+                Geocoder geoCoder = new Geocoder();
+                IEnumerable<Position> approximateLocations = await geoCoder.GetPositionsForAddressAsync(address);
+                Position position = approximateLocations.FirstOrDefault();
+                result = new Location(position.Latitude, position.Longitude);
+            }
+            catch (Exception unknowAddress)
+            {
+                string exception = unknowAddress.Message;
+            }
+
+            return result;
+        }
+
+        public async Task<string> getZoneFromLocation(string latitude, string longitude)
+        {
+            string result = "";
+
+            var client = new HttpClient();
+            var endpointCall = await client.GetAsync(Constant.ProduceByLocation + longitude + "," + latitude);
+
+            if (endpointCall.IsSuccessStatusCode)
+            {
+                var contentString = await endpointCall.Content.ReadAsStringAsync();
+                var data = JsonConvert.DeserializeObject<ServingFreshBusiness>(contentString);
+
+                if (contentString.Contains("280") && data.result.Count != 0)
+                {
+                    result = data.business_details[0].zone;
+                }
+                else
+                {
+                    result = "OUTSIDE ZONE RANGE";
+                }
+            }
+
+            return result;
+        }
+
         public async Task<string> isLocationInZones(string zone, string latitude, string longitude)
         {
             string result = "";

@@ -99,6 +99,7 @@ namespace ServingFresh.Views
                 if (paymentIsSuccessful)
                 {
                     _ = paymentClient.SendPurchaseToDatabase(purchase);
+                    order.Clear();
                     Application.Current.MainPage = new ConfirmationPage();
                 }
                 else
@@ -138,6 +139,7 @@ namespace ServingFresh.Views
                 if (paymentIsSuccessful)
                 {
                     _ = paymentClient.SendPurchaseToDatabase(purchase);
+                    order.Clear();
                     Application.Current.MainPage = new ConfirmationPage();
                 }
                 else

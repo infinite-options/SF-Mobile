@@ -21,7 +21,7 @@ namespace ServingFresh
             try
             {
 
-                if(user == null)
+                if(user.getUserID() == "")
                 {
                     MainPage = new PrincipalPage();
                 }

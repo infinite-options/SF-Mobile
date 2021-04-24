@@ -9,6 +9,7 @@ namespace ServingFresh.Models
         public string coupon_id { get; set; }
         public string valid { get; set; }
         public object threshold { get; set; }
+        public object coupon_title { get; set; }
         public double discount_percent { get; set; }
         public double discount_amount { get; set; }
         public double discount_shipping { get; set; }

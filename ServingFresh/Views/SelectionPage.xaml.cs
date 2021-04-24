@@ -1147,26 +1147,7 @@ namespace ServingFresh.Views
                 fruitsListView.ItemsSource = fruitsList;
                 othersListView.ItemsSource = othersList;
                 dessertsListView.ItemsSource = dessertsList;
-                //foreach (string key in order.Keys)
-                //{
 
-                //    foreach (ItemsModel a in datagrid)
-                //    {
-                //        if (order[key].item_name == a.itemNameLeft)
-                //        {
-                //            Debug.WriteLine(order[key].item_name);
-                //            a.quantityLeft = order[key].item_quantity;
-                //            break;
-                //        }
-                //        else if (order[key].item_name == a.itemNameRight)
-                //        {
-                //            Debug.WriteLine(order[key].item_name);
-                //            a.quantityRight = order[key].item_quantity;
-                //            break;
-                //        }
-                //    }
-                //}
-                //itemList.ItemsSource = datagrid;
             }
             catch (Exception ex)
             {
