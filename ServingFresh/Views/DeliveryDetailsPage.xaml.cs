@@ -58,6 +58,7 @@ namespace ServingFresh.Views
                 button.BackgroundColor = Color.FromHex("#2B6D74");
                 stripeInformationView.HeightRequest = 194;
 
+                SetNextSteps(purchaseProcess, "Complete Payment");
                 purchase.setPurchaseFirstName(firstName.Text);
                 purchase.setPurchaseLastName(lastName.Text);
                 purchase.setPurchasePhoneNumber(phoneNumber.Text);
@@ -120,6 +121,7 @@ namespace ServingFresh.Views
         async void CheckoutWithPayPal(System.Object sender, System.EventArgs e)
         {
             paypalRow.Height = this.Height - 100;
+            SetNextSteps(purchaseProcess, "Complete Payment");
             string mode = Payments.getMode(purchase.getPurchaseDeliveryInstructions(), "PAYPAL");
             paymentClient = new Payments(mode);
             webView.Source = await paymentClient.PayViaPayPal(purchase.getPurchaseAmountDue());
@@ -166,6 +168,25 @@ namespace ServingFresh.Views
             else
             {
                 menuFrame.Height = 0;
+            }
+        }
+
+        void SetNextSteps(StackLayout layout, string step)
+        {
+            foreach(View child in layout.Children)
+            {
+                child.Opacity = 0.5;
+
+                var payment = child as Label;
+                if(payment.Text != step)
+                {
+                    child.Opacity = 0.5;
+                }
+                else
+                {
+                    child.Opacity = 1.0;
+                }
+
             }
         }
 

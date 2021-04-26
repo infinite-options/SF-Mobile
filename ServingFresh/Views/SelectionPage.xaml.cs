@@ -195,7 +195,7 @@ namespace ServingFresh.Views
         public static readonly Dictionary<string, ItemPurchased> order = new Dictionary<string, ItemPurchased>();
         public static string zone = "";
         public int totalCount = 0;
-
+        private double menuRowHeight = 0;
 
         // New variables for single lists
         ObservableCollection<SingleItem> vegetablesList = new ObservableCollection<SingleItem>();
@@ -766,9 +766,19 @@ namespace ServingFresh.Views
                         if(selectedDeliveryDate == null)
                         {
                             selectedDeliveryDate = displaySchedule[0];
+                            displaySchedule[0].colorScheduleUpdate = Color.FromHex("#FF8500");
+                            displaySchedule[0].textColorUpdate = Color.FromHex("#FFFFFF");
+                            Debug.WriteLine("FILL SELECTED SCHEDULE WITH DEFAULT DELIVERY DATE");
                         }
-                        displaySchedule[0].colorScheduleUpdate = Color.FromHex("#FF8500");
-                        displaySchedule[0].textColorUpdate = Color.FromHex("#FFFFFF");
+                        else
+                        {
+                            var i = FindSelectedDeliveryDate(displaySchedule, selectedDeliveryDate);
+                            displaySchedule[i].colorScheduleUpdate = Color.FromHex("#FF8500");
+                            displaySchedule[i].textColorUpdate = Color.FromHex("#FFFFFF");
+                        }
+
+                        //displaySchedule[0].colorScheduleUpdate = Color.FromHex("#FF8500");
+                        //displaySchedule[0].textColorUpdate = Color.FromHex("#FFFFFF");
 
                         var day = DateTime.Parse(displaySchedule[0].deliveryTimeStamp.ToString());
 
@@ -814,6 +824,37 @@ namespace ServingFresh.Views
             }
         }
 
+        private int FindSelectedDeliveryDate(List<ScheduleInfo> deliveryDate, ScheduleInfo selectedDate)
+        {
+            int selectedItem = 0;
+            bool check = true;
+            for (int i = 0; i < deliveryDate.Count; i++)
+            {
+                if (deliveryDate[i].deliveryTimeStamp == selectedDate.deliveryTimeStamp
+                    && deliveryDate[i].delivery_date == selectedDate.delivery_date
+                    && deliveryDate[i].delivery_dayofweek == selectedDate.delivery_dayofweek
+                    && deliveryDate[i].delivery_shortname == selectedDate.delivery_shortname
+                    && deliveryDate[i].delivery_time == selectedDate.delivery_time
+                    && deliveryDate[i].orderExpTime == selectedDate.orderExpTime
+                    )
+                {
+
+                    foreach (string businessID in selectedDate.business_uids)
+                    {
+                        if (!deliveryDate[i].business_uids.Contains(businessID))
+                        {
+                            check = false;
+                        }
+                    }
+                    if (check)
+                    {
+                        selectedItem = i;
+                    }
+                    check = true;
+                }
+            }
+            return selectedItem;
+        }
 
         private void SetVerticalView(IList<SingleItem> listOfItems, ListView verticalList)
         {
@@ -1862,7 +1903,7 @@ namespace ServingFresh.Views
             var tgr = (TapGestureRecognizer)sl.GestureRecognizers[0];
             var dm = (ScheduleInfo)tgr.CommandParameter;
             string weekday = dm.delivery_dayofweek;
-
+            HideMenu(menuFrame);
             selectedDeliveryDate = dm;
             var day = DateTime.Parse(selectedDeliveryDate.deliveryTimeStamp.ToString());
             title.Text = day.ToString("ddd") + ", " + selectedDeliveryDate.delivery_date.ToString();
@@ -1893,6 +1934,15 @@ namespace ServingFresh.Views
             SetVerticalView(dessertsList, dessertsVerticalView);
             SetVerticalView(othersList, othersVerticalView);
             UpdateNumberOfItemsInCart();
+        }
+
+        void HideMenu(RowDefinition menuRow)
+        {
+            if (menuRowHeight > 0)
+            {
+                menuRow.Height = 0;
+                menuRowHeight = 0;
+            }
         }
 
         void Change_Border_Color(Object sender, EventArgs e)
@@ -1959,12 +2009,38 @@ namespace ServingFresh.Views
 
         }
 
-        void ImageButton_Clicked(System.Object sender, System.EventArgs e)
+        void AddFavoriteLeftItemOnVerticalView(System.Object sender, System.EventArgs e)
         {
             var selectedImage = (ImageButton)sender;
             var pickedElement = (ItemsModel)selectedImage.CommandParameter;
 
-            pickedElement.favoriteIconLeftUpdate = "selectedFavoritesIcon.png";
+            if(pickedElement.favoriteIconLeft != "selectedFavoritesIcon.png")
+            {
+                pickedElement.favoriteIconLeftUpdate = "selectedFavoritesIcon.png";
+                AddItemToFavorites(pickedElement.itemNameLeft);
+            }
+            else
+            {
+                pickedElement.favoriteIconLeftUpdate = "unselectedHeartIcon.png";
+                RemoveItemFromFavorites(pickedElement.itemNameLeft);
+            }
+        }
+
+        void AddFavoriteRighttemOnVerticalView(System.Object sender, System.EventArgs e)
+        {
+            var selectedImage = (ImageButton)sender;
+            var pickedElement = (ItemsModel)selectedImage.CommandParameter;
+
+            if (pickedElement.favoriteIconRight != "selectedFavoritesIcon.png")
+            {
+                pickedElement.favoriteIconRightUpdate = "selectedFavoritesIcon.png";
+                AddItemToFavorites(pickedElement.itemNameRight);
+            }
+            else
+            {
+                pickedElement.favoriteIconRightUpdate = "unselectedHeartIcon.png";
+                RemoveItemFromFavorites(pickedElement.itemNameRight);
+            }
         }
 
         void FavoriteClick(System.Object sender, System.EventArgs e)
@@ -2094,10 +2170,12 @@ namespace ServingFresh.Views
             if (menuFrame.Height.Equals(height))
             {
                 menuFrame.Height = this.Height - 180;
+                menuRowHeight = this.Height - 180;
             }
             else
             {
                 menuFrame.Height = 0;
+                menuRowHeight = this.Height - 180;
             }
         }
 
@@ -2244,5 +2322,7 @@ namespace ServingFresh.Views
         {
             NavigateToMain(sender, e);
         }
+
+
     }
 }

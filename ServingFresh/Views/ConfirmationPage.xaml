@@ -44,10 +44,10 @@
             <Frame Grid.Row="1" CornerRadius="20" HasShadow="False">
                 <StackLayout>
                     <StackLayout Margin="0,-15,0,0" HeightRequest="50" Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
-                            <Label VerticalTextAlignment="Center" Text="Enter Delivery Details" TextColor="#136D74" TextDecorations="Underline" FontSize="9" FontAttributes="Bold"></Label>
-                            <Label VerticalTextAlignment="Center" Text=">" TextColor="#136D74" TextDecorations="Underline" FontSize="9" FontAttributes="Bold"></Label>
-                            <Label VerticalTextAlignment="Center" Text="Complete Payment" TextColor="#136D74" TextDecorations="Underline" FontSize="9" FontAttributes="Bold"></Label>
-                            <Label VerticalTextAlignment="Center" Text=">" TextColor="#136D74" TextDecorations="Underline" FontSize="9" FontAttributes="Bold"></Label>
+                            <Label VerticalTextAlignment="Center" Text="Enter Delivery Details" TextColor="#136D74" TextDecorations="Underline" FontSize="9" FontAttributes="Bold" Opacity="0.5"></Label>
+                            <Label VerticalTextAlignment="Center" Text=">" TextColor="#136D74" TextDecorations="Underline" FontSize="9" FontAttributes="Bold" Opacity="0.5"></Label>
+                            <Label VerticalTextAlignment="Center" Text="Complete Payment" TextColor="#136D74" TextDecorations="Underline" FontSize="9" FontAttributes="Bold" Opacity="0.5"></Label>
+                            <Label VerticalTextAlignment="Center" Text=">" TextColor="#136D74" TextDecorations="Underline" FontSize="9" FontAttributes="Bold" Opacity="0.5"></Label>
                             <Label VerticalTextAlignment="Center" Text="Order Confirmation" TextColor="#136D74" TextDecorations="Underline" FontSize="9" FontAttributes="Bold"></Label>
                         </StackLayout>
                         <ScrollView>

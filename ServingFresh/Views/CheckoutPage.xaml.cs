@@ -98,7 +98,7 @@ namespace ServingFresh.Views
         private bool isAddressValidated;
         private string latitude = "0";
         private string longitude = "0";
-
+        private AddressAutocomplete addressToValidate = null;
         // Coupons Lists
         private CouponResponse couponData = null;
         private List<double> unsortedNewTotals = new List<double>();
@@ -771,142 +771,8 @@ namespace ServingFresh.Views
 
         public async void ValidateAddressClick(System.Object sender, System.EventArgs e)
         {
-            if (newUserAddress.Text == null)
-            {
-                await DisplayAlert("Alert!", "Please enter an address", "OK");
-            }
-
-            if (newUserUnitNumber.Text == null)
-            {
-                newUserUnitNumber.Text = "";
-            }
-
-            if(newUserCity.Text == null)
-            {
-                await DisplayAlert("Alert!", "Please enter a city", "OK");
-            }
-
-            if(newUserState.Text == null)
-            {
-                await DisplayAlert("Alert!", "Please enter a state", "OK");
-            }
-
-            if(newUserZipcode.Text == null)
-            {
-                await DisplayAlert("Alert!", "Please enter a zipcode", "OK");
-            }
-
-            // Setting request for USPS API
-            XDocument requestDoc = new XDocument(
-                new XElement("AddressValidateRequest",
-                new XAttribute("USERID", "400INFIN1745"),
-                new XElement("Revision", "1"),
-                new XElement("Address",
-                new XAttribute("ID", "0"),
-                new XElement("Address1", newUserAddress.Text.Trim()),
-                new XElement("Address2", newUserUnitNumber.Text.Trim()),
-                new XElement("City", newUserCity.Text.Trim()),
-                new XElement("State", newUserState.Text.Trim()),
-                new XElement("Zip5", newUserZipcode.Text.Trim()),
-                new XElement("Zip4", "")
-                     )
-                 )
-             );
-            var url = "http://production.shippingapis.com/ShippingAPI.dll?API=Verify&XML=" + requestDoc;
-            Console.WriteLine(url);
-            var client = new WebClient();
-            var response = client.DownloadString(url);
-
-            var xdoc = XDocument.Parse(response.ToString());
-            Console.WriteLine(xdoc);
-
-            foreach (XElement element in xdoc.Descendants("Address"))
-            {
-                if (GetXMLElement(element, "Error").Equals(""))
-                {
-                    if (GetXMLElement(element, "DPVConfirmation").Equals("Y") && GetXMLElement(element, "Zip5").Equals(newUserZipcode.Text.Trim()) && GetXMLElement(element, "City").Equals(newUserCity.Text.Trim().ToUpper())) // Best case
-                    {
-                        // Get longitude and latitide because we can make a deliver here. Move on to next page.
-                        // Console.WriteLine("The address you entered is valid and deliverable by USPS. We are going to get its latitude & longitude");
-                        //GetAddressLatitudeLongitude();
-                        Geocoder geoCoder = new Geocoder();
-
-                        IEnumerable<Position> approximateLocations = await geoCoder.GetPositionsForAddressAsync(newUserAddress.Text.Trim() + "," + newUserCity.Text.Trim() + "," + newUserState.Text.Trim());
-                        Position position = approximateLocations.FirstOrDefault();
-
-                        latitude = $"{position.Latitude}";
-                        longitude = $"{position.Longitude}";
-
-                        map.MapType = MapType.Street;
-                        var mapSpan = new MapSpan(position, 0.001, 0.001);
-
-                        Pin address = new Pin();
-                        address.Label = "Delivery Address";
-                        address.Type = PinType.SearchResult;
-                        address.Position = position;
-
-                        map.MoveToRegion(mapSpan);
-                        map.Pins.Add(address);
-
-                        break;
-                    }
-                    else if (GetXMLElement(element, "DPVConfirmation").Equals("D"))
-                    {
-                        //await DisplayAlert("Alert!", "Address is missing information like 'Apartment number'.", "Ok");
-                        //return;
-                    }
-                    else
-                    {
-                        //await DisplayAlert("Alert!", "Seems like your address is invalid.", "Ok");
-                        //return;
-                    }
-                }
-                else
-                {   // USPS sents an error saying address not found in there records. In other words, this address is not valid because it does not exits.
-                    //Console.WriteLine("Seems like your address is invalid.");
-                    //await DisplayAlert("Alert!", "Error from USPS. The address you entered was not found.", "Ok");
-                    //return;
-                }
-            }
-            if (latitude == "0" || longitude == "0")
-            {
-                await DisplayAlert("We couldn't find your address", "Please check for errors.", "OK");
-            }
-            else
-            {
-
-                //purchaseObject.delivery_address = newUserAddress.Text;
-                //purchaseObject.delivery_unit = newUserUnitNumber.Text;
-                //purchaseObject.delivery_city = newUserCity.Text;
-                //purchaseObject.delivery_state = newUserState.Text;
-                //purchaseObject.delivery_zip = newUserZipcode.Text;
-                //purchaseObject.delivery_latitude = latitude;
-                //purchaseObject.delivery_longitude = longitude;
-                isAddressValidated = true;
-                addressButton.Text = "Address Verified";
-                addressButton.BackgroundColor = Color.FromHex("#136D74");
-                await Application.Current.SavePropertiesAsync();
-            }
-        }
-
-        public static string GetXMLElement(XElement element, string name)
-        {
-            var el = element.Element(name);
-            if (el != null)
-            {
-                return el.Value;
-            }
-            return "";
-        }
-
-        public static string GetXMLAttribute(XElement element, string name)
-        {
-            var el = element.Attribute(name);
-            if (el != null)
-            {
-                return el.Value;
-            }
-            return "";
+            
+       
         }
 
 
@@ -1120,40 +986,62 @@ namespace ServingFresh.Views
             addr.OnAddressChanged(addressList, Addresses, AddressEntry.Text);
         }
 
-        private void addressEntryFocused(object sender, EventArgs eventArgs)
+        void addressEntryFocused(object sender, EventArgs eventArgs)
         {
-            //addr.addressEntryFocused(addressList);
+            addr.addressEntryFocused(addressList, addressFrame);
         }
 
-        private void addressEntryUnfocused(object sender, EventArgs eventArgs)
+        void addressEntryUnfocused(object sender, EventArgs eventArgs)
         {
-            //addr.addressEntryUnfocused(addressList);
+            addr.addressEntryUnfocused(addressList, addressFrame);
         }
 
-         void addressSelected(System.Object sender, SelectedItemChangedEventArgs e)
+        async void addressSelected(System.Object sender, SelectedItemChangedEventArgs e)
         {
-            //addr.addressSelected(addressList);
-            var elementUI = (AddressAutocomplete) e.SelectedItem;
-            //AddressEntry.Text = elementUI.Address;
-            Debug.WriteLine("ADDRESS SELECTED :" + elementUI.Address);
-            var address = "";
-            foreach(char a in elementUI.Address)
+            addressToValidate = addr.addressSelected(addressList, AddressEntry, addressFrame, newUserUnitNumber, gridAddressView, newUserCity, newUserState, newUserZipcode);
+            addressFrame.Margin = new Thickness(0, -75, 0, 0);
+            // check if given address is with in zones
+
+            if(addressToValidate != null)
             {
-                if(a != ',')
+                // ask for unit
+                addressToValidate.Unit = newUserUnitNumber.Text;
+
+                var client = new AddressValidation();
+                var location = await client.ValidateAddress(addressToValidate.Street, addressToValidate.Unit, addressToValidate.City, addressToValidate.State, addressToValidate.ZipCode);
+
+                if (location != null)
                 {
-                    address += a;
+                    var isAddressInZones = await client.isLocationInZones(zone, location.Latitude.ToString(), location.Longitude.ToString());
+                    if(isAddressInZones != "INSIDE CURRENT ZONE" && isAddressInZones != "")
+                    {
+                        // We can continue with payments since we can deliver to this location
+                        await DisplayAlert("Great!", "We are able to deliver to your location! Proceed to payments", "OK");
+                        client.SetPinOnMap(map, location, addressToValidate.Address);
+                        purchase.setPurchaseAddress(addressToValidate.Street);
+                        purchase.setPurchaseUnit(addressToValidate.Unit);
+                        purchase.setPurchaseCity(addressToValidate.City);
+                        purchase.setPurchaseState(addressToValidate.State);
+                        purchase.setPurchaseZipcode(addressToValidate.ZipCode);
+                        purchase.setPurchaseLatitude(location.Latitude.ToString());
+                        purchase.setPurchaseLongitude(location.Longitude.ToString());
+                    }
+                    else if(isAddressInZones != "INSIDE DIFFERENT ZONE" && isAddressInZones != "")
+                    {
+                        // We have to reset cart or send user to store
+                        await DisplayAlert("Great!", "We are able to deliver to your location! However, your new entered address is outside the initial given address.", "OK");
+                    }
+                    else if (isAddressInZones != "OUTSIDE ZONE RANGE" && isAddressInZones != "")
+                    {
+                        // User is outside zones
+                        await DisplayAlert("Sorry", "Unfortunately, we can't deliver to this location.", "OK");
+                    }
                 }
                 else
                 {
-                    break;
+                    await DisplayAlert("Is your address missing a unit number?", "Please check your address and add unit number if missing", "OK");
                 }
-
             }
-            newUserAddress.Text = address;
-            newUserCity.Text = elementUI.City;
-            newUserState.Text = elementUI.State;
-            newUserZipcode.Text = elementUI.ZipCode;
-
         }
 
         void ShowLogInUI(System.Object sender, System.EventArgs e)

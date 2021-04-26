@@ -216,6 +216,7 @@
     <BundleResource Include="Resources\facebookWhiteIcon.png" />
     <BundleResource Include="Resources\googleWhiteIcon.png" />
     <BundleResource Include="Resources\backArrow.png" />
+    <BundleResource Include="Resources\greenHelpIcon.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AppleSignIn\" />

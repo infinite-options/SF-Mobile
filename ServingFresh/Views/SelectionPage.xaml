@@ -225,7 +225,7 @@
                                                 <StackLayout Grid.Column="0">
                                                     <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
                                                         <StackLayout Padding="5">
-                                                            <ImageButton Margin="0,-7,0,0" Source="{Binding favoriteIconLeft}" Clicked="ImageButton_Clicked"  CommandParameter="{Binding .}"></ImageButton>
+                                                            <ImageButton Margin="0,-7,0,0" Source="{Binding favoriteIconLeft}" Clicked="AddFavoriteLeftItemOnVerticalView"  CommandParameter="{Binding .}"></ImageButton>
                                                         </StackLayout>
                                                     </Frame>
                                                 </StackLayout>
@@ -289,7 +289,7 @@
                                                 <StackLayout Grid.Column="0">
                                                     <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
                                                         <StackLayout Padding="5">
-                                                            <ImageButton Margin="0,-7,0,0" Source="{Binding favoriteIconRight}" Clicked="ImageButton_Clicked" CommandParameter="{Binding .}"></ImageButton>
+                                                            <ImageButton Margin="0,-7,0,0" Source="{Binding favoriteIconRight}" Clicked="AddFavoriteRighttemOnVerticalView" CommandParameter="{Binding .}"></ImageButton>
                                                         </StackLayout>
                                                     </Frame>
                                                 </StackLayout>
@@ -454,7 +454,7 @@
                                                 <StackLayout Grid.Column="0">
                                                     <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
                                                         <StackLayout Padding="5">
-                                                            <ImageButton Margin="0,-7,0,0" Source="{Binding favoriteIconLeft}" Clicked="ImageButton_Clicked"  CommandParameter="{Binding .}"></ImageButton>
+                                                            <ImageButton Margin="0,-7,0,0" Source="{Binding favoriteIconLeft}" Clicked="AddFavoriteLeftItemOnVerticalView"  CommandParameter="{Binding .}"></ImageButton>
                                                         </StackLayout>
                                                     </Frame>
                                                 </StackLayout>
@@ -518,7 +518,7 @@
                                                 <StackLayout Grid.Column="0">
                                                     <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
                                                         <StackLayout Padding="5">
-                                                            <ImageButton Margin="0,-7,0,0" Source="{Binding favoriteIconRight}" Clicked="ImageButton_Clicked" CommandParameter="{Binding .}"></ImageButton>
+                                                            <ImageButton Margin="0,-7,0,0" Source="{Binding favoriteIconRight}" Clicked="AddFavoriteRighttemOnVerticalView" CommandParameter="{Binding .}"></ImageButton>
                                                         </StackLayout>
                                                     </Frame>
                                                 </StackLayout>
@@ -683,7 +683,7 @@
                                                 <StackLayout Grid.Column="0">
                                                     <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
                                                         <StackLayout Padding="5">
-                                                            <ImageButton Margin="0,-7,0,0" Source="{Binding favoriteIconLeft}" Clicked="ImageButton_Clicked"  CommandParameter="{Binding .}"></ImageButton>
+                                                            <ImageButton Margin="0,-7,0,0" Source="{Binding favoriteIconLeft}" Clicked="AddFavoriteLeftItemOnVerticalView"  CommandParameter="{Binding .}"></ImageButton>
                                                         </StackLayout>
                                                     </Frame>
                                                 </StackLayout>
@@ -747,7 +747,7 @@
                                                 <StackLayout Grid.Column="0">
                                                     <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
                                                         <StackLayout Padding="5">
-                                                            <ImageButton Margin="0,-7,0,0" Source="{Binding favoriteIconRight}" Clicked="ImageButton_Clicked" CommandParameter="{Binding .}"></ImageButton>
+                                                            <ImageButton Margin="0,-7,0,0" Source="{Binding favoriteIconRight}" Clicked="AddFavoriteRighttemOnVerticalView" CommandParameter="{Binding .}"></ImageButton>
                                                         </StackLayout>
                                                     </Frame>
                                                 </StackLayout>
@@ -912,7 +912,7 @@
                                                 <StackLayout Grid.Column="0">
                                                     <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
                                                         <StackLayout Padding="5">
-                                                            <ImageButton Margin="0,-7,0,0" Source="{Binding favoriteIconLeft}" Clicked="ImageButton_Clicked"  CommandParameter="{Binding .}"></ImageButton>
+                                                            <ImageButton Margin="0,-7,0,0" Source="{Binding favoriteIconLeft}" Clicked="AddFavoriteLeftItemOnVerticalView"  CommandParameter="{Binding .}"></ImageButton>
                                                         </StackLayout>
                                                     </Frame>
                                                 </StackLayout>
@@ -976,7 +976,7 @@
                                                 <StackLayout Grid.Column="0">
                                                     <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
                                                         <StackLayout Padding="5">
-                                                            <ImageButton Margin="0,-7,0,0" Source="{Binding favoriteIconRight}" Clicked="ImageButton_Clicked" CommandParameter="{Binding .}"></ImageButton>
+                                                            <ImageButton Margin="0,-7,0,0" Source="{Binding favoriteIconRight}" Clicked="AddFavoriteRighttemOnVerticalView" CommandParameter="{Binding .}"></ImageButton>
                                                         </StackLayout>
                                                     </Frame>
                                                 </StackLayout>

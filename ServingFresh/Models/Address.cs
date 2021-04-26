@@ -37,7 +37,7 @@ namespace ServingFresh.Models
                     if (message.IsSuccessStatusCode)
                     {
                         string json = await message.Content.ReadAsStringAsync().ConfigureAwait(false);
-                     
+                        Debug.WriteLine("RESPONSE FROM GOOGLE ADDRESS PREDICTION: " + json);
                         PlacesLocationPredictions predictionList = await Task.Run(() => JsonConvert.DeserializeObject<PlacesLocationPredictions>(json)).ConfigureAwait(false);
                         
                         if (predictionList.Status == "OK")
@@ -155,26 +155,37 @@ namespace ServingFresh.Models
             addressList.IsVisible = false;
             frame.IsVisible = false; 
             entry.Text = ((AddressAutocomplete)addressList.SelectedItem).Street +", " + ((AddressAutocomplete)addressList.SelectedItem).City + ", " + ((AddressAutocomplete)addressList.SelectedItem).State + ", " + ((AddressAutocomplete)addressList.SelectedItem).ZipCode;
+            selectedAddress.Street = ((AddressAutocomplete)addressList.SelectedItem).Street;
+            selectedAddress.City = ((AddressAutocomplete)addressList.SelectedItem).City;
+            selectedAddress.State = ((AddressAutocomplete)addressList.SelectedItem).State;
+            selectedAddress.ZipCode = ((AddressAutocomplete)addressList.SelectedItem).ZipCode;
+            return selectedAddress;
+        }
 
+        public AddressAutocomplete addressSelected(ListView addressList, Entry address, Frame frame, Entry unit, Grid grid, Entry city, Entry state, Entry zipcode)
+        {
+            AddressAutocomplete selectedAddress = new AddressAutocomplete();
+
+            addressList.IsVisible = false;
+            frame.IsVisible = false;
+            unit.IsVisible = true;
+            grid.IsVisible = true;
+
+            address.Text = ((AddressAutocomplete)addressList.SelectedItem).Street;
+            selectedAddress.Address = ((AddressAutocomplete)addressList.SelectedItem).Address;
             selectedAddress.Street = ((AddressAutocomplete)addressList.SelectedItem).Street;
             selectedAddress.City = ((AddressAutocomplete)addressList.SelectedItem).City;
             selectedAddress.State = ((AddressAutocomplete)addressList.SelectedItem).State;
             selectedAddress.ZipCode = ((AddressAutocomplete)addressList.SelectedItem).ZipCode;
 
+            city.Text = ((AddressAutocomplete)addressList.SelectedItem).City;
+            state.Text = ((AddressAutocomplete)addressList.SelectedItem).State;
+            zipcode.Text = ((AddressAutocomplete)addressList.SelectedItem).ZipCode;
+
             return selectedAddress;
-            //foreach (Grid g in grids)
-            //{
-            //    g.IsVisible = true;
-            //}
-
-            //AddressEntry.Text = ((AddressAutocomplete)addressList.SelectedItem).Street;
-            //CityEntry.Text = ((AddressAutocomplete)addressList.SelectedItem).City;
-            //StateEntry.Text = ((AddressAutocomplete)addressList.SelectedItem).State;
-            //ZipEntry.Text = ((AddressAutocomplete)addressList.SelectedItem).ZipCode;
-
         }
 
-   
+
 
         protected void OnPropertyChanged(string propertyName)
         {

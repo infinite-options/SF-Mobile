@@ -138,8 +138,6 @@ namespace ServingFresh.Models
         public async static Task<HttpResponse> createOrder(string amount)
         {
             HttpResponse response;
-            // Construct a request object and set desired parameters
-            // Here, OrdersCreateRequest() creates a POST request to /v2/checkout/orders
 
             var order = new OrderRequest()
             {

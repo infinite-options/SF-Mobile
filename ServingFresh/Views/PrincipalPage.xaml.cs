@@ -86,10 +86,12 @@ namespace ServingFresh.Views
                             Debug.WriteLine("RESULT FROM PROMPT " + unit);
                             addressToValidate.Unit = unit;
                             var client = new AddressValidation();
+                            Debug.WriteLine("INPUTS TO VALIDATE ADDRESS METHOD: STREET: {0}, UNIT: {1}, CITY: {2}, STATE {3}, ZIPCODE: {4}", addressToValidate.Street, addressToValidate.Unit, addressToValidate.City, addressToValidate.State, addressToValidate.ZipCode);
                             var location = await client.ValidateAddress(addressToValidate.Street, addressToValidate.Unit, addressToValidate.City, addressToValidate.State, addressToValidate.ZipCode);
                             if(location != null)
                             {
                                 var zone = await client.getZoneFromLocation(location.Latitude.ToString(), location.Longitude.ToString());
+                                Debug.WriteLine("RESULT FROM GET ZONE FROM LOCATION: " + zone);
                                 if(zone != "OUTSIDE ZONE RANGE" && zone != "")
                                 {
                                     SetUser(location);
@@ -116,6 +118,7 @@ namespace ServingFresh.Views
                         if (location != null)
                         {
                             var zone = await client.getZoneFromLocation(location.Latitude.ToString(), location.Longitude.ToString());
+                            Debug.WriteLine("RESULT FROM GET ZONE FROM LOCATION: " + zone);
                             if (zone != "OUTSIDE ZONE RANGE" && zone != "")
                             {
                                 SetUser(location);
@@ -146,7 +149,7 @@ namespace ServingFresh.Views
 
                         if(tempCollection.Count != 0)
                         {
-
+                            Debug.WriteLine("INPUT FROM ZIPCODE: " + tempCollection[0].Address);
                             var location = await client.ConvertAddressToGeoCoordiantes(tempCollection[0].Address);
                             
                             //Debug.WriteLine("ZIPCODE: ADDRESS {0}, CITY {0}, STATE {0}", tempCollection[0].Address, tempCollection[0].City, tempCollection[0].State);
