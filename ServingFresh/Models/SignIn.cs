@@ -15,9 +15,17 @@ namespace ServingFresh.Models
 {
     public class SignIn
     {
+        private string accessToken;
+        private string refreshToken;
+        private string platform;
+        private AuthenticatorCompletedEventArgs googleAccount;
+
         public SignIn()
         {
-
+            googleAccount = null;
+            platform = "";
+            accessToken = "";
+            refreshToken = "";
         }
 
         public async Task<User> SignInDirectUser(Button button, Entry email, Entry password)
@@ -140,6 +148,47 @@ namespace ServingFresh.Models
             return directUser;
         }
 
+        //private string platform;
+        //private AuthenticatorCompletedEventArgs googleAccount;
+        public void setPlatform(string platform)
+        {
+            this.platform = platform;
+        }
+
+        public void setGoogleAccount(AuthenticatorCompletedEventArgs googleAccount)
+        {
+            this.googleAccount = googleAccount;
+        }
+
+        public void setAccessToken(string accessToken)
+        {
+            this.accessToken = accessToken;
+        }
+
+        public void setRefreshToken(string refreshToken)
+        {
+            this.refreshToken = refreshToken;
+        }
+
+        public AuthenticatorCompletedEventArgs getGoogleAccount()
+        {
+            return googleAccount;
+        }
+
+        public string getPlatfomr()
+        {
+            return platform;
+        }
+
+        public string getAccessToken()
+        {
+            return accessToken;
+        }
+
+        public string getRefreshToken()
+        {
+            return refreshToken;
+        }
 
         private async Task<AccountSalt> RetrieveAccountSalt(string userEmail)
         {
@@ -288,11 +337,10 @@ namespace ServingFresh.Models
             }
             else
             {
-                Application.Current.MainPage = new LogInPage();
+                Application.Current.MainPage = new PrincipalPage();
                 //await DisplayAlert("Error", "Google was not able to autheticate your account", "OK");
             }
         }
-
 
 
         private void FacebookAutheticatorError(object sender, AuthenticatorErrorEventArgs e)
@@ -306,6 +354,7 @@ namespace ServingFresh.Models
             Application.Current.MainPage = new PrincipalPage();
             //await DisplayAlert("Authentication error: ", e.Message, "OK");
         }
+
 
         public void SignInWithGoogle()
         {
@@ -335,7 +384,7 @@ namespace ServingFresh.Models
             presenter.Login(authenticator);
 
         }
-        private async void GoogleAuthenticatorCompleted(object sender, AuthenticatorCompletedEventArgs e)
+        private void GoogleAuthenticatorCompleted(object sender, AuthenticatorCompletedEventArgs e)
         {
             var authenticator = sender as OAuth2Authenticator;
 

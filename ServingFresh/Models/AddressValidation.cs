@@ -46,7 +46,7 @@ namespace ServingFresh.Models
             var client = new WebClient();
             var response = client.DownloadString(url);
             var xdoc = XDocument.Parse(response.ToString());
-
+            Debug.WriteLine("RESULT FROM USPS: " + xdoc);
             foreach (XElement element in xdoc.Descendants("Address"))
             {
                 if (GetXMLElement(element, "Error").Equals(""))

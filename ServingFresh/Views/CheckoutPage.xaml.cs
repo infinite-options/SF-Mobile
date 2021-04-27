@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Acr.UserDialogs;
 using static ServingFresh.Views.SelectionPage;
 using static ServingFresh.Views.SignUpPage;
+using Xamarin.Auth;
 
 namespace ServingFresh.Views
 {
@@ -1115,6 +1116,73 @@ namespace ServingFresh.Views
                 userPassword.IsPassword = true;
                 label.Text = "Show password";
             }
+        }
+
+        public void SignInWithFacebook()
+        {
+            string clientID = string.Empty;
+            string redirectURL = string.Empty;
+
+            switch (Device.RuntimePlatform)
+            {
+                case Device.iOS:
+                    clientID = Constant.FacebookiOSClientID;
+                    redirectURL = Constant.FacebookiOSRedirectUrl;
+                    break;
+                case Device.Android:
+                    clientID = Constant.FacebookAndroidClientID;
+                    redirectURL = Constant.FacebookAndroidRedirectUrl;
+                    break;
+            }
+
+            var authenticator = new OAuth2Authenticator(clientID, Constant.FacebookScope, new Uri(Constant.FacebookAuthorizeUrl), new Uri(redirectURL), null, false);
+            var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
+
+            authenticator.Completed += FacebookAuthenticatorCompleted;
+            authenticator.Error += FacebookAutheticatorError;
+
+            presenter.Login(authenticator);
+        }
+
+        public void FacebookAuthenticatorCompleted(object sender, AuthenticatorCompletedEventArgs e)
+        {
+            var authenticator = sender as OAuth2Authenticator;
+
+            if (authenticator != null)
+            {
+                authenticator.Completed -= FacebookAuthenticatorCompleted;
+                authenticator.Error -= FacebookAutheticatorError;
+            }
+
+            if (e.IsAuthenticated)
+            {
+                try
+                {
+                    
+                }
+                catch (Exception g)
+                {
+                    Debug.WriteLine(g.Message);
+                }
+            }
+            else
+            {
+                Application.Current.MainPage = new PrincipalPage();
+                //await DisplayAlert("Error", "Google was not able to autheticate your account", "OK");
+            }
+        }
+
+
+        private void FacebookAutheticatorError(object sender, AuthenticatorErrorEventArgs e)
+        {
+            var authenticator = sender as OAuth2Authenticator;
+            if (authenticator != null)
+            {
+                authenticator.Completed -= FacebookAuthenticatorCompleted;
+                authenticator.Error -= FacebookAutheticatorError;
+            }
+            Application.Current.MainPage = new PrincipalPage();
+            //await DisplayAlert("Authentication error: ", e.Message, "OK");
         }
     }
 }

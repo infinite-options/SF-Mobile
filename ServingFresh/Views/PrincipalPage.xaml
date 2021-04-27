@@ -7,6 +7,7 @@
                 <RowDefinition Height="220"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
                 <RowDefinition x:Name="logInRow" Height="0"></RowDefinition>
+                <RowDefinition x:Name="addressRow" Height="0"></RowDefinition>
                 <RowDefinition x:Name="signUpRow" Height="0"></RowDefinition>
             </Grid.RowDefinitions>
             <StackLayout Grid.Row="0" >
@@ -52,7 +53,7 @@
                         <Entry Margin="70,0,70,0" x:Name="zipcodeEntry" Placeholder="Enter Zip Code" FontSize="14" PlaceholderColor="Gray"  HorizontalTextAlignment="Center"></Entry>
                         <Button Margin="50,10,50,0" HeightRequest="40" TextColor="white" Text="Find Local Produce" FontSize="Medium"  BackgroundColor="#136D74" Clicked="FindLocalProduceBaseOnLocation"></Button>
                         <Frame Margin="0,-135,0,0" Padding="2" HorizontalOptions="CenterAndExpand" CornerRadius="5" x:Name="addressFrame" IsVisible="false">
-                            <ListView x:Name="addressList" IsVisible="false" HorizontalOptions="CenterAndExpand" WidthRequest="220" HeightRequest="100"  ItemsSource="{Binding Addresses}" ItemSelected="addressSelected">
+                            <ListView x:Name="addressList" IsVisible="false" HorizontalOptions="CenterAndExpand" WidthRequest="250" HeightRequest="100"  ItemsSource="{Binding Addresses}" ItemSelected="addressSelected">
                                 <ListView.ItemTemplate>
                                     <DataTemplate>
                                         <ViewCell>
@@ -193,7 +194,47 @@
                 </StackLayout>
             </StackLayout>
             </Frame>
-            <Frame Grid.Row="4" x:Name="signUpFrame" Margin="5,0,5,0" CornerRadius="20" BackgroundColor="WhiteSmoke">
+            <Frame Grid.Row="4" x:Name="addressFrameSignUp" Margin="5,0,5,0" CornerRadius="20" BackgroundColor="WhiteSmoke">
+                <StackLayout Padding="5,0,5,0">
+                <ImageButton Source="closeFrameIcon.png" HorizontalOptions="End" Clicked="HideSignUpUI"></ImageButton>
+                <StackLayout HeightRequest="60" Margin="0,-10,0,0">
+                    <Label Text="Sign Up" TextColor="#136D74" FontSize="32" FontAttributes="Bold" TextDecorations="Underline" HorizontalTextAlignment="Center" ></Label>
+                </StackLayout>
+                <ScrollView Margin="0,0,0,250" HorizontalScrollBarVisibility="Always">
+                    <StackLayout>
+                        <StackLayout Spacing="10" Margin="0,0,0,20">
+                            <Entry WidthRequest="390" HeightRequest="44" Placeholder="First name (so we can address you)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                            <Entry WidthRequest="372" HeightRequest="44" Placeholder="Last name (in case you want to be formal)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                            <Entry WidthRequest="372" HeightRequest="44" Keyboard="Email" Placeholder="Email address (for order confirmation)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                            <Entry WidthRequest="372" HeightRequest="44" Keyboard="Numeric" Placeholder="Phone number (so we can call if there is an issue)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                            <StackLayout HeightRequest="150">
+                                <RelativeLayout
+                                    RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
+                                    RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                    <StackLayout
+                                         RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
+                                         RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                         <Entry WidthRequest="372" HeightRequest="44" Placeholder="Address 1" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                                         <StackLayout  >
+                                             <Grid HeightRequest="44">
+                                                 <Entry Grid.Column="0" Placeholder="Unit" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                                                 <Entry Grid.Column="1" Placeholder="City" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                                             </Grid>
+                                             <Grid HeightRequest="44">
+                                                 <Entry Grid.Column="0" Placeholder="State" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                                                 <Entry Grid.Column="1" Placeholder="Zip Code" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                                             </Grid>
+                                         </StackLayout>
+                                    </StackLayout>
+                                </RelativeLayout>
+                            </StackLayout>
+                        </StackLayout>
+                        <Button CornerRadius="13" HorizontalOptions="CenterAndExpand" WidthRequest="287" HeightRequest="48" Text="Continue" FontAttributes="Bold" TextColor="White" FontSize="20" BackgroundColor="#FF8500"></Button>
+                    </StackLayout>
+                </ScrollView>
+            </StackLayout>
+            </Frame>
+            <Frame Grid.Row="5" x:Name="signUpFrame" Margin="5,0,5,0" CornerRadius="20" BackgroundColor="WhiteSmoke">
                 <StackLayout Padding="5,0,5,0">
                 <ImageButton Source="closeFrameIcon.png" HorizontalOptions="End" Clicked="HideSignUpUI"></ImageButton>
                 <StackLayout HeightRequest="60" Margin="0,-10,0,0">

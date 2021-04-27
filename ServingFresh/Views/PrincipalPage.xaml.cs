@@ -241,8 +241,8 @@ namespace ServingFresh.Views
 
         void NavigateToSignUp(System.Object sender, System.EventArgs e)
         {
-            signUpRow.Height = this.Height - 200;
-            signUpFrame.Margin = new Thickness(5, -this.Height + 400, 5, 0);
+            addressRow.Height = this.Height - 200;
+            addressFrameSignUp.Margin = new Thickness(5, -this.Height + 400, 5, 0);
         }
 
         public async Task GetPlacesPredictionsAsync()
@@ -330,11 +330,9 @@ namespace ServingFresh.Views
             }
         }
 
-
         void SignInWithFacebookFromPrincipal(System.Object sender, System.EventArgs e)
         {
             var client = new SignIn();
-            
             client.SignInWithFacebook();
         }
 
