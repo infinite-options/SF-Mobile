@@ -71,9 +71,9 @@ namespace ServingFresh.Views
 
         async void FindLocalProduceBaseOnLocation(System.Object sender, System.EventArgs e)
         {
-            if (AddressEntry.Text != null || zipcodeEntry.Text != null)
+            if (AddressEntry.Text != null)
             {
-                if (AddressEntry.Text != null && zipcodeEntry.Text == null)
+                if (AddressEntry.Text != null)
                 {
                     var needToEnterUnit = await DisplayAlert("Do you have a unit number in your address?", "Your answer will help us validate your delivery address. Thank you!", "Yes", "No");
                     if (needToEnterUnit)
@@ -143,39 +143,39 @@ namespace ServingFresh.Views
                     var tempListView = new ListView();
                     var tempCollection = new ObservableCollection<AddressAutocomplete>();
 
-                    if(zipcodeEntry.Text != null)
-                    {
-                        await addr.GetPlacesPredictionsAsync(tempListView, tempCollection, zipcodeEntry.Text);
+                    //if(zipcodeEntry.Text != null)
+                    //{
+                    //    await addr.GetPlacesPredictionsAsync(tempListView, tempCollection, zipcodeEntry.Text);
 
-                        if(tempCollection.Count != 0)
-                        {
-                            Debug.WriteLine("INPUT FROM ZIPCODE: " + tempCollection[0].Address);
-                            var location = await client.ConvertAddressToGeoCoordiantes(tempCollection[0].Address);
+                    //    if(tempCollection.Count != 0)
+                    //    {
+                    //        Debug.WriteLine("INPUT FROM ZIPCODE: " + tempCollection[0].Address);
+                    //        var location = await client.ConvertAddressToGeoCoordiantes(tempCollection[0].Address);
                             
-                            //Debug.WriteLine("ZIPCODE: ADDRESS {0}, CITY {0}, STATE {0}", tempCollection[0].Address, tempCollection[0].City, tempCollection[0].State);
-                            //Debug.WriteLine("ZIPCODE: LATITUDE {0}, LONGITUDE {0}", location.Latitude, location.Longitude);
-                            if (location != null)
-                            {
-                                var zone = await client.getZoneFromLocation(location.Latitude.ToString(), location.Longitude.ToString());
-                                if (zone != "OUTSIDE ZONE RANGE" && zone != "")
-                                {
-                                    SetUser(location);
-                                    // may need to add the give data
-                                }
-                                else
-                                {
-                                    await DisplayAlert("Sorry, your address seems to be outside our supported areas", "Please share with us your interest at pmarathay@gmail.com and we will send you an email as soon as we start serving your area", "OK");
-                                    return;
-                                }
-                            }
+                    //        //Debug.WriteLine("ZIPCODE: ADDRESS {0}, CITY {0}, STATE {0}", tempCollection[0].Address, tempCollection[0].City, tempCollection[0].State);
+                    //        //Debug.WriteLine("ZIPCODE: LATITUDE {0}, LONGITUDE {0}", location.Latitude, location.Longitude);
+                    //        if (location != null)
+                    //        {
+                    //            var zone = await client.getZoneFromLocation(location.Latitude.ToString(), location.Longitude.ToString());
+                    //            if (zone != "OUTSIDE ZONE RANGE" && zone != "")
+                    //            {
+                    //                SetUser(location);
+                    //                // may need to add the give data
+                    //            }
+                    //            else
+                    //            {
+                    //                await DisplayAlert("Sorry, your address seems to be outside our supported areas", "Please share with us your interest at pmarathay@gmail.com and we will send you an email as soon as we start serving your area", "OK");
+                    //                return;
+                    //            }
+                    //        }
                            
-                        }
-                        else
-                        {
-                            await DisplayAlert("We can't delivery to this address", "Unfortunately, we can't delivery to this address because our algorithm can't verify it. Try a new address", "OK");
-                            return;
-                        }
-                    }
+                    //    }
+                    //    else
+                    //    {
+                    //        await DisplayAlert("We can't delivery to this address", "Unfortunately, we can't delivery to this address because our algorithm can't verify it. Try a new address", "OK");
+                    //        return;
+                    //    }
+                    //}
                 }
             }
             else
@@ -350,6 +350,20 @@ namespace ServingFresh.Views
         void SignUpUserFromPrincipal(System.Object sender, System.EventArgs e)
         {
 
+        }
+
+        void ContinueWithSignUp(System.Object sender, System.EventArgs e)
+        {
+            addressRow.Height = 0;
+            addressFrameSignUp.Margin = new Thickness(5, 0, 5, 0);
+            signUpRow.Height = this.Height - 200;
+            signUpFrame.Margin = new Thickness(5, -this.Height + 400, 5, 0);
+        }
+
+        void HideAddressModal(System.Object sender, System.EventArgs e)
+        {
+            addressRow.Height = 0;
+            addressFrameSignUp.Margin = new Thickness(5, 0, 5, 0);
         }
     }
 }

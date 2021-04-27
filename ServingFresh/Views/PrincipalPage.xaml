@@ -4,7 +4,7 @@
         <Grid RowSpacing="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="220"></RowDefinition>
-                <RowDefinition Height="220"></RowDefinition>
+                <RowDefinition Height="180"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
                 <RowDefinition x:Name="logInRow" Height="0"></RowDefinition>
                 <RowDefinition x:Name="addressRow" Height="0"></RowDefinition>
@@ -48,11 +48,11 @@
                         RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
                         RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
                         <Label Text="Local produce delivered to your doorstep" TextColor="White" FontSize="Medium" HorizontalTextAlignment="Center" FontAttributes="Bold"></Label>
-                        <Entry Margin="50,0,50,0" HorizontalTextAlignment="Center" x:Name="AddressEntry" FontSize="14" Placeholder="Search for your address" PlaceholderColor="Gray"  Keyboard="Text" TextColor="Black" Text="{Binding AddressText}" TextChanged="OnAddressChanged" Focused="addressEntryFocused" Unfocused="addressEntryUnfocused"/>
-                        <Label Text="OR" TextColor="White"  FontSize="Medium" HorizontalTextAlignment="Center" FontAttributes="Bold" ></Label>
-                        <Entry Margin="70,0,70,0" x:Name="zipcodeEntry" Placeholder="Enter Zip Code" FontSize="14" PlaceholderColor="Gray"  HorizontalTextAlignment="Center"></Entry>
+                        <Entry Margin="50,0,50,0" HeightRequest="40" HorizontalTextAlignment="Center" x:Name="AddressEntry" FontSize="14" Placeholder="Search for your address" PlaceholderColor="Gray"  Keyboard="Text" TextColor="Black" Text="{Binding AddressText}" TextChanged="OnAddressChanged" Focused="addressEntryFocused" Unfocused="addressEntryUnfocused"/>
+                        <!--<Label Text="OR" TextColor="White"  FontSize="Medium" HorizontalTextAlignment="Center" FontAttributes="Bold" ></Label>
+                        <Entry Margin="70,0,70,0" x:Name="zipcodeEntry" Placeholder="Enter Zip Code" FontSize="14" PlaceholderColor="Gray"  HorizontalTextAlignment="Center"></Entry>-->
                         <Button Margin="50,10,50,0" HeightRequest="40" TextColor="white" Text="Find Local Produce" FontSize="Medium"  BackgroundColor="#136D74" Clicked="FindLocalProduceBaseOnLocation"></Button>
-                        <Frame Margin="0,-135,0,0" Padding="2" HorizontalOptions="CenterAndExpand" CornerRadius="5" x:Name="addressFrame" IsVisible="false">
+                        <Frame Margin="0,-65,0,0" Padding="2" HorizontalOptions="CenterAndExpand" CornerRadius="5" x:Name="addressFrame" IsVisible="false">
                             <ListView x:Name="addressList" IsVisible="false" HorizontalOptions="CenterAndExpand" WidthRequest="250" HeightRequest="100"  ItemsSource="{Binding Addresses}" ItemSelected="addressSelected">
                                 <ListView.ItemTemplate>
                                     <DataTemplate>
@@ -196,7 +196,7 @@
             </Frame>
             <Frame Grid.Row="4" x:Name="addressFrameSignUp" Margin="5,0,5,0" CornerRadius="20" BackgroundColor="WhiteSmoke">
                 <StackLayout Padding="5,0,5,0">
-                <ImageButton Source="closeFrameIcon.png" HorizontalOptions="End" Clicked="HideSignUpUI"></ImageButton>
+                <ImageButton Source="closeFrameIcon.png" HorizontalOptions="End" Clicked="HideAddressModal"></ImageButton>
                 <StackLayout HeightRequest="60" Margin="0,-10,0,0">
                     <Label Text="Sign Up" TextColor="#136D74" FontSize="32" FontAttributes="Bold" TextDecorations="Underline" HorizontalTextAlignment="Center" ></Label>
                 </StackLayout>
@@ -229,7 +229,7 @@
                                 </RelativeLayout>
                             </StackLayout>
                         </StackLayout>
-                        <Button CornerRadius="13" HorizontalOptions="CenterAndExpand" WidthRequest="287" HeightRequest="48" Text="Continue" FontAttributes="Bold" TextColor="White" FontSize="20" BackgroundColor="#FF8500"></Button>
+                        <Button CornerRadius="13" HorizontalOptions="CenterAndExpand" WidthRequest="287" HeightRequest="48" Text="Continue" Clicked="ContinueWithSignUp"  FontAttributes="Bold" TextColor="White" FontSize="20" BackgroundColor="#FF8500"></Button>
                     </StackLayout>
                 </ScrollView>
             </StackLayout>
