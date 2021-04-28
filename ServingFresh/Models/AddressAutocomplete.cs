@@ -5,6 +5,8 @@ namespace ServingFresh.Models
 {
     public class AddressAutocomplete
     {
+        public string PredictionID { get; set; }
+
         public string Address { get; set; }
 
         public string Street { get; set; }

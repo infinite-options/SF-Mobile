@@ -28,6 +28,17 @@ namespace ServingFresh.Views
             build.Text = "Running App build: " + buildStr;
         }
 
+        public string GetAppVersion()
+        {
+            string versionStr = "";
+            string buildStr = "";
+
+            versionStr = DependencyService.Get<IAppVersionAndBuild>().GetVersionNumber();
+            buildStr = DependencyService.Get<IAppVersionAndBuild>().GetBuildNumber();
+
+            return versionStr + ", " + buildStr;
+        }
+
         void ShowMenuFromInfo(System.Object sender, System.EventArgs e)
         {
             var height = new GridLength(0);

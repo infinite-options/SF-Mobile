@@ -218,7 +218,7 @@ namespace ServingFresh.Views
             InitializeComponent();
             _ = VerifyUserCredentials(accessToken, refreshToken, googleCredentials, appleCredentials, platform);
             _ = SetFavoritesList();
-            _ = CheckVersion();
+            //_ = CheckVersion();
         }
 
         public SelectionPage()
@@ -390,7 +390,7 @@ namespace ServingFresh.Views
                                         user.setUserLongitude(userProfile.result[0].customer_long);
 
                                         SetMenu(guestMenuSection, customerMenuSection, historyLabel, profileLabel);
-
+                                        GetBusinesses();
                                         if (Device.RuntimePlatform == Device.iOS)
                                         {
                                             deviceId = Preferences.Get("guid", null);
@@ -510,6 +510,8 @@ namespace ServingFresh.Views
             var client = new HttpClient();
             var response = await client.GetAsync(Constant.ProduceByLocation + userLong + "," + userLat);
             var result = await response.Content.ReadAsStringAsync();
+
+            Debug.WriteLine("URL: " + Constant.ProduceByLocation + userLong + "," + userLat);
 
             Debug.WriteLine("CALL TO ENDPOINT SUCCESSFULL?: " + response.IsSuccessStatusCode);
             Debug.WriteLine("JSON RETURNED: " + result);
@@ -788,7 +790,7 @@ namespace ServingFresh.Views
 
                         //GetData(data.result);
 
-                        GetDataForSingleList(data.result);
+                        GetDataForSingleList(data.result, data.types);
                         //GetDataForVegetables(vegetableDoubleList);
                         //GetDataForFruits(fruitDoubleList);
                         //GetDataForOthers(otherDoubleList);
@@ -1059,7 +1061,7 @@ namespace ServingFresh.Views
             }
         }
 
-        private void GetDataForSingleList(IList<Items> listOfItems)
+        private void GetDataForSingleList(IList<Items> listOfItems, IList<string> types)
         {
             try
             {
@@ -1135,55 +1137,34 @@ namespace ServingFresh.Views
                     listOfItems = listUniqueItems;
 
                     vegetablesList.Clear();
-                    foreach (Items produce in listOfItems)
+                    int j = 0;
+                    foreach (string type in types)
                     {
-                        if (produce.taxable == null || produce.taxable == "NULL")
+                        if(j == 0)
                         {
-                            produce.taxable = "FALSE";
+                            vegetablesList = SetItemList(listOfItems, type);
+                            //vegetablesListView.IsVisible = true;
+                            category1.Text = type;
                         }
-
-                        var itemToInsert = new SingleItem()
+                        else if (j == 1)
                         {
-                            itemType = produce.item_type,
-                            itemImage = produce.item_photo,
-                            itemFavoriteImage = "unselectedHeartIcon.png",
-                            itemUID = produce.item_uid,
-                            itemBusinessUID = produce.itm_business_uid,
-                            itemName = produce.item_name,
-                            itemPrice = "$ " + produce.item_price.ToString(),
-                            itemPriceWithUnit = "$ " + produce.item_price.ToString("N2") + " / " + (string)produce.item_unit.ToString(),
-                            itemUnit = (string)produce.item_unit.ToString(),
-                            itemDescription = produce.item_desc,
-                            itemTaxable = produce.taxable,
-                            itemQuantity = 0,
-                            itemBusinessPrice = produce.business_price,
-                            itemBackgroundColor = Color.FromHex("#FFFFFF"),
-                            itemOpacity = 1,
-                            isItemVisiable = true,
-                            isItemEnable = true,
-                            isItemUnavailable = false,
-                        };
-
-                        if (produce.item_type == "vegetable")
-                        {
-                            vegetablesList.Add(itemToInsert);
-                            vegetableDoubleList.Add(produce);
+                            fruitsList = SetItemList(listOfItems, type);
+                            //fruitsListView.IsVisible = true;
+                            category2.Text = type;
                         }
-                        else if (produce.item_type == "fruit")
+                        else if (j == 2)
                         {
-                            fruitsList.Add(itemToInsert);
-                            fruitDoubleList.Add(produce);
+                            othersList = SetItemList(listOfItems, type);
+                            //othersListView.IsVisible = true;
+                            category3.Text = type;
                         }
-                        else if (produce.item_type == "dessert")
+                        else if (j == 3)
                         {
-                            dessertsList.Add(itemToInsert);
-                            dessetDoubleList.Add(produce);
+                            dessertsList = SetItemList(listOfItems, type);
+                            //dessertsListView.IsVisible = true;
+                            category4.Text = type;
                         }
-                        else
-                        {
-                            othersList.Add(itemToInsert);
-                            otherDoubleList.Add(produce);
-                        }
+                        j++;
                     }
                 }
 
@@ -1197,6 +1178,46 @@ namespace ServingFresh.Views
             {
                 Debug.WriteLine(ex.Message);
             }
+        }
+
+        public ObservableCollection<SingleItem> SetItemList(IList<Items> listOfItems, string type)
+        {
+            var list = new ObservableCollection<SingleItem>();
+            foreach (Items produce in listOfItems)
+            {
+                if (produce.taxable == null || produce.taxable == "NULL")
+                {
+                    produce.taxable = "FALSE";
+                }
+
+                var itemToInsert = new SingleItem()
+                {
+                    itemType = produce.item_type,
+                    itemImage = produce.item_photo,
+                    itemFavoriteImage = "unselectedHeartIcon.png",
+                    itemUID = produce.item_uid,
+                    itemBusinessUID = produce.itm_business_uid,
+                    itemName = produce.item_name,
+                    itemPrice = "$ " + produce.item_price.ToString(),
+                    itemPriceWithUnit = "$ " + produce.item_price.ToString("N2") + " / " + (string)produce.item_unit.ToString(),
+                    itemUnit = (string)produce.item_unit.ToString(),
+                    itemDescription = produce.item_desc,
+                    itemTaxable = produce.taxable,
+                    itemQuantity = 0,
+                    itemBusinessPrice = produce.business_price,
+                    itemBackgroundColor = Color.FromHex("#FFFFFF"),
+                    itemOpacity = 1,
+                    isItemVisiable = true,
+                    isItemEnable = true,
+                    isItemUnavailable = false,
+                };
+
+                if (produce.item_type == type)
+                {
+                    list.Add(itemToInsert);
+                }
+            }
+            return list;
         }
 
         public bool isAmountItemsEven(int num)

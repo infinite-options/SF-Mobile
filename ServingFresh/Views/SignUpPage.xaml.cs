@@ -666,6 +666,10 @@ namespace ServingFresh.Views
                 {
                     userID = parsedData.result.customer_uid;
                 }
+                else
+                {
+                    userID = "USER ALREADY EXIST";
+                }
             }
             
             return userID;

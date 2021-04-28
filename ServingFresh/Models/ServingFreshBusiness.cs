@@ -181,5 +181,6 @@ namespace ServingFresh.Models
         public IList<Items> result { get; set; }
         public string sql { get; set; }
         public IList<Business> business_details { get; set; }
+        public IList<string> types { get; set; }
     }
 }

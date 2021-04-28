@@ -20,6 +20,7 @@ using Acr.UserDialogs;
 using static ServingFresh.Views.SelectionPage;
 using static ServingFresh.Views.SignUpPage;
 using Xamarin.Auth;
+using ServingFresh.LogIn.Classes;
 
 namespace ServingFresh.Views
 {
@@ -151,7 +152,11 @@ namespace ServingFresh.Views
                 }
                 else
                 {
-                    DeliveryAddress1.Text = purchase.getPurchaseAddress();
+                    purchase.setPurchaseAddress(user.getUserAddress());
+                    purchase.setPurchaseCity(user.getUserCity());
+                    purchase.setPurchaseState(user.getUserState());
+                    purchase.setPurchaseZipcode(user.getUserZipcode());
+                    DeliveryAddress1.Text = purchase.getPurchaseAddress() + ",";
                     DeliveryAddress2.Text = purchase.getPurchaseCity() + ", " + purchase.getPurchaseState() + ", " + purchase.getPurchaseZipcode();
                     guestAddressInfoView.HeightRequest = 0;
                     guestPaymentsView.HeightRequest = 0;
@@ -189,7 +194,7 @@ namespace ServingFresh.Views
             }
         }
 
-        public async Task<string> GetDeliveryInstructions(User user)
+        public async Task<string> GetDeliveryInstructions(Models.User user)
         {
 
             var result = "";
@@ -258,7 +263,7 @@ namespace ServingFresh.Views
             }
         }
 
-        public async void GetAvailiableCoupons(User user)
+        public async void GetAvailiableCoupons(Models.User user)
         {
             var client = new System.Net.Http.HttpClient();
             var email = user.getUserEmail();
@@ -1002,45 +1007,50 @@ namespace ServingFresh.Views
             addressToValidate = addr.addressSelected(addressList, AddressEntry, addressFrame, newUserUnitNumber, gridAddressView, newUserCity, newUserState, newUserZipcode);
             addressFrame.Margin = new Thickness(0, -75, 0, 0);
             // check if given address is with in zones
-
-            if(addressToValidate != null)
+            var zipcode = await addr.getZipcode(addressToValidate.PredictionID);
+            if (zipcode != null)
             {
-                // ask for unit
-                addressToValidate.Unit = newUserUnitNumber.Text;
+                addressToValidate.ZipCode = zipcode;
 
-                var client = new AddressValidation();
-                var location = await client.ValidateAddress(addressToValidate.Street, addressToValidate.Unit, addressToValidate.City, addressToValidate.State, addressToValidate.ZipCode);
+                if (addressToValidate != null)
+                {
+                    // ask for unit
+                    addressToValidate.Unit = newUserUnitNumber.Text;
 
-                if (location != null)
-                {
-                    var isAddressInZones = await client.isLocationInZones(zone, location.Latitude.ToString(), location.Longitude.ToString());
-                    if(isAddressInZones != "INSIDE CURRENT ZONE" && isAddressInZones != "")
+                    var client = new AddressValidation();
+                    var location = await client.ValidateAddress(addressToValidate.Street, addressToValidate.Unit, addressToValidate.City, addressToValidate.State, addressToValidate.ZipCode);
+
+                    if (location != null)
                     {
-                        // We can continue with payments since we can deliver to this location
-                        await DisplayAlert("Great!", "We are able to deliver to your location! Proceed to payments", "OK");
-                        client.SetPinOnMap(map, location, addressToValidate.Address);
-                        purchase.setPurchaseAddress(addressToValidate.Street);
-                        purchase.setPurchaseUnit(addressToValidate.Unit);
-                        purchase.setPurchaseCity(addressToValidate.City);
-                        purchase.setPurchaseState(addressToValidate.State);
-                        purchase.setPurchaseZipcode(addressToValidate.ZipCode);
-                        purchase.setPurchaseLatitude(location.Latitude.ToString());
-                        purchase.setPurchaseLongitude(location.Longitude.ToString());
+                        var isAddressInZones = await client.isLocationInZones(zone, location.Latitude.ToString(), location.Longitude.ToString());
+                        if (isAddressInZones != "INSIDE CURRENT ZONE" && isAddressInZones != "")
+                        {
+                            // We can continue with payments since we can deliver to this location
+                            await DisplayAlert("Great!", "We are able to deliver to your location! Proceed to payments", "OK");
+                            client.SetPinOnMap(map, location, addressToValidate.Address);
+                            purchase.setPurchaseAddress(addressToValidate.Street);
+                            purchase.setPurchaseUnit(addressToValidate.Unit);
+                            purchase.setPurchaseCity(addressToValidate.City);
+                            purchase.setPurchaseState(addressToValidate.State);
+                            purchase.setPurchaseZipcode(addressToValidate.ZipCode);
+                            purchase.setPurchaseLatitude(location.Latitude.ToString());
+                            purchase.setPurchaseLongitude(location.Longitude.ToString());
+                        }
+                        else if (isAddressInZones != "INSIDE DIFFERENT ZONE" && isAddressInZones != "")
+                        {
+                            // We have to reset cart or send user to store
+                            await DisplayAlert("Great!", "We are able to deliver to your location! However, your new entered address is outside the initial given address.", "OK");
+                        }
+                        else if (isAddressInZones != "OUTSIDE ZONE RANGE" && isAddressInZones != "")
+                        {
+                            // User is outside zones
+                            await DisplayAlert("Sorry", "Unfortunately, we can't deliver to this location.", "OK");
+                        }
                     }
-                    else if(isAddressInZones != "INSIDE DIFFERENT ZONE" && isAddressInZones != "")
+                    else
                     {
-                        // We have to reset cart or send user to store
-                        await DisplayAlert("Great!", "We are able to deliver to your location! However, your new entered address is outside the initial given address.", "OK");
+                        await DisplayAlert("Is your address missing a unit number?", "Please check your address and add unit number if missing", "OK");
                     }
-                    else if (isAddressInZones != "OUTSIDE ZONE RANGE" && isAddressInZones != "")
-                    {
-                        // User is outside zones
-                        await DisplayAlert("Sorry", "Unfortunately, we can't deliver to this location.", "OK");
-                    }
-                }
-                else
-                {
-                    await DisplayAlert("Is your address missing a unit number?", "Please check your address and add unit number if missing", "OK");
                 }
             }
         }
@@ -1118,71 +1128,310 @@ namespace ServingFresh.Views
             }
         }
 
-        public void SignInWithFacebook()
+
+        async void SignInDirectUser(System.Object sender, System.EventArgs e)
         {
-            string clientID = string.Empty;
-            string redirectURL = string.Empty;
-
-            switch (Device.RuntimePlatform)
+            var client = new SignIn();
+            var result = await client.SignInDirectUser(logInButton, userEmailAddress, userPassword);
+            if (result != null)
             {
-                case Device.iOS:
-                    clientID = Constant.FacebookiOSClientID;
-                    redirectURL = Constant.FacebookiOSRedirectUrl;
-                    break;
-                case Device.Android:
-                    clientID = Constant.FacebookAndroidClientID;
-                    redirectURL = Constant.FacebookAndroidRedirectUrl;
-                    break;
+                Debug.WriteLine("You have an acccount");
+
+                user.setUserID(result.getUserID());
+                user.setUserSessionTime(result.getUserSessionTime());
+                user.setUserPlatform(result.getUserPlatform());
+                user.setUserType(result.getUserType());
+                user.setUserEmail(result.getUserEmail());
+                user.setUserFirstName(result.getUserFirstName());
+                user.setUserLastName(result.getUserLastName());
+                user.setUserPhoneNumber(result.getUserPhoneNumber());
+                user.setUserAddress(result.getUserAddress());
+                user.setUserUnit(result.getUserUnit());
+                user.setUserCity(result.getUserCity());
+                user.setUserState(result.getUserState());
+                user.setUserZipcode(result.getUserZipcode());
+                user.setUserLatitude(result.getUserLatitude());
+                user.setUserLongitude(result.getUserLongitude());
+
+                await DisplayAlert("Great!", "You have signed in to your account","OK");
+                Application.Current.MainPage = new CheckoutPage();
             }
+            else
+            {
+                Debug.WriteLine("Not Log In");
+            }
+        }
 
-            var authenticator = new OAuth2Authenticator(clientID, Constant.FacebookScope, new Uri(Constant.FacebookAuthorizeUrl), new Uri(redirectURL), null, false);
+        void SignInWithFacebook(System.Object sender, System.EventArgs e)
+        {
+            var client = new SignIn();
+            var authenticator = client.GetFacebookAuthetication();
             var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
-
-            authenticator.Completed += FacebookAuthenticatorCompleted;
-            authenticator.Error += FacebookAutheticatorError;
-
+            authenticator.Completed += SignInFacebookAuth;
+            authenticator.Error += Authenticator_Error;
             presenter.Login(authenticator);
         }
 
-        public void FacebookAuthenticatorCompleted(object sender, AuthenticatorCompletedEventArgs e)
+        void SignInWithGoogle(System.Object sender, System.EventArgs e)
+        {
+            var client = new SignIn();
+            var authenticator = client.GetGoogleAuthetication();
+            var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
+            AuthenticationState.Authenticator = authenticator;
+            authenticator.Completed += SignInGoogleAuth;
+            authenticator.Error += Authenticator_Error;
+            presenter.Login(authenticator);
+        }
+
+        private async void SignInFacebookAuth(object sender, AuthenticatorCompletedEventArgs e)
         {
             var authenticator = sender as OAuth2Authenticator;
 
             if (authenticator != null)
             {
-                authenticator.Completed -= FacebookAuthenticatorCompleted;
-                authenticator.Error -= FacebookAutheticatorError;
+                authenticator.Completed -= FacebookAuthetication;
+                authenticator.Error -= Authenticator_Error;
             }
 
             if (e.IsAuthenticated)
             {
                 try
                 {
-                    
+                    var clientLogIn = new SignIn();
+                    var facebookUser = clientLogIn.GetFacebookUser(e.Account.Properties["access_token"]);
+                    var result = await clientLogIn.VerifyUserCredentials(facebookUser.email, facebookUser.id,"FACEBOOK");
+                    if(result != null)
+                    {
+                        user.setUserID(result.getUserID());
+                        user.setUserSessionTime(result.getUserSessionTime());
+                        user.setUserPlatform(result.getUserPlatform());
+                        user.setUserType(result.getUserType());
+                        user.setUserEmail(result.getUserEmail());
+                        user.setUserFirstName(result.getUserFirstName());
+                        user.setUserLastName(result.getUserLastName());
+                        user.setUserPhoneNumber(result.getUserPhoneNumber());
+                        user.setUserAddress(result.getUserAddress());
+                        user.setUserUnit(result.getUserUnit());
+                        user.setUserCity(result.getUserCity());
+                        user.setUserState(result.getUserState());
+                        user.setUserZipcode(result.getUserZipcode());
+                        user.setUserLatitude(result.getUserLatitude());
+                        user.setUserLongitude(result.getUserLongitude());
+                        await DisplayAlert("Great!", "You have signed in to your account", "OK");
+                        Application.Current.MainPage = new CheckoutPage();
+                    }
+                    else
+                    {
+                        await DisplayAlert("Oops","We were not able to sign you in. Please sign in witht the correct social medial sign in button","OK");
+                    }
                 }
                 catch (Exception g)
                 {
                     Debug.WriteLine(g.Message);
                 }
             }
-            else
+        }
+
+        private async void SignInGoogleAuth(object sender, AuthenticatorCompletedEventArgs e)
+        {
+            var authenticator = sender as OAuth2Authenticator;
+
+            if (authenticator != null)
             {
-                Application.Current.MainPage = new PrincipalPage();
-                //await DisplayAlert("Error", "Google was not able to autheticate your account", "OK");
+                authenticator.Completed -= GoogleAuthetication;
+                authenticator.Error -= Authenticator_Error;
+            }
+
+            if (e.IsAuthenticated)
+            {
+                try
+                {
+                    var clientLogIn = new SignIn();
+                    var googleUser = await clientLogIn.GetGoogleUser(e);
+                    var result = await clientLogIn.VerifyUserCredentials(googleUser.email, googleUser.id, "GOOGLE");
+                    if (result != null)
+                    {
+                        user.setUserID(result.getUserID());
+                        user.setUserSessionTime(result.getUserSessionTime());
+                        user.setUserPlatform(result.getUserPlatform());
+                        user.setUserType(result.getUserType());
+                        user.setUserEmail(result.getUserEmail());
+                        user.setUserFirstName(result.getUserFirstName());
+                        user.setUserLastName(result.getUserLastName());
+                        user.setUserPhoneNumber(result.getUserPhoneNumber());
+                        user.setUserAddress(result.getUserAddress());
+                        user.setUserUnit(result.getUserUnit());
+                        user.setUserCity(result.getUserCity());
+                        user.setUserState(result.getUserState());
+                        user.setUserZipcode(result.getUserZipcode());
+                        user.setUserLatitude(result.getUserLatitude());
+                        user.setUserLongitude(result.getUserLongitude());
+                        await DisplayAlert("Great!", "You have signed in to your account", "OK");
+                        Application.Current.MainPage = new CheckoutPage();
+
+                    }
+                    else
+                    {
+                        await DisplayAlert("Oops", "We were not able to sign you in. Please sign in witht the correct social medial sign in button", "OK");
+                    }
+                }
+                catch (Exception g)
+                {
+                    Debug.WriteLine(g.Message);
+                }
             }
         }
 
+        async void SignUpDirectUser(System.Object sender, System.EventArgs e)
+        {
+            var client = new PrincipalPage();
 
-        private void FacebookAutheticatorError(object sender, AuthenticatorErrorEventArgs e)
+            if (client.ValidateSignUpInfo(newUserFirstName, newUserLastName, newUserEmail1, newUserEmail2, newUserPassword1, newUserPassword2))
+            {
+                if (client.ValidateEmail(newUserEmail1, newUserEmail2))
+                {
+                    if (client.ValidatePassword(newUserPassword1, newUserPassword2))
+                    {
+                        // user is ready to be sign in.
+                        var clientSignUp = new SignUp();
+                        var content = clientSignUp.SetDirectUser(user, newUserPassword1.Text);
+                        var signUpStatus = await clientSignUp.SignUpNewUser(content);
+
+                        if (signUpStatus != "" && signUpStatus != "USER ALREADY EXIST")
+                        {
+                            user.setUserID(signUpStatus);
+                            user.setUserPlatform("DIRECT");
+                            user.setUserType("CUSTOMER");
+                            clientSignUp.SendUserToCheckoutPage();
+                        }
+                        else if (signUpStatus != "" && signUpStatus == "USER ALREADY EXIST")
+                        {
+                            await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await DisplayAlert("Oops", "Please check that your password is the same in both entries", "OK");
+                        return;
+                    }
+                }
+                else
+                {
+                    await DisplayAlert("Oops", "Please check that your email is the same in both entries", "OK");
+                    return;
+                }
+            }
+            else
+            {
+                await DisplayAlert("Oops", "Please enter all the required information. Thanks!", "OK");
+                return;
+            }
+        }
+
+        void SignUpWithFacebook(System.Object sender, System.EventArgs e)
+        {
+            var client = new SignIn();
+            var authenticator = client.GetFacebookAuthetication();
+            var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
+            authenticator.Completed += FacebookAuthetication;
+            authenticator.Error += Authenticator_Error;
+            presenter.Login(authenticator);
+        }
+
+        void SignUpWithGoogle(System.Object sender, System.EventArgs e)
+        {
+            var client = new SignIn();
+            var authenticator = client.GetGoogleAuthetication();
+            var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
+            AuthenticationState.Authenticator = authenticator;
+            authenticator.Completed += GoogleAuthetication;
+            authenticator.Error += Authenticator_Error;
+            presenter.Login(authenticator);
+        }
+
+        private async void FacebookAuthetication(object sender, Xamarin.Auth.AuthenticatorCompletedEventArgs e)
         {
             var authenticator = sender as OAuth2Authenticator;
+
             if (authenticator != null)
             {
-                authenticator.Completed -= FacebookAuthenticatorCompleted;
-                authenticator.Error -= FacebookAutheticatorError;
+                authenticator.Completed -= FacebookAuthetication;
+                authenticator.Error -= Authenticator_Error;
             }
-            Application.Current.MainPage = new PrincipalPage();
-            //await DisplayAlert("Authentication error: ", e.Message, "OK");
+
+            if (e.IsAuthenticated)
+            {
+                try
+                {
+                    var clientLogIn = new SignIn();
+                    var clientSignUp = new SignUp();
+
+                    var facebookUser = clientLogIn.GetFacebookUser(e.Account.Properties["access_token"]);
+                    var content = clientSignUp.SetDirectUser(user, e.Account.Properties["access_token"], "", facebookUser.id, facebookUser.email, "FACEBOOK");
+                    var signUpStatus = await clientSignUp.SignUpNewUser(content);
+
+                    if (signUpStatus != "" && signUpStatus != "USER ALREADY EXIST")
+                    {
+                        user.setUserID(signUpStatus);
+                        user.setUserPlatform("FACEBOOK");
+                        user.setUserType("CUSTOMER");
+                        clientSignUp.SendUserToCheckoutPage();
+                    }
+                    else if (signUpStatus != "" && signUpStatus == "USER ALREADY EXIST")
+                    {
+                        await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
+                    }
+                }
+                catch (Exception g)
+                {
+                    Debug.WriteLine(g.Message);
+                }
+            }
+        }
+
+        private async void GoogleAuthetication(object sender, AuthenticatorCompletedEventArgs e)
+        {
+            var authenticator = sender as OAuth2Authenticator;
+
+            if (authenticator != null)
+            {
+                authenticator.Completed -= GoogleAuthetication;
+                authenticator.Error -= Authenticator_Error;
+            }
+
+            if (e.IsAuthenticated)
+            {
+                try
+                {
+                    var clientLogIn = new SignIn();
+                    var clientSignUp = new SignUp();
+
+                    var googleUser = await clientLogIn.GetGoogleUser(e);
+                    var content = clientSignUp.SetDirectUser(user, e.Account.Properties["access_token"], e.Account.Properties["refresh_token"], googleUser.id, googleUser.email, "GOOGLE");
+                    var signUpStatus = await clientSignUp.SignUpNewUser(content);
+
+                    if (signUpStatus != "" && signUpStatus != "USER ALREADY EXIST")
+                    {
+                        user.setUserID(signUpStatus);
+                        user.setUserPlatform("GOOGLE");
+                        user.setUserType("CUSTOMER");
+                        clientSignUp.SendUserToCheckoutPage();
+                    }
+                    else if (signUpStatus != "" && signUpStatus == "USER ALREADY EXIST")
+                    {
+                        await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
+                    }
+                }
+                catch (Exception g)
+                {
+                    Debug.WriteLine(g.Message);
+                }
+            }
+        }
+
+        private async void Authenticator_Error(object sender, Xamarin.Auth.AuthenticatorErrorEventArgs e)
+        {
+            await DisplayAlert("An error occur when authenticating", "Please try again", "OK");
         }
     }
 }

@@ -53,11 +53,11 @@
                         <Entry Margin="70,0,70,0" x:Name="zipcodeEntry" Placeholder="Enter Zip Code" FontSize="14" PlaceholderColor="Gray"  HorizontalTextAlignment="Center"></Entry>-->
                         <Button Margin="50,10,50,0" HeightRequest="40" TextColor="white" Text="Find Local Produce" FontSize="Medium"  BackgroundColor="#136D74" Clicked="FindLocalProduceBaseOnLocation"></Button>
                         <Frame Margin="0,-65,0,0" Padding="2" HorizontalOptions="CenterAndExpand" CornerRadius="5" x:Name="addressFrame" IsVisible="false">
-                            <ListView x:Name="addressList" IsVisible="false" HorizontalOptions="CenterAndExpand" WidthRequest="250" HeightRequest="100"  ItemsSource="{Binding Addresses}" ItemSelected="addressSelected">
+                            <ListView x:Name="addressList" IsVisible="false" HorizontalOptions="CenterAndExpand" WidthRequest="250" HeightRequest="100" ItemSelected="addressSelected">
                                 <ListView.ItemTemplate>
                                     <DataTemplate>
                                         <ViewCell>
-                                                <Label Text="{Binding Address}" FontSize="12" TextColor="Black"/>
+                                                <Label Text="{Binding Street}" FontSize="12" TextColor="Black"/>
                                         </ViewCell>
                                     </DataTemplate>
                                 </ListView.ItemTemplate>
@@ -203,28 +203,39 @@
                 <ScrollView Margin="0,0,0,250" HorizontalScrollBarVisibility="Always">
                     <StackLayout>
                         <StackLayout Spacing="10" Margin="0,0,0,20">
-                            <Entry WidthRequest="390" HeightRequest="44" Placeholder="First name (so we can address you)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
-                            <Entry WidthRequest="372" HeightRequest="44" Placeholder="Last name (in case you want to be formal)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
-                            <Entry WidthRequest="372" HeightRequest="44" Keyboard="Email" Placeholder="Email address (for order confirmation)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
-                            <Entry WidthRequest="372" HeightRequest="44" Keyboard="Numeric" Placeholder="Phone number (so we can call if there is an issue)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
-                            <StackLayout HeightRequest="150">
+                            <Entry WidthRequest="390" HeightRequest="44" x:Name="signUpFirstName" Placeholder="First name (so we can address you)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                            <Entry WidthRequest="372" HeightRequest="44" x:Name="signUpLastName" Placeholder="Last name (in case you want to be formal)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                            <Entry WidthRequest="372" HeightRequest="44" x:Name="signUpEmail" Keyboard="Email" Placeholder="Email address (for order confirmation)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                            <Entry WidthRequest="372" HeightRequest="44" x:Name="signUpPhone" Keyboard="Numeric" Placeholder="Phone number (so we can call if there is an issue)" MaxLength="10" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                            <StackLayout HeightRequest="140">
                                 <RelativeLayout
                                     RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
                                     RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
                                     <StackLayout
                                          RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
                                          RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
-                                         <Entry WidthRequest="372" HeightRequest="44" Placeholder="Address 1" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
-                                         <StackLayout  >
+                                         <Entry x:Name="signUpAddress1Entry" HeightRequest="44" FontSize="16" Placeholder="Address 1" PlaceholderColor="Gray"  Keyboard="Text" TextColor="#6D7278" Text="{Binding AddressText}" TextChanged="signUpAddress1Entry_TextChanged" Focused="signUpAddress1Entry_Focused" Unfocused="signUpAddress1Entry_Unfocused"/>
+                                         <StackLayout >
                                              <Grid HeightRequest="44">
-                                                 <Entry Grid.Column="0" Placeholder="Unit" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
-                                                 <Entry Grid.Column="1" Placeholder="City" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                                                 <Entry Grid.Column="0" x:Name="signUpAddress2Entry" Placeholder="Unit" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                                                 <Entry Grid.Column="1" x:Name="signUpCityEntry" Placeholder="City" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
                                              </Grid>
                                              <Grid HeightRequest="44">
-                                                 <Entry Grid.Column="0" Placeholder="State" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
-                                                 <Entry Grid.Column="1" Placeholder="Zip Code" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                                                 <Entry Grid.Column="0" x:Name="signUpStateEntry" Placeholder="State" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                                                 <Entry Grid.Column="1" x:Name="signUpZipcodeEntry" Placeholder="Zip Code" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
                                              </Grid>
                                          </StackLayout>
+                                        <Frame Margin="0,-88,0,0" Padding="2" HorizontalOptions="CenterAndExpand" CornerRadius="5" x:Name="signUpAddressFrame" IsVisible="false">
+                                            <ListView x:Name="SignUpAddressList" IsVisible="false"  HeightRequest="100"  ItemsSource="{Binding Addresses}" ItemSelected="SignUpAddressList_ItemSelected">
+                                                <ListView.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <ViewCell>
+                                                                <Label Text="{Binding Address}" FontSize="12" TextColor="Black"/>
+                                                        </ViewCell>
+                                                    </DataTemplate>
+                                                </ListView.ItemTemplate>
+                                            </ListView>
+                                        </Frame>
                                     </StackLayout>
                                 </RelativeLayout>
                             </StackLayout>
@@ -244,29 +255,29 @@
                     <StackLayout>
                         <StackLayout Margin="0,0,0,13">
                             <Grid>
-                                <Button CornerRadius="13" HorizontalOptions="CenterAndExpand" WidthRequest="241" HeightRequest="52" Padding="25,0,0,0" Text="Sign up with Apple" TextColor="White" FontSize="16" BackgroundColor="#466DED"></Button>
+                                <Button CornerRadius="13"  HorizontalOptions="CenterAndExpand" WidthRequest="241" HeightRequest="52" Padding="25,0,0,0" Text="Sign up with Apple" TextColor="White" FontSize="16" BackgroundColor="#466DED"></Button>
                                 <Image Margin="55,0,0,0" Source="appleWhiteIcon.png" HorizontalOptions="Start"></Image>
                             </Grid>
                             <Grid>
-                                <Button CornerRadius="13" HorizontalOptions="CenterAndExpand" WidthRequest="241" HeightRequest="52" Padding="50,0,0,0" Text="Sign up with Facebook" TextColor="White" FontSize="16" BackgroundColor="#485A95"></Button>
+                                <Button CornerRadius="13" Clicked="ContinueWithFacebook" HorizontalOptions="CenterAndExpand" WidthRequest="241" HeightRequest="52" Padding="50,0,0,0" Text="Sign up with Facebook" TextColor="White" FontSize="16" BackgroundColor="#485A95"></Button>
                                 <Image Margin="55,0,0,0" Source="facebookWhiteIcon.png" HorizontalOptions="Start"></Image>
                             </Grid>
                             <Grid>
-                                <Button CornerRadius="13" HorizontalOptions="CenterAndExpand" WidthRequest="241" HeightRequest="52" Padding="27,0,0,0" Text="Sign up with Google" TextColor="White" FontSize="16" BackgroundColor="#5C83F0"></Button>
+                                <Button CornerRadius="13" Clicked="ContinueWithGoogle" HorizontalOptions="CenterAndExpand" WidthRequest="241" HeightRequest="52" Padding="27,0,0,0" Text="Sign up with Google" TextColor="White" FontSize="16" BackgroundColor="#5C83F0"></Button>
                                 <Image Margin="55,0,0,0" Source="googleWhiteIcon.png" HorizontalOptions="Start"></Image>
                             </Grid>
                         </StackLayout>
                         <BoxView Margin="0,0,0,13" HeightRequest="1" Color="#136D74"></BoxView>
                         <Label Margin="0,0,0,13" Text="Or continue with email" TextColor="Black" FontSize="19" HorizontalTextAlignment="Center" ></Label>
                         <StackLayout Spacing="10" Margin="0,0,0,20">
-                            <Entry WidthRequest="372" HeightRequest="44" Placeholder="First name (so we can address you)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
-                            <Entry WidthRequest="372" HeightRequest="44" Placeholder="Last name (in case you want to be formal)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
-                            <Entry WidthRequest="372" HeightRequest="44" Placeholder="Email address (for order confirmation)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
-                            <Entry WidthRequest="372" HeightRequest="44" Placeholder="Confirm Email address" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
-                            <Entry WidthRequest="372" HeightRequest="44" Placeholder="Create Password" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
-                            <Entry WidthRequest="372" HeightRequest="44" Placeholder="Confirm Password" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                            <Entry WidthRequest="372" HeightRequest="44" x:Name="newUserFirstName" Placeholder="First name (so we can address you)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                            <Entry WidthRequest="372" HeightRequest="44" x:Name="newUserLastName" Placeholder="Last name (in case you want to be formal)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                            <Entry WidthRequest="372" HeightRequest="44" Keyboard="Email" x:Name="newUserEmail1" Placeholder="Email address (for order confirmation)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                            <Entry WidthRequest="372" HeightRequest="44" Keyboard="Email" x:Name="newUserEmail2" Placeholder="Confirm Email address" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                            <Entry WidthRequest="372" HeightRequest="44" Keyboard="Email" x:Name="newUserPassword1" Placeholder="Create Password" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                            <Entry WidthRequest="372" HeightRequest="44" Keyboard="Email" x:Name="newUserPassword2" Placeholder="Confirm Password" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
                         </StackLayout>
-                        <Button CornerRadius="13" HorizontalOptions="CenterAndExpand" WidthRequest="287" HeightRequest="48" Text="Sign Up" Clicked="SignUpUserFromPrincipal" FontAttributes="Bold" TextColor="White" FontSize="20" BackgroundColor="#FF8500"></Button>
+                        <Button CornerRadius="13" HorizontalOptions="CenterAndExpand" WidthRequest="287" HeightRequest="48" Text="Sign Up" Clicked="SignUpDirectUserFromPrincipal" FontAttributes="Bold" TextColor="White" FontSize="20" BackgroundColor="#FF8500"></Button>
                     </StackLayout>
                 </ScrollView>
             </StackLayout>

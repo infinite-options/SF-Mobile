@@ -62,6 +62,55 @@ namespace ServingFresh.Models
             return result;
         }
 
+        public string ValidateAddressString(string address, string unit, string city, string state, string zipcode)
+        {
+            string result = null;
+
+            // Setting request for USPS API
+            XDocument requestDoc = new XDocument(
+                new XElement("AddressValidateRequest",
+                new XAttribute("USERID", "400INFIN1745"),
+                new XElement("Revision", "1"),
+                new XElement("Address",
+                new XAttribute("ID", "0"),
+                new XElement("Address1", address),
+                new XElement("Address2", unit),
+                new XElement("City", city),
+                new XElement("State", state),
+                new XElement("Zip5", zipcode),
+                new XElement("Zip4", "")
+                     )
+                 )
+             );
+
+            // This endpoint needs to change
+            var url = "http://production.shippingapis.com/ShippingAPI.dll?API=Verify&XML=" + requestDoc;
+            var client = new WebClient();
+            var response = client.DownloadString(url);
+            var xdoc = XDocument.Parse(response.ToString());
+            Debug.WriteLine("RESULT FROM USPS: " + xdoc);
+            foreach (XElement element in xdoc.Descendants("Address"))
+            {
+                if (GetXMLElement(element, "Error").Equals(""))
+                {
+                    if (GetXMLElement(element, "DPVConfirmation").Equals("Y") && GetXMLElement(element, "Zip5").Equals(zipcode) && GetXMLElement(element, "City").Equals(city.ToUpper()))
+                    {
+                        result = "Y";
+                    }else if (GetXMLElement(element, "DPVConfirmation").Equals("D") && GetXMLElement(element, "Zip5").Equals(zipcode) && GetXMLElement(element, "City").Equals(city.ToUpper()))
+                    {
+                        result = "D";
+                    }
+                    else if (GetXMLElement(element, "DPVConfirmation").Equals("S") && GetXMLElement(element, "Zip5").Equals(zipcode) && GetXMLElement(element, "City").Equals(city.ToUpper()))
+                    {
+                        result = "S";
+                    }
+                }
+            }
+
+            return result;
+        }
+
+
         public async Task<Location> ConvertAddressToGeoCoordiantes(string address, string city, string state)
         {
             Location result = null;

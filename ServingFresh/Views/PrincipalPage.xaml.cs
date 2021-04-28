@@ -8,6 +8,8 @@ using static ServingFresh.Views.SignUpPage;
 using ServingFresh.Models;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
+using Xamarin.Auth;
+using ServingFresh.LogIn.Classes;
 
 namespace ServingFresh.Views
 {
@@ -73,109 +75,45 @@ namespace ServingFresh.Views
         {
             if (AddressEntry.Text != null)
             {
-                if (AddressEntry.Text != null)
+                var client = new AddressValidation();
+                var addressStatus = client.ValidateAddressString(addressToValidate.Street, addressToValidate.Unit, addressToValidate.City, addressToValidate.State, addressToValidate.ZipCode);
+
+                if (addressStatus != null)
                 {
-                    var needToEnterUnit = await DisplayAlert("Do you have a unit number in your address?", "Your answer will help us validate your delivery address. Thank you!", "Yes", "No");
-                    if (needToEnterUnit)
+                    if (addressStatus == "Y" || addressStatus == "S")
                     {
-                        var unit = await DisplayPromptAsync("Enter you unit!", "", "Continue", "Cancel");
-                        
-                        if (unit != "")
-                        {
-                            // validate complete address with all the input required
-                            Debug.WriteLine("RESULT FROM PROMPT " + unit);
-                            addressToValidate.Unit = unit;
-                            var client = new AddressValidation();
-                            Debug.WriteLine("INPUTS TO VALIDATE ADDRESS METHOD: STREET: {0}, UNIT: {1}, CITY: {2}, STATE {3}, ZIPCODE: {4}", addressToValidate.Street, addressToValidate.Unit, addressToValidate.City, addressToValidate.State, addressToValidate.ZipCode);
-                            var location = await client.ValidateAddress(addressToValidate.Street, addressToValidate.Unit, addressToValidate.City, addressToValidate.State, addressToValidate.ZipCode);
-                            if(location != null)
-                            {
-                                var zone = await client.getZoneFromLocation(location.Latitude.ToString(), location.Longitude.ToString());
-                                Debug.WriteLine("RESULT FROM GET ZONE FROM LOCATION: " + zone);
-                                if(zone != "OUTSIDE ZONE RANGE" && zone != "")
-                                {
-                                    SetUser(location);
-                                    // may need to add the give data
-                                }
-                                else
-                                {
-                                    await DisplayAlert("Sorry, your address seems to be outside our supported areas", "Please share with us your interest at pmarathay@gmail.com and we will send you an email as soon as we start serving your area", "OK");
-                                    return;
-                                }
-                            }
-                            else
-                            {
-                                await DisplayAlert("We can't delivery to this address", "Unfortunately, we can't delivery to this address because our algorithm can't verify it. Try a new address", "OK");
-                                return;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        addressToValidate.Unit = "";
-                        var client = new AddressValidation();
-                        var location = await client.ValidateAddress(addressToValidate.Street, addressToValidate.Unit, addressToValidate.City, addressToValidate.State, addressToValidate.ZipCode);
+
+                        var location = await client.ConvertAddressToGeoCoordiantes(addressToValidate.Street, addressToValidate.City, addressToValidate.State);
                         if (location != null)
                         {
-                            var zone = await client.getZoneFromLocation(location.Latitude.ToString(), location.Longitude.ToString());
-                            Debug.WriteLine("RESULT FROM GET ZONE FROM LOCATION: " + zone);
-                            if (zone != "OUTSIDE ZONE RANGE" && zone != "")
+                            var isAddressInZones = await client.getZoneFromLocation(location.Latitude.ToString(), location.Longitude.ToString());
+
+                            if (isAddressInZones != "" && isAddressInZones != "OUTSIDE ZONE RANGE")
                             {
                                 SetUser(location);
-                                // may need to add the give data
                             }
                             else
                             {
-                                await DisplayAlert("Sorry, your address seems to be outside our supported areas", "Please share with us your interest at pmarathay@gmail.com and we will send you an email as soon as we start serving your area", "OK");
+                                await DisplayAlert("Oops", "You address is outside our delivery areas", "OK");
                                 return;
                             }
                         }
                         else
                         {
-                            await DisplayAlert("We can't delivery to this address", "Unfortunately, we can't delivery to this address because our algorithm can't verify it. Try a new address", "OK");
+                            await DisplayAlert("We were not able to find your location in our system.", "Try again", "OK");
                             return;
                         }
+
                     }
-                }
-                else
-                {
-                    var client = new AddressValidation();
-                    var tempListView = new ListView();
-                    var tempCollection = new ObservableCollection<AddressAutocomplete>();
-
-                    //if(zipcodeEntry.Text != null)
-                    //{
-                    //    await addr.GetPlacesPredictionsAsync(tempListView, tempCollection, zipcodeEntry.Text);
-
-                    //    if(tempCollection.Count != 0)
-                    //    {
-                    //        Debug.WriteLine("INPUT FROM ZIPCODE: " + tempCollection[0].Address);
-                    //        var location = await client.ConvertAddressToGeoCoordiantes(tempCollection[0].Address);
-                            
-                    //        //Debug.WriteLine("ZIPCODE: ADDRESS {0}, CITY {0}, STATE {0}", tempCollection[0].Address, tempCollection[0].City, tempCollection[0].State);
-                    //        //Debug.WriteLine("ZIPCODE: LATITUDE {0}, LONGITUDE {0}", location.Latitude, location.Longitude);
-                    //        if (location != null)
-                    //        {
-                    //            var zone = await client.getZoneFromLocation(location.Latitude.ToString(), location.Longitude.ToString());
-                    //            if (zone != "OUTSIDE ZONE RANGE" && zone != "")
-                    //            {
-                    //                SetUser(location);
-                    //                // may need to add the give data
-                    //            }
-                    //            else
-                    //            {
-                    //                await DisplayAlert("Sorry, your address seems to be outside our supported areas", "Please share with us your interest at pmarathay@gmail.com and we will send you an email as soon as we start serving your area", "OK");
-                    //                return;
-                    //            }
-                    //        }
-                           
-                    //    }
-                    //    else
-                    //    {
-                    //        await DisplayAlert("We can't delivery to this address", "Unfortunately, we can't delivery to this address because our algorithm can't verify it. Try a new address", "OK");
-                    //        return;
-                    //    }
-                    //}
+                    else if (addressStatus == "D")
+                    {
+                        var unit = await DisplayPromptAsync("It looks like your address is missing its unit number", "Please enter your address unit number in the space below", "OK","Cancel");
+                        if(unit != null)
+                        {
+                            addressToValidate.Unit = unit;
+                        }
+                        return;
+                    }
                 }
             }
             else
@@ -245,14 +183,12 @@ namespace ServingFresh.Views
             addressFrameSignUp.Margin = new Thickness(5, -this.Height + 400, 5, 0);
         }
 
-        public async Task GetPlacesPredictionsAsync()
+        async void OnAddressChanged(object sender, EventArgs eventArgs)
         {
-            await addr.GetPlacesPredictionsAsync(addressList, Addresses, AddressEntry.Text);
-        }
+            //var newList = new ObservableCollection<AddressAutocomplete>();
 
-        void OnAddressChanged(object sender, EventArgs eventArgs)
-        {
-            addr.OnAddressChanged(addressList, Addresses, AddressEntry.Text);
+            //addr.OnAddressChanged(addressList, AddressEntry.Text);
+            addressList.ItemsSource = await addr.GetPlacesPredictionsAsync(AddressEntry.Text);
         }
 
         void addressEntryFocused(object sender, EventArgs eventArgs)
@@ -265,9 +201,15 @@ namespace ServingFresh.Views
             addr.addressEntryUnfocused(addressList, addressFrame);
         }
 
-        void addressSelected(System.Object sender, SelectedItemChangedEventArgs e)
+        async void addressSelected(System.Object sender, SelectedItemChangedEventArgs e)
         {
+            
             addressToValidate = addr.addressSelected(addressList, AddressEntry, addressFrame);
+            string zipcode = await addr.getZipcode(addressToValidate.PredictionID);
+            if( zipcode != null)
+            {
+                addressToValidate.ZipCode = zipcode;
+            }
         }
 
         async void SignInDirectUser(System.Object sender, System.EventArgs e)
@@ -301,7 +243,6 @@ namespace ServingFresh.Views
                 Debug.WriteLine("Not Log In");
             }
         }
-
 
         void HideLogInUI(System.Object sender, System.EventArgs e)
         {
@@ -347,23 +288,315 @@ namespace ServingFresh.Views
             var client = new SignIn();
         }
 
-        void SignUpUserFromPrincipal(System.Object sender, System.EventArgs e)
+        async void SignUpDirectUserFromPrincipal(System.Object sender, System.EventArgs e)
         {
+            if (ValidateSignUpInfo(newUserFirstName, newUserLastName, newUserEmail1, newUserEmail2, newUserPassword1, newUserPassword2))
+            {
+                if(ValidateEmail(newUserEmail1, newUserEmail2))
+                {
+                    if(ValidatePassword(newUserPassword1, newUserPassword2))
+                    {
+                        // user is ready to be sign in.
+                        var client = new SignUp();
+                        var content = client.SetDirectUser(user, newUserPassword1.Text);
+                        var signUpStatus = await client.SignUpNewUser(content);
 
+                        if(signUpStatus != "" && signUpStatus != "USER ALREADY EXIST")
+                        {
+                            user.setUserID(signUpStatus);
+                            user.setUserPlatform("DIRECT");
+                            user.setUserType("CUSTOMER");
+                            client.SendUserToSelectionPage();
+                        }
+                        else if (signUpStatus != "" && signUpStatus == "USER ALREADY EXIST")
+                        {
+                            await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await DisplayAlert("Oops", "Please check that your password is the same in both entries", "OK");
+                        return;
+                    }
+                }
+                else
+                {
+                    await DisplayAlert("Oops", "Please check that your email is the same in both entries", "OK");
+                    return;
+                }
+            }
+            else
+            {
+                await DisplayAlert("Oops", "Please enter all the required information. Thanks!", "OK");
+                return;
+            }
         }
 
-        void ContinueWithSignUp(System.Object sender, System.EventArgs e)
+        async void ContinueWithSignUp(System.Object sender, System.EventArgs e)
         {
-            addressRow.Height = 0;
-            addressFrameSignUp.Margin = new Thickness(5, 0, 5, 0);
-            signUpRow.Height = this.Height - 200;
-            signUpFrame.Margin = new Thickness(5, -this.Height + 400, 5, 0);
+
+            if (ValidateSignUpInfo(signUpFirstName, signUpLastName, signUpEmail, signUpPhone, signUpAddress1Entry, signUpCityEntry, signUpStateEntry, signUpZipcodeEntry))
+            {
+                //try to validate address if address doesn't return true ask to enter unit number and try again
+                var client = new AddressValidation();
+                var addressStatus = client.ValidateAddressString(signUpAddress1Entry.Text, signUpAddress2Entry.Text, signUpCityEntry.Text, signUpStateEntry.Text, signUpZipcodeEntry.Text);
+
+                if(addressStatus != null)
+                {
+                    if(addressStatus == "Y" || addressStatus == "S")
+                    {
+
+                        var location = await client.ConvertAddressToGeoCoordiantes(signUpAddress1Entry.Text, signUpCityEntry.Text, signUpStateEntry.Text);
+                        if(location != null)
+                        {
+                            var isAddressInZones = await client.getZoneFromLocation(location.Latitude.ToString(), location.Longitude.ToString());
+
+                            if (isAddressInZones != "" && isAddressInZones != "OUTSIDE ZONE RANGE")
+                            {
+                                addressRow.Height = 0;
+                                addressFrameSignUp.Margin = new Thickness(5, 0, 5, 0);
+                                signUpRow.Height = this.Height - 200;
+                                signUpFrame.Margin = new Thickness(5, -this.Height + 400, 5, 0);
+
+                                user.setUserFirstName(signUpFirstName.Text);
+                                user.setUserLastName(signUpLastName.Text);
+                                user.setUserEmail(signUpEmail.Text);
+                                user.setUserPhoneNumber(signUpPhone.Text);
+                                user.setUserAddress(signUpAddress1Entry.Text);
+                                user.setUserUnit(signUpAddress2Entry.Text);
+                                user.setUserCity(signUpCityEntry.Text);
+                                user.setUserState(signUpStateEntry.Text);
+                                user.setUserZipcode(signUpZipcodeEntry.Text);
+                                user.setUserLatitude(location.Latitude.ToString());
+                                user.setUserLongitude(location.Longitude.ToString());
+
+                                newUserFirstName.Text = user.getUserFirstName();
+                                newUserLastName.Text = user.getUserLastName();
+                                newUserEmail1.Text = user.getUserEmail();
+                                newUserEmail2.Text = user.getUserEmail();
+                            }
+                            else
+                            {
+                                await DisplayAlert("Oops","You address is outside our delivery areas","OK");
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            await DisplayAlert("We were not able to find your location in our system.", "Try again", "OK");
+                            return;
+                        }
+
+                    }else if (addressStatus == "D")
+                    {
+                        await DisplayAlert("Oops", "Please enter your address unit number", "OK");
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                await DisplayAlert("Oops", "Please enter all the required information. Thanks!", "OK");
+                return;
+            }
+        }
+
+        public bool ValidateSignUpInfo(Entry firstName, Entry lastName, Entry email, Entry phoneNumber,  Entry address1, Entry city, Entry state, Entry zipcode)
+        {
+            bool result = false;
+            if (!(String.IsNullOrEmpty(firstName.Text)
+                || String.IsNullOrEmpty(lastName.Text)
+                || String.IsNullOrEmpty(email.Text)
+                || String.IsNullOrEmpty(address1.Text)
+                || String.IsNullOrEmpty(city.Text)
+                || String.IsNullOrEmpty(state.Text)
+                || String.IsNullOrEmpty(zipcode.Text)
+                ))
+            {
+                result = true;
+            }
+            return result;
+        }
+
+        public bool ValidateSignUpInfo(Entry firstName, Entry lastName, Entry email1, Entry email2, Entry password1, Entry password2)
+        {
+            bool result = false;
+            if (!(String.IsNullOrEmpty(firstName.Text)
+                || String.IsNullOrEmpty(lastName.Text)
+                || String.IsNullOrEmpty(email1.Text)
+                || String.IsNullOrEmpty(email2.Text)
+                || String.IsNullOrEmpty(password1.Text)
+                || String.IsNullOrEmpty(password2.Text)
+                ))
+            {
+                result = true;
+            }
+            return result;
+        }
+
+        public bool ValidateEmail(Entry email1, Entry email2)
+        {
+            bool result = false;
+            if (!(String.IsNullOrEmpty(email1.Text)||String.IsNullOrEmpty(email2.Text)))
+            {
+                if(email1.Text == email2.Text)
+                {
+                    result = true;
+                }
+            }
+            return result;
+        }
+
+        public bool ValidatePassword(Entry password1, Entry password2)
+        {
+            bool result = false;
+            if (!(String.IsNullOrEmpty(password1.Text) || String.IsNullOrEmpty(password2.Text)))
+            {
+                if (password1.Text == password2.Text)
+                {
+                    result = true;
+                }
+            }
+            return result;
         }
 
         void HideAddressModal(System.Object sender, System.EventArgs e)
         {
             addressRow.Height = 0;
             addressFrameSignUp.Margin = new Thickness(5, 0, 5, 0);
+        }
+
+        void signUpAddress1Entry_TextChanged(System.Object sender, Xamarin.Forms.TextChangedEventArgs e)
+        {
+            addr.OnAddressChanged(SignUpAddressList, Addresses, signUpAddress1Entry.Text);
+        }
+
+        void signUpAddress1Entry_Focused(System.Object sender, Xamarin.Forms.FocusEventArgs e)
+        {
+            addr.addressEntryFocused(SignUpAddressList, signUpAddressFrame);
+        }
+
+        void signUpAddress1Entry_Unfocused(System.Object sender, Xamarin.Forms.FocusEventArgs e)
+        {
+            addr.addressEntryUnfocused(SignUpAddressList, signUpAddressFrame);
+        }
+
+        async void SignUpAddressList_ItemSelected(System.Object sender, Xamarin.Forms.SelectedItemChangedEventArgs e)
+        {
+            addressToValidate = addr.addressSelected(SignUpAddressList, signUpAddress1Entry, signUpAddressFrame);
+            string zipcode = await addr.getZipcode(addressToValidate.PredictionID);
+            if (zipcode != null)
+            {
+                addressToValidate.ZipCode = zipcode;
+            }
+            addr.addressSelectedFillEntries(addressToValidate, signUpAddress1Entry, signUpAddress2Entry, signUpCityEntry, signUpStateEntry, signUpZipcodeEntry);
+            addr.addressEntryUnfocused(SignUpAddressList, signUpAddressFrame);
+        }
+
+        void ContinueWithFacebook(System.Object sender, System.EventArgs e)
+        {
+            var client = new SignIn();
+            var authenticator = client.GetFacebookAuthetication();
+            var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
+                authenticator.Completed += FacebookAuthetication;
+                authenticator.Error += Authenticator_Error;
+            presenter.Login(authenticator);
+        }
+
+        void ContinueWithGoogle(System.Object sender, System.EventArgs e)
+        {
+            var client = new SignIn();
+            var authenticator = client.GetGoogleAuthetication();
+            var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
+            AuthenticationState.Authenticator = authenticator;
+            authenticator.Completed += GoogleAuthetication;
+            authenticator.Error += Authenticator_Error;
+            presenter.Login(authenticator);
+        }
+
+        private async void FacebookAuthetication(object sender, Xamarin.Auth.AuthenticatorCompletedEventArgs e)
+        {
+            var authenticator = sender as OAuth2Authenticator;
+
+            if (authenticator != null)
+            {
+                authenticator.Completed -= FacebookAuthetication;
+                authenticator.Error -= Authenticator_Error;
+            }
+
+            if (e.IsAuthenticated)
+            {
+                try
+                {
+                    var clientLogIn = new SignIn();
+                    var clientSignUp = new SignUp();
+
+                    var facebookUser = clientLogIn.GetFacebookUser(e.Account.Properties["access_token"]);
+                    var content = clientSignUp.SetDirectUser(user, e.Account.Properties["access_token"], "", facebookUser.id, facebookUser.email, "FACEBOOK");
+                    var signUpStatus = await clientSignUp.SignUpNewUser(content);
+
+                    if (signUpStatus != "" && signUpStatus != "USER ALREADY EXIST")
+                    {
+                        user.setUserID(signUpStatus);
+                        user.setUserPlatform("FACEBOOK");
+                        user.setUserType("CUSTOMER");
+                        clientSignUp.SendUserToSelectionPage();
+                    }
+                    else if (signUpStatus != "" && signUpStatus == "USER ALREADY EXIST")
+                    {
+                        await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
+                    }
+                }
+                catch (Exception g)
+                {
+                    Debug.WriteLine(g.Message);
+                }
+            }
+        }
+
+        private async void GoogleAuthetication(object sender, AuthenticatorCompletedEventArgs e)
+        {
+            var authenticator = sender as OAuth2Authenticator;
+
+            if (authenticator != null)
+            {
+                authenticator.Completed -= GoogleAuthetication;
+                authenticator.Error -= Authenticator_Error;
+            }
+
+            if (e.IsAuthenticated)
+            {
+                try
+                {
+                    var clientLogIn = new SignIn();
+                    var clientSignUp = new SignUp();
+
+                    var googleUser = await clientLogIn.GetGoogleUser(e);
+                    var content = clientSignUp.SetDirectUser(user, e.Account.Properties["access_token"], e.Account.Properties["refresh_token"], googleUser.id, googleUser.email, "GOOGLE");
+                    var signUpStatus = await clientSignUp.SignUpNewUser(content);
+
+                    if (signUpStatus != "" && signUpStatus != "USER ALREADY EXIST")
+                    {
+                        user.setUserID(signUpStatus);
+                        user.setUserPlatform("GOOGLE");
+                        user.setUserType("CUSTOMER");
+                        clientSignUp.SendUserToSelectionPage();
+                    }
+                    else if (signUpStatus != "" && signUpStatus == "USER ALREADY EXIST")
+                    {
+                        await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
+                    }
+                }
+                catch (Exception g)
+                {
+                    Debug.WriteLine(g.Message);
+                }
+            }
+        }
+
+        private async void Authenticator_Error(object sender, Xamarin.Auth.AuthenticatorErrorEventArgs e)
+        {
+            await DisplayAlert("An error occur when authenticating", "Please try again", "OK");
         }
     }
 }
