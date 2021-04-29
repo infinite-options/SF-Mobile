@@ -711,7 +711,7 @@ namespace ServingFresh.Models
                     resultUser.setUserID(authetication.result[0].customer_uid);
                     resultUser.setUserSessionTime(expDate);
                     resultUser.setUserPlatform(platform);
-                    resultUser.setUserType("CUSTOMER");
+                    resultUser.setUserType(authetication.result[0].role);
                     resultUser.setUserEmail(authetication.result[0].customer_email);
                     resultUser.setUserFirstName(authetication.result[0].customer_first_name);
                     resultUser.setUserLastName(authetication.result[0].customer_last_name);
@@ -723,7 +723,6 @@ namespace ServingFresh.Models
                     resultUser.setUserZipcode(authetication.result[0].customer_zip);
                     resultUser.setUserLatitude(authetication.result[0].customer_lat);
                     resultUser.setUserLongitude(authetication.result[0].customer_long);
-
                 }
             }
 

@@ -41,6 +41,25 @@ namespace ServingFresh.Models
             sessionTime = new DateTime();
         }
 
+        public void setUserFromProfile(UserProfile profile)
+        {
+            userType = profile.result[0].role;
+            id = profile.result[0].customer_uid;
+            firstName = profile.result[0].customer_first_name;
+            lastName = profile.result[0].customer_last_name;
+            address = profile.result[0].customer_address;
+            unit = profile.result[0].customer_unit;
+            city = profile.result[0].customer_city;
+            state = profile.result[0].customer_state;
+            zipcode = profile.result[0].customer_zip;
+            email = profile.result[0].customer_email;
+            phoneNumber = profile.result[0].customer_phone_num;
+            latitude = profile.result[0].customer_lat;
+            longitude = profile.result[0].customer_long;
+            platform = profile.result[0].user_social_media;
+            deviceID = "";
+        }
+
         public string getUserType()
         {
             return userType;

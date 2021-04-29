@@ -57,8 +57,8 @@
                             <StackLayout>
                                 <Entry x:Name="firstName" Placeholder="First name (so we can address you)" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
                                 <Entry x:Name="lastName" Placeholder="Last name (in case you want to be formal)" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
-                                <Entry x:Name="phoneNumber" Placeholder="Phone number (so we can call if there is an issue)" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
-                                <Entry x:Name="emailAddress" Placeholder="Email address (for order confirmation)" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
+                                <Entry x:Name="phoneNumber"  Placeholder="Phone number (so we can call if there is an issue)" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
+                                <Entry x:Name="emailAddress" Keyboard="Email" Placeholder="Email address (for order confirmation)" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
                             </StackLayout>
                             <StackLayout>
                                 <Frame Margin="1,5,1,10" HeightRequest="100" BackgroundColor="LightGray" CornerRadius="20" HasShadow="False" Padding="0" IsClippedToBounds="True">

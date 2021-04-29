@@ -114,7 +114,7 @@ namespace ServingFresh.Models
         {
             try
             {
-                ObservableCollection<AddressAutocomplete> d = new ObservableCollection<AddressAutocomplete>();
+                ObservableCollection<AddressAutocomplete> list = new ObservableCollection<AddressAutocomplete>();
                 CancellationToken cancellationToken = new CancellationTokenSource(TimeSpan.FromMinutes(2)).Token;
 
                 using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, string.Format(GooglePlacesApiAutoCompletePath, Constant.GooglePlacesApiKey, WebUtility.UrlEncode(_addressText))))
@@ -141,7 +141,7 @@ namespace ServingFresh.Models
                                         // comment zipcode 
                                         //await setZipcode(prediction.PlaceId);
                                         Console.WriteLine("After setZipcode:\n" + prediction.Description.Trim() + "\n" + predictionSplit[0].Trim() + "\n" + predictionSplit[1].Trim() + "\n" + predictionSplit[2].Trim() + "\n" + zip);
-                                        d.Add(new AddressAutocomplete
+                                        list.Add(new AddressAutocomplete
                                         {
                                             Address = prediction.Description.Trim(),
                                             Street = predictionSplit[0].Trim(),
@@ -150,23 +150,18 @@ namespace ServingFresh.Models
                                             ZipCode = "",
                                             PredictionID = prediction.PlaceId
                                         });
-
                                     }
                                 }
-                            }
-                            else
-                            {
-
                             }
                         }
                     }
                 }
-                return d;
+                return list;
                 
             }
             catch (Exception prediction)
             {
-                Debug.WriteLine("MESSAGE WHEN LIST IS NOT READY TO UPDATE: " + prediction.Message);
+                Debug.WriteLine("EXCEPTION ON GET PLACE PREDICTION: " + prediction.Message);
                 return null;
             }
         }

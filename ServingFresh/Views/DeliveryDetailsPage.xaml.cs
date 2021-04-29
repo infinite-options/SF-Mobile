@@ -86,29 +86,82 @@ namespace ServingFresh.Views
                 string mode = Payments.getMode(purchase.getPurchaseDeliveryInstructions(), "STRIPE");
                 paymentClient = new Payments(mode);
 
-                var userID = await SignUpNewUser(GetUserFrom(purchase));
-                if( userID != "") { purchase.setPurchaseCustomerUID(userID); }
-                var paymentIsSuccessful = paymentClient.PayViaStripe(
-                    purchase.getPurchaseEmail(),
-                    cardHolderName.Text,
-                    cardHolderNumber.Text,
-                    cardCVV.Text,
-                    cardExpMonth.Text,
-                    cardExpYear.Text,
-                    purchase.getPurchaseAmountDue()
-                    ); ;
-
-                await WriteFavorites(GetFavoritesList(),userID);
-
-                if (paymentIsSuccessful)
+                var isEmailUnused = await ValidateExistingAccountFromEmail(purchase.getPurchaseEmail());
+                if(isEmailUnused == null)
                 {
-                    _ = paymentClient.SendPurchaseToDatabase(purchase);
-                    order.Clear();
-                    Application.Current.MainPage = new ConfirmationPage();
+                    var userID = await SignUp.SignUpNewUser(SignUp.GetUserFrom(purchase));
+                    if (userID != "")
+                    {
+                        purchase.setPurchaseCustomerUID(userID);
+                        var paymentIsSuccessful = paymentClient.PayViaStripe(
+                            purchase.getPurchaseEmail(),
+                            cardHolderName.Text,
+                            cardHolderNumber.Text,
+                            cardCVV.Text,
+                            cardExpMonth.Text,
+                            cardExpYear.Text,
+                            purchase.getPurchaseAmountDue()
+                            );
+
+                        await WriteFavorites(GetFavoritesList(), userID);
+
+                        if (paymentIsSuccessful)
+                        {
+                            purchase.setPurchaseZipcode("95120");
+                            purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
+                            purchase.setPurchaseChargeID(paymentClient.getTransactionID());
+                            purchase.printPurchase();
+                            _ = paymentClient.SendPurchaseToDatabase(purchase);
+                            order.Clear();
+                            Application.Current.MainPage = new ConfirmationPage();
+                        }
+                        else
+                        {
+                            await DisplayAlert("Make sure you fill all entries", "", "OK");
+                        }
+                    }
                 }
                 else
                 {
-                    await DisplayAlert("Make sure you fill all entries", "", "OK");
+                    if(isEmailUnused.result.Count != 0)
+                    {
+                        var role = isEmailUnused.result[0].role;
+                        if(role == "CUSTOMER")
+                        {
+                            await DisplayAlert("Oops", "You are not a guest. We are sending you to the checkout page where you can sign in to proceed with your purchase", "OK");
+                            Application.Current.MainPage = new CheckoutPage();
+                        }
+                        else if (role == "GUEST")
+                        {
+                            // we don't sign up but get user id
+                            user.setUserID(isEmailUnused.result[0].customer_uid);
+                            purchase.setPurchaseCustomerUID(user.getUserID());
+                            user.setUserFromProfile(isEmailUnused);
+                            var paymentIsSuccessful = paymentClient.PayViaStripe(
+                                purchase.getPurchaseEmail(),
+                                cardHolderName.Text,
+                                cardHolderNumber.Text,
+                                cardCVV.Text,
+                                cardExpMonth.Text,
+                                cardExpYear.Text,
+                                purchase.getPurchaseAmountDue()
+                                );
+
+                            await WriteFavorites(GetFavoritesList(), user.getUserID());
+                            if (paymentIsSuccessful)
+                            {
+                                purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
+                                purchase.setPurchaseChargeID(paymentClient.getTransactionID());
+                                _ = paymentClient.SendPurchaseToDatabase(purchase);
+                                order.Clear();
+                                Application.Current.MainPage = new ConfirmationPage();
+                            }
+                            else
+                            {
+                                await DisplayAlert("Make sure you fill all entries", "", "OK");
+                            }
+                        }
+                    }
                 }
             }
             else
@@ -117,6 +170,28 @@ namespace ServingFresh.Views
             }
         }
 
+        public static async Task<UserProfile> ValidateExistingAccountFromEmail(string email)
+        {
+            UserProfile result = null;
+
+            var client = new System.Net.Http.HttpClient();
+            var endpointCall = await client.GetAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/email_info/" + email);
+
+            
+            if (endpointCall.IsSuccessStatusCode)
+            {
+                var endpointContent = await endpointCall.Content.ReadAsStringAsync();
+                Debug.WriteLine("PROFILE: " + endpointContent);
+                var profile = JsonConvert.DeserializeObject<UserProfile>(endpointContent);
+                if(profile.result.Count != 0)
+                {
+                    result = profile;
+                }
+                
+            }
+
+            return result;
+        }
 
         async void CheckoutWithPayPal(System.Object sender, System.EventArgs e)
         {
@@ -140,20 +215,58 @@ namespace ServingFresh.Views
                 Debug.WriteLine("SUCCESSFULL REDIRECT FROM PAYPAL TO SF WEB TO MOBILE APP");
                 purchase.setPurchasePaymentType("PAYPAL");
 
-
-                var userID = await SignUpNewUser(GetUserFrom(purchase));
-                if (userID != "") { purchase.setPurchaseCustomerUID(userID); }
-                var paymentIsSuccessful = await paymentClient.captureOrder(paymentClient.getTransactionID());
-                await WriteFavorites(GetFavoritesList(), userID);
-                if (paymentIsSuccessful)
+                var isEmailUnused = await ValidateExistingAccountFromEmail(purchase.getPurchaseEmail());
+                if(isEmailUnused == null)
                 {
-                    _ = paymentClient.SendPurchaseToDatabase(purchase);
-                    order.Clear();
-                    Application.Current.MainPage = new ConfirmationPage();
+                    var userID = await SignUp.SignUpNewUser(SignUp.GetUserFrom(purchase));
+                    if (userID != "") { purchase.setPurchaseCustomerUID(userID); }
+                    var paymentIsSuccessful = await paymentClient.captureOrder(paymentClient.getTransactionID());
+                    await WriteFavorites(GetFavoritesList(), userID);
+                    if (paymentIsSuccessful)
+                    {
+                        purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
+                        purchase.setPurchaseChargeID(paymentClient.getTransactionID());
+                        _ = paymentClient.SendPurchaseToDatabase(purchase);
+                        order.Clear();
+                        Application.Current.MainPage = new ConfirmationPage();
+                    }
+                    else
+                    {
+                        await DisplayAlert("Issue with payment via PayPal", "", "OK");
+                    }
                 }
                 else
                 {
-                    await DisplayAlert("Issue with payment via PayPal", "", "OK");
+                    if (isEmailUnused.result.Count != 0)
+                    {
+                        var role = isEmailUnused.result[0].role;
+                        if (role == "CUSTOMER")
+                        {
+                            await DisplayAlert("Oops", "You are not a guest. We are sending you to the checkout page where you can sign in to proceed with your purchase", "OK");
+                            Application.Current.MainPage = new CheckoutPage();
+                        }
+                        else if (role == "GUEST")
+                        {
+                            // we don't sign up but get user id
+                            user.setUserID(isEmailUnused.result[0].customer_uid);
+                            purchase.setPurchaseCustomerUID(user.getUserID());
+                            user.setUserFromProfile(isEmailUnused);
+                            var paymentIsSuccessful = await paymentClient.captureOrder(paymentClient.getTransactionID());
+                            await WriteFavorites(GetFavoritesList(), user.getUserID());
+                            if (paymentIsSuccessful)
+                            {
+                                purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
+                                purchase.setPurchaseChargeID(paymentClient.getTransactionID());
+                                _ = paymentClient.SendPurchaseToDatabase(purchase);
+                                order.Clear();
+                                Application.Current.MainPage = new ConfirmationPage();
+                            }
+                            else
+                            {
+                                await DisplayAlert("Issue with payment via PayPal", "", "OK");
+                            }
+                        }
+                    }
                 }
             }
         }

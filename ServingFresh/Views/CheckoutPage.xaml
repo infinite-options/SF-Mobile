@@ -17,9 +17,6 @@
                 <RowDefinition x:Name="signUpRow" Height="0"></RowDefinition>
                 <RowDefinition x:Name="menuFrame" Height="0"></RowDefinition>
             </Grid.RowDefinitions>
-            <Grid.GestureRecognizers>
-               <TapGestureRecognizer></TapGestureRecognizer>
-            </Grid.GestureRecognizers>
             <Grid Grid.Row="0" ColumnSpacing="0" BackgroundColor="#136D74">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100"></ColumnDefinition>
@@ -84,15 +81,66 @@
                                         <Label Grid.Column="0" Text="Delivery Address:" TextColor="#136D74" FontSize="16" FontAttributes="Bold"></Label>
                                         <Label Grid.Column="1" Text="Change delivery address" HorizontalTextAlignment="End" VerticalTextAlignment="Center" FontSize="12" TextColor="#FF8500">
                                             <Label.GestureRecognizers>
-                                                <TapGestureRecognizer></TapGestureRecognizer>
+                                                <TapGestureRecognizer Tapped="UpdateAddressForCustomer"></TapGestureRecognizer>
                                             </Label.GestureRecognizers>
                                         </Label>
                                     </Grid>
                                     <StackLayout Orientation="Horizontal">
-                                        <Label x:Name="DeliveryAddress1" Text="24 Main Street, Apt #5 San Jose, CA 91101" FontSize="14" TextColor="Black"></Label>
-                                        <Label x:Name="DeliveryAddress2" Text="24 Main Street, Apt #5 San Jose, CA 91101" FontSize="14" TextColor="Black"></Label>
+                                        <Label x:Name="DeliveryAddress1" Text="" FontSize="14" TextColor="Black"></Label>
+                                        <Label x:Name="DeliveryAddress2" Text="" FontSize="14" TextColor="Black"></Label>
                                     </StackLayout>
                                  
+                                </StackLayout>
+                                <StackLayout x:Name="guestAddressInfoView">
+                                    
+                                    <Label Text="Delivery Address:" x:Name="guestDeliveryAddressLabel" TextColor="#136D74" FontSize="16" FontAttributes="Bold"></Label>
+                                    <StackLayout Grid.Row="2" x:Name="addressGrid" HeightRequest="140" >
+                                        <RelativeLayout
+                                            RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
+                                            RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                            <StackLayout
+                                                Spacing="5"
+                                                RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
+                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+
+                                                <Entry x:Name="AddressEntry" HeightRequest="35" Placeholder="Street Address (so we can find you)" PlaceholderColor="Gray" FontSize="14" FontAttributes="Bold" Keyboard="Text" TextColor="Black" TextChanged="OnAddressChanged" Focused="addressEntryFocused" Unfocused="addressEntryUnfocused"/>
+                                                <Entry x:Name="newUserUnitNumber" IsVisible="false" HeightRequest="35" Placeholder="Apt number" PlaceholderColor="Gray" FontSize="14" FontAttributes="Bold"></Entry>
+                                                <Grid IsVisible="false" x:Name="gridAddressView">
+                                                    <Entry Grid.Column="0" x:Name="newUserCity" HeightRequest="35" Placeholder="City" PlaceholderColor="Gray" FontSize="14" FontAttributes="Bold"></Entry>
+                                                    <Entry Grid.Column="1" x:Name="newUserState" HeightRequest="35" Placeholder="State" PlaceholderColor="Gray" FontSize="14" FontAttributes="Bold"></Entry>
+                                                    <Entry Grid.Column="2" x:Name="newUserZipcode" HeightRequest="35" Placeholder="Zip" PlaceholderColor="Gray" FontSize="14" FontAttributes="Bold"></Entry>
+                                                </Grid>
+                                                <Frame Margin="5,0,5,0" x:Name="guestMap" HeightRequest="100" BackgroundColor="LightGray" CornerRadius="20" HasShadow="False" Padding="0" IsClippedToBounds="True">
+                                                    <maps:Map HeightRequest="1"
+                                                            x:Name="map"
+                                                            IsVisible="true">
+                                                    </maps:Map>
+                                                    </Frame>
+                                                <Frame Margin="0,-100,0,0" Padding="2" HorizontalOptions="CenterAndExpand" CornerRadius="5" x:Name="addressFrame" IsVisible="false">
+                                                    <ListView x:Name="addressList" IsVisible="false" HorizontalOptions="CenterAndExpand" HasUnevenRows="true" WidthRequest="300" HeightRequest="90" ItemSelected="addressList_ItemSelected">
+                                                        <ListView.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <ViewCell Height="25">
+                                                                        <Label Text="{Binding Address}" FontSize="12" TextColor="Black"/>
+                                                                </ViewCell>
+                                                            </DataTemplate>
+                                                        </ListView.ItemTemplate>
+                                                    </ListView>
+                                                </Frame>
+                                            </StackLayout>
+                                        </RelativeLayout>
+                                    </StackLayout>
+
+                                    <!--<Frame Margin="5,0,5,0" HeightRequest="100" BackgroundColor="LightGray" CornerRadius="20" HasShadow="False" Padding="0" IsClippedToBounds="True">
+                                        <maps:Map HeightRequest="1"
+                                                x:Name="map"
+                                                IsVisible="true">
+                                        </maps:Map>
+                                     </Frame>-->
+                                    <!--<Entry x:Name="newUserAddress" Placeholder="Street Address (so we can find)" PlaceholderColor="Gray" FontSize="14" FontAttributes="Bold"></Entry>
+                                    
+                                    <Button x:Name="addressButton" Text="Verify Address" TextColor="White" FontAttributes="Bold" Clicked="ValidateAddressClick" BackgroundColor="#FF8500"></Button>-->
+                                    <BoxView HeightRequest="1" Color="LightGray"></BoxView>
                                 </StackLayout>
                                 <StackLayout>
                                     <Label Text="Delivery Instructions:" TextColor="#136D74" FontSize="16" FontAttributes="Bold"></Label>
@@ -147,54 +195,10 @@
                                 </StackLayout>
                                 <Grid>
                                     <Label Grid.Column="0" Text="Subtotal" TextColor="Black" FontSize="20" FontAttributes="Bold"></Label>
-                                    <Label Grid.Column="1" x:Name="SubTotal" HorizontalTextAlignment="End" Text="$11.99" TextColor="Black" FontSize="20" FontAttributes="Bold"></Label>
+                                    <Label Grid.Column="1" x:Name="SubTotal" HorizontalTextAlignment="End" Text="$0.00" TextColor="Black" FontSize="20" FontAttributes="Bold"></Label>
                                 </Grid>
-                                <BoxView HeightRequest="1" Color="LightGray"></BoxView>
-                                <StackLayout x:Name="guestAddressInfoView">
-                                    
-                                    <Label Text="Search your delivery address" TextColor="Black" FontSize="16" FontAttributes="Bold"></Label>
-                                    <StackLayout Grid.Row="2" HeightRequest="110">
-                                        <RelativeLayout
-                                            RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
-                                            RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
-                                            <StackLayout
-                                                Spacing="5"
-                                                RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
-                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
-
-                                                <Entry x:Name="AddressEntry" Placeholder="Street Address (so we can find you)" PlaceholderColor="Gray" FontSize="14" FontAttributes="Bold" Keyboard="Text" TextColor="Black" Text="{Binding AddressText}" TextChanged="OnAddressChanged" Focused="addressEntryFocused" Unfocused="addressEntryUnfocused"/>
-                                                <Entry x:Name="newUserUnitNumber" IsVisible="false" Placeholder="Apt number" PlaceholderColor="Gray" FontSize="14" FontAttributes="Bold"></Entry>
-                                                <Grid IsVisible="false" x:Name="gridAddressView">
-                                                    <Entry Grid.Column="0" x:Name="newUserCity"  Placeholder="City" PlaceholderColor="Gray" FontSize="14" FontAttributes="Bold"></Entry>
-                                                    <Entry Grid.Column="1" x:Name="newUserState"  Placeholder="State" PlaceholderColor="Gray" FontSize="14" FontAttributes="Bold"></Entry>
-                                                    <Entry Grid.Column="2" x:Name="newUserZipcode" Placeholder="Zip" PlaceholderColor="Gray" FontSize="14" FontAttributes="Bold"></Entry>
-                                                </Grid>
-                                                <Frame Margin="0,0,0,0" Padding="2" HorizontalOptions="CenterAndExpand" CornerRadius="5" x:Name="addressFrame" IsVisible="false">
-                                                    <ListView x:Name="addressList" IsVisible="false" HorizontalOptions="CenterAndExpand" HasUnevenRows="true" WidthRequest="300" HeightRequest="100"  ItemsSource="{Binding Addresses}" ItemSelected="addressSelected">
-                                                        <ListView.ItemTemplate>
-                                                            <DataTemplate>
-                                                                <ViewCell Height="25">
-                                                                        <Label Text="{Binding Address}" FontSize="12" TextColor="Black"/>
-                                                                </ViewCell>
-                                                            </DataTemplate>
-                                                        </ListView.ItemTemplate>
-                                                    </ListView>
-                                                </Frame>
-                                            </StackLayout>
-                                        </RelativeLayout>
-                                    </StackLayout>
-
-                                    <Frame Margin="5,0,5,0" HeightRequest="100" BackgroundColor="LightGray" CornerRadius="20" HasShadow="False" Padding="0" IsClippedToBounds="True">
-                                        <maps:Map HeightRequest="1"
-                                                x:Name="map"
-                                                IsVisible="true">
-                                        </maps:Map>
-                                     </Frame>
-                                    <!--<Entry x:Name="newUserAddress" Placeholder="Street Address (so we can find)" PlaceholderColor="Gray" FontSize="14" FontAttributes="Bold"></Entry>
-                                    
-                                    <Button x:Name="addressButton" Text="Verify Address" TextColor="White" FontAttributes="Bold" Clicked="ValidateAddressClick" BackgroundColor="#FF8500"></Button>-->
-                                    <BoxView HeightRequest="1" Color="LightGray"></BoxView>
-                                </StackLayout>
+                                <!--<BoxView HeightRequest="1" Color="LightGray"></BoxView>-->
+                                
                                 <Label Text="Coupons:" TextColor="Black" FontSize="16" FontAttributes="Bold"></Label>
                                 <StackLayout>
                                     <CollectionView x:Name="coupon_list" ItemsLayout="HorizontalList" HeightRequest="95">
@@ -226,7 +230,7 @@
                                     <Label Grid.Column="0" Text="Coupon applied" TextColor="#136D74" FontSize="14"></Label>
                                     <StackLayout Grid.Column="1" Orientation="Horizontal" HorizontalOptions="End" VerticalOptions="Center">
                                         <Label Text="-" TextColor="Black" FontSize="14"></Label>
-                                        <Label  x:Name="Discount"  Text="$11.99" TextColor="Black" FontSize="14"></Label>
+                                        <Label  x:Name="Discount"  Text="$0.00" TextColor="Black" FontSize="14"></Label>
                                     </StackLayout>
                                 </Grid>
                                 <BoxView HeightRequest="1" Color="LightGray"></BoxView>
@@ -240,7 +244,7 @@
                                 <BoxView HeightRequest="1" Color="LightGray"></BoxView>
                                 <Grid>
                                     <Label Grid.Column="0" Text="Service Fee" TextColor="Black" FontSize="14"></Label>
-                                    <Label Grid.Column="1" x:Name="ServiceFee" HorizontalTextAlignment="End" Text="$11.99" TextColor="Black" FontSize="14"></Label>
+                                    <Label Grid.Column="1" x:Name="ServiceFee" HorizontalTextAlignment="End" Text="$0.00"  TextColor="Black" FontSize="14"></Label>
                                 </Grid>
                                 <BoxView HeightRequest="1" Color="LightGray"></BoxView>
                                 <StackLayout>
@@ -258,7 +262,7 @@
                                 <BoxView HeightRequest="1" Color="LightGray"></BoxView>
                                 <Grid>
                                     <Label Grid.Column="0" Text="Taxes" TextColor="Black" FontSize="14"></Label>
-                                    <Label Grid.Column="1" x:Name="Taxes" HorizontalTextAlignment="End" Text="$11.99" TextColor="Black" FontSize="14"></Label>
+                                    <Label Grid.Column="1" x:Name="Taxes" HorizontalTextAlignment="End" Text="$0.00"  TextColor="Black" FontSize="14"></Label>
                                 </Grid>
                                 <BoxView HeightRequest="1" Color="LightGray"></BoxView>
                                 <FlexLayout JustifyContent="SpaceBetween">

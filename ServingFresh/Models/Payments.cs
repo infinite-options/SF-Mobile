@@ -169,18 +169,26 @@ namespace ServingFresh.Models
 
         public static PayPalHttp.HttpClient client()
         {
-            PayPalEnvironment environment = null;
-            if (mode == "TEST")
+            try
             {
-                Debug.WriteLine("PAYPAL TEST ENVIROMENT");
-                environment = new SandboxEnvironment(Constant.TestClientId, Constant.TestSecret);
+                PayPalEnvironment environment = null;
+                if (mode == "TEST")
+                {
+                    Debug.WriteLine("PAYPAL TEST ENVIROMENT");
+                    environment = new SandboxEnvironment(Constant.TestClientId, Constant.TestSecret);
+                }
+                else if (mode == "LIVE")
+                {
+                    Debug.WriteLine("PAYPAL LIVE ENVIROMENT");
+                    environment = new LiveEnvironment(Constant.LiveClientId, Constant.LiveSecret);
+                }
+                return new PayPalHttpClient(environment);
             }
-            else if (mode == "LIVE")
+            catch (Exception wrongMode)
             {
-                Debug.WriteLine("PAYPAL LIVE ENVIROMENT");
-                environment = new LiveEnvironment(Constant.LiveClientId, Constant.LiveSecret);
+                Debug.WriteLine("USING PAYMENTS IN THE WRONG MODE: " + wrongMode);
+                return null;
             }
-            return new PayPalHttpClient(environment); ;
         }
 
 
@@ -201,68 +209,74 @@ namespace ServingFresh.Models
 
         public bool PayViaStripe(string customerEmail, string customerName, string cardNumber, string cardCVV, string ExpMonth, string ExpYear, string amount)
         {
-
-            StripeConfiguration.ApiKey = ReturnStripeApikey(mode);
-
-            // Step 1: Create Card 
-            TokenCardOptions stripeOption = new TokenCardOptions();
-            stripeOption.Number = cardNumber;
-            stripeOption.ExpMonth = Convert.ToInt64(ExpMonth);
-            stripeOption.ExpYear = Convert.ToInt64(ExpYear);
-            stripeOption.Cvc = cardCVV;
-
-            // Step 2: Assign card to token object
-            TokenCreateOptions stripeCard = new TokenCreateOptions();
-            stripeCard.Card = stripeOption;
-
-
-            TokenService service = new TokenService();
-            Stripe.Token newToken = service.Create(stripeCard);
-
-            // Step 3: Assign the token to the soruce 
-            SourceCreateOptions option = new SourceCreateOptions();
-
-            option.Type = SourceType.Card;
-            option.Currency = "usd";
-            option.Token = newToken.Id;
-
-            SourceService sourceService = new SourceService();
-            Source source = sourceService.Create(option);
-
-            // Step 4: Create customer
-            CustomerCreateOptions customer = new CustomerCreateOptions();
-            customer.Name = customerName;
-            //customer.Email = cardHolderEmail.Text.ToLower().Trim();
-            //customer.Description = cardDescription.Text.Trim();
-            //if (cardHolderUnit.Text == null)
-            //{
-            //    cardHolderUnit.Text = "";
-            //}
-            //customer.Address = new AddressOptions { City = cardCity.Text.Trim(), Country = Constant.Contry, Line1 = cardHolderAddress.Text.Trim(), Line2 = cardHolderUnit.Text.Trim(), PostalCode = cardZip.Text.Trim(), State = cardState.Text.Trim() };
-
-            CustomerService customerService = new CustomerService();
-            Customer cust = customerService.Create(customer);
-
-            // Step 5: Charge option
-            ChargeCreateOptions chargeOption = new ChargeCreateOptions();
-            chargeOption.Amount = (long) RemoveDecimalFromTotalAmount(amount);
-            chargeOption.Currency = "usd";
-            chargeOption.ReceiptEmail = customerEmail;
-            chargeOption.Customer = cust.Id;
-            chargeOption.Source = source.Id;
-            chargeOption.Description = "";
-
-            // Step 6: charge the customer
-            ChargeService chargeService = new ChargeService();
-            Charge charge = chargeService.Create(chargeOption);
-
-            if (charge.Status == "succeeded")
+            try
             {
-                transactionID = charge.Id;
-                return true;
-            }
-            else
+                StripeConfiguration.ApiKey = ReturnStripeApikey(mode);
+
+                // Step 1: Create Card 
+                TokenCardOptions stripeOption = new TokenCardOptions();
+                stripeOption.Number = cardNumber;
+                stripeOption.ExpMonth = Convert.ToInt64(ExpMonth);
+                stripeOption.ExpYear = Convert.ToInt64(ExpYear);
+                stripeOption.Cvc = cardCVV;
+
+                // Step 2: Assign card to token object
+                TokenCreateOptions stripeCard = new TokenCreateOptions();
+                stripeCard.Card = stripeOption;
+
+
+                TokenService service = new TokenService();
+                Stripe.Token newToken = service.Create(stripeCard);
+
+                // Step 3: Assign the token to the soruce 
+                SourceCreateOptions option = new SourceCreateOptions();
+
+                option.Type = SourceType.Card;
+                option.Currency = "usd";
+                option.Token = newToken.Id;
+
+                SourceService sourceService = new SourceService();
+                Source source = sourceService.Create(option);
+
+                // Step 4: Create customer
+                CustomerCreateOptions customer = new CustomerCreateOptions();
+                customer.Name = customerName;
+                //customer.Email = cardHolderEmail.Text.ToLower().Trim();
+                //customer.Description = cardDescription.Text.Trim();
+                //if (cardHolderUnit.Text == null)
+                //{
+                //    cardHolderUnit.Text = "";
+                //}
+                //customer.Address = new AddressOptions { City = cardCity.Text.Trim(), Country = Constant.Contry, Line1 = cardHolderAddress.Text.Trim(), Line2 = cardHolderUnit.Text.Trim(), PostalCode = cardZip.Text.Trim(), State = cardState.Text.Trim() };
+
+                CustomerService customerService = new CustomerService();
+                Customer cust = customerService.Create(customer);
+
+                // Step 5: Charge option
+                ChargeCreateOptions chargeOption = new ChargeCreateOptions();
+                chargeOption.Amount = (long)RemoveDecimalFromTotalAmount(amount);
+                chargeOption.Currency = "usd";
+                chargeOption.ReceiptEmail = customerEmail;
+                chargeOption.Customer = cust.Id;
+                chargeOption.Source = source.Id;
+                chargeOption.Description = "";
+
+                // Step 6: charge the customer
+                ChargeService chargeService = new ChargeService();
+                Charge charge = chargeService.Create(chargeOption);
+
+                if (charge.Status == "succeeded")
+                {
+                    transactionID = charge.Id;
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }catch(Exception changeMode)
             {
+                Debug.WriteLine("USING PAYMENTS IN WRONG MODE" + changeMode.Message);
                 return false;
             }
         }

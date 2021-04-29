@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using Xamarin.Auth;
 using ServingFresh.LogIn.Classes;
+using System.Net.Http;
+using ServingFresh.Config;
+using Newtonsoft.Json;
 
 namespace ServingFresh.Views
 {
@@ -24,6 +27,7 @@ namespace ServingFresh.Views
             currentLocation = new Location();
             currentLocation.Latitude = 37.227124;
             currentLocation.Longitude = -121.886943;
+            GetBusinesses();
             //GetCurrentLocation();
         }
 
@@ -299,7 +303,7 @@ namespace ServingFresh.Views
                         // user is ready to be sign in.
                         var client = new SignUp();
                         var content = client.SetDirectUser(user, newUserPassword1.Text);
-                        var signUpStatus = await client.SignUpNewUser(content);
+                        var signUpStatus = await SignUp.SignUpNewUser(content);
 
                         if(signUpStatus != "" && signUpStatus != "USER ALREADY EXIST")
                         {
@@ -418,6 +422,20 @@ namespace ServingFresh.Views
             return result;
         }
 
+        public bool ValidateSignUpInfo(Entry address1, Entry city, Entry state, Entry zipcode)
+        {
+            bool result = false;
+            if (!(String.IsNullOrEmpty(address1.Text)
+                || String.IsNullOrEmpty(city.Text)
+                || String.IsNullOrEmpty(state.Text)
+                || String.IsNullOrEmpty(zipcode.Text)
+                ))
+            {
+                result = true;
+            }
+            return result;
+        }
+
         public bool ValidateSignUpInfo(Entry firstName, Entry lastName, Entry email1, Entry email2, Entry password1, Entry password2)
         {
             bool result = false;
@@ -427,6 +445,18 @@ namespace ServingFresh.Views
                 || String.IsNullOrEmpty(email2.Text)
                 || String.IsNullOrEmpty(password1.Text)
                 || String.IsNullOrEmpty(password2.Text)
+                ))
+            {
+                result = true;
+            }
+            return result;
+        }
+
+        public bool ValidateDirectSignInCredentials(Entry email, Entry password)
+        {
+            bool result = false;
+            if (!(String.IsNullOrEmpty(email.Text)
+                || String.IsNullOrEmpty(password.Text)
                 ))
             {
                 result = true;
@@ -466,9 +496,9 @@ namespace ServingFresh.Views
             addressFrameSignUp.Margin = new Thickness(5, 0, 5, 0);
         }
 
-        void signUpAddress1Entry_TextChanged(System.Object sender, Xamarin.Forms.TextChangedEventArgs e)
+        async void signUpAddress1Entry_TextChanged(System.Object sender, Xamarin.Forms.TextChangedEventArgs e)
         {
-            addr.OnAddressChanged(SignUpAddressList, Addresses, signUpAddress1Entry.Text);
+            SignUpAddressList.ItemsSource = await addr.GetPlacesPredictionsAsync(signUpAddress1Entry.Text);
         }
 
         void signUpAddress1Entry_Focused(System.Object sender, Xamarin.Forms.FocusEventArgs e)
@@ -533,7 +563,7 @@ namespace ServingFresh.Views
 
                     var facebookUser = clientLogIn.GetFacebookUser(e.Account.Properties["access_token"]);
                     var content = clientSignUp.SetDirectUser(user, e.Account.Properties["access_token"], "", facebookUser.id, facebookUser.email, "FACEBOOK");
-                    var signUpStatus = await clientSignUp.SignUpNewUser(content);
+                    var signUpStatus = await SignUp.SignUpNewUser(content);
 
                     if (signUpStatus != "" && signUpStatus != "USER ALREADY EXIST")
                     {
@@ -573,7 +603,7 @@ namespace ServingFresh.Views
 
                     var googleUser = await clientLogIn.GetGoogleUser(e);
                     var content = clientSignUp.SetDirectUser(user, e.Account.Properties["access_token"], e.Account.Properties["refresh_token"], googleUser.id, googleUser.email, "GOOGLE");
-                    var signUpStatus = await clientSignUp.SignUpNewUser(content);
+                    var signUpStatus = await SignUp.SignUpNewUser(content);
 
                     if (signUpStatus != "" && signUpStatus != "USER ALREADY EXIST")
                     {
@@ -597,6 +627,163 @@ namespace ServingFresh.Views
         private async void Authenticator_Error(object sender, Xamarin.Auth.AuthenticatorErrorEventArgs e)
         {
             await DisplayAlert("An error occur when authenticating", "Please try again", "OK");
+        }
+
+        public async void GetBusinesses()
+        {
+            var userLat = "37.227124";
+            var userLong = "-121.886943";
+
+            Debug.WriteLine("INPUT 1: " + userLat);
+            Debug.WriteLine("INPUT 2: " + userLong);
+
+            //if (userLat == "0" && userLong == "0"){ userLong = "-121.8866517"; userLat = "37.2270928";}
+
+            var client = new HttpClient();
+            var response = await client.GetAsync(Constant.ProduceByLocation + userLong + "," + userLat);
+            var result = await response.Content.ReadAsStringAsync();
+
+            Debug.WriteLine("URL: " + Constant.ProduceByLocation + userLong + "," + userLat);
+
+            Debug.WriteLine("CALL TO ENDPOINT SUCCESSFULL?: " + response.IsSuccessStatusCode);
+            Debug.WriteLine("JSON RETURNED: " + result);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var data = JsonConvert.DeserializeObject<ServingFreshBusiness>(result);
+
+                GetDataForSingleList(data.result, data.types);
+            }
+            else
+            {
+                //await DisplayAlert("Oops!", "Our system is down. We are working to fix this issue.", "OK");
+                return;
+            }
+        }
+
+        private void GetDataForSingleList(IList<Items> listOfItems, IList<string> types)
+        {
+            try
+            {
+                if (listOfItems.Count != 0 && listOfItems != null)
+                {
+                    List<Items> listUniqueItems = new List<Items>();
+                    Dictionary<string, Items> uniqueItems = new Dictionary<string, Items>();
+                    foreach (Items a in listOfItems)
+                    {
+                        string key = a.item_name + a.item_desc + a.item_price;
+                        if (!uniqueItems.ContainsKey(key))
+                        {
+                            uniqueItems.Add(key, a);
+                        }
+                        else
+                        {
+                            var savedItem = uniqueItems[key];
+
+                            if (savedItem.item_price != a.item_price)
+                            {
+                                if (savedItem.business_price != Math.Min(savedItem.business_price, a.business_price))
+                                {
+                                    savedItem = a;
+                                }
+                            }
+                            else
+                            {
+                                List<DateTime> creationDates = new List<DateTime>();
+                                Debug.WriteLine("NAME {0}, {1}", savedItem.item_name, a.item_name);
+                                Debug.WriteLine("SAVED ITEM UID {0}, SAVED TIME STAMP {1}", savedItem.item_uid, savedItem.created_at);
+                                Debug.WriteLine("NEW ITEM UID {0}, NEW TIME STAMP {1}", a.item_uid, a.created_at);
+
+                                creationDates.Add(DateTime.Parse(savedItem.created_at));
+                                creationDates.Add(DateTime.Parse(a.created_at));
+                                creationDates.Sort();
+
+                                if (creationDates[0] != creationDates[1])
+                                {
+                                    Debug.WriteLine("CREATED FIRST {0}, STRING DATETIME INDEX 0 {1}", creationDates[0], creationDates[0].ToString("yyyy-MM-dd HH:mm:ss"));
+
+                                    if (savedItem.created_at != creationDates[0].ToString("yyyy-MM-dd HH:mm:ss"))
+                                    {
+                                        savedItem = a;
+                                    }
+                                }
+                                else
+                                {
+                                    var itemsIdsList = new List<long>();
+                                    var savedItemId = savedItem.item_uid.Replace('-', '0');
+                                    var newItemId = a.item_uid.Replace('-', '0');
+
+                                    itemsIdsList.Add(long.Parse(savedItemId));
+                                    itemsIdsList.Add(long.Parse(newItemId));
+                                    itemsIdsList.Sort();
+
+                                    if (savedItemId != itemsIdsList[0].ToString())
+                                    {
+                                        //savedItem.item_uid = a.item_uid;
+                                        savedItem = a;
+                                    }
+                                }
+                                Debug.WriteLine("SELECTED ITEM UID: " + savedItem.item_uid);
+                                uniqueItems[key] = savedItem;
+                            }
+                        }
+                    }
+
+                    foreach (string key in uniqueItems.Keys)
+                    {
+                        listUniqueItems.Add(uniqueItems[key]);
+                    }
+
+                    listOfItems = listUniqueItems;
+
+                    vegetablesListView.ItemsSource = SetItemList(listOfItems, "Vegetables");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+        }
+
+        public ObservableCollection<SingleItem> SetItemList(IList<Items> listOfItems, string type)
+        {
+            var list = new ObservableCollection<SingleItem>();
+            foreach (Items produce in listOfItems)
+            {
+                if (produce.taxable == null || produce.taxable == "NULL")
+                {
+                    produce.taxable = "FALSE";
+                }
+
+                var itemToInsert = new SingleItem()
+                {
+                    itemType = produce.item_type,
+                    itemImage = produce.item_photo,
+                    itemFavoriteImage = "unselectedHeartIcon.png",
+                    itemUID = produce.item_uid,
+                    itemBusinessUID = produce.itm_business_uid,
+                    itemName = produce.item_name,
+                    itemPrice = "$ " + produce.item_price.ToString(),
+                    itemPriceWithUnit = "$ " + produce.item_price.ToString("N2") + " / " + (string)produce.item_unit.ToString(),
+                    itemUnit = (string)produce.item_unit.ToString(),
+                    itemDescription = produce.item_desc,
+                    itemTaxable = produce.taxable,
+                    itemQuantity = 0,
+                    itemBusinessPrice = produce.business_price,
+                    itemBackgroundColor = Color.FromHex("#FFFFFF"),
+                    itemOpacity = 1,
+                    isItemVisiable = true,
+                    isItemEnable = true,
+                    isItemUnavailable = false,
+                };
+
+                if (produce.item_type == type)
+                {
+                    list.Add(itemToInsert);
+                }
+            }
+            return list;
         }
     }
 }

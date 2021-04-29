@@ -160,6 +160,8 @@ namespace ServingFresh.Views
                     DeliveryAddress2.Text = purchase.getPurchaseCity() + ", " + purchase.getPurchaseState() + ", " + purchase.getPurchaseZipcode();
                     guestAddressInfoView.HeightRequest = 0;
                     guestPaymentsView.HeightRequest = 0;
+                    guestDeliveryAddressLabel.IsVisible = false;
+                    guestMap.IsVisible = false;
                 }
 
                 cartItems.Clear();
@@ -190,7 +192,13 @@ namespace ServingFresh.Views
             }
             else
             {
+                customerPaymentsView.HeightRequest = 0;
+                customerStripeInformationView.HeightRequest = 0;
+                customerDeliveryAddressView.HeightRequest = 0;
+                guestAddressInfoView.HeightRequest = 0;
+                guestPaymentsView.HeightRequest = 0;
                 expectedDelivery.Text = "";
+                
             }
         }
 
@@ -851,6 +859,8 @@ namespace ServingFresh.Views
 
                 if (paymentIsSuccessful)
                 {
+                    purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
+                    purchase.setPurchaseChargeID(paymentClient.getTransactionID());
                     _ = paymentClient.SendPurchaseToDatabase(purchase);
                     order.Clear();
                     await WriteFavorites(GetFavoritesList(), purchase.getPurchaseCustomerUID());
@@ -867,10 +877,18 @@ namespace ServingFresh.Views
             }
         }
 
-        void ProceedAsGuest(System.Object sender, System.EventArgs e)
+        async void ProceedAsGuest(System.Object sender, System.EventArgs e)
         {
-            FinalizePurchase(purchase, selectedDeliveryDate);
-            Application.Current.MainPage = new DeliveryDetailsPage();
+            if(purchase.getPurchaseLatitude() != "" && purchase.getPurchaseLongitude() != "")
+            {
+                FinalizePurchase(purchase, selectedDeliveryDate);
+                Application.Current.MainPage = new DeliveryDetailsPage();
+            }
+            else
+            {
+                await DisplayAlert("Please verify your address!","It looks like we were not able to validate your address. Make sure that your delivery address shows in the map","OK");
+            }
+            
         }
 
         void CheckoutViaStripe(System.Object sender, System.EventArgs e)
@@ -913,6 +931,8 @@ namespace ServingFresh.Views
                 await WriteFavorites(GetFavoritesList(), purchase.getPurchaseCustomerUID());
                 if (paymentIsSuccessful)
                 {
+                    purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
+                    purchase.setPurchaseChargeID(paymentClient.getTransactionID());
                     _ = paymentClient.SendPurchaseToDatabase(purchase);
                     order.Clear();
                     Application.Current.MainPage = new HistoryPage();
@@ -982,14 +1002,10 @@ namespace ServingFresh.Views
             }
         }
 
-        public async Task GetPlacesPredictionsAsync()
-        {
-           await addr.GetPlacesPredictionsAsync(addressList, Addresses, AddressEntry.Text);
-        }
 
-        private void OnAddressChanged(object sender, EventArgs eventArgs)
+        public async void OnAddressChanged(object sender, EventArgs eventArgs)
         {
-            addr.OnAddressChanged(addressList, Addresses, AddressEntry.Text);
+            addressList.ItemsSource = await addr.GetPlacesPredictionsAsync(AddressEntry.Text);
         }
 
         void addressEntryFocused(object sender, EventArgs eventArgs)
@@ -1000,6 +1016,131 @@ namespace ServingFresh.Views
         void addressEntryUnfocused(object sender, EventArgs eventArgs)
         {
             addr.addressEntryUnfocused(addressList, addressFrame);
+        }
+
+        async void addressList_ItemSelected(System.Object sender, Xamarin.Forms.SelectedItemChangedEventArgs e)
+        {
+            addressGrid.HeightRequest = 140 + 40 + 40;
+            newUserUnitNumber.IsVisible = true;
+            gridAddressView.IsVisible = true;
+            addressFrame.Margin = new Thickness(0, -105-40-40, 0, 0);
+            addressToValidate = addr.addressSelected(addressList, AddressEntry, addressFrame);
+            string zipcode = await addr.getZipcode(addressToValidate.PredictionID);
+            if (zipcode != null)
+            {
+                addressToValidate.ZipCode = zipcode;
+            }
+            addr.addressSelectedFillEntries(addressToValidate, AddressEntry, newUserUnitNumber, newUserCity, newUserState, newUserZipcode);
+            addr.addressEntryUnfocused(addressList, addressFrame);
+
+
+            var client = new AddressValidation();
+            var addressStatus = client.ValidateAddressString(AddressEntry.Text, newUserUnitNumber.Text, newUserCity.Text, newUserState.Text, newUserZipcode.Text);
+
+            if (addressStatus != null)
+            {
+                if (addressStatus == "Y" || addressStatus == "S")
+                {
+
+                    var location = await client.ConvertAddressToGeoCoordiantes(AddressEntry.Text, newUserUnitNumber.Text, newUserState.Text);
+                    if (location != null)
+                    {
+                        var isAddressInZones = await client.getZoneFromLocation(location.Latitude.ToString(), location.Longitude.ToString());
+
+                        if (isAddressInZones != "" && isAddressInZones != "OUTSIDE ZONE RANGE")
+                        {
+                            addressToValidate.Unit = newUserUnitNumber.Text == null ? "" : newUserUnitNumber.Text;
+                            client.SetPinOnMap(map, location, addressToValidate.Street);
+                            purchase.setPurchaseAddress(addressToValidate.Street);
+                            purchase.setPurchaseUnit(addressToValidate.Unit);
+                            purchase.setPurchaseCity(addressToValidate.City);
+                            purchase.setPurchaseState(addressToValidate.State);
+                            purchase.setPurchaseZipcode(addressToValidate.ZipCode);
+                            purchase.setPurchaseLatitude(location.Latitude.ToString());
+                            purchase.setPurchaseLongitude(location.Longitude.ToString());
+                            if (user.getUserType() == "CUSTOMER")
+                            {
+                                DeliveryAddress1.Text = purchase.getPurchaseAddress() + ",";
+                                DeliveryAddress2.Text = purchase.getPurchaseCity() + ", " + purchase.getPurchaseState() + ", " + purchase.getPurchaseZipcode();
+                            }
+                        }
+                        else
+                        {
+                            await DisplayAlert("Oops", "You address is outside our delivery areas", "OK");
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        await DisplayAlert("We were not able to find your location in our system.", "Try again", "OK");
+                        return;
+                    }
+
+                }
+                else if (addressStatus == "D")
+                {
+                    var unit = await DisplayPromptAsync("It looks like your address is missing its unit number", "Please enter your address unit number in the space below", "OK", "Cancel");
+                    if (unit != null)
+                    {
+                        newUserUnitNumber.Text = unit;
+
+                        addressStatus = client.ValidateAddressString(AddressEntry.Text, newUserUnitNumber.Text, newUserCity.Text, newUserState.Text, newUserZipcode.Text);
+
+                        if (addressStatus != null)
+                        {
+                            if (addressStatus == "Y" || addressStatus == "S")
+                            {
+
+                                var location = await client.ConvertAddressToGeoCoordiantes(AddressEntry.Text, newUserUnitNumber.Text, newUserState.Text);
+                                if (location != null)
+                                {
+                                    var isAddressInZones = await client.getZoneFromLocation(location.Latitude.ToString(), location.Longitude.ToString());
+
+                                    if (isAddressInZones != "" && isAddressInZones != "OUTSIDE ZONE RANGE")
+                                    {
+                                        addressToValidate.Unit = newUserUnitNumber.Text == null ? "" : newUserUnitNumber.Text;
+                                        client.SetPinOnMap(map, location, addressToValidate.Street);
+                                        purchase.setPurchaseAddress(addressToValidate.Street);
+                                        purchase.setPurchaseUnit(addressToValidate.Unit);
+                                        purchase.setPurchaseCity(addressToValidate.City);
+                                        purchase.setPurchaseState(addressToValidate.State);
+                                        purchase.setPurchaseZipcode(addressToValidate.ZipCode);
+                                        purchase.setPurchaseLatitude(location.Latitude.ToString());
+                                        purchase.setPurchaseLongitude(location.Longitude.ToString());
+                                        if(user.getUserType() == "CUSTOMER")
+                                        {
+                                            DeliveryAddress1.Text = purchase.getPurchaseAddress() + ",";
+                                            DeliveryAddress2.Text = purchase.getPurchaseCity() + ", " + purchase.getPurchaseState() + ", " + purchase.getPurchaseZipcode();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        await DisplayAlert("Oops", "You address is outside our delivery areas", "OK");
+                                        return;
+                                    }
+                                }
+                                else
+                                {
+                                    await DisplayAlert("We were not able to find your location in our system.", "Try again", "OK");
+                                    return;
+                                }
+
+                            }
+                            else if (addressStatus == "D")
+                            {
+                                 unit = await DisplayPromptAsync("It looks like your address is missing its unit number", "Please enter your address unit number in the space below", "OK", "Cancel");
+                                if (unit != null)
+                                {
+                                    newUserUnitNumber.Text = unit;
+                                }
+                                return;
+                            }
+                        }
+                    }
+                    return;
+                }
+            }
+            
         }
 
         async void addressSelected(System.Object sender, SelectedItemChangedEventArgs e)
@@ -1029,7 +1170,7 @@ namespace ServingFresh.Views
                             await DisplayAlert("Great!", "We are able to deliver to your location! Proceed to payments", "OK");
                             client.SetPinOnMap(map, location, addressToValidate.Address);
                             purchase.setPurchaseAddress(addressToValidate.Street);
-                            purchase.setPurchaseUnit(addressToValidate.Unit);
+                            purchase.setPurchaseUnit(addressToValidate.Unit == null?"": addressToValidate.Unit);
                             purchase.setPurchaseCity(addressToValidate.City);
                             purchase.setPurchaseState(addressToValidate.State);
                             purchase.setPurchaseZipcode(addressToValidate.ZipCode);
@@ -1131,6 +1272,55 @@ namespace ServingFresh.Views
 
         async void SignInDirectUser(System.Object sender, System.EventArgs e)
         {
+            var logInClient = new PrincipalPage();
+            if(logInClient.ValidateDirectSignInCredentials(userEmailAddress, userPassword))
+            {
+                var isEmailValid = await DeliveryDetailsPage.ValidateExistingAccountFromEmail(userEmailAddress.Text);
+                if (isEmailValid != null)
+                {
+                    if (isEmailValid.result.Count != 0)
+                    {
+                        var role = isEmailValid.result[0].role;
+                        if (role == "CUSTOMER")
+                        {
+                            var status = await SignInDirectUser(logInButton, userEmailAddress, userPassword);
+                            if (status)
+                            {
+                                await DisplayAlert("Great!", "You have signed in to your account", "OK");
+                            }
+                            else
+                            {
+                                await DisplayAlert("Oops!", "We were not able to sign you in", "OK");
+                            }
+                        }
+                        else if (role == "GUEST")
+                        {
+                            // we don't sign up but get user id
+                            user.setUserID(isEmailValid.result[0].customer_uid);
+                            user.setUserFromProfile(isEmailValid);
+                            var updateClient = new SignUp();
+                            var content = updateClient.UpdateDirectUser(user, userPassword.Text);
+                            var signUpStatus = await SignUp.SignUpNewUser(content);
+
+                            if (signUpStatus)
+                            {
+                                await DisplayAlert("Great!", "We have created your account! Congratulations", "OK");
+                                user.setUserType("CUSTOMER");
+                                Application.Current.MainPage = new SelectionPage();
+                            }
+                            else
+                            {
+                                await DisplayAlert("Oops", "We were not able to sign you up. Try again.", "OK");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        async Task<bool> SignInDirectUser(Button logInButton, Entry userEmailAddress, Entry userPassword)
+        {
+            var status = false;
             var client = new SignIn();
             var result = await client.SignInDirectUser(logInButton, userEmailAddress, userPassword);
             if (result != null)
@@ -1152,14 +1342,10 @@ namespace ServingFresh.Views
                 user.setUserZipcode(result.getUserZipcode());
                 user.setUserLatitude(result.getUserLatitude());
                 user.setUserLongitude(result.getUserLongitude());
-
-                await DisplayAlert("Great!", "You have signed in to your account","OK");
-                Application.Current.MainPage = new CheckoutPage();
+                
+                status = true;
             }
-            else
-            {
-                Debug.WriteLine("Not Log In");
-            }
+            return status;
         }
 
         void SignInWithFacebook(System.Object sender, System.EventArgs e)
@@ -1217,6 +1403,22 @@ namespace ServingFresh.Views
                         user.setUserZipcode(result.getUserZipcode());
                         user.setUserLatitude(result.getUserLatitude());
                         user.setUserLongitude(result.getUserLongitude());
+
+                        if(user.getUserType() == "GUEST")
+                        {
+                            var updateClient = new SignUp();
+                            var content = updateClient.UpdateSocialUser(user, e.Account.Properties["access_token"], "", facebookUser.id, "FACEBOOK");
+                            var signUpStatus = await SignUp.SignUpNewUser(content);
+
+                            if (signUpStatus)
+                            {
+                                user.setUserType("CUSTOMER");
+                            }
+                            else
+                            {
+                                await DisplayAlert("Oops", "We were not able to sign you up. Try again.", "OK");
+                            }
+                        }
                         await DisplayAlert("Great!", "You have signed in to your account", "OK");
                         Application.Current.MainPage = new CheckoutPage();
                     }
@@ -1266,6 +1468,22 @@ namespace ServingFresh.Views
                         user.setUserZipcode(result.getUserZipcode());
                         user.setUserLatitude(result.getUserLatitude());
                         user.setUserLongitude(result.getUserLongitude());
+
+                        if (user.getUserType() == "GUEST")
+                        {
+                            var updateClient = new SignUp();
+                            var content = updateClient.UpdateSocialUser(user, e.Account.Properties["access_token"], e.Account.Properties["refresh_token"], googleUser.id, "GOOGLE");
+                            var signUpStatus = await SignUp.SignUpNewUser(content);
+
+                            if (signUpStatus)
+                            {
+                                user.setUserType("CUSTOMER");
+                            }
+                            else
+                            {
+                                await DisplayAlert("Oops", "We were not able to sign you up. Try again.", "OK");
+                            }
+                        }
                         await DisplayAlert("Great!", "You have signed in to your account", "OK");
                         Application.Current.MainPage = new CheckoutPage();
 
@@ -1295,7 +1513,7 @@ namespace ServingFresh.Views
                         // user is ready to be sign in.
                         var clientSignUp = new SignUp();
                         var content = clientSignUp.SetDirectUser(user, newUserPassword1.Text);
-                        var signUpStatus = await clientSignUp.SignUpNewUser(content);
+                        var signUpStatus = await SignUp.SignUpNewUser(content);
 
                         if (signUpStatus != "" && signUpStatus != "USER ALREADY EXIST")
                         {
@@ -1325,6 +1543,20 @@ namespace ServingFresh.Views
             {
                 await DisplayAlert("Oops", "Please enter all the required information. Thanks!", "OK");
                 return;
+            }
+        }
+
+        void UpdateAddressForCustomer(System.Object sender, System.EventArgs e)
+        {
+            if(guestAddressInfoView.HeightRequest != 0)
+            {
+                guestAddressInfoView.HeightRequest = 0;
+                guestDeliveryAddressLabel.IsVisible = false;
+                guestMap.IsVisible = false;
+            }
+            else
+            {
+                guestAddressInfoView.HeightRequest = 140;
             }
         }
 
@@ -1368,7 +1600,7 @@ namespace ServingFresh.Views
 
                     var facebookUser = clientLogIn.GetFacebookUser(e.Account.Properties["access_token"]);
                     var content = clientSignUp.SetDirectUser(user, e.Account.Properties["access_token"], "", facebookUser.id, facebookUser.email, "FACEBOOK");
-                    var signUpStatus = await clientSignUp.SignUpNewUser(content);
+                    var signUpStatus = await SignUp.SignUpNewUser(content);
 
                     if (signUpStatus != "" && signUpStatus != "USER ALREADY EXIST")
                     {
@@ -1408,7 +1640,7 @@ namespace ServingFresh.Views
 
                     var googleUser = await clientLogIn.GetGoogleUser(e);
                     var content = clientSignUp.SetDirectUser(user, e.Account.Properties["access_token"], e.Account.Properties["refresh_token"], googleUser.id, googleUser.email, "GOOGLE");
-                    var signUpStatus = await clientSignUp.SignUpNewUser(content);
+                    var signUpStatus = await SignUp.SignUpNewUser(content);
 
                     if (signUpStatus != "" && signUpStatus != "USER ALREADY EXIST")
                     {

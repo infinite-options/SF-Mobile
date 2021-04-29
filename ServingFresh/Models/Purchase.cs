@@ -1,51 +1,52 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace ServingFresh.Models
 {
     public class Purchase
     {
-        private string pur_customer_uid;
-        private string pur_business_uid;
-        private ObservableCollection<PurchasedItem> items;
-        private string order_instructions;
-        private string delivery_instructions;
-        private string order_type;
-        private string delivery_first_name;
-        private string delivery_last_name;
-        private string delivery_phone_num;
-        private string delivery_email;
-        private string delivery_address;
-        private string delivery_unit;
-        private string delivery_city;
-        private string delivery_state;
-        private string delivery_zip;
-        private string delivery_latitude;
-        private string delivery_longitude;
-        private string purchase_notes;
-        private string start_delivery_date;
-        private string pay_coupon_id;
-        private string amount_due;
-        private string amount_discount;
-        private string amount_paid;
-        private string info_is_Addon;
-        private string cc_num;
-        private string cc_exp_date;
-        private string cc_cvv;
-        private string cc_zip;
-        private string charge_id;
-        private string payment_type;
-        private string subtotal;
-        private string service_fee;
-        private string delivery_fee;
-        private string driver_tip;
-        private string taxes;
+        public string pur_customer_uid;
+        public string pur_business_uid;
+        public ObservableCollection<PurchasedItem> items;
+        public string order_instructions;
+        public string delivery_instructions;
+        public string order_type;
+        public string delivery_first_name;
+        public string delivery_last_name;
+        public string delivery_phone_num;
+        public string delivery_email;
+        public string delivery_address;
+        public string delivery_unit;
+        public string delivery_city;
+        public string delivery_state;
+        public string delivery_zip;
+        public string delivery_latitude;
+        public string delivery_longitude;
+        public string purchase_notes;
+        public string start_delivery_date;
+        public string pay_coupon_id;
+        public string amount_due;
+        public string amount_discount;
+        public string amount_paid;
+        public string info_is_Addon;
+        public string cc_num;
+        public string cc_exp_date;
+        public string cc_cvv;
+        public string cc_zip;
+        public string charge_id;
+        public string payment_type;
+        public string subtotal;
+        public string service_fee;
+        public string delivery_fee;
+        public string driver_tip;
+        public string taxes;
 
         public Purchase(User user)
         {
             pur_customer_uid = user.getUserID();
             pur_business_uid = "";
-            items = null;
+            items = new ObservableCollection<PurchasedItem>();
             order_instructions = "";
             delivery_instructions = "";
             order_type = "";
@@ -429,5 +430,43 @@ namespace ServingFresh.Models
         {
             this.taxes = taxes;
         }
+
+        public void printPurchase()
+        {
+            Debug.WriteLine("1: " + pur_customer_uid);
+            Debug.WriteLine("2: " + pur_business_uid);
+            Debug.WriteLine("3: " + items);
+            Debug.WriteLine("4: " + order_instructions);
+            Debug.WriteLine("5: " + delivery_instructions);
+            Debug.WriteLine("6: " + order_type);
+            Debug.WriteLine("7: " + delivery_first_name);
+            Debug.WriteLine("8: " + delivery_last_name);
+            Debug.WriteLine("9: " + delivery_phone_num);
+            Debug.WriteLine("10: " + delivery_email);
+            Debug.WriteLine("11: " + delivery_address);
+            Debug.WriteLine("12: " + delivery_unit);
+            Debug.WriteLine("13: " + delivery_city);
+            Debug.WriteLine("14: " + delivery_state);
+            Debug.WriteLine("15: " + delivery_zip);
+            Debug.WriteLine("16: " + delivery_latitude);
+            Debug.WriteLine("17: " + delivery_longitude);
+            Debug.WriteLine("18: " + purchase_notes);
+            Debug.WriteLine("19: " + start_delivery_date);
+            Debug.WriteLine("20: " + pay_coupon_id);
+            Debug.WriteLine("21: " + amount_paid);
+            Debug.WriteLine("22: " + info_is_Addon);
+            Debug.WriteLine("23: " + cc_num);
+            Debug.WriteLine("24: " + cc_exp_date);
+            Debug.WriteLine("25: " + cc_cvv);
+            Debug.WriteLine("26: " + cc_zip);
+            Debug.WriteLine("27: " + charge_id);
+            Debug.WriteLine("27.5: " + payment_type);
+            Debug.WriteLine("28: " + subtotal);
+            Debug.WriteLine("29: " + service_fee);
+            Debug.WriteLine("30: " + delivery_fee);
+            Debug.WriteLine("31: " + driver_tip);
+            Debug.WriteLine("32: " + taxes);
+        }
+
     }
 }

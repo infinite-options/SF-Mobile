@@ -6,6 +6,10 @@ using Xamarin.Forms.Maps;
 using static ServingFresh.Views.SelectionPage;
 using static ServingFresh.Views.CheckoutPage;
 using static ServingFresh.Views.SignUpPage;
+using ServingFresh.Models;
+using ServingFresh.LogIn.Classes;
+using Xamarin.Auth;
+using System.Diagnostics;
 
 namespace ServingFresh.Views
 {
@@ -15,7 +19,7 @@ namespace ServingFresh.Views
         {
             InitializeComponent();
             SelectionPage.SetMenu(guestMenuSection, customerMenuSection, historyLabel, profileLabel);
-            cartItemsNumber.Text = purchase.getPurchaseItems().Count.ToString();
+            cartItemsNumber.Text = order.Count.ToString();
             contactMessage.Text = "If we have question. We will contact you at " + purchase.getPurchaseEmail() + " or " + purchase.getPurchasePhoneNumber();
             expectedDeliveryMessage.Text = "Your order will be delivered on: " + selectedDeliveryDate.deliveryTimeStamp.ToString("dddd, MMM dd, yyyy");
             PlaceLocationOnMap(double.Parse(purchase.getPurchaseLatitude()), double.Parse(purchase.getPurchaseLongitude()));
@@ -106,6 +110,141 @@ namespace ServingFresh.Views
         void NavigateToMainFromConfirmation(System.Object sender, System.EventArgs e)
         {
             NavigateToMain(sender, e);
+        }
+
+        async void SignUpUser(System.Object sender, System.EventArgs e)
+        {
+            var client = new PrincipalPage();
+            if (client.ValidatePassword(passsword1, passsword2))
+            {
+                // user is ready to be sign in.
+                var updateClient = new SignUp();
+                var content = updateClient.UpdateDirectUser(user, passsword1.Text);
+                var signUpStatus = await SignUp.SignUpNewUser(content);
+
+                if (signUpStatus)
+                {
+                    await DisplayAlert("Great!", "We have created your account! Congratulations", "OK");
+                    user.setUserType("CUSTOMER");
+                    Application.Current.MainPage = new SelectionPage();
+                }
+                else
+                {
+                    await DisplayAlert("Oops", "We were not able to sign you up. Try again.", "OK");
+                }
+            }
+            else
+            {
+                await DisplayAlert("Oops", "Please check that your password is the same in both entries", "OK");
+                return;
+            }
+        }
+
+        void ContinuteWithFacebook(System.Object sender, System.EventArgs e)
+        {
+            var client = new SignIn();
+            var authenticator = client.GetFacebookAuthetication();
+            var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
+            authenticator.Completed += FacebookAuthetication;
+            authenticator.Error += Authenticator_Error;
+            presenter.Login(authenticator);
+        }
+
+        void ContinueWithGoogle(System.Object sender, System.EventArgs e)
+        {
+            var client = new SignIn();
+            var authenticator = client.GetGoogleAuthetication();
+            var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
+            AuthenticationState.Authenticator = authenticator;
+            authenticator.Completed += GoogleAuthetication;
+            authenticator.Error += Authenticator_Error;
+            presenter.Login(authenticator);
+        }
+
+        private async void FacebookAuthetication(object sender, Xamarin.Auth.AuthenticatorCompletedEventArgs e)
+        {
+            var authenticator = sender as OAuth2Authenticator;
+
+            if (authenticator != null)
+            {
+                authenticator.Completed -= FacebookAuthetication;
+                authenticator.Error -= Authenticator_Error;
+            }
+
+            if (e.IsAuthenticated)
+            {
+                try
+                {
+                    var clientLogIn = new SignIn();
+                    var facebookUser = clientLogIn.GetFacebookUser(e.Account.Properties["access_token"]);
+                    var updateClient = new SignUp();
+
+                    user.setUserEmail(facebookUser.email);
+                    var content = updateClient.UpdateSocialUser(user, e.Account.Properties["access_token"], "", facebookUser.id, "FACEBOOK");
+                    var signUpStatus = await SignUp.SignUpNewUser(content);
+
+                    if (signUpStatus)
+                    {
+                        await DisplayAlert("Great!", "We have created your account! Congratulations", "OK");
+                        user.setUserType("CUSTOMER");
+                        Application.Current.MainPage = new SelectionPage();
+                    }
+                    else
+                    {
+                        await DisplayAlert("Oops", "We were not able to sign you up. Try again.", "OK");
+                    }
+                }
+                catch (Exception g)
+                {
+                    Debug.WriteLine(g.Message);
+                }
+            }
+        }
+
+        private async void GoogleAuthetication(object sender, AuthenticatorCompletedEventArgs e)
+        {
+            var authenticator = sender as OAuth2Authenticator;
+
+            if (authenticator != null)
+            {
+                authenticator.Completed -= GoogleAuthetication;
+                authenticator.Error -= Authenticator_Error;
+            }
+
+            if (e.IsAuthenticated)
+            {
+                try
+                {
+                    var clientLogIn = new SignIn();
+                    var updateClient = new SignUp();
+
+                    var googleUser = await clientLogIn.GetGoogleUser(e);
+
+                    user.setUserEmail(googleUser.email);
+                    var content = updateClient.UpdateSocialUser(user, e.Account.Properties["access_token"], e.Account.Properties["refresh_token"], googleUser.id, "GOOGLE");
+                    var signUpStatus = await SignUp.SignUpNewUser(content);
+
+                    if (signUpStatus)
+                    {
+                        await DisplayAlert("Great!", "We have created your account! Congratulations", "OK");
+                        user.setUserType("CUSTOMER");
+                        Application.Current.MainPage = new SelectionPage();
+                    }
+                    else
+                    {
+                        await DisplayAlert("Oops", "We were not able to sign you up. Try again.", "OK");
+                    }
+                }
+                catch (Exception g)
+                {
+                    Debug.WriteLine(g.Message);
+                }
+            }
+        }
+
+        private async void Authenticator_Error(object sender, Xamarin.Auth.AuthenticatorErrorEventArgs e)
+        {
+            await DisplayAlert("An error occur when authenticating", "Please try again", "OK");
         }
     }  
 }
