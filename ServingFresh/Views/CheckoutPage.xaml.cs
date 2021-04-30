@@ -1064,7 +1064,7 @@ namespace ServingFresh.Views
                             var role = isEmailUnused.result[0].role;
                             if (role == "CUSTOMER")
                             {
-                                await DisplayAlert("Oops", "You are not a guest. We are sending you to the checkout page where you can sign in to proceed with your purchase", "OK");
+                                await DisplayAlert("Great!", "It looks like you already have an account. Please log in to find out if you have any additional discounts", "OK");
                                 await Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(94), true);
                             }
                             else if (role == "GUEST")
