@@ -276,7 +276,7 @@ namespace ServingFresh.Models
                 }
             }catch(Exception changeMode)
             {
-                Debug.WriteLine("USING PAYMENTS IN WRONG MODE" + changeMode.Message);
+                Debug.WriteLine("USING PAYMENTS IN WRONG MODE: " + changeMode.Message);
                 return false;
             }
         }

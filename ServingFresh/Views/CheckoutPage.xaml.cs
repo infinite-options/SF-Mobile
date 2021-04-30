@@ -969,6 +969,115 @@ namespace ServingFresh.Views
             }
         }
 
+        async void GuestCompletePaymentWithStripe(System.Object sender, System.EventArgs e)
+        {
+            var client1 = new SignUp();
+            if (client1.GuestCheckAllRequiredEntries(firstName,lastName, emailAddress, phoneNumber, guestCardHolderName,guestCardHolderNumber,guestCardCVV,guestCardExpMonth,guestCardExpYear,guestCardZipcode))
+            {
+
+                purchase.setPurchaseFirstName(firstName.Text);
+                purchase.setPurchaseLastName(lastName.Text);
+                purchase.setPurchaseEmail(emailAddress.Text);
+                purchase.setPurchasePhoneNumber(phoneNumber.Text);
+
+                var button = (Button)sender;
+
+                if (button.BackgroundColor == Color.FromHex("#FF8500"))
+                {
+                    button.BackgroundColor = Color.FromHex("#2B6D74");
+                    purchase.setPurchasePaymentType("STRIPE");
+
+                    string mode = Payments.getMode(purchase.getPurchaseDeliveryInstructions(), "STRIPE");
+                    paymentClient = new Payments(mode);
+                    var client = new SignIn();
+                    var isEmailUnused = await client.ValidateExistingAccountFromEmail(purchase.getPurchaseEmail());
+                    if (isEmailUnused == null)
+                    {
+                        var userID = await SignUp.SignUpNewUser(SignUp.GetUserFrom(purchase));
+                        if (userID != "")
+                        {
+                            purchase.setPurchaseCustomerUID(userID);
+                            var paymentIsSuccessful = paymentClient.PayViaStripe(
+                                purchase.getPurchaseEmail(),
+                                guestCardHolderName.Text,
+                                guestCardHolderNumber.Text,
+                                guestCardCVV.Text,
+                                guestCardExpMonth.Text,
+                                guestCardExpYear.Text,
+                                purchase.getPurchaseAmountDue()
+                                );
+
+                            await WriteFavorites(GetFavoritesList(), userID);
+
+                            if (paymentIsSuccessful)
+                            {
+                                purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
+                                purchase.setPurchaseChargeID(paymentClient.getTransactionID());
+                                purchase.printPurchase();
+                                _ = paymentClient.SendPurchaseToDatabase(purchase);
+                                order.Clear();
+                                Application.Current.MainPage = new ConfirmationPage();
+                            }
+                            else
+                            {
+                                await DisplayAlert("Oop", "It seems that your card is invalid. Try again", "OK");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (isEmailUnused.result.Count != 0)
+                        {
+                            var role = isEmailUnused.result[0].role;
+                            if (role == "CUSTOMER")
+                            {
+                                await DisplayAlert("Oops", "You are not a guest. We are sending you to the checkout page where you can sign in to proceed with your purchase", "OK");
+                                await Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(94), true);
+                            }
+                            else if (role == "GUEST")
+                            {
+                                // we don't sign up but get user id
+                                user.setUserID(isEmailUnused.result[0].customer_uid);
+                                purchase.setPurchaseCustomerUID(user.getUserID());
+                                user.setUserFromProfile(isEmailUnused);
+                                var paymentIsSuccessful = paymentClient.PayViaStripe(
+                                    purchase.getPurchaseEmail(),
+                                    guestCardHolderName.Text,
+                                    guestCardHolderNumber.Text,
+                                    guestCardCVV.Text,
+                                    guestCardExpMonth.Text,
+                                    guestCardExpYear.Text,
+                                    purchase.getPurchaseAmountDue()
+                                    );
+
+                                await WriteFavorites(GetFavoritesList(), user.getUserID());
+                                if (paymentIsSuccessful)
+                                {
+                                    purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
+                                    purchase.setPurchaseChargeID(paymentClient.getTransactionID());
+                                    _ = paymentClient.SendPurchaseToDatabase(purchase);
+                                    order.Clear();
+                                    Application.Current.MainPage = new ConfirmationPage();
+                                }
+                                else
+                                {
+                                    await DisplayAlert("Oop", "It seems that your card is invalid. Try again", "OK");
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    button.BackgroundColor = Color.FromHex("#FF8500");
+                }
+            }
+            else
+            {
+                await DisplayAlert("Oops","You seem to forgot to fill in all entries. Please fill in all entries to continue","OK");
+            }
+        }
+
         void CheckoutViaStripe(System.Object sender, System.EventArgs e)
         {
             var button = (Button)sender;

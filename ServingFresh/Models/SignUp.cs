@@ -246,11 +246,32 @@ namespace ServingFresh.Models
             bool result = false;
             if (!(String.IsNullOrEmpty(firstName.Text)
                 || String.IsNullOrEmpty(lastName.Text)
+                || String.IsNullOrEmpty(phoneNumber.Text)
                 || String.IsNullOrEmpty(email.Text)
                 || String.IsNullOrEmpty(address1.Text)
                 || String.IsNullOrEmpty(city.Text)
                 || String.IsNullOrEmpty(state.Text)
                 || String.IsNullOrEmpty(zipcode.Text)
+                ))
+            {
+                result = true;
+            }
+            return result;
+        }
+
+        public bool GuestCheckAllRequiredEntries(Entry firstName, Entry lastName, Entry email, Entry phoneNumber, Entry cardHolderName, Entry cardNumber, Entry cardCvv, Entry cardMonth, Entry cardYear, Entry cardZipcode)
+        {
+            bool result = false;
+            if (!(String.IsNullOrEmpty(firstName.Text)
+                || String.IsNullOrEmpty(lastName.Text)
+                || String.IsNullOrEmpty(phoneNumber.Text)
+                || String.IsNullOrEmpty(email.Text)
+                || String.IsNullOrEmpty(cardHolderName.Text)
+                || String.IsNullOrEmpty(cardNumber.Text)
+                || String.IsNullOrEmpty(cardCvv.Text)
+                || String.IsNullOrEmpty(cardMonth.Text)
+                || String.IsNullOrEmpty(cardYear.Text)
+                || String.IsNullOrEmpty(cardZipcode.Text)
                 ))
             {
                 result = true;

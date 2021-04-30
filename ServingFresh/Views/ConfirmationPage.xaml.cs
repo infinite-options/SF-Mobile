@@ -66,6 +66,7 @@ namespace ServingFresh.Views
             //{
             //    menuFrame.Height = 0;
             //}
+            Application.Current.MainPage.Navigation.PushModalAsync(new MenuPage(),true);
         }
 
         void NavigateToCartFromConfirmation(System.Object sender, System.EventArgs e)

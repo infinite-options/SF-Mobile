@@ -767,6 +767,29 @@ namespace ServingFresh.Models
             //await DisplayAlert("Authentication error: ", e.Message, "OK");
         }
 
+        public async Task<UserProfile> ValidateExistingAccountFromEmail(string email)
+        {
+            UserProfile result = null;
+
+            var client = new System.Net.Http.HttpClient();
+            var endpointCall = await client.GetAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/email_info/" + email);
+
+
+            if (endpointCall.IsSuccessStatusCode)
+            {
+                var endpointContent = await endpointCall.Content.ReadAsStringAsync();
+                Debug.WriteLine("PROFILE: " + endpointContent);
+                var profile = JsonConvert.DeserializeObject<UserProfile>(endpointContent);
+                if (profile.result.Count != 0)
+                {
+                    result = profile;
+                }
+
+            }
+
+            return result;
+        }
+
         //public void AppleLogInClick(System.Object sender, System.EventArgs e)
         //{
         //    SignIn?.Invoke(sender, e);
