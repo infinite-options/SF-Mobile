@@ -179,6 +179,7 @@ namespace ServingFresh.Views
                     DeliveryAddress2.Text = purchase.getPurchaseCity() + ", " + purchase.getPurchaseState() + ", " + purchase.getPurchaseZipcode();
                     guestAddressInfoView.HeightRequest = 0;
                     guestPaymentsView.HeightRequest = 0;
+                    addressFrame.Margin = new Thickness(0, 0, 0, 0);
                     guestDeliveryAddressLabel.IsVisible = false;
                     guestMap.IsVisible = false;
                 }
@@ -969,6 +970,38 @@ namespace ServingFresh.Views
             }
         }
 
+        //await Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(94), true);
+
+         void GuestCompletePaymentWithPayPal(System.Object sender, System.EventArgs e)
+        {
+            var client1 = new SignUp();
+            //client1.GuestCheckAllRequiredEntries(firstName, lastName, emailAddress, phoneNumber)
+            if (true)
+            {
+
+                purchase.setPurchaseFirstName("Carlos");
+                purchase.setPurchaseLastName("Torres");
+                purchase.setPurchaseEmail("omarfacio2010@gmail.com");
+                purchase.setPurchasePhoneNumber("4158329643");
+
+                var button = (Button)sender;
+
+                if (button.BackgroundColor == Color.FromHex("#FF8500"))
+                {
+                    button.BackgroundColor = Color.FromHex("#2B6D74");
+                    Application.Current.MainPage.Navigation.PushModalAsync(new PayPalPage(), true);
+                }
+                else
+                {
+                    button.BackgroundColor = Color.FromHex("#FF8500");
+                }
+            }
+            //else
+            //{
+            //    await DisplayAlert("Oops", "You seem to forgot to fill in all entries. Please fill in all entries to continue", "OK");
+            //}
+        }
+
         async void GuestCompletePaymentWithStripe(System.Object sender, System.EventArgs e)
         {
             var client1 = new SignUp();
@@ -1245,8 +1278,14 @@ namespace ServingFresh.Views
             gridAddressView.IsVisible = true;
             addressToValidate = addr.addressSelected(addressList, addressFrame);
             AddressEntry.Text = addressToValidate.Street;
-
-            addressFrame.Margin = new Thickness(0, -105-40-40, 0, 0);
+            if(user.getUserType() == "GUEST")
+            {
+                addressFrame.Margin = new Thickness(0, -105 - 40 - 40, 0, 0);
+            }
+            else
+            {
+                addressFrame.Margin = new Thickness(0, - 40 - 40, 0, 0);
+            }
             //addressToValidate = addr.addressSelected(addressList, AddressEntry, addressFrame);
             string zipcode = await addr.getZipcode(addressToValidate.PredictionID);
             if (zipcode != null)

@@ -279,6 +279,20 @@ namespace ServingFresh.Models
             return result;
         }
 
+        public bool GuestCheckAllRequiredEntries(Entry firstName, Entry lastName, Entry email, Entry phoneNumber)
+        {
+            bool result = false;
+            if (!(String.IsNullOrEmpty(firstName.Text)
+                || String.IsNullOrEmpty(lastName.Text)
+                || String.IsNullOrEmpty(phoneNumber.Text)
+                || String.IsNullOrEmpty(email.Text)
+                ))
+            {
+                result = true;
+            }
+            return result;
+        }
+
         public bool ValidateDirectSignInCredentials(Entry email, Entry password)
         {
             bool result = false;

@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="ServingFresh.Views.PayPalPage">
+    <ContentPage.Content>
+        <Frame Margin="0,94,0,0" BackgroundColor="White" CornerRadius="2">
+            <StackLayout>
+                <StackLayout HeightRequest="30" >
+                        <ImageButton BackgroundColor="White" Padding="2,0,2,0" HeightRequest="30" Source="closeFrameIcon.png" HorizontalOptions="End" Clicked="ImageButton_Clicked"></ImageButton>
+                </StackLayout>
+                <StackLayout BackgroundColor="Navy" VerticalOptions="FillAndExpand">
+                   <WebView x:Name="webView" VerticalOptions="FillAndExpand"></WebView>
+                </StackLayout>
+            </StackLayout>
+        </Frame>
+    </ContentPage.Content>
+</ContentPage>

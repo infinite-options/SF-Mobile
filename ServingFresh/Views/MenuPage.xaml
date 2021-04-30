@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     x:Class="ServingFresh.Views.MenuPage">
     <ContentPage.Content>
-            <Frame Margin="0,94,0,0" BackgroundColor="#136D74" CornerRadius="2">
+        <Frame Margin="0,94,0,0" BackgroundColor="#136D74" CornerRadius="2">
 
                 <StackLayout Spacing="10">
                     <StackLayout HeightRequest="30" >

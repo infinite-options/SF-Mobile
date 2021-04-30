@@ -293,7 +293,7 @@
                                     </StackLayout>
                                     <StackLayout Margin="0,50,0,50" Spacing="15" x:Name="guestCheckoutView" IsVisible="false">
                                          <Button Text="Checkout with Stripe" BorderWidth="4" BorderColor="#FF8500" HeightRequest="36" WidthRequest="264" HorizontalOptions="Center" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="GuestCheckoutWithStripe"></Button>
-                                        <Button Text="Checkout with PayPal" HeightRequest="36" WidthRequest="264" HorizontalOptions="Center"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" ></Button>
+                                        <Button Text="Checkout with PayPal" HeightRequest="36" WidthRequest="264" HorizontalOptions="Center"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="GuestCompletePaymentWithPayPal"></Button>
                                     </StackLayout>
                                     <StackLayout x:Name="guestStripeView" Spacing="10" IsVisible="false">
 
