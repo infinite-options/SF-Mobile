@@ -1339,8 +1339,15 @@ namespace ServingFresh.Views
                 {
                     if (order.ContainsKey(i.itemName))
                     {
-                        i.updateItemBackgroundColor = Color.FromHex("#ffce99");
-                        i.updateItemQuantity = order[i.itemName].item_quantity;
+                        if (order[i.itemName].item_quantity != 0)
+                        {
+                            i.updateItemBackgroundColor = Color.FromHex("#ffce99");
+                            i.updateItemQuantity = order[i.itemName].item_quantity;
+                        }
+                        else
+                        {
+                            i.updateItemBackgroundColor = Color.FromHex("#FFFFFF");
+                        }
                     }
                 }
 
@@ -1549,17 +1556,28 @@ namespace ServingFresh.Views
 
         void CheckOutClickBusinessPage(System.Object sender, System.EventArgs e)
         {
-
+            var itemKeyToRemove = new List<string>();
             foreach (string item in order.Keys)
             {
-                if (!selectedDeliveryDate.business_uids.Contains(order[item].pur_business_uid))
+                if(order[item].item_quantity != 0)
                 {
-                    order[item].isItemAvailable = false;
-                }
-                else
+                    if (!selectedDeliveryDate.business_uids.Contains(order[item].pur_business_uid))
+                    {
+                        order[item].isItemAvailable = false;
+                    }
+                    else
+                    {
+                        order[item].isItemAvailable = true;
+                    }
+                }else
                 {
-                    order[item].isItemAvailable = true;
+                    itemKeyToRemove.Add(item);
                 }
+            }
+
+            foreach(string key in itemKeyToRemove)
+            {
+                order.Remove(key);
             }
 
             Application.Current.MainPage = new CheckoutPage();
@@ -1925,7 +1943,7 @@ namespace ServingFresh.Views
             var tgr = (TapGestureRecognizer)sl.GestureRecognizers[0];
             var dm = (ScheduleInfo)tgr.CommandParameter;
             string weekday = dm.delivery_dayofweek;
-            HideMenu(menuFrame);
+            //HideMenu(menuFrame);
             selectedDeliveryDate = dm;
             var day = DateTime.Parse(selectedDeliveryDate.deliveryTimeStamp.ToString());
             title.Text = day.ToString("ddd") + ", " + selectedDeliveryDate.delivery_date.ToString();
@@ -1958,14 +1976,14 @@ namespace ServingFresh.Views
             UpdateNumberOfItemsInCart();
         }
 
-        void HideMenu(RowDefinition menuRow)
-        {
-            if (menuRowHeight > 0)
-            {
-                menuRow.Height = 0;
-                menuRowHeight = 0;
-            }
-        }
+        //void HideMenu(RowDefinition menuRow)
+        //{
+        //    if (menuRowHeight > 0)
+        //    {
+        //        menuRow.Height = 0;
+        //        menuRowHeight = 0;
+        //    }
+        //}
 
         void Change_Border_Color(Object sender, EventArgs e)
         {

@@ -8,7 +8,7 @@
 
                 <StackLayout Spacing="10">
                     <StackLayout HeightRequest="30" >
-                        <ImageButton BackgroundColor="White" Padding="2,0,2,0" HeightRequest="30" Source="closeFrameIcon.png" HorizontalOptions="End" Clicked="ImageButton_Clicked"></ImageButton>
+                        <ImageButton  Padding="2,0,2,0" HeightRequest="30" Source="closeMenuIcon.png" HorizontalOptions="End" Clicked="ImageButton_Clicked"></ImageButton>
                     </StackLayout>
                     <StackLayout Orientation="Horizontal" Spacing="20">
                         <Frame HasShadow="False" BackgroundColor="Transparent" Padding="0" HeightRequest="32" WidthRequest="32" >
@@ -89,7 +89,7 @@
                         </StackLayout.GestureRecognizers>
                     </StackLayout>
 
-                    <StackLayout x:Name="guestMenuSection">
+                    <StackLayout x:Name="guestMenuSection" >
                         <StackLayout Orientation="Horizontal" Spacing="20">
                             <Frame HasShadow="False" BackgroundColor="Transparent" Padding="0"  HeightRequest="32" WidthRequest="32">
                                 <Image Margin="-3,0,0,0" VerticalOptions="CenterAndExpand" Source="signIn.png"  Scale="0.9"></Image>
@@ -121,9 +121,9 @@
                         </StackLayout>
                     </StackLayout>
 
-                    <StackLayout Orientation="Horizontal" Spacing="20" x:Name="customerMenuSection">
+                    <StackLayout Margin="0,-10,0,0" Orientation="Horizontal" Spacing="20" x:Name="customerMenuSection">
                         <Frame HasShadow="False" BackgroundColor="Transparent" Padding="0"  HeightRequest="32" WidthRequest="32">
-                            <Image VerticalOptions="CenterAndExpand" Source="logoutIcon.png"  Scale="0.9"></Image>
+                            <Image VerticalOptions="CenterAndExpand" Source="logoutIcon.png"  Scale="0.8"></Image>
                         </Frame>
                         <Label VerticalOptions="Center" Text="Logout" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
                         <StackLayout.GestureRecognizers>

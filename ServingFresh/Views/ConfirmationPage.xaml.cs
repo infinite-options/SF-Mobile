@@ -11,6 +11,7 @@ using ServingFresh.Models;
 using ServingFresh.LogIn.Classes;
 using Xamarin.Auth;
 using System.Diagnostics;
+using Acr.UserDialogs;
 
 namespace ServingFresh.Views
 {
@@ -120,18 +121,21 @@ namespace ServingFresh.Views
             if (client.ValidatePassword(passsword1, passsword2))
             {
                 // user is ready to be sign in.
+                UserDialogs.Instance.ShowLoading("We are creating your Serving Fresh account!");
                 var updateClient = new SignUp();
                 var content = updateClient.UpdateDirectUser(user, passsword1.Text);
                 var signUpStatus = await SignUp.SignUpNewUser(content);
 
                 if (signUpStatus)
                 {
+                    UserDialogs.Instance.HideLoading();
                     await DisplayAlert("Great!", "We have created your account! Congratulations", "OK");
                     user.setUserType("CUSTOMER");
                     Application.Current.MainPage = new SelectionPage();
                 }
                 else
                 {
+                    UserDialogs.Instance.HideLoading();
                     await DisplayAlert("Oops", "We were not able to sign you up. Try again.", "OK");
                 }
             }

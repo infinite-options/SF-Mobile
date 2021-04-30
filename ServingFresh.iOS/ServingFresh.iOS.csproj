@@ -227,6 +227,7 @@
     <BundleResource Include="Resources\homeIcon.png" />
     <BundleResource Include="Resources\ambassadorIcon.png" />
     <BundleResource Include="Resources\giftCardIcon.png" />
+    <BundleResource Include="Resources\closeMenuIcon.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AppleSignIn\" />

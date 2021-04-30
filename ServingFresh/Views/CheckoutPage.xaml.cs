@@ -82,7 +82,7 @@ namespace ServingFresh.Views
 
 
         public static Purchase purchase = new Purchase(user);
-        public static ObservableCollection<ItemObject> cartItems = new ObservableCollection<ItemObject>();
+        public ObservableCollection<ItemObject> cartItems = new ObservableCollection<ItemObject>();
         public ObservableCollection<CouponItem> couponsList = new ObservableCollection<CouponItem>();
         public ObservableCollection<CouponItem> availableCoupons = new ObservableCollection<CouponItem>();
         public CouponItem appliedCoupon = null;
@@ -155,6 +155,7 @@ namespace ServingFresh.Views
                         addressGrid.HeightRequest = 230;
                         newUserUnitNumber.IsVisible = true;
                         gridAddressView.IsVisible = true;
+                        addressFrame.Margin = new Thickness(0, -190, 0, 0);
                         var validatedAddress = new AddressAutocomplete();
 
                         validatedAddress.Street = user.getUserAddress();
@@ -694,6 +695,12 @@ namespace ServingFresh.Views
             if (item != null)
             {
                 item.increase_qty();
+                if (order.ContainsKey(item.name))
+                {
+                    var itemToUpdate = order[item.name];
+                    itemToUpdate.item_quantity = item.qty;
+                    order[item.name] = itemToUpdate;
+                }
                 GetNewDefaltCoupon();
             }
         }
@@ -707,6 +714,12 @@ namespace ServingFresh.Views
             if (item != null)
             {
                 item.decrease_qty();
+                if (order.ContainsKey(item.name))
+                {
+                    var itemToUpdate = order[item.name];
+                    itemToUpdate.item_quantity = item.qty;
+                    order[item.name] = itemToUpdate;
+                }
                 GetNewDefaltCoupon();
             }
         }
@@ -864,8 +877,6 @@ namespace ServingFresh.Views
             }
         }
 
-
-
         async void CompletePaymentWithStripe(System.Object sender, System.EventArgs e)
         {
             var button = (Button)sender;
@@ -920,22 +931,20 @@ namespace ServingFresh.Views
 
                 if (button.BorderColor == Color.FromHex("#FF8500"))
                 {
+                    bool animate = true;
+                    var y = scrollView.ScrollY;
+                    y = y + 210;
+                    await scrollView.ScrollToAsync(0, y, animate);
                     button.BorderColor = Color.FromHex("#2F787F");
+                    guestRequiredInfoView.IsVisible = true;
                     guestCheckoutView.IsVisible = true;
-                    //stripeInformationView.HeightRequest = 194;
-
-                    //SetNextSteps(purchaseProcess, "Complete Payment");
-                    //purchase.setPurchaseFirstName(firstName.Text);
-                    //purchase.setPurchaseLastName(lastName.Text);
-                    //purchase.setPurchasePhoneNumber(phoneNumber.Text);
-                    //purchase.setPurchaseEmail(emailAddress.Text);
 
                 }
                 else
                 {
                     button.BorderColor = Color.FromHex("#FF8500");
                     guestCheckoutView.IsVisible = false;
-                    //stripeInformationView.HeightRequest = 0;
+                    guestRequiredInfoView.IsVisible = false;
                 }
             }
             else
@@ -945,67 +954,49 @@ namespace ServingFresh.Views
             
         }
 
-        void GuestCheckoutWithStripe(System.Object sender, System.EventArgs e)
+        async void GuestCheckoutWithStripe(System.Object sender, System.EventArgs e)
         {
-            var button = (Button)sender;
+            var client1 = new SignUp();
 
-            if (button.BorderColor == Color.FromHex("#FF8500"))
+            if (client1.GuestCheckAllRequiredEntries(firstName, lastName, emailAddress, phoneNumber))
             {
-                button.BorderColor = Color.FromHex("#2F787F");
-                guestStripeView.IsVisible = true;
-                //stripeInformationView.HeightRequest = 194;
 
-                //SetNextSteps(purchaseProcess, "Complete Payment");
-                //purchase.setPurchaseFirstName(firstName.Text);
-                //purchase.setPurchaseLastName(lastName.Text);
-                //purchase.setPurchasePhoneNumber(phoneNumber.Text);
-                //purchase.setPurchaseEmail(emailAddress.Text);
+                purchase.setPurchaseFirstName(firstName.Text);
+                purchase.setPurchaseLastName(lastName.Text);
+                purchase.setPurchaseEmail(emailAddress.Text);
+                purchase.setPurchasePhoneNumber(phoneNumber.Text);
+                guestCardHolderName.Text = firstName.Text + " " +lastName.Text;
+                guestCardZipcode.Text = purchase.getPurchaseZipcode();
 
+                var button = (Button)sender;
+
+                if (button.BorderColor == Color.FromHex("#FF8500"))
+                {
+                    var y = scrollView.ScrollY + 120;
+                    y = y + 60;
+                    await scrollView.ScrollToAsync(0, y, true);
+                    button.BorderColor = Color.FromHex("#2F787F");
+                    guestStripeView.IsVisible = true;
+                }
+                else
+                {
+                    button.BorderColor = Color.FromHex("#FF8500");
+                    guestStripeView.IsVisible = false;
+                }
             }
             else
             {
-                button.BorderColor = Color.FromHex("#FF8500");
-                guestStripeView.IsVisible = false;
-                //stripeInformationView.HeightRequest = 0;
+                await DisplayAlert("Oops", "You seem to forgot to fill in all entries. Please fill in all entries to continue", "OK");
             }
         }
 
         //await Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(94), true);
 
-         void GuestCompletePaymentWithPayPal(System.Object sender, System.EventArgs e)
+        async void GuestCompletePaymentWithPayPal(System.Object sender, System.EventArgs e)
         {
             var client1 = new SignUp();
-            //client1.GuestCheckAllRequiredEntries(firstName, lastName, emailAddress, phoneNumber)
-            if (true)
-            {
-
-                purchase.setPurchaseFirstName("Carlos");
-                purchase.setPurchaseLastName("Torres");
-                purchase.setPurchaseEmail("omarfacio2010@gmail.com");
-                purchase.setPurchasePhoneNumber("4158329643");
-
-                var button = (Button)sender;
-
-                if (button.BackgroundColor == Color.FromHex("#FF8500"))
-                {
-                    button.BackgroundColor = Color.FromHex("#2B6D74");
-                    Application.Current.MainPage.Navigation.PushModalAsync(new PayPalPage(), true);
-                }
-                else
-                {
-                    button.BackgroundColor = Color.FromHex("#FF8500");
-                }
-            }
-            //else
-            //{
-            //    await DisplayAlert("Oops", "You seem to forgot to fill in all entries. Please fill in all entries to continue", "OK");
-            //}
-        }
-
-        async void GuestCompletePaymentWithStripe(System.Object sender, System.EventArgs e)
-        {
-            var client1 = new SignUp();
-            if (client1.GuestCheckAllRequiredEntries(firstName,lastName, emailAddress, phoneNumber, guestCardHolderName,guestCardHolderNumber,guestCardCVV,guestCardExpMonth,guestCardExpYear,guestCardZipcode))
+            
+            if (client1.GuestCheckAllRequiredEntries(firstName, lastName, emailAddress, phoneNumber))
             {
 
                 purchase.setPurchaseFirstName(firstName.Text);
@@ -1018,8 +1009,31 @@ namespace ServingFresh.Views
                 if (button.BackgroundColor == Color.FromHex("#FF8500"))
                 {
                     button.BackgroundColor = Color.FromHex("#2B6D74");
-                    purchase.setPurchasePaymentType("STRIPE");
+                    await Application.Current.MainPage.Navigation.PushModalAsync(new PayPalPage(), true);
+                }
+                else
+                {
+                    button.BackgroundColor = Color.FromHex("#FF8500");
+                }
+            }
+            else
+            {
+                await DisplayAlert("Oops", "You seem to forgot to fill in all entries. Please fill in all entries to continue", "OK");
+            }
+        }
 
+        async void GuestCompletePaymentWithStripe(System.Object sender, System.EventArgs e)
+        {
+            var client1 = new SignUp();
+            if (client1.GuestCheckAllStripeRequiredEntries(guestCardHolderName,guestCardHolderNumber,guestCardCVV,guestCardExpMonth,guestCardExpYear,guestCardZipcode))
+            {
+                var button = (Button)sender;
+
+                if (button.BackgroundColor == Color.FromHex("#FF8500"))
+                {
+                    button.BackgroundColor = Color.FromHex("#2B6D74");
+                    purchase.setPurchasePaymentType("STRIPE");
+                    UserDialogs.Instance.ShowLoading("Your payment is processing...");
                     string mode = Payments.getMode(purchase.getPurchaseDeliveryInstructions(), "STRIPE");
                     paymentClient = new Payments(mode);
                     var client = new SignIn();
@@ -1049,10 +1063,12 @@ namespace ServingFresh.Views
                                 purchase.printPurchase();
                                 _ = paymentClient.SendPurchaseToDatabase(purchase);
                                 order.Clear();
+                                UserDialogs.Instance.HideLoading();
                                 Application.Current.MainPage = new ConfirmationPage();
                             }
                             else
                             {
+                                UserDialogs.Instance.HideLoading();
                                 await DisplayAlert("Oop", "It seems that your card is invalid. Try again", "OK");
                             }
                         }
@@ -1064,6 +1080,7 @@ namespace ServingFresh.Views
                             var role = isEmailUnused.result[0].role;
                             if (role == "CUSTOMER")
                             {
+                                UserDialogs.Instance.HideLoading();
                                 await DisplayAlert("Great!", "It looks like you already have an account. Please log in to find out if you have any additional discounts", "OK");
                                 await Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(94), true);
                             }
@@ -1090,15 +1107,18 @@ namespace ServingFresh.Views
                                     purchase.setPurchaseChargeID(paymentClient.getTransactionID());
                                     _ = paymentClient.SendPurchaseToDatabase(purchase);
                                     order.Clear();
+                                    UserDialogs.Instance.HideLoading();
                                     Application.Current.MainPage = new ConfirmationPage();
                                 }
                                 else
                                 {
+                                    UserDialogs.Instance.HideLoading();
                                     await DisplayAlert("Oop", "It seems that your card is invalid. Try again", "OK");
                                 }
                             }
                         }
                     }
+                    
                 }
                 else
                 {

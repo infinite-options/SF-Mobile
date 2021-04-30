@@ -78,52 +78,55 @@ namespace ServingFresh.Views
 
         async void FindLocalProduceBaseOnLocation(System.Object sender, System.EventArgs e)
         {
-            if (!String.IsNullOrEmpty(AddressEntry.Text))
+            if(addressToValidate != null)
             {
-                var client = new AddressValidation();
-                var addressStatus = client.ValidateAddressString(addressToValidate.Street, addressToValidate.Unit, addressToValidate.City, addressToValidate.State, addressToValidate.ZipCode);
-
-                if (addressStatus != null)
+                if (!String.IsNullOrEmpty(AddressEntry.Text))
                 {
-                    if (addressStatus == "Y" || addressStatus == "S")
+                    var client = new AddressValidation();
+                    var addressStatus = client.ValidateAddressString(addressToValidate.Street, addressToValidate.Unit, addressToValidate.City, addressToValidate.State, addressToValidate.ZipCode);
+
+                    if (addressStatus != null)
                     {
-
-                        var location = await client.ConvertAddressToGeoCoordiantes(addressToValidate.Street, addressToValidate.City, addressToValidate.State);
-                        if (location != null)
+                        if (addressStatus == "Y" || addressStatus == "S")
                         {
-                            var isAddressInZones = await client.getZoneFromLocation(location.Latitude.ToString(), location.Longitude.ToString());
 
-                            if (isAddressInZones != "" && isAddressInZones != "OUTSIDE ZONE RANGE")
+                            var location = await client.ConvertAddressToGeoCoordiantes(addressToValidate.Street, addressToValidate.City, addressToValidate.State);
+                            if (location != null)
                             {
+                                var isAddressInZones = await client.getZoneFromLocation(location.Latitude.ToString(), location.Longitude.ToString());
 
-                                user.setUserAddress(addressToValidate.Street);
-                                user.setUserCity(addressToValidate.City);
-                                user.setUserUnit(addressToValidate.Unit == null? "": addressToValidate.Unit);
-                                user.setUserState(addressToValidate.State);
-                                user.setUserZipcode(addressToValidate.ZipCode);
-                                SetUser(location);
+                                if (isAddressInZones != "" && isAddressInZones != "OUTSIDE ZONE RANGE")
+                                {
+
+                                    user.setUserAddress(addressToValidate.Street);
+                                    user.setUserCity(addressToValidate.City);
+                                    user.setUserUnit(addressToValidate.Unit == null? "": addressToValidate.Unit);
+                                    user.setUserState(addressToValidate.State);
+                                    user.setUserZipcode(addressToValidate.ZipCode);
+                                    SetUser(location);
+                                }
+                                else
+                                {
+                                    await DisplayAlert("Oops", "You address is outside our delivery areas", "OK");
+                                    return;
+                                }
                             }
                             else
                             {
-                                await DisplayAlert("Oops", "You address is outside our delivery areas", "OK");
+                                await DisplayAlert("We were not able to find your location in our system.", "Try again", "OK");
                                 return;
                             }
+
                         }
-                        else
+                        else if (addressStatus == "D")
                         {
-                            await DisplayAlert("We were not able to find your location in our system.", "Try again", "OK");
+                            var unit = await DisplayPromptAsync("It looks like your address is missing its unit number", "Please enter your address unit number in the space below", "OK","Cancel");
+                            if(unit != null)
+                            {
+                                addressToValidate.Unit = unit;
+                            }
                             return;
                         }
-
-                    }
-                    else if (addressStatus == "D")
-                    {
-                        var unit = await DisplayPromptAsync("It looks like your address is missing its unit number", "Please enter your address unit number in the space below", "OK","Cancel");
-                        if(unit != null)
-                        {
-                            addressToValidate.Unit = unit;
-                        }
-                        return;
                     }
                 }
             }
@@ -202,15 +205,32 @@ namespace ServingFresh.Views
 
         async void OnAddressChanged(object sender, EventArgs eventArgs)
         {
-            //var newList = new ObservableCollection<AddressAutocomplete>();
-
-            //addr.OnAddressChanged(addressList, AddressEntry.Text);
-            addressList.ItemsSource = await addr.GetPlacesPredictionsAsync(AddressEntry.Text);
+            if (!String.IsNullOrEmpty(AddressEntry.Text))
+            {
+                if (addressToValidate != null)
+                {
+                    if (addressToValidate.Street != AddressEntry.Text)
+                    {
+                        addressList.ItemsSource = await addr.GetPlacesPredictionsAsync(AddressEntry.Text);
+                        addressEntryFocused(sender, eventArgs);
+                    }
+                }
+                else
+                {
+                    addressList.ItemsSource = await addr.GetPlacesPredictionsAsync(AddressEntry.Text);
+                    addressEntryFocused(sender, eventArgs);
+                }
+            }
+            else
+            {
+                addressEntryUnfocused(sender, eventArgs);
+                addressToValidate = null;
+            }
         }
 
         void addressEntryFocused(object sender, EventArgs eventArgs)
         {
-            if (String.IsNullOrEmpty(AddressEntry.Text))
+            if (!String.IsNullOrEmpty(AddressEntry.Text))
             {
                 addr.addressEntryFocused(addressList, addressFrame);
             }
@@ -223,14 +243,15 @@ namespace ServingFresh.Views
 
         async void addressSelected(System.Object sender, SelectedItemChangedEventArgs e)
         {
-            
+            AddressEntry.TextChanged -= OnAddressChanged;
             addressToValidate = addr.addressSelected(addressList, AddressEntry, addressFrame);
             string zipcode = await addr.getZipcode(addressToValidate.PredictionID);
             if( zipcode != null)
             {
                 addressToValidate.ZipCode = zipcode;
             }
-
+            AddressEntry.Text += zipcode;
+            AddressEntry.TextChanged += OnAddressChanged;
         }
 
         async void SignInDirectUser(System.Object sender, System.EventArgs e)

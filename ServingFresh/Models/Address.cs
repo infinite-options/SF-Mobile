@@ -242,7 +242,7 @@ namespace ServingFresh.Models
             addressList.IsVisible = false;
             frame.IsVisible = false;
             entry.Text = ((AddressAutocomplete)addressList.SelectedItem).Street + ", " + ((AddressAutocomplete)addressList.SelectedItem).City + ", " + ((AddressAutocomplete)addressList.SelectedItem).State + ", " + ((AddressAutocomplete)addressList.SelectedItem).ZipCode;
-            entry.Text = ((AddressAutocomplete)addressList.SelectedItem).Street;
+            //entry.Text = ((AddressAutocomplete)addressList.SelectedItem).Street;
             selectedAddress.Street = ((AddressAutocomplete)addressList.SelectedItem).Street;
             selectedAddress.City = ((AddressAutocomplete)addressList.SelectedItem).City;
             selectedAddress.State = ((AddressAutocomplete)addressList.SelectedItem).State;

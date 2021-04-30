@@ -279,6 +279,22 @@ namespace ServingFresh.Models
             return result;
         }
 
+        public bool GuestCheckAllStripeRequiredEntries( Entry cardHolderName, Entry cardNumber, Entry cardCvv, Entry cardMonth, Entry cardYear, Entry cardZipcode)
+        {
+            bool result = false;
+            if (!( String.IsNullOrEmpty(cardHolderName.Text)
+                || String.IsNullOrEmpty(cardNumber.Text)
+                || String.IsNullOrEmpty(cardCvv.Text)
+                || String.IsNullOrEmpty(cardMonth.Text)
+                || String.IsNullOrEmpty(cardYear.Text)
+                || String.IsNullOrEmpty(cardZipcode.Text)
+                ))
+            {
+                result = true;
+            }
+            return result;
+        }
+
         public bool GuestCheckAllRequiredEntries(Entry firstName, Entry lastName, Entry email, Entry phoneNumber)
         {
             bool result = false;
