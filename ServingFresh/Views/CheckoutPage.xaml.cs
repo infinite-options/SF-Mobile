@@ -149,6 +149,25 @@ namespace ServingFresh.Views
                     customerPaymentsView.HeightRequest = 0;
                     customerStripeInformationView.HeightRequest = 0;
                     customerDeliveryAddressView.HeightRequest = 0;
+
+                    if(user.getUserAddress() != "")
+                    {
+                        addressGrid.HeightRequest = 230;
+                        newUserUnitNumber.IsVisible = true;
+                        gridAddressView.IsVisible = true;
+                        var validatedAddress = new AddressAutocomplete();
+
+                        validatedAddress.Street = user.getUserAddress();
+                        validatedAddress.Unit = user.getUserUnit() == "" ? "" : user.getUserUnit();
+                        validatedAddress.City = user.getUserCity();
+                        validatedAddress.State = user.getUserState();
+                        validatedAddress.ZipCode = user.getUserZipcode();
+
+                        addressToValidate = validatedAddress;
+                        addr.addressSelectedFillEntries(addressToValidate, AddressEntry, newUserUnitNumber, newUserCity, newUserState, newUserZipcode);
+                        var client = new AddressValidation();
+                        client.SetPinOnMap(map, user.getUserLatitude(), user.getUserLongitude(), addressToValidate.Street);
+                    }
                 }
                 else
                 {
@@ -187,11 +206,13 @@ namespace ServingFresh.Views
 
                 CartItems.ItemsSource = cartItems;
                 CartItems.HeightRequest = 50 * cartItems.Count;
-
+                SetTips("$2");
                 updateTotals(0, 0);
             }
             else
             {
+                SetTips("$2");
+                GetAvailiableCoupons(user);
                 customerPaymentsView.HeightRequest = 0;
                 customerStripeInformationView.HeightRequest = 0;
                 customerDeliveryAddressView.HeightRequest = 0;
@@ -232,6 +253,7 @@ namespace ServingFresh.Views
             Position point = new Position(37.334789, -121.888138);
             var mapSpan = new MapSpan(point, 5, 5);
             map.MoveToRegion(mapSpan);
+            map.Pins.Clear();
         }
 
         public async void GetFees(string day, string zone)
@@ -250,11 +272,11 @@ namespace ServingFresh.Views
                     if (RDSResponse.IsSuccessStatusCode)
                     {
                         var data = JsonConvert.DeserializeObject<ZoneFees>(content);
-                        Constant.deliveryFee = data.result.delivery_fee;
-                        Constant.serviceFee = data.result.service_fee;
-                        Constant.tax_rate = data.result.tax_rate;
-                        delivery_fee = Constant.deliveryFee;
-                        service_fee = Constant.serviceFee;
+                        //Constant.deliveryFee = data.result.delivery_fee;
+                        //Constant.serviceFee = data.result.service_fee;
+                        //Constant.tax_rate = data.result.tax_rate;
+                        delivery_fee = data.result.delivery_fee;
+                        service_fee = data.result.service_fee;
                     }
 
                     Debug.WriteLine("Delivery Fee: " + delivery_fee);
@@ -263,6 +285,8 @@ namespace ServingFresh.Views
                     ServiceFee.Text = "$" + service_fee.ToString("N2");
                     DeliveryFee.Text = "$" + delivery_fee.ToString("N2");
                     // GetAvailiableCoupons();
+                    SetTips("$2");
+                    updateTotals(0, 0);
                 }
             }
             catch (Exception fees)
@@ -578,7 +602,7 @@ namespace ServingFresh.Views
         // This function return the delivery fee amount
         public double GetDeliveryFee()
         {
-            return Constant.deliveryFee;
+            return delivery_fee;
         }
 
         public double GetTaxes()
@@ -588,7 +612,7 @@ namespace ServingFresh.Views
 
         public double GetServiceFee()
         {
-            return Constant.serviceFee;
+            return service_fee;
         }
 
         public double GetTotal()
@@ -805,6 +829,14 @@ namespace ServingFresh.Views
             tipOption.TextColor = Color.White;
 
             SetTips(tipOption.Text);
+            if(appliedCoupon != null)
+            {
+                updateTotals(appliedCoupon.discount, appliedCoupon.shipping);
+            }
+            else
+            {
+                updateTotals(0, 0);
+            }
         }
 
         void SetTips(string value)
@@ -879,16 +911,62 @@ namespace ServingFresh.Views
 
         async void ProceedAsGuest(System.Object sender, System.EventArgs e)
         {
-            if(purchase.getPurchaseLatitude() != "" && purchase.getPurchaseLongitude() != "")
+            var client = new AddressValidation();
+            if(client.ValidateGuestDeliveryInfo(purchase.getPurchaseAddress(), purchase.getPurchaseCity(), purchase.getPurchaseState(), purchase.getPurchaseZipcode(), purchase.getPurchaseLatitude(), purchase.getPurchaseLongitude()))
             {
                 FinalizePurchase(purchase, selectedDeliveryDate);
-                Application.Current.MainPage = new DeliveryDetailsPage();
+                var button = (Button)sender;
+
+                if (button.BorderColor == Color.FromHex("#FF8500"))
+                {
+                    button.BorderColor = Color.FromHex("#2F787F");
+                    guestCheckoutView.IsVisible = true;
+                    //stripeInformationView.HeightRequest = 194;
+
+                    //SetNextSteps(purchaseProcess, "Complete Payment");
+                    //purchase.setPurchaseFirstName(firstName.Text);
+                    //purchase.setPurchaseLastName(lastName.Text);
+                    //purchase.setPurchasePhoneNumber(phoneNumber.Text);
+                    //purchase.setPurchaseEmail(emailAddress.Text);
+
+                }
+                else
+                {
+                    button.BorderColor = Color.FromHex("#FF8500");
+                    guestCheckoutView.IsVisible = false;
+                    //stripeInformationView.HeightRequest = 0;
+                }
             }
             else
             {
                 await DisplayAlert("Please verify your address!","It looks like we were not able to validate your address. Make sure that your delivery address shows in the map","OK");
             }
             
+        }
+
+        void GuestCheckoutWithStripe(System.Object sender, System.EventArgs e)
+        {
+            var button = (Button)sender;
+
+            if (button.BorderColor == Color.FromHex("#FF8500"))
+            {
+                button.BorderColor = Color.FromHex("#2F787F");
+                guestStripeView.IsVisible = true;
+                //stripeInformationView.HeightRequest = 194;
+
+                //SetNextSteps(purchaseProcess, "Complete Payment");
+                //purchase.setPurchaseFirstName(firstName.Text);
+                //purchase.setPurchaseLastName(lastName.Text);
+                //purchase.setPurchasePhoneNumber(phoneNumber.Text);
+                //purchase.setPurchaseEmail(emailAddress.Text);
+
+            }
+            else
+            {
+                button.BorderColor = Color.FromHex("#FF8500");
+                guestStripeView.IsVisible = false;
+                //stripeInformationView.HeightRequest = 0;
+            }
         }
 
         void CheckoutViaStripe(System.Object sender, System.EventArgs e)
@@ -1005,7 +1083,33 @@ namespace ServingFresh.Views
 
         public async void OnAddressChanged(object sender, EventArgs eventArgs)
         {
-            addressList.ItemsSource = await addr.GetPlacesPredictionsAsync(AddressEntry.Text);
+            if (!String.IsNullOrEmpty(AddressEntry.Text))
+            {
+                if(addressToValidate != null)
+                {
+                    if (addressToValidate.Street != AddressEntry.Text)
+                    {
+                        addressList.ItemsSource = await addr.GetPlacesPredictionsAsync(AddressEntry.Text);
+                        addressEntryFocused(sender, eventArgs);
+                        InitializeMap();
+                        purchase.setPurchaseLatitude("");
+                        purchase.setPurchaseLongitude("");
+                    }
+                }
+                else
+                {
+                    addressList.ItemsSource = await addr.GetPlacesPredictionsAsync(AddressEntry.Text);
+                    addressEntryFocused(sender, eventArgs);
+                    InitializeMap();
+                    purchase.setPurchaseLatitude("");
+                    purchase.setPurchaseLongitude("");
+                }
+            }
+            else
+            {
+                addressEntryUnfocused(sender, eventArgs);
+                addr.resetAddressEntries(newUserUnitNumber, newUserCity, newUserState, newUserZipcode);
+            }
         }
 
         void addressEntryFocused(object sender, EventArgs eventArgs)
@@ -1014,7 +1118,10 @@ namespace ServingFresh.Views
             {
                 addr.addressEntryFocused(addressList, addressFrame);
             }
-            
+            else
+            {
+                addressEntryUnfocused(sender, eventArgs);
+            }
         }
 
         void addressEntryUnfocused(object sender, EventArgs eventArgs)
@@ -1027,16 +1134,18 @@ namespace ServingFresh.Views
             addressGrid.HeightRequest = 140 + 40 + 40;
             newUserUnitNumber.IsVisible = true;
             gridAddressView.IsVisible = true;
+            addressToValidate = addr.addressSelected(addressList, addressFrame);
+            AddressEntry.Text = addressToValidate.Street;
+
             addressFrame.Margin = new Thickness(0, -105-40-40, 0, 0);
-            addressToValidate = addr.addressSelected(addressList, AddressEntry, addressFrame);
+            //addressToValidate = addr.addressSelected(addressList, AddressEntry, addressFrame);
             string zipcode = await addr.getZipcode(addressToValidate.PredictionID);
             if (zipcode != null)
             {
                 addressToValidate.ZipCode = zipcode;
             }
             addr.addressSelectedFillEntries(addressToValidate, AddressEntry, newUserUnitNumber, newUserCity, newUserState, newUserZipcode);
-            addr.addressEntryUnfocused(addressList, addressFrame);
-
+            //addressFrame.IsVisible = false;
 
             var client = new AddressValidation();
             var addressStatus = client.ValidateAddressString(AddressEntry.Text, newUserUnitNumber.Text, newUserCity.Text, newUserState.Text, newUserZipcode.Text);
@@ -1141,8 +1250,13 @@ namespace ServingFresh.Views
                             }
                         }
                     }
+                    // let them go and write D in delivery purchase notes
                     return;
                 }
+            }
+            else
+            {
+                await DisplayAlert("Oops", "This address was not confirm by USPS. Try a different address", "OK");
             }
             
         }
@@ -1200,14 +1314,14 @@ namespace ServingFresh.Views
             }
         }
 
-        void ShowLogInUI(System.Object sender, System.EventArgs e)
+        void ShowLogInModal(System.Object sender, System.EventArgs e)
         {
-            loginRow.Height = this.Height - 94;
+            Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(94), true);
         }
 
-        void ShowSignUpUI(System.Object sender, System.EventArgs e)
+        void ShowSignUpModal(System.Object sender, System.EventArgs e)
         {
-            signUpRow.Height = this.Height - 94;
+            Application.Current.MainPage.Navigation.PushModalAsync(new SignUpPage(94), true);
         }
 
         void HideLogInUI(System.Object sender, System.EventArgs e)

@@ -116,12 +116,15 @@
                                                             IsVisible="true">
                                                     </maps:Map>
                                                     </Frame>
-                                                <Frame Margin="0,-100,0,0" Padding="2" HorizontalOptions="CenterAndExpand" CornerRadius="5" x:Name="addressFrame" IsVisible="false">
-                                                    <ListView x:Name="addressList" IsVisible="false" HorizontalOptions="CenterAndExpand" HasUnevenRows="true" WidthRequest="300" HeightRequest="90" ItemSelected="addressList_ItemSelected">
+                                                <Frame Margin="1,-100,1,0" HasShadow="False" HeightRequest="100" BackgroundColor="#E0EBEC" Padding="2" MinimumHeightRequest="300" HorizontalOptions="Center" CornerRadius="1" x:Name="addressFrame" IsVisible="false">
+                                                    <ListView x:Name="addressList" HorizontalOptions="Center" BackgroundColor="#E0EBEC" RowHeight="53" HasUnevenRows="true" MinimumHeightRequest="374" HeightRequest="90" ItemSelected="addressList_ItemSelected">
                                                         <ListView.ItemTemplate>
                                                             <DataTemplate>
-                                                                <ViewCell Height="25">
-                                                                        <Label Text="{Binding Address}" FontSize="12" TextColor="Black"/>
+                                                                <ViewCell Height="53">
+                                                                    <StackLayout HeightRequest="53" VerticalOptions="CenterAndExpand">
+                                                                         <Label HeightRequest="53" VerticalTextAlignment="Center" Text="{Binding Address}" FontSize="12" TextColor="Black" LineBreakMode="WordWrap"/>
+                                                                        <BoxView HeightRequest="1" Color="#136D74"></BoxView>
+                                                                    </StackLayout>
                                                                 </ViewCell>
                                                             </DataTemplate>
                                                         </ListView.ItemTemplate>
@@ -140,10 +143,10 @@
                                     <!--<Entry x:Name="newUserAddress" Placeholder="Street Address (so we can find)" PlaceholderColor="Gray" FontSize="14" FontAttributes="Bold"></Entry>
                                     
                                     <Button x:Name="addressButton" Text="Verify Address" TextColor="White" FontAttributes="Bold" Clicked="ValidateAddressClick" BackgroundColor="#FF8500"></Button>-->
-                                    <BoxView HeightRequest="1" Color="LightGray"></BoxView>
+                                    <!--<BoxView HeightRequest="1" Color="LightGray"></BoxView>-->
                                 </StackLayout>
                                 <StackLayout>
-                                    <Label Text="Delivery Instructions:" TextColor="#136D74" FontSize="16" FontAttributes="Bold"></Label>
+                                    <!--<Label Text="Delivery Instructions:" TextColor="#136D74" FontSize="16" FontAttributes="Bold"></Label>-->
                                     <Entry Placeholder="Delivery instructions (ex: gate code)" PlaceholderColor="Gray" FontAttributes="Bold" FontSize="14"  TextColor="black" x:Name="deliveryInstructions"></Entry>
                                 </StackLayout>
                                 <BoxView HeightRequest="1" Color="LightGray"></BoxView>
@@ -282,11 +285,38 @@
                                 </Grid>
                                 <StackLayout Margin="0,15,0,0" x:Name="guestPaymentsView">
                                     <StackLayout Padding="20,0,20,0">
-                                        <Button Text="Proceed as guest" Clicked="ProceedAsGuest"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold"></Button>
+                                        <Button WidthRequest="264" HeightRequest="36" HorizontalOptions="Center"  Text="Proceed as guest" BorderWidth="4" BorderColor="#FF8500" Clicked="ProceedAsGuest"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold"></Button>
                                         <Label Text="Already have an account?" TextColor="#2B6D74" FontSize="14" HorizontalTextAlignment="Center"></Label>
-                                        <Button Text="Login"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="ShowLogInUI"></Button>
+                                        <Button WidthRequest="264" HeightRequest="36" HorizontalOptions="Center"  Text="Login"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="ShowLogInModal"></Button>
                                         <Label Text="Save time and create an account" FontSize="14" TextColor="#2B6D74" HorizontalTextAlignment="Center"></Label>
-                                        <Button Text="Sign up"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="ShowSignUpUI"></Button>
+                                        <Button WidthRequest="264" HeightRequest="36" HorizontalOptions="Center"  Text="Sign up"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="ShowSignUpModal"></Button>
+                                    </StackLayout>
+                                    <StackLayout Margin="0,50,0,50" Spacing="15" x:Name="guestCheckoutView" IsVisible="false">
+                                         <Button Text="Checkout with Stripe" BorderWidth="4" BorderColor="#FF8500" HeightRequest="36" WidthRequest="264" HorizontalOptions="Center" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="GuestCheckoutWithStripe"></Button>
+                                        <Button Text="Checkout with PayPal" HeightRequest="36" WidthRequest="264" HorizontalOptions="Center"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" ></Button>
+                                    </StackLayout>
+                                    <StackLayout x:Name="guestStripeView" Spacing="10" IsVisible="false">
+
+                                            <Entry x:Name="firstName" HeightRequest="43" WidthRequest="372" HorizontalOptions="Center" Placeholder="First name (so we can address you)" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
+                                            <Entry x:Name="lastName" HeightRequest="43" WidthRequest="372" HorizontalOptions="Center" Placeholder="Last name (in case you want to be formal)" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
+                                            <Entry x:Name="emailAddress" HeightRequest="43" WidthRequest="372" HorizontalOptions="Center" Keyboard="Email" Placeholder="Email address (for order confirmation)" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
+                                            <Entry x:Name="phoneNumber" HeightRequest="43" WidthRequest="372" HorizontalOptions="Center" Keyboard="Numeric" Placeholder="Phone number (so we can call if there is an issue)" MaxLength="10" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
+                             
+                                            <Entry x:Name="guestCardHolderName" HeightRequest="43" WidthRequest="372" Placeholder="Cardholder Name" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                                    <ColumnDefinition Width="100"></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <Entry Grid.Column="0" x:Name="guestCardHolderNumber" Keyboard="Numeric" HeightRequest="43" MaxLength="16" Placeholder="Card Number" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
+                                                <Entry Grid.Column="1" x:Name="guestCardCVV" Keyboard="Numeric" HeightRequest="43"  Placeholder="CVV" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
+                                            </Grid>
+                                            <Grid>
+                                                <Entry Grid.Column="0" x:Name="guestCardExpMonth" Keyboard="Numeric" HeightRequest="43"  MaxLength="2" Placeholder="Exp MM" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
+                                                <Entry Grid.Column="1" x:Name="guestCardExpYear" Keyboard="Numeric" HeightRequest="43"  MaxLength="2" Placeholder="Exp YY" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
+                                                <Entry Grid.Column="2" x:Name="guestCardZipcode" Keyboard="Numeric" HeightRequest="43"  MaxLength="5" Placeholder="ZIP" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
+                                            </Grid>
+                                        <Button Margin="0,40,0,0" WidthRequest="264" HorizontalOptions="Center" HeightRequest="36" Text="Complete Payment with Stripe" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="GuestCompletePaymentWithStripe"></Button>
                                     </StackLayout>
                                 </StackLayout>
                                 <StackLayout Margin="0,15,0,0" x:Name="customerPaymentsView">

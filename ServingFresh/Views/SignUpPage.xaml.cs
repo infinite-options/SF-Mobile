@@ -241,6 +241,7 @@ namespace ServingFresh.Views
 
         void ContinueWithFacebook(System.Object sender, System.EventArgs e)
         {
+            Application.Current.MainPage.Navigation.PopModalAsync();
             var client = new SignIn();
             var authenticator = client.GetFacebookAuthetication();
             var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
@@ -251,6 +252,7 @@ namespace ServingFresh.Views
 
         void ContinueWithGoogle(System.Object sender, System.EventArgs e)
         {
+            Application.Current.MainPage.Navigation.PopModalAsync();
             var client = new SignIn();
             var authenticator = client.GetGoogleAuthetication();
             var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();

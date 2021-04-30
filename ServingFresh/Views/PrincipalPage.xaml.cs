@@ -95,6 +95,12 @@ namespace ServingFresh.Views
 
                             if (isAddressInZones != "" && isAddressInZones != "OUTSIDE ZONE RANGE")
                             {
+
+                                user.setUserAddress(addressToValidate.Street);
+                                user.setUserCity(addressToValidate.City);
+                                user.setUserUnit(addressToValidate.Unit == null? "": addressToValidate.Unit);
+                                user.setUserState(addressToValidate.State);
+                                user.setUserZipcode(addressToValidate.ZipCode);
                                 SetUser(location);
                             }
                             else

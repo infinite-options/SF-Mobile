@@ -68,6 +68,8 @@ namespace ServingFresh.Models
             string result = null;
 
             // Setting request for USPS API
+
+            Debug.WriteLine("INPUTS: ADDRESS1: {0}, ADDRESS2: {1}, CITY: {2}, STATE: {3}, ZIPCODE: {4}", address, unit, city, state, zipcode);
             XDocument requestDoc = new XDocument(
                 new XElement("AddressValidateRequest",
                 new XAttribute("USERID", "400INFIN1745"),
@@ -75,7 +77,7 @@ namespace ServingFresh.Models
                 new XElement("Address",
                 new XAttribute("ID", "0"),
                 new XElement("Address1", address),
-                new XElement("Address2", unit),
+                new XElement("Address2", unit != null? unit: ""),
                 new XElement("City", city),
                 new XElement("State", state),
                 new XElement("Zip5", zipcode),
@@ -282,9 +284,40 @@ namespace ServingFresh.Models
             return result;
         }
 
+        public bool ValidateGuestDeliveryInfo(string address1, string city, string state, string zipcode, string latidude, string longitude)
+        {
+            bool result = false;
+            if (!(String.IsNullOrEmpty(address1)
+                || String.IsNullOrEmpty(city)
+                || String.IsNullOrEmpty(state)
+                || String.IsNullOrEmpty(zipcode)
+                || String.IsNullOrEmpty(latidude)
+                || String.IsNullOrEmpty(longitude)
+                ))
+            {
+                result = true;
+            }
+            return result;
+        }
+
         public void SetPinOnMap(Xamarin.Forms.Maps.Map map, Location location, string address)
         {
             Position position = new Position(location.Latitude, location.Longitude);
+            map.MapType = MapType.Street;
+            var mapSpan = new MapSpan(position, 0.001, 0.001);
+
+            Pin pin = new Pin();
+            pin.Label = address;
+            pin.Type = PinType.SearchResult;
+            pin.Position = position;
+
+            map.MoveToRegion(mapSpan);
+            map.Pins.Add(pin);
+        }
+
+        public void SetPinOnMap(Xamarin.Forms.Maps.Map map, string latitude, string longitude, string address)
+        {
+            Position position = new Position(double.Parse(latitude == null || latitude == ""?"0":latitude), double.Parse(longitude == null || longitude == "" ? "0" : longitude));
             map.MapType = MapType.Street;
             var mapSpan = new MapSpan(position, 0.001, 0.001);
 

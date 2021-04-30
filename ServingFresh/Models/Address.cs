@@ -240,8 +240,24 @@ namespace ServingFresh.Models
         {
             AddressAutocomplete selectedAddress = new AddressAutocomplete();
             addressList.IsVisible = false;
-            frame.IsVisible = false; 
-            entry.Text = ((AddressAutocomplete)addressList.SelectedItem).Street +", " + ((AddressAutocomplete)addressList.SelectedItem).City + ", " + ((AddressAutocomplete)addressList.SelectedItem).State + ", " + ((AddressAutocomplete)addressList.SelectedItem).ZipCode;
+            frame.IsVisible = false;
+            entry.Text = ((AddressAutocomplete)addressList.SelectedItem).Street + ", " + ((AddressAutocomplete)addressList.SelectedItem).City + ", " + ((AddressAutocomplete)addressList.SelectedItem).State + ", " + ((AddressAutocomplete)addressList.SelectedItem).ZipCode;
+            entry.Text = ((AddressAutocomplete)addressList.SelectedItem).Street;
+            selectedAddress.Street = ((AddressAutocomplete)addressList.SelectedItem).Street;
+            selectedAddress.City = ((AddressAutocomplete)addressList.SelectedItem).City;
+            selectedAddress.State = ((AddressAutocomplete)addressList.SelectedItem).State;
+            selectedAddress.ZipCode = ((AddressAutocomplete)addressList.SelectedItem).ZipCode;
+            selectedAddress.PredictionID = ((AddressAutocomplete)addressList.SelectedItem).PredictionID;
+            return selectedAddress;
+        }
+
+        public AddressAutocomplete addressSelected(ListView addressList, Frame frame)
+        {
+            AddressAutocomplete selectedAddress = new AddressAutocomplete();
+            addressList.IsVisible = false;
+            frame.IsVisible = false;
+            //entry.Text = ((AddressAutocomplete)addressList.SelectedItem).Street + ", " + ((AddressAutocomplete)addressList.SelectedItem).City + ", " + ((AddressAutocomplete)addressList.SelectedItem).State + ", " + ((AddressAutocomplete)addressList.SelectedItem).ZipCode;
+            //entry.Text = ((AddressAutocomplete)addressList.SelectedItem).Street;
             selectedAddress.Street = ((AddressAutocomplete)addressList.SelectedItem).Street;
             selectedAddress.City = ((AddressAutocomplete)addressList.SelectedItem).City;
             selectedAddress.State = ((AddressAutocomplete)addressList.SelectedItem).State;
@@ -272,6 +288,14 @@ namespace ServingFresh.Models
             zipcode.Text = ((AddressAutocomplete)addressList.SelectedItem).ZipCode;
 
             return selectedAddress;
+        }
+
+        public void resetAddressEntries(Entry unit, Entry city, Entry state, Entry zipcode)
+        {
+            unit.Text = null;
+            city.Text = null;
+            state.Text = null;
+            zipcode.Text = null;
         }
 
 

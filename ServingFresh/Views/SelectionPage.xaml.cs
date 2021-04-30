@@ -1274,6 +1274,7 @@ namespace ServingFresh.Views
                 else
                 {
                     itemModelObject.updateItemBackgroundColor = Color.FromHex("#FFFFFF");
+                    order.Remove(itemModelObject.itemName);
                 }
             }
 

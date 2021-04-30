@@ -321,6 +321,7 @@ namespace ServingFresh.Views
 
         public void FacebookLogInClick(System.Object sender, System.EventArgs e)
         {
+            Application.Current.MainPage.Navigation.PopModalAsync();
             string clientID = string.Empty;
             string redirectURL = string.Empty;
 
@@ -368,8 +369,8 @@ namespace ServingFresh.Views
             }
             else
             {
-                Application.Current.MainPage = new LogInPage();
-                await DisplayAlert("Error", "Google was not able to autheticate your account", "OK");
+               // Application.Current.MainPage = new LogInPage();
+               //await DisplayAlert("Error", "Facebook was not able to autheticate your account", "OK");
             }
         }
 
@@ -389,6 +390,7 @@ namespace ServingFresh.Views
 
         public void GoogleLogInClick(System.Object sender, System.EventArgs e)
         {
+            Application.Current.MainPage.Navigation.PopModalAsync();
             string clientId = string.Empty;
             string redirectUri = string.Empty;
 
@@ -417,6 +419,7 @@ namespace ServingFresh.Views
         }
         private async void GoogleAuthenticatorCompleted(object sender, AuthenticatorCompletedEventArgs e)
         {
+            
             var authenticator = sender as OAuth2Authenticator;
 
             if (authenticator != null)
@@ -440,8 +443,8 @@ namespace ServingFresh.Views
             }
             else
             {
-                Application.Current.MainPage = new LogInPage();
-                await DisplayAlert("Error", "Google was not able to autheticate your account", "OK");
+                //Application.Current.MainPage = new LogInPage();
+                //await DisplayAlert("Error", "Google was not able to autheticate your account", "OK");
             }
         }
 
