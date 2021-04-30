@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="ServingFresh.Views.LogInPage">
     <ContentPage.Content><!--#E0E6E6F2-->
-    <Frame Margin="0,180,0,0" BackgroundColor="WhiteSmoke">
+    <Frame x:Name="logInFrame" Margin="0,180,0,0" BackgroundColor="WhiteSmoke">
         <StackLayout>
             <StackLayout HeightRequest="30" >
                 <ImageButton Padding="0,0,2,0" HeightRequest="30" Source="closeFrameIcon.png" HorizontalOptions="End" Clicked="ImageButton_Clicked"></ImageButton>

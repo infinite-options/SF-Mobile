@@ -6,7 +6,7 @@
     xmlns:servingfresh="clr-namespace:ServingFresh.Models"
     x:Class="ServingFresh.Views.SignUpPage">
     <ContentPage.Content>
-      <Frame Margin="0,180,0,0" BackgroundColor="WhiteSmoke">
+      <Frame x:Name="signUpFrame" Margin="0,180,0,0" BackgroundColor="WhiteSmoke">
         <StackLayout>
             <StackLayout HeightRequest="30" >
                 <ImageButton Padding="0,0,2,0" HeightRequest="30" Source="closeFrameIcon.png" HorizontalOptions="End" Clicked="CloseSignUpPage"></ImageButton>
@@ -15,7 +15,7 @@
             <ScrollView>
                 <StackLayout>
                     <StackLayout>
-                        <Grid>
+                        <!--<Grid>
                             <Button CornerRadius="13"  Command = "{Binding SignInWithAppleCommand}" HorizontalOptions="Center" WidthRequest="241" HeightRequest="52" Padding="25,0,0,0" Text="Sign up with Apple" TextColor="White" FontSize="16" BackgroundColor="#466DED"></Button>
                             <Image Margin="55,0,0,0" Source="appleWhiteIcon.png" HorizontalOptions="Start"></Image>
                         </Grid>
@@ -26,7 +26,10 @@
                         <Grid>
                             <Button CornerRadius="13" HorizontalOptions="Center" WidthRequest="241" HeightRequest="52" Padding="27,0,0,0" Text="Sign up with Google" TextColor="White" FontSize="16" BackgroundColor="#5C83F0"></Button>
                             <Image Margin="55,0,0,0" Source="googleWhiteIcon.png" HorizontalOptions="Start"></Image>
-                        </Grid>
+                        </Grid>-->
+                        <ImageButton Source="continueWithApple.png" HeightRequest="52"></ImageButton>
+                        <ImageButton Source="continueWithFacebook.png" HeightRequest="52"></ImageButton>
+                        <ImageButton Source="continueWithGoogle.png" HeightRequest="53"></ImageButton>
                     </StackLayout>
                     <BoxView Margin="0,0,0,13" HeightRequest="1" Color="#136D74"></BoxView>
                     <Label Margin="0,0,0,13" Text="Or continue with email" TextColor="Black" FontSize="19" HorizontalTextAlignment="Center" ></Label>

@@ -57,6 +57,38 @@ namespace ServingFresh.Views
             }
         }
 
+        public LogInPage(double height)
+        {
+            //grids.BackgroundColor = Color.FromHex("AB000000");
+            InitializeComponent();
+            //grids.BackgroundColor = Color.FromHex("AB000000");
+            BackgroundColor = Color.FromHex("AB000000");
+            logInFrame.Margin = new Thickness(0, height, 0, 0);
+            if (Device.RuntimePlatform == Device.Android)
+            {
+                System.Diagnostics.Debug.WriteLine("Running on Android: Line 32");
+                Console.WriteLine("guid: " + Preferences.Get("guid", null));
+                appleLogInButton.IsEnabled = false;
+            }
+            else
+            {
+                InitializedAppleLogin();
+                appleNotification.IsNotifications();
+            }
+
+            if (Device.RuntimePlatform == Device.iOS)
+            {
+                deviceId = Preferences.Get("guid", null);
+                if (deviceId != null) { Debug.WriteLine("This is the iOS GUID from Log in: " + deviceId); }
+            }
+            else
+            {
+                deviceId = Preferences.Get("guid", null);
+                if (deviceId != null) { Debug.WriteLine("This is the Android GUID from Log in " + deviceId); }
+            }
+            
+        }
+
 
         public async void MessageFromSelectionPage(string title, string message)
         {

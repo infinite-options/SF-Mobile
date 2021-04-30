@@ -41,15 +41,16 @@ namespace ServingFresh.Views
 
         void ShowMenuFromInfo(System.Object sender, System.EventArgs e)
         {
-            var height = new GridLength(0);
-            if (menuFrame.Height.Equals(height))
-            {
-                menuFrame.Height = this.Height - 180;
-            }
-            else
-            {
-                menuFrame.Height = 0;
-            }
+            Application.Current.MainPage.Navigation.PushModalAsync(new MenuPage(), true);
+            //var height = new GridLength(0);
+            //if (menuFrame.Height.Equals(height))
+            //{
+            //    menuFrame.Height = this.Height - 180;
+            //}
+            //else
+            //{
+            //    menuFrame.Height = 0;
+            //}
         }
 
         void NavigateToCartFromInfo(System.Object sender, System.EventArgs e)

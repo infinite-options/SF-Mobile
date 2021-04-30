@@ -95,7 +95,10 @@ namespace ServingFresh.Views
 
         void signUpAddress1Entry_Focused(System.Object sender, Xamarin.Forms.FocusEventArgs e)
         {
-            addr.addressEntryFocused(SignUpAddressList, signUpAddressFrame);
+            if (!String.IsNullOrEmpty(signUpAddress1Entry.Text))
+            {
+                addr.addressEntryFocused(SignUpAddressList, signUpAddressFrame);
+            }
         }
 
         void signUpAddress1Entry_Unfocused(System.Object sender, Xamarin.Forms.FocusEventArgs e)

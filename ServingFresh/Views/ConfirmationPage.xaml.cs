@@ -57,15 +57,15 @@ namespace ServingFresh.Views
 
         void ShowMenuFromConfirmation(System.Object sender, System.EventArgs e)
         {
-            var height = new GridLength(0);
-            if (menuFrame.Height.Equals(height))
-            {
-                menuFrame.Height = this.Height - 180;
-            }
-            else
-            {
-                menuFrame.Height = 0;
-            }
+            //var height = new GridLength(0);
+            //if (menuFrame.Height.Equals(height))
+            //{
+            //    menuFrame.Height = this.Height - 180;
+            //}
+            //else
+            //{
+            //    menuFrame.Height = 0;
+            //}
         }
 
         void NavigateToCartFromConfirmation(System.Object sender, System.EventArgs e)

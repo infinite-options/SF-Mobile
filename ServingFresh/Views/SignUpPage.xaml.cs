@@ -15,6 +15,8 @@ using Xamarin.Forms;
 using Xamarin.Forms.Maps;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using static ServingFresh.Views.PrincipalPage;
+using Xamarin.Auth;
 
 namespace ServingFresh.Views
 {
@@ -37,6 +39,38 @@ namespace ServingFresh.Views
             InitializeComponent();
             BackgroundColor = Color.FromHex("AB000000");
           
+            //InitializeSignUpPost();
+            //InitializeMap();
+
+            //if (Device.RuntimePlatform == Device.iOS)
+            //{
+            //    deviceId = Preferences.Get("guid", null);
+            //    if(deviceId != null) { Debug.WriteLine("This is the iOS GUID from Direct Sign Up: " + deviceId); }
+            //}
+            //else
+            //{
+            //    deviceId = Preferences.Get("guid", null);
+            //    if (deviceId != null) { Debug.WriteLine("This is the Android GUID from Direct Sign Up " + deviceId); }
+            //}
+
+            //if(deviceId != null)
+            //{
+            //    localNotificationButton.IsToggled = true;
+            //}
+            //else
+            //{
+            //    localNotificationButton.IsToggled = false;
+            //}
+
+        }
+
+
+        public SignUpPage(double height)
+        {
+            InitializeComponent();
+            BackgroundColor = Color.FromHex("AB000000");
+            signUpFrame.Margin = new Thickness(0, height, 0, 0);
+            
             //InitializeSignUpPost();
             //InitializeMap();
 
@@ -157,7 +191,159 @@ namespace ServingFresh.Views
             return userID;
         }
 
-       
+
+        async void SignUpDirectUserFromPrincipal(System.Object sender, System.EventArgs e)
+        {
+            var client1 = new SignUp();
+            if (client1.ValidateSignUpInfo(newUserFirstName, newUserLastName, newUserEmail1, newUserEmail2, newUserPassword1, newUserPassword2))
+            {
+                if (client1.ValidateEmail(newUserEmail1, newUserEmail2))
+                {
+                    if (client1.ValidatePassword(newUserPassword1, newUserPassword2))
+                    {
+                        // user is ready to be sign in.
+                        var client = new SignUp();
+                        var content = client.SetDirectUser(user, newUserPassword1.Text);
+                        var signUpStatus = await SignUp.SignUpNewUser(content);
+
+                        if (signUpStatus != "" && signUpStatus != "USER ALREADY EXIST")
+                        {
+                            user.setUserID(signUpStatus);
+                            user.setUserPlatform("DIRECT");
+                            user.setUserType("CUSTOMER");
+                            client.SendUserToSelectionPage();
+                            await DisplayAlert("Sign Up", "Confirmation email sent. Please check and click the link included.", "Okay, continue");
+                            Application.Current.MainPage = new SelectionPage();
+                        }
+                        else if (signUpStatus != "" && signUpStatus == "USER ALREADY EXIST")
+                        {
+                            await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await DisplayAlert("Oops", "Please check that your password is the same in both entries", "OK");
+                        return;
+                    }
+                }
+                else
+                {
+                    await DisplayAlert("Oops", "Please check that your email is the same in both entries", "OK");
+                    return;
+                }
+            }
+            else
+            {
+                await DisplayAlert("Oops", "Please enter all the required information. Thanks!", "OK");
+                return;
+            }
+        }
+
+        void ContinueWithFacebook(System.Object sender, System.EventArgs e)
+        {
+            var client = new SignIn();
+            var authenticator = client.GetFacebookAuthetication();
+            var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
+            authenticator.Completed += FacebookAuthetication;
+            authenticator.Error += Authenticator_Error;
+            presenter.Login(authenticator);
+        }
+
+        void ContinueWithGoogle(System.Object sender, System.EventArgs e)
+        {
+            var client = new SignIn();
+            var authenticator = client.GetGoogleAuthetication();
+            var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
+            AuthenticationState.Authenticator = authenticator;
+            authenticator.Completed += GoogleAuthetication;
+            authenticator.Error += Authenticator_Error;
+            presenter.Login(authenticator);
+        }
+
+        private async void FacebookAuthetication(object sender, Xamarin.Auth.AuthenticatorCompletedEventArgs e)
+        {
+            var authenticator = sender as OAuth2Authenticator;
+
+            if (authenticator != null)
+            {
+                authenticator.Completed -= FacebookAuthetication;
+                authenticator.Error -= Authenticator_Error;
+            }
+
+            if (e.IsAuthenticated)
+            {
+                try
+                {
+                    var clientLogIn = new SignIn();
+                    var clientSignUp = new SignUp();
+
+                    var facebookUser = clientLogIn.GetFacebookUser(e.Account.Properties["access_token"]);
+                    var content = clientSignUp.SetDirectUser(user, e.Account.Properties["access_token"], "", facebookUser.id, facebookUser.email, "FACEBOOK");
+                    var signUpStatus = await SignUp.SignUpNewUser(content);
+
+                    if (signUpStatus != "" && signUpStatus != "USER ALREADY EXIST")
+                    {
+                        user.setUserID(signUpStatus);
+                        user.setUserPlatform("FACEBOOK");
+                        user.setUserType("CUSTOMER");
+                        clientSignUp.SendUserToSelectionPage();
+                    }
+                    else if (signUpStatus != "" && signUpStatus == "USER ALREADY EXIST")
+                    {
+                        await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
+                    }
+                }
+                catch (Exception g)
+                {
+                    Debug.WriteLine(g.Message);
+                }
+            }
+        }
+
+        private async void GoogleAuthetication(object sender, AuthenticatorCompletedEventArgs e)
+        {
+            var authenticator = sender as OAuth2Authenticator;
+
+            if (authenticator != null)
+            {
+                authenticator.Completed -= GoogleAuthetication;
+                authenticator.Error -= Authenticator_Error;
+            }
+
+            if (e.IsAuthenticated)
+            {
+                try
+                {
+                    var clientLogIn = new SignIn();
+                    var clientSignUp = new SignUp();
+
+                    var googleUser = await clientLogIn.GetGoogleUser(e);
+                    var content = clientSignUp.SetDirectUser(user, e.Account.Properties["access_token"], e.Account.Properties["refresh_token"], googleUser.id, googleUser.email, "GOOGLE");
+                    var signUpStatus = await SignUp.SignUpNewUser(content);
+
+                    if (signUpStatus != "" && signUpStatus != "USER ALREADY EXIST")
+                    {
+                        user.setUserID(signUpStatus);
+                        user.setUserPlatform("GOOGLE");
+                        user.setUserType("CUSTOMER");
+                        clientSignUp.SendUserToSelectionPage();
+                    }
+                    else if (signUpStatus != "" && signUpStatus == "USER ALREADY EXIST")
+                    {
+                        await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
+                    }
+                }
+                catch (Exception g)
+                {
+                    Debug.WriteLine(g.Message);
+                }
+            }
+        }
+
+        private async void Authenticator_Error(object sender, Xamarin.Auth.AuthenticatorErrorEventArgs e)
+        {
+            await DisplayAlert("An error occur when authenticating", "Please try again", "OK");
+        }
 
         void CloseSignUpPage(System.Object sender, System.EventArgs e)
         {

@@ -245,15 +245,16 @@ namespace ServingFresh.Views
 
         void ShowMenuFromHistory(System.Object sender, System.EventArgs e)
         {
-            var height = new GridLength(0);
-            if (menuFrame.Height.Equals(height))
-            {
-                menuFrame.Height = this.Height - 180;
-            }
-            else
-            {
-                menuFrame.Height = 0;
-            }
+            Application.Current.MainPage.Navigation.PushModalAsync(new MenuPage(), true);
+            //var height = new GridLength(0);
+            //if (menuFrame.Height.Equals(height))
+            //{
+            //    menuFrame.Height = this.Height - 180;
+            //}
+            //else
+            //{
+            //    menuFrame.Height = 0;
+            //}
         }
 
         void NavigateToCartFromHistory(System.Object sender, System.EventArgs e)

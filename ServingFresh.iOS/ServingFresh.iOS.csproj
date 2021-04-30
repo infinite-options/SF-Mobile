@@ -224,6 +224,9 @@
     <BundleResource Include="Resources\continueWithApple.png" />
     <BundleResource Include="Resources\continueWithFacebook.png" />
     <BundleResource Include="Resources\continueWithGoogle.png" />
+    <BundleResource Include="Resources\homeIcon.png" />
+    <BundleResource Include="Resources\ambassadorIcon.png" />
+    <BundleResource Include="Resources\giftCardIcon.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AppleSignIn\" />

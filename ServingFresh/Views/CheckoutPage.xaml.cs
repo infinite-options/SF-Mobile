@@ -1010,7 +1010,11 @@ namespace ServingFresh.Views
 
         void addressEntryFocused(object sender, EventArgs eventArgs)
         {
-            addr.addressEntryFocused(addressList, addressFrame);
+            if (!String.IsNullOrEmpty(AddressEntry.Text))
+            {
+                addr.addressEntryFocused(addressList, addressFrame);
+            }
+            
         }
 
         void addressEntryUnfocused(object sender, EventArgs eventArgs)
@@ -1229,11 +1233,15 @@ namespace ServingFresh.Views
         void NagivateToSignInFromCheckout(System.Object sender, System.EventArgs e)
         {
             NavigateToSignIn(sender, e);
+            //Application.Current.MainPage.Navigation.PopModalAsync();
+            //Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(), true);
         }
 
         void NagivateToSignUpFromCheckout(System.Object sender, System.EventArgs e)
         {
             NavigateToSignUp(sender, e);
+            //Application.Current.MainPage.Navigation.PopModalAsync();
+            //Application.Current.MainPage.Navigation.PushModalAsync(new SignUpPage(), true);
         }
 
         void NagigateToMainFromCheckout(System.Object sender, System.EventArgs e)
@@ -1243,15 +1251,17 @@ namespace ServingFresh.Views
 
         void ShowMenuFromCheckout(System.Object sender, System.EventArgs e)
         {
-            var height = new GridLength(0);
-            if (menuFrame.Height.Equals(height))
-            {
-                menuFrame.Height = this.Height - 180;
-            }
-            else
-            {
-                menuFrame.Height = 0;
-            }
+            Application.Current.MainPage.Navigation.PushModalAsync(new MenuPage(), true);
+
+            //var height = new GridLength(0);
+            //if (menuFrame.Height.Equals(height))
+            //{
+            //    menuFrame.Height = this.Height - 180;
+            //}
+            //else
+            //{
+            //    menuFrame.Height = 0;
+            //}
         }
 
         void ShowHidePassword(System.Object sender, System.EventArgs e)

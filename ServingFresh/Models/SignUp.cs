@@ -270,6 +270,21 @@ namespace ServingFresh.Models
             return result;
         }
 
+
+        public bool ValidatePassword(Entry password1, Entry password2)
+        {
+            bool result = false;
+            if (!(String.IsNullOrEmpty(password1.Text) || String.IsNullOrEmpty(password2.Text)))
+            {
+                if (password1.Text == password2.Text)
+                {
+                    result = true;
+                }
+            }
+            return result;
+        }
+
+
         public bool ValidateEmail(Entry email1, Entry email2)
         {
             bool result = false;
