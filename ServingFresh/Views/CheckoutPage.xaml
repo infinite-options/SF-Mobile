@@ -73,12 +73,12 @@
                         <ScrollView>
                             <StackLayout>
                                 <StackLayout>
-                                    <Label Text="Expected Delivery:" TextColor="#136D74" FontSize="16" FontAttributes="Bold"></Label>
+                                    <Label Text="Expected Delivery:" TextColor="#F48609" FontSize="16" FontAttributes="Bold"></Label>
                                     <Label x:Name="expectedDelivery" Text="Wednesday, Aug 20, 2020, between 6pm to 8pm"  FontSize="14" TextColor="Black"></Label>
                                 </StackLayout>
                                 <StackLayout x:Name="customerDeliveryAddressView">
                                     <Grid>
-                                        <Label Grid.Column="0" Text="Delivery Address:" TextColor="#136D74" FontSize="16" FontAttributes="Bold"></Label>
+                                        <Label Grid.Column="0" Text="Delivery Address:" TextColor="#F48609" FontSize="16" FontAttributes="Bold"></Label>
                                         <Label Grid.Column="1" Text="Change delivery address" HorizontalTextAlignment="End" VerticalTextAlignment="Center" FontSize="12" TextColor="#FF8500">
                                             <Label.GestureRecognizers>
                                                 <TapGestureRecognizer Tapped="UpdateAddressForCustomer"></TapGestureRecognizer>
@@ -93,7 +93,7 @@
                                 </StackLayout>
                                 <StackLayout x:Name="guestAddressInfoView">
                                     
-                                    <Label Text="Delivery Address:" x:Name="guestDeliveryAddressLabel" TextColor="#136D74" FontSize="16" FontAttributes="Bold"></Label>
+                                    <Label Text="Delivery Address:" x:Name="guestDeliveryAddressLabel" TextColor="#F48609" FontSize="16" FontAttributes="Bold"></Label>
                                     <StackLayout Grid.Row="2" x:Name="addressGrid" HeightRequest="140" >
                                         <RelativeLayout
                                             RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
