@@ -6,6 +6,7 @@ using Xamarin.Forms.Maps;
 using static ServingFresh.Views.SelectionPage;
 using static ServingFresh.Views.CheckoutPage;
 using static ServingFresh.Views.SignUpPage;
+using static ServingFresh.Views.PrincipalPage;
 using ServingFresh.Models;
 using ServingFresh.LogIn.Classes;
 using Xamarin.Auth;

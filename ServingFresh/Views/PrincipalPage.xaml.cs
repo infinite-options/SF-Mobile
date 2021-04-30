@@ -18,6 +18,7 @@ namespace ServingFresh.Views
 {
     public partial class PrincipalPage : ContentPage
     {
+        public readonly static Models.User user = new Models.User();
         Location currentLocation;
         private AddressAutocomplete addressToValidate = null;
         public PrincipalPage()
@@ -77,7 +78,7 @@ namespace ServingFresh.Views
 
         async void FindLocalProduceBaseOnLocation(System.Object sender, System.EventArgs e)
         {
-            if (AddressEntry.Text != null)
+            if (!String.IsNullOrEmpty(AddressEntry.Text))
             {
                 var client = new AddressValidation();
                 var addressStatus = client.ValidateAddressString(addressToValidate.Street, addressToValidate.Unit, addressToValidate.City, addressToValidate.State, addressToValidate.ZipCode);
@@ -177,14 +178,20 @@ namespace ServingFresh.Views
 
         void NavigateToLogIn(System.Object sender, System.EventArgs e)
         {
-            logInRow.Height = this.Height - 200;
-            logInFrame.Margin = new Thickness(5, -this.Height + 400, 5, 0);
+            bool animate = false;
+            scrollView.ScrollToAsync(0, 50, animate);
+            Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(),true);
+            //logInRow.Height = this.Height - 200;
+            //logInFrame.Margin = new Thickness(5, -this.Height + 400, 5, 0);
         }
 
         void NavigateToSignUp(System.Object sender, System.EventArgs e)
         {
-            addressRow.Height = this.Height - 200;
-            addressFrameSignUp.Margin = new Thickness(5, -this.Height + 400, 5, 0);
+            bool animate = false;
+            scrollView.ScrollToAsync(0, 50, animate);
+            Application.Current.MainPage.Navigation.PushModalAsync(new AddressPage(), true);
+            //addressRow.Height = this.Height - 200;
+            //addressFrameSignUp.Margin = new Thickness(5, -this.Height + 400, 5, 0);
         }
 
         async void OnAddressChanged(object sender, EventArgs eventArgs)
@@ -214,6 +221,7 @@ namespace ServingFresh.Views
             {
                 addressToValidate.ZipCode = zipcode;
             }
+
         }
 
         async void SignInDirectUser(System.Object sender, System.EventArgs e)
@@ -250,14 +258,16 @@ namespace ServingFresh.Views
 
         void HideLogInUI(System.Object sender, System.EventArgs e)
         {
-            logInRow.Height = 0;
-            logInFrame.Margin = new Thickness(5, 0, 5, 0);
+            Application.Current.MainPage.Navigation.PopModalAsync();
+            //logInRow.Height = 0;
+            //logInFrame.Margin = new Thickness(5, 0, 5, 0);
         }
 
         void HideSignUpUI(System.Object sender, System.EventArgs e)
         {
-            signUpRow.Height = 0;
-            signUpFrame.Margin = new Thickness(5, 0, 5, 0);
+            //signUpRow.Height = 0;
+            //signUpFrame.Margin = new Thickness(5, 0, 5, 0);
+            Application.Current.MainPage.Navigation.PopModalAsync();
         }
 
         void ShowHidePassword(System.Object sender, System.EventArgs e)
@@ -764,7 +774,7 @@ namespace ServingFresh.Views
                     itemUID = produce.item_uid,
                     itemBusinessUID = produce.itm_business_uid,
                     itemName = produce.item_name,
-                    itemPrice = "$ " + produce.item_price.ToString(),
+                    itemPrice = "$ " + produce.item_price.ToString("N2"),
                     itemPriceWithUnit = "$ " + produce.item_price.ToString("N2") + " / " + (string)produce.item_unit.ToString(),
                     itemUnit = (string)produce.item_unit.ToString(),
                     itemDescription = produce.item_desc,
@@ -778,10 +788,7 @@ namespace ServingFresh.Views
                     isItemUnavailable = false,
                 };
 
-                if (produce.item_type == type)
-                {
-                    list.Add(itemToInsert);
-                }
+                list.Add(itemToInsert);
             }
             return list;
         }

@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 using ServingFresh.Config;
 using Xamarin.Forms;
 using static ServingFresh.Views.SelectionPage;
-using static ServingFresh.Views.SignUpPage;
+using static ServingFresh.Views.PrincipalPage;
 namespace ServingFresh.Views
 {
     public partial class HistoryPage : ContentPage

@@ -9,6 +9,7 @@ using System.Xml.Linq;
 using Newtonsoft.Json;
 using ServingFresh.Config;
 using Xamarin.Essentials;
+using Xamarin.Forms;
 using Xamarin.Forms.Maps;
 
 namespace ServingFresh.Models
@@ -262,6 +263,23 @@ namespace ServingFresh.Models
                 return el.Value;
             }
             return "";
+        }
+
+        public bool ValidateSignUpInfo(Entry firstName, Entry lastName, Entry email, Entry phoneNumber, Entry address1, Entry city, Entry state, Entry zipcode)
+        {
+            bool result = false;
+            if (!(String.IsNullOrEmpty(firstName.Text)
+                || String.IsNullOrEmpty(lastName.Text)
+                || String.IsNullOrEmpty(email.Text)
+                || String.IsNullOrEmpty(address1.Text)
+                || String.IsNullOrEmpty(city.Text)
+                || String.IsNullOrEmpty(state.Text)
+                || String.IsNullOrEmpty(zipcode.Text)
+                ))
+            {
+                result = true;
+            }
+            return result;
         }
 
         public void SetPinOnMap(Xamarin.Forms.Maps.Map map, Location location, string address)

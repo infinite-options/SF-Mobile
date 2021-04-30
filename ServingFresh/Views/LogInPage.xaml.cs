@@ -16,7 +16,7 @@ using ServingFresh.Notifications;
 using System.Diagnostics;
 using ServingFresh.Models;
 using Acr.UserDialogs;
-using static ServingFresh.Views.SignUpPage;
+using static ServingFresh.Views.PrincipalPage;
 
 namespace ServingFresh.Views
 {
@@ -29,8 +29,10 @@ namespace ServingFresh.Views
 
         public LogInPage()
         {
+            //grids.BackgroundColor = Color.FromHex("AB000000");
             InitializeComponent();
-            
+            //grids.BackgroundColor = Color.FromHex("AB000000");
+            BackgroundColor = Color.FromHex("AB000000");
             if (Device.RuntimePlatform == Device.Android)
             {
                 System.Diagnostics.Debug.WriteLine("Running on Android: Line 32");
@@ -459,6 +461,11 @@ namespace ServingFresh.Views
                 userPassword.IsPassword = true;
                 label.Text = "Show password";
             }
+        }
+
+        void ImageButton_Clicked(System.Object sender, System.EventArgs e)
+        {
+            Application.Current.MainPage.Navigation.PopModalAsync();
         }
     }
 }

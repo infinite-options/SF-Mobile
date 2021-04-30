@@ -6,189 +6,44 @@
     xmlns:servingfresh="clr-namespace:ServingFresh.Models"
     x:Class="ServingFresh.Views.SignUpPage">
     <ContentPage.Content>
-        <StackLayout Padding="0,0,0,0" BackgroundColor="WhiteSmoke">
-            <Grid BackgroundColor="WhiteSmoke">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="96"></RowDefinition>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="100"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="100"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-                <StackLayout Grid.Row="0" Orientation="Horizontal" VerticalOptions="Center" HorizontalOptions="Center">
-                    <Image Source="backArrow.png"></Image>
-                    <Label Text="Back" TextColor="#136D74" FontSize="17"></Label>
-                    <StackLayout.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"></TapGestureRecognizer>
-                    </StackLayout.GestureRecognizers>
-                </StackLayout>
-                <Label
-                    Grid.Row="0"
-                    Grid.Column="1"
-                    HeightRequest="136"
-                    HorizontalTextAlignment="Center"
-                    VerticalTextAlignment="Center"
-                    Text="Sign Up"
-                    TextColor="#136D74"
-                    TextDecorations="Underline"
-                    FontSize="34"
-                    FontAttributes="Bold"
-                    BackgroundColor="WhiteSmoke">
-                </Label>
-            </Grid>
+      <Frame Margin="0,180,0,0" BackgroundColor="WhiteSmoke">
+        <StackLayout>
+            <StackLayout HeightRequest="30" >
+                <ImageButton Padding="0,0,2,0" HeightRequest="30" Source="closeFrameIcon.png" HorizontalOptions="End" Clicked="CloseSignUpPage"></ImageButton>
+            </StackLayout>
+            <Label Margin="0,0,0,20" Text="Sign Up" TextColor="#136D74" FontSize="32" FontAttributes="Bold" TextDecorations="Underline" HorizontalTextAlignment="Center" ></Label>
             <ScrollView>
-
-              
-
-                <StackLayout
-                    Margin="10,10,10,0">
-
+                <StackLayout>
                     <StackLayout>
-                        <StackLayout Margin="0,0,0,13">
-                            <Grid>
-                                <Button CornerRadius="13" HorizontalOptions="CenterAndExpand" WidthRequest="241" HeightRequest="52" Padding="25,0,0,0" Text="Sign up with Apple" TextColor="White" FontSize="16" BackgroundColor="#466DED"></Button>
-                                <Image Margin="80,0,0,0" Source="appleWhiteIcon.png" HorizontalOptions="Start"></Image>
-                            </Grid>
-                            <Grid>
-                                <Button CornerRadius="13" HorizontalOptions="CenterAndExpand" WidthRequest="241" HeightRequest="52" Padding="50,0,0,0" Text="Sign up with Facebook" TextColor="White" FontSize="16" BackgroundColor="#485A95"></Button>
-                                <Image Margin="80,0,0,0" Source="facebookWhiteIcon.png" HorizontalOptions="Start"></Image>
-                            </Grid>
-                            <Grid>
-                                <Button CornerRadius="13" HorizontalOptions="CenterAndExpand" WidthRequest="241" HeightRequest="52" Padding="27,0,0,0" Text="Sign up with Google" TextColor="White" FontSize="16" BackgroundColor="#5C83F0"></Button>
-                                <Image Margin="80,0,0,0" Source="googleWhiteIcon.png" HorizontalOptions="Start"></Image>
-                            </Grid>
-                        </StackLayout>
-                        <BoxView Margin="0,0,0,13" HeightRequest="1" Color="#136D74"></BoxView>
-                        <Label Margin="0,0,0,13" Text="Or continue with email" TextColor="Black" FontSize="19" HorizontalTextAlignment="Center" ></Label>
-                        <StackLayout Spacing="10" Margin="0,0,0,20">
-                            <Entry WidthRequest="372" HeightRequest="44" Placeholder="First name (so we can address you)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
-                            <Entry WidthRequest="372" HeightRequest="44" Placeholder="Last name (in case you want to be formal)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
-                            <Entry WidthRequest="372" HeightRequest="44" Placeholder="Email address (for order confirmation)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
-                            <Entry WidthRequest="372" HeightRequest="44" Placeholder="Confirm Email address" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
-                            <Entry WidthRequest="372" HeightRequest="44" Placeholder="Create Password" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
-                            <Entry WidthRequest="372" HeightRequest="44" Placeholder="Confirm Password" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
-                        </StackLayout>
-                        <Button CornerRadius="13" HorizontalOptions="CenterAndExpand" WidthRequest="287" HeightRequest="48" Text="Sign Up" FontAttributes="Bold" TextColor="White" FontSize="20" BackgroundColor="#FF8500"></Button>
+                        <Grid>
+                            <Button CornerRadius="13"  Command = "{Binding SignInWithAppleCommand}" HorizontalOptions="Center" WidthRequest="241" HeightRequest="52" Padding="25,0,0,0" Text="Sign up with Apple" TextColor="White" FontSize="16" BackgroundColor="#466DED"></Button>
+                            <Image Margin="55,0,0,0" Source="appleWhiteIcon.png" HorizontalOptions="Start"></Image>
+                        </Grid>
+                        <Grid>
+                            <Button CornerRadius="13" x:Name="appleLogInButton"  HorizontalOptions="Center" WidthRequest="241" HeightRequest="52" Padding="50,0,0,0" Text="Sign up with Facebook" TextColor="White" FontSize="16" BackgroundColor="#485A95"></Button>
+                            <Image Margin="55,0,0,0" Source="facebookWhiteIcon.png" HorizontalOptions="Start"></Image>
+                        </Grid>
+                        <Grid>
+                            <Button CornerRadius="13" HorizontalOptions="Center" WidthRequest="241" HeightRequest="52" Padding="27,0,0,0" Text="Sign up with Google" TextColor="White" FontSize="16" BackgroundColor="#5C83F0"></Button>
+                            <Image Margin="55,0,0,0" Source="googleWhiteIcon.png" HorizontalOptions="Start"></Image>
+                        </Grid>
                     </StackLayout>
-
-                    <StackLayout IsVisible="false">
-                    <Entry
-                        x:Name="userEmailAddress"
-                        Placeholder="Email Address"
-                        Keyboard="Email"
-                        TextColor="Black"
-                        PlaceholderColor="Gray">
-                    </Entry>
-                    <Entry
-                        x:Name="userConfirmEmailAddress"
-                        Placeholder="Confirm Email Address"
-                        TextColor="Black"
-                        PlaceholderColor="Gray"></Entry>
-                    <Entry
-                        x:Name="userPassword"
-                        Placeholder="Enter Password"
-                        TextColor="Black"
-                        PlaceholderColor="Gray">
-                    </Entry>
-                    <Entry
-                        x:Name="userConfirmPassword"
-                        Placeholder="Confirm Password"
-                        TextColor="Black"
-                        PlaceholderColor="Gray">
-                    </Entry>
-                    <Grid>
-                        <servingfresh:CustomEntry Placeholder="Push Notification" PlaceholderColor="Gray" IsReadOnly="True" Margin="7,0,0,0"></servingfresh:CustomEntry>
-                        <Switch x:Name="localNotificationButton" HorizontalOptions="End" Grid.Column="1" ></Switch>
-                    </Grid>
-                    <Entry
-                        x:Name="userFirstName"
-                        Placeholder="First name"
-                        TextColor="Black"
-                        PlaceholderColor="Gray">
-                    </Entry>
-                    <Entry
-                        x:Name="userLastName"
-                        Placeholder="Last name"
-                        TextColor="Black"
-                        PlaceholderColor="Gray">
-                    </Entry>
-                    <Entry
-                        x:Name="userPhoneNumber"
-                        Placeholder="Phone number - Enter only 10 digits"
-                        MaxLength="10"
-                        Keyboard="Numeric"
-                        TextColor="Black"
-                        PlaceholderColor="Gray">
-                    </Entry>
-                    <Entry
-                        x:Name="userAddress"
-                        Placeholder="Street Address"
-                        TextColor="Black"
-                        PlaceholderColor="Gray">
-                    </Entry>
-                    <Entry
-                        x:Name="userUnitNumber"
-                        Placeholder="Apt number"
-                        TextColor="Black"
-                        PlaceholderColor="Gray">
-                    </Entry>
-                    <Grid>
-                        <Entry
-                            x:Name="userCity"
-                            Grid.Column="0"
-                            Placeholder="City"
-                            TextColor="Black"
-                            PlaceholderColor="Gray">
-                        </Entry>
-                        <Entry
-                            x:Name="userState"
-                            Grid.Column="1"
-                            Placeholder="State"
-                            TextColor="Black"
-                            PlaceholderColor="Gray">
-                        </Entry>
-                        <Entry
-                            x:Name="userZipcode"
-                            Grid.Column="2"
-                            Placeholder="Zipcode"
-                            TextColor="Black"
-                            PlaceholderColor="Gray">
-                        </Entry>
-                    </Grid>
-                    <!--<Entry x:Name="userDeliveryInstructions" Placeholder="Delivery instructions" IsEnabled="False"></Entry>-->
-                    <Frame HasShadow="False" BackgroundColor="Gray" Padding="0" HeightRequest="200">
-                        <maps:Map
-                            x:Name="map"
-                            IsVisible="true">
-                        </maps:Map>
-                    </Frame>
-                    <Button
-                        x:Name="validateAddressButton"
-                        Text="Validate Address"
-                        TextColor="#FF8500"
-                        FontAttributes="Bold"
-                        CornerRadius="5"
-                        BorderColor="LightGray"
-                        BorderWidth="1"
-                        HeightRequest="40"
-                        BackgroundColor="White"
-                        Clicked="ValidateAddressClick">
-
-                    </Button>
-                    <!--<Button
-                        Text="Sign up"
-                        TextColor="White"
-                        CornerRadius="5"
-                        BorderColor="LightGray"
-                        BorderWidth="1"
-                        HeightRequest="40"
-                        BackgroundColor="#FF8500"
-                        Clicked="SignUpNewUser">
-                    </Button>-->
-                        </StackLayout>
+                    <BoxView Margin="0,0,0,13" HeightRequest="1" Color="#136D74"></BoxView>
+                    <Label Margin="0,0,0,13" Text="Or continue with email" TextColor="Black" FontSize="19" HorizontalTextAlignment="Center" ></Label>
+                    <StackLayout Spacing="10" Margin="0,0,0,20">
+                        <Entry WidthRequest="372" HeightRequest="44" x:Name="newUserFirstName" Placeholder="First name (so we can address you)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                        <Entry WidthRequest="372" HeightRequest="44" x:Name="newUserLastName" Placeholder="Last name (in case you want to be formal)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                        <Entry WidthRequest="372" HeightRequest="44" Keyboard="Email" x:Name="newUserEmail1" Placeholder="Email address (for order confirmation)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                        <Entry WidthRequest="372" HeightRequest="44" Keyboard="Email" x:Name="newUserEmail2" Placeholder="Confirm Email address" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                        <Entry WidthRequest="372" HeightRequest="44" Keyboard="Email" x:Name="newUserPassword1" Placeholder="Create Password" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                        <Entry WidthRequest="372" HeightRequest="44" Keyboard="Email" x:Name="newUserPassword2" Placeholder="Confirm Password" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                    </StackLayout>
+                    <Button CornerRadius="13" HorizontalOptions="CenterAndExpand" WidthRequest="287" HeightRequest="48" Text="Sign Up" Clicked="SignUpDirectUserFromPrincipal" FontAttributes="Bold" TextColor="White" FontSize="20" BackgroundColor="#FF8500"></Button>
                 </StackLayout>
             </ScrollView>
-        </StackLayout>
+            </StackLayout>
+      </Frame>
+       
+
     </ContentPage.Content>
 </ContentPage>

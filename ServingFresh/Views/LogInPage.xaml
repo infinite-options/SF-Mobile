@@ -1,32 +1,76 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="ServingFresh.Views.LogInPage">
     <ContentPage.Content><!--#E0E6E6F2-->
-        <Grid RowSpacing="0" BackgroundColor="WhiteSmoke">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="94"></RowDefinition>
-                <RowDefinition Height="*"></RowDefinition>
-            </Grid.RowDefinitions>
-            <Grid Grid.Row="0">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="100"></ColumnDefinition>
-                        <ColumnDefinition Width="*"></ColumnDefinition>
-                        <ColumnDefinition Width="100"></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
-                    <StackLayout Grid.Column="0"  VerticalOptions="Center" HorizontalOptions="Center" Orientation="Horizontal">
-                        <Image Source="backArrow.png"></Image>
-                        <Label Text="Back" TextColor="#136D74" FontSize="17"></Label>
-                        <StackLayout.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="ReturnBackToPrincipalPage"></TapGestureRecognizer>
-                        </StackLayout.GestureRecognizers>
+    <Frame Margin="0,180,0,0" BackgroundColor="WhiteSmoke">
+        <StackLayout>
+            <StackLayout HeightRequest="30" >
+                <ImageButton Padding="0,0,2,0" HeightRequest="30" Source="closeFrameIcon.png" HorizontalOptions="End" Clicked="ImageButton_Clicked"></ImageButton>
+            </StackLayout>
+            <Label Margin="0,0,0,20" Text="Log In" TextColor="#136D74" FontSize="32" FontAttributes="Bold" TextDecorations="Underline" HorizontalTextAlignment="Center" ></Label>
+        <ScrollView>
 
-                    </StackLayout>
-                    <StackLayout Grid.Column="1" VerticalOptions="Center">
-                        <Label Text="Log In" TextColor="#136D74" FontSize="32" FontAttributes="Bold" TextDecorations="Underline" HorizontalTextAlignment="Center" ></Label>
-                    </StackLayout>
+       
+        <StackLayout x:Name="grids" BackgroundColor="WhiteSmoke"  HorizontalOptions="Center" >
+           
+           
+            <StackLayout>
+                <Grid>
+                    <Button CornerRadius="13" Clicked="AppleLogInClick" Command = "{Binding SignInWithAppleCommand}" HorizontalOptions="Center" WidthRequest="241" HeightRequest="52" Padding="25,0,0,0" Text="Sign up with Apple" TextColor="White" FontSize="16" BackgroundColor="#466DED"></Button>
+                    <Image Margin="55,0,0,0" Source="appleWhiteIcon.png" HorizontalOptions="Start"></Image>
                 </Grid>
+                <Grid>
+                    <Button CornerRadius="13" x:Name="appleLogInButton" Clicked="FacebookLogInClick" HorizontalOptions="Center" WidthRequest="241" HeightRequest="52" Padding="50,0,0,0" Text="Sign up with Facebook" TextColor="White" FontSize="16" BackgroundColor="#485A95"></Button>
+                    <Image Margin="55,0,0,0" Source="facebookWhiteIcon.png" HorizontalOptions="Start"></Image>
+                </Grid>
+                <Grid>
+                    <Button CornerRadius="13" Clicked="GoogleLogInClick" HorizontalOptions="Center" WidthRequest="241" HeightRequest="52" Padding="27,0,0,0" Text="Sign up with Google" TextColor="White" FontSize="16" BackgroundColor="#5C83F0"></Button>
+                    <Image Margin="55,0,0,0" Source="googleWhiteIcon.png" HorizontalOptions="Start"></Image>
+                </Grid>
+            </StackLayout>
+            <BoxView Margin="0,20,0,15" HeightRequest="1" Color="#136D74"></BoxView>
+            <Label Text="Or continue with email" HorizontalTextAlignment="Center" TextColor="Black" FontSize="17"></Label>
+            <Entry
+                x:Name="userEmailAddress"
+                HeightRequest="52"
+                Placeholder="Email address"
+                HorizontalTextAlignment="Start"
+                Keyboard="Email"
+                PlaceholderColor="#6D7278"
+                TextColor="Gray"
+                FontSize="18">
+            </Entry>
+            <Grid>
+                <Entry
+                    x:Name="userPassword"
+                    HeightRequest="52"
+                    WidthRequest="372"
+                    HorizontalOptions="Center"
+                    Placeholder="Enter Password"
+                    IsPassword="True"
+                    HorizontalTextAlignment="Start"
+                    Keyboard="Email"
+                    PlaceholderColor="#6D7278"
+                    TextColor="Gray"
+                    FontSize="18">
+                </Entry>
+                <Label Text="Show password" Margin="0,0,26,0" TextColor="#6D7278" FontSize="14"  VerticalOptions="Center" HorizontalOptions="End">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="ShowHidePassword"></TapGestureRecognizer>
+                    </Label.GestureRecognizers>
+                </Label>
             </Grid>
-            <StackLayout Grid.Row="1" Padding="21,50,21,0" >
+            <Button
+                    x:Name="logInButton"
+                    Margin="50,20,50,0"
+                    Text="Login"
+                    FontSize="20"
+                    FontAttributes="Bold"
+                    TextColor="White"
+                    BackgroundColor="#FF8500"
+                    Clicked="DirectLogInClick">
+            </Button>
+            <Button Text="Reset password" TextColor="#6D7278" BackgroundColor="Transparent"></Button>
+            <!--<StackLayout Grid.Row="1" Padding="21,50,21,0" >
                 <Entry
                     x:Name="userEmailAddress"
                     HeightRequest="52"
@@ -111,7 +155,11 @@
                         </ImageButton>
                     </StackLayout>
                 </StackLayout>
+            </StackLayout>-->
+        </StackLayout>
+       </ScrollView>
             </StackLayout>
-        </Grid>
+    </Frame>
+     
     </ContentPage.Content>
 </ContentPage>

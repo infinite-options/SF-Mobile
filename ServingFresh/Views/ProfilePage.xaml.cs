@@ -13,7 +13,7 @@ using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Maps;
 using Switch = Xamarin.Forms.Switch;
-using static ServingFresh.Views.SignUpPage;
+using static ServingFresh.Views.PrincipalPage;
 using static ServingFresh.Views.SelectionPage;
 using System.Threading.Tasks;
 

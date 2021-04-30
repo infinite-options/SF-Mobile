@@ -210,6 +210,79 @@ namespace ServingFresh.Models
             return userID;
         }
 
+        public bool ValidateSignUpInfo(Entry phoneNumber, Entry address1, Entry city, Entry state, Entry zipcode)
+        {
+            bool result = false;
+            if (!( String.IsNullOrEmpty(phoneNumber.Text)
+                || String.IsNullOrEmpty(address1.Text)
+                || String.IsNullOrEmpty(city.Text)
+                || String.IsNullOrEmpty(state.Text)
+                || String.IsNullOrEmpty(zipcode.Text)
+                ))
+            {
+                result = true;
+            }
+            return result;
+        }
+
+        public bool ValidateSignUpInfo(Entry firstName, Entry lastName, Entry email1, Entry email2, Entry password1, Entry password2)
+        {
+            bool result = false;
+            if (!(String.IsNullOrEmpty(firstName.Text)
+                || String.IsNullOrEmpty(lastName.Text)
+                || String.IsNullOrEmpty(email1.Text)
+                || String.IsNullOrEmpty(email2.Text)
+                || String.IsNullOrEmpty(password1.Text)
+                || String.IsNullOrEmpty(password2.Text)
+                ))
+            {
+                result = true;
+            }
+            return result;
+        }
+
+        public bool ValidateSignUpInfo(Entry firstName, Entry lastName, Entry email, Entry phoneNumber, Entry address1, Entry city, Entry state, Entry zipcode)
+        {
+            bool result = false;
+            if (!(String.IsNullOrEmpty(firstName.Text)
+                || String.IsNullOrEmpty(lastName.Text)
+                || String.IsNullOrEmpty(email.Text)
+                || String.IsNullOrEmpty(address1.Text)
+                || String.IsNullOrEmpty(city.Text)
+                || String.IsNullOrEmpty(state.Text)
+                || String.IsNullOrEmpty(zipcode.Text)
+                ))
+            {
+                result = true;
+            }
+            return result;
+        }
+
+        public bool ValidateDirectSignInCredentials(Entry email, Entry password)
+        {
+            bool result = false;
+            if (!(String.IsNullOrEmpty(email.Text)
+                || String.IsNullOrEmpty(password.Text)
+                ))
+            {
+                result = true;
+            }
+            return result;
+        }
+
+        public bool ValidateEmail(Entry email1, Entry email2)
+        {
+            bool result = false;
+            if (!(String.IsNullOrEmpty(email1.Text) || String.IsNullOrEmpty(email2.Text)))
+            {
+                if (email1.Text == email2.Text)
+                {
+                    result = true;
+                }
+            }
+            return result;
+        }
+
         public static async Task<bool> SignUpNewUser(UpdateProfile existingUser)
         {
             bool result = false;

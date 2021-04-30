@@ -148,7 +148,7 @@ namespace ServingFresh.Models
                                             City = predictionSplit[1].Trim(),
                                             State = predictionSplit[2].Trim(),
                                             ZipCode = "",
-                                            PredictionID = prediction.PlaceId
+                                            PredictionID = prediction.PlaceId,
                                         });
                                     }
                                 }

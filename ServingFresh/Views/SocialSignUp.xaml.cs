@@ -13,7 +13,7 @@ using Xamarin.Forms.Maps;
 using Xamarin.Essentials;
 using ServingFresh.Models;
 using System.Diagnostics;
-using static ServingFresh.Views.SignUpPage;
+using static ServingFresh.Views.PrincipalPage;
 namespace ServingFresh.Views
 {
     public partial class SocialSignUp : ContentPage

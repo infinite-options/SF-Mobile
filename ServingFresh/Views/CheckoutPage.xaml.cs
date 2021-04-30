@@ -18,7 +18,7 @@ using Application = Xamarin.Forms.Application;
 using System.Threading.Tasks;
 using Acr.UserDialogs;
 using static ServingFresh.Views.SelectionPage;
-using static ServingFresh.Views.SignUpPage;
+using static ServingFresh.Views.PrincipalPage;
 using Xamarin.Auth;
 using ServingFresh.LogIn.Classes;
 

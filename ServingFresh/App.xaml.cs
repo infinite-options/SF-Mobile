@@ -6,7 +6,7 @@ using ServingFresh.Config;
 using Xamarin.Essentials;
 using ServingFresh.LogIn.Apple;
 using System.Diagnostics;
-using static ServingFresh.Views.SignUpPage;
+using static ServingFresh.Views.PrincipalPage;
 namespace ServingFresh
 {
     public partial class App : Application

@@ -16,7 +16,7 @@ using Xamarin.Forms;
 using Xamarin.Forms.Maps;
 using static ServingFresh.Views.CheckoutPage;
 using static ServingFresh.Views.SelectionPage;
-using static ServingFresh.Views.SignUpPage;
+using static ServingFresh.Views.PrincipalPage;
 using Application = Xamarin.Forms.Application;
 
 
