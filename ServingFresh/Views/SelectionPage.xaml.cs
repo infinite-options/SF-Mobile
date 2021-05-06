@@ -224,9 +224,8 @@ namespace ServingFresh.Views
         public SelectionPage()
         {
             InitializeComponent();
-            _ = CheckVersion();
+            GetBusinesses();
             _ = SetFavoritesList();
-            SetMenu(guestMenuSection, customerMenuSection, historyLabel, profileLabel);
         }
 
         public static void SetMenu(StackLayout guest, StackLayout customer, Label history, Label profile)

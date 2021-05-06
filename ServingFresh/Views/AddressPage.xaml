@@ -14,6 +14,8 @@
                 <StackLayout>
                     <StackLayout Spacing="10">
                         <Label Margin="0,0,0,20" Text="Let’s first make sure we deliver to you."  TextColor="#000000" FontSize="18" HorizontalTextAlignment="Center"></Label>
+                        <Entry HeightRequest="44" x:Name="firstName" Placeholder="First Name" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                        <Entry HeightRequest="44" x:Name="lastName" Placeholder="Last Name" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
                         <StackLayout HeightRequest="150">
                             <RelativeLayout
                                 RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
@@ -32,7 +34,7 @@
                                                 <Entry Grid.Column="1" x:Name="signUpZipcodeEntry" Placeholder="Zip Code" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
                                             </Grid>
                                         </StackLayout>
-                                    <Frame Margin="0,-110,0,0" Padding="2" BackgroundColor="#E0EBEC" CornerRadius="0" HorizontalOptions="CenterAndExpand" x:Name="signUpAddressFrame" IsVisible="false">
+                                    <Frame Margin="0,-100,0,0" Padding="2" BackgroundColor="#E0EBEC" CornerRadius="0" HorizontalOptions="CenterAndExpand" x:Name="signUpAddressFrame" IsVisible="false">
                                         <ListView x:Name="SignUpAddressList" IsVisible="false" BackgroundColor="#E0EBEC"  HeightRequest="100"  ItemsSource="{Binding Addresses}" ItemSelected="SignUpAddressList_ItemSelected">
                                             <ListView.ItemTemplate>
                                                 <DataTemplate>
@@ -51,7 +53,7 @@
                                 </StackLayout>
                             </RelativeLayout>
                           </StackLayout>
-                         <Entry WidthRequest="372" HeightRequest="44" x:Name="signUpPhone" Keyboard="Numeric" Placeholder="Phone number (so we can call if there is an issue)" MaxLength="10" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                         <Entry WidthRequest="372" HeightRequest="44" x:Name="signUpPhone" Keyboard="Numeric" Placeholder="Phone number" MaxLength="10" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
                          <Button Margin="0,20,0,0" CornerRadius="13" HorizontalOptions="CenterAndExpand" WidthRequest="287" HeightRequest="48" Text="Continue" Clicked="ContinueWithSignUp"  FontAttributes="Bold" TextColor="White" FontSize="20" BackgroundColor="#FF8500"></Button>
                     </StackLayout>
                 </StackLayout>

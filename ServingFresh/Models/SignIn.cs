@@ -11,12 +11,15 @@ using ServingFresh.LogIn.Apple;
 using ServingFresh.LogIn.Classes;
 using ServingFresh.Views;
 using Xamarin.Auth;
+using Xamarin.Essentials;
 using Xamarin.Forms;
-
+using static ServingFresh.Views.PrincipalPage;
 namespace ServingFresh.Models
 {
+
     public class SignIn
     {
+        private string deviceId = "";
         private string accessToken;
         private string refreshToken;
         private string platform;
@@ -131,7 +134,7 @@ namespace ServingFresh.Models
                             }
                             catch (Exception ex)
                             {
-                                System.Diagnostics.Debug.WriteLine(ex.Message);
+                                Debug.WriteLine(ex.Message);
                             }
                         }
                         else
@@ -148,6 +151,277 @@ namespace ServingFresh.Models
                 button.IsEnabled = true;
             }
             return directUser;
+        }
+
+        public async Task<string> VerifyUserCredentials(string accessToken = "", string refreshToken = "", AuthenticatorCompletedEventArgs googleAccount = null, AppleAccount appleCredentials = null, string platform = "")
+        {
+            var isUserVerified = "";
+            try
+            {
+                //var progress = UserDialogs.Instance.Loading("Loading...");
+                var client = new HttpClient();
+                var socialLogInPost = new SocialLogInPost();
+
+                var googleData = new GoogleResponse();
+                var facebookData = new FacebookResponse();
+
+                if (platform == "GOOGLE")
+                {
+                    var request = new OAuth2Request("GET", new Uri(Constant.GoogleUserInfoUrl), null, googleAccount.Account);
+                    var GoogleResponse = await request.GetResponseAsync();
+                    var googelUserData = GoogleResponse.GetResponseText();
+
+                    googleData = JsonConvert.DeserializeObject<GoogleResponse>(googelUserData);
+
+                    socialLogInPost.email = googleData.email;
+                    socialLogInPost.social_id = googleData.id;
+                }
+                else if (platform == "FACEBOOK")
+                {
+                    var facebookResponse = client.GetStringAsync(Constant.FacebookUserInfoUrl + accessToken);
+                    var facebookUserData = facebookResponse.Result;
+
+                    facebookData = JsonConvert.DeserializeObject<FacebookResponse>(facebookUserData);
+
+                    socialLogInPost.email = facebookData.email;
+                    socialLogInPost.social_id = facebookData.id;
+                }
+                else if (platform == "APPLE")
+                {
+                    socialLogInPost.email = appleCredentials.Email;
+                    socialLogInPost.social_id = appleCredentials.UserId;
+                }
+
+                socialLogInPost.password = "";
+                socialLogInPost.signup_platform = platform;
+
+                var socialLogInPostSerialized = JsonConvert.SerializeObject(socialLogInPost);
+                var postContent = new StringContent(socialLogInPostSerialized, Encoding.UTF8, "application/json");
+
+                //var test = UserDialogs.Instance.Loading("Loading...");
+                var RDSResponse = await client.PostAsync(Constant.LogInUrl, postContent);
+                var responseContent = await RDSResponse.Content.ReadAsStringAsync();
+                var authetication = JsonConvert.DeserializeObject<SuccessfulSocialLogIn>(responseContent);
+                if (RDSResponse.IsSuccessStatusCode)
+                {
+                    if (responseContent != null)
+                    {
+                        if (authetication.code.ToString() == Constant.EmailNotFound)
+                        {
+                            //test.Hide();
+                            isUserVerified = "USER NEEDS TO SIGN UP";
+                            //if (platform == "GOOGLE")
+                            //{
+                            //    Application.Current.MainPage = new SocialSignUp(googleData.id, googleData.given_name, googleData.family_name, googleData.email, accessToken, refreshToken, "GOOGLE");
+                            //}
+                            //else if (platform == "FACEBOOK")
+                            //{
+                            //    Application.Current.MainPage = new SocialSignUp(facebookData.id, facebookData.name, "", facebookData.email, accessToken, accessToken, "FACEBOOK");
+                            //}
+                            //else if (platform == "APPLE")
+                            //{
+                            //    Application.Current.MainPage = new SocialSignUp(appleCredentials.UserId, appleCredentials.Name, "", appleCredentials.Email, appleCredentials.Token, appleCredentials.Token, "APPLE");
+                            //}
+                        }
+                        if (authetication.code.ToString() == Constant.AutheticatedSuccesful)
+                        {
+                            try
+                            {
+                                var data = JsonConvert.DeserializeObject<SuccessfulSocialLogIn>(responseContent);
+                                user.setUserID(data.result[0].customer_uid);
+
+                                UpdateTokensPost updateTokesPost = new UpdateTokensPost();
+                                updateTokesPost.uid = data.result[0].customer_uid;
+                                if (platform == "GOOGLE")
+                                {
+                                    updateTokesPost.mobile_access_token = accessToken;
+                                    updateTokesPost.mobile_refresh_token = refreshToken;
+                                }
+                                else if (platform == "FACEBOOK")
+                                {
+                                    updateTokesPost.mobile_access_token = accessToken;
+                                    updateTokesPost.mobile_refresh_token = accessToken;
+                                }
+                                else if (platform == "APPLE")
+                                {
+                                    updateTokesPost.mobile_access_token = appleCredentials.Token;
+                                    updateTokesPost.mobile_refresh_token = appleCredentials.Token;
+                                }
+
+                                var updateTokesPostSerializedObject = JsonConvert.SerializeObject(updateTokesPost);
+                                var updateTokesContent = new StringContent(updateTokesPostSerializedObject, Encoding.UTF8, "application/json");
+                                var updateTokesResponse = await client.PostAsync(Constant.UpdateTokensUrl, updateTokesContent);
+                                var updateTokenResponseContent = await updateTokesResponse.Content.ReadAsStringAsync();
+
+                                if (updateTokesResponse.IsSuccessStatusCode)
+                                {
+                                    var user1 = new RequestUserInfo();
+                                    user1.uid = data.result[0].customer_uid;
+
+                                    var requestSelializedObject = JsonConvert.SerializeObject(user1);
+                                    var requestContent = new StringContent(requestSelializedObject, Encoding.UTF8, "application/json");
+
+                                    var clientRequest = await client.PostAsync(Constant.GetUserInfoUrl, requestContent);
+
+                                    if (clientRequest.IsSuccessStatusCode)
+                                    {
+                                        var userSfJSON = await clientRequest.Content.ReadAsStringAsync();
+                                        var userProfile = JsonConvert.DeserializeObject<UserInfo>(userSfJSON);
+
+                                        DateTime today = DateTime.Now;
+                                        DateTime expDate = today.AddDays(Constant.days);
+
+
+
+
+
+                                        user.setUserID(data.result[0].customer_uid);
+                                        user.setUserSessionTime(expDate);
+                                        user.setUserPlatform(platform);
+                                        user.setUserType("CUSTOMER");
+                                        user.setUserEmail(userProfile.result[0].customer_email);
+                                        user.setUserFirstName(userProfile.result[0].customer_first_name);
+                                        user.setUserLastName(userProfile.result[0].customer_last_name);
+                                        user.setUserPhoneNumber(userProfile.result[0].customer_phone_num);
+                                        user.setUserAddress(userProfile.result[0].customer_address);
+                                        user.setUserUnit(userProfile.result[0].customer_unit);
+                                        user.setUserCity(userProfile.result[0].customer_city);
+                                        user.setUserState(userProfile.result[0].customer_state);
+                                        user.setUserZipcode(userProfile.result[0].customer_zip);
+                                        user.setUserLatitude(userProfile.result[0].customer_lat);
+                                        user.setUserLongitude(userProfile.result[0].customer_long);
+
+
+
+                                        if (data.result[0].role == "GUEST")
+                                        {
+                                            var clientSignUp = new SignUp();
+                                            var content = clientSignUp.UpdateSocialUser(user, userProfile.result[0].mobile_access_token, userProfile.result[0].mobile_refresh_token, userProfile.result[0].social_id, platform);
+                                            var signUpStatus = await SignUp.SignUpNewUser(content);
+                                        }
+
+                                        isUserVerified = "LOGIN USER";
+
+                                        //SetMenu(guestMenuSection, customerMenuSection, historyLabel, profileLabel);
+                                        //GetBusinesses();
+                                        if (Device.RuntimePlatform == Device.iOS)
+                                        {
+                                            deviceId = Preferences.Get("guid", null);
+                                            if (deviceId != null) { Debug.WriteLine("This is the iOS GUID from Log in: " + deviceId); }
+                                        }
+                                        else
+                                        {
+                                            deviceId = Preferences.Get("guid", null);
+                                            if (deviceId != null) { Debug.WriteLine("This is the Android GUID from Log in " + deviceId); }
+                                        }
+
+                                        if (deviceId != null)
+                                        {
+                                            NotificationPost notificationPost = new NotificationPost();
+
+                                            notificationPost.uid = user.getUserID();
+                                            notificationPost.guid = deviceId.Substring(5);
+                                            user.setUserDeviceID(deviceId.Substring(5));
+                                            notificationPost.notification = "TRUE";
+
+                                            var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
+                                            Debug.WriteLine("Notification JSON Object to send: " + notificationSerializedObject);
+
+                                            var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
+
+                                            var clientResponse = await client.PostAsync(Constant.NotificationsUrl, notificationContent);
+
+                                            Debug.WriteLine("Status code: " + clientResponse.IsSuccessStatusCode);
+
+                                            if (clientResponse.IsSuccessStatusCode)
+                                            {
+                                                Debug.WriteLine("We have post the guid to the database");
+                                            }
+                                            else
+                                            {
+                                                //await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
+                                            }
+                                        }
+                                        //test.Hide();
+                                        //Application.Current.MainPage = new SelectionPage();
+                                    }
+                                    else
+                                    {
+                                        isUserVerified = "ERROR1";
+                                        //test.Hide();
+                                        //await DisplayAlert("Alert!", "Our internal system was not able to retrieve your user information. We are working to solve this issue.", "OK");
+                                    }
+                                }
+                                else
+                                {
+                                    isUserVerified = "ERROR2";
+                                    //test.Hide();
+                                    //await DisplayAlert("Oops", "We are facing some problems with our internal system. We weren't able to update your credentials", "OK");
+                                }
+                                //test.Hide();
+                            }
+                            catch (Exception second)
+                            {
+                                Debug.WriteLine(second.Message);
+                            }
+                        }
+                        if (authetication.code.ToString() == Constant.ErrorPlatform)
+                        {
+                            var RDSCode = JsonConvert.DeserializeObject<RDSLogInMessage>(responseContent);
+                            //if(RDSCode.message != null && RDSCode.message == "")
+                            //{
+                            //    Debug.WriteLine("DATA FROM LOGIN WHEN USING WRONG PLATFORM: " + responseContent);
+                            //    isUserVerified = "PLEASE SIGN IN THROUGH";
+                            //}
+                            //else
+                            //{
+                            //    isUserVerified = "SIGN IN USING SOCIAL MEDIA";
+                            //}
+
+                            isUserVerified = "WRONG SOCIAL MEDIA TO SIGN IN";
+
+                            //test.Hide();
+                            //Application.Current.MainPage = new LogInPage();
+                        }
+
+                        if (authetication.code.ToString() == Constant.ErrorUserDirectLogIn)
+                        {
+                            isUserVerified = "SIGN IN DIRECTLY";
+                            //test.Hide();
+                            //Application.Current.MainPage = new LogInPage();
+                        }
+                    }
+                }
+                //test.Hide();
+                return isUserVerified;
+            }
+            catch (Exception first)
+            {
+                
+                Debug.WriteLine(first.Message);
+                isUserVerified = "ERROR";
+                return isUserVerified;
+            }
+        }
+
+        public async Task<string> ResetPassword(ResetPassword request)
+        {
+            string result = "";
+            var client = new HttpClient();
+            var serializedObject = JsonConvert.SerializeObject(request);
+            var content = new StringContent(serializedObject, Encoding.UTF8, "application/json");
+            var endpointCall = await client.PostAsync(Constant.ResetPasswork, content);
+
+            Debug.WriteLine("JSON TO BE SENT " + serializedObject);
+
+            if (endpointCall.IsSuccessStatusCode)
+            {
+                var endpointContentString = await endpointCall.Content.ReadAsStringAsync();
+                Debug.WriteLine("RESPONSE " + endpointContentString);
+                result = endpointContentString;
+            }
+
+            return result;
         }
 
         //private string platform;
@@ -191,6 +465,47 @@ namespace ServingFresh.Models
         {
             return refreshToken;
         }
+
+        //public void AppleLogIn()
+        //{
+        //    var client = new SignIn();
+        //    UserDialogs.Instance.ShowLoading("Retring your SF account...");
+        //    var status = await client.VerifyUserCredentials(e.Account.Properties["access_token"], "", null, null, "FACEBOOK");
+        //    if (direction == "" && status == "LOGIN USER")
+        //    {
+        //        UserDialogs.Instance.HideLoading();
+        //        Application.Current.MainPage = new SelectionPage();
+        //    }
+        //    else if (direction != "" && status == "LOGIN USER")
+        //    {
+        //        UserDialogs.Instance.HideLoading();
+        //        await Application.Current.MainPage.Navigation.PopModalAsync();
+        //    }
+        //    else if (direction == "" && status == "SIGN IN USING SOCIAL MEDIA")
+        //    {
+        //        UserDialogs.Instance.HideLoading();
+        //        await DisplayAlert("Oops", "Please sign in via social media", "OK");
+        //        await Application.Current.MainPage.Navigation.PopModalAsync();
+        //    }
+        //    else if (direction == "" && status == "PLEASE SIGN IN USING DIRECT LOG IN")
+        //    {
+        //        UserDialogs.Instance.HideLoading();
+        //        await DisplayAlert("Oops", "Please sign in via direct log in", "OK");
+        //        await Application.Current.MainPage.Navigation.PopModalAsync();
+        //    }
+        //    else if (status == "ERROR")
+        //    {
+        //        UserDialogs.Instance.HideLoading();
+        //        await DisplayAlert("Oops", "Please sign in via direct log in", "OK");
+        //        await Application.Current.MainPage.Navigation.PopModalAsync();
+        //    }
+        //    else
+        //    {
+        //        UserDialogs.Instance.HideLoading();
+        //        await DisplayAlert("Oops", "There was an error geting your account. Please contact customer service", "OK");
+        //        await Application.Current.MainPage.Navigation.PopModalAsync();
+        //    }
+        //}
 
         private async Task<AccountSalt> RetrieveAccountSalt(string userEmail)
         {
@@ -772,7 +1087,7 @@ namespace ServingFresh.Models
             UserProfile result = null;
 
             var client = new System.Net.Http.HttpClient();
-            var endpointCall = await client.GetAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/email_info/" + email);
+            var endpointCall = await client.GetAsync(Constant.UpdateUserProfile + email);
 
 
             if (endpointCall.IsSuccessStatusCode)
@@ -790,6 +1105,54 @@ namespace ServingFresh.Models
             return result;
         }
 
+        
+        public async Task<bool> UpdateProfile(UserProfile profile)
+        {
+            bool result = false;
+
+            var client = new HttpClient();
+            var updateClient = new UpdatedProfile();
+            var updatedProfile = updateClient.GetUpdatedProfile(profile);
+
+            var serializedObject = JsonConvert.SerializeObject(updatedProfile);
+            var content = new StringContent(serializedObject, Encoding.UTF8, "application/json");
+            var endpointCall = await client.PostAsync(Constant.UpdateUserProfileAddress, content);
+
+            Debug.WriteLine("JSON TO BE SEND: " + serializedObject);
+
+            if (endpointCall.IsSuccessStatusCode)
+            {
+                var endpointContentString = await endpointCall.Content.ReadAsStringAsync();
+                Debug.WriteLine("UPDATED PROFILE: " + endpointContentString);
+                result = true;
+            }
+
+            return result;
+        }
+
+        //public async Task<string> ResetPassword(string email)
+        //{
+        //    string result = "";
+
+        //    var client = new HttpClient();
+        //    var updateClient = new UpdatedProfile();
+        //    var updatedProfile = updateClient.GetUpdatedProfile(profile);
+
+        //    var serializedObject = JsonConvert.SerializeObject(updatedProfile);
+        //    var content = new StringContent(serializedObject, Encoding.UTF8, "application/json");
+        //    var endpointCall = await client.PostAsync(Constant.UpdateUserProfileAddress, content);
+
+        //    Debug.WriteLine("JSON TO BE SEND: " + serializedObject);
+
+        //    if (endpointCall.IsSuccessStatusCode)
+        //    {
+        //        var endpointContentString = await endpointCall.Content.ReadAsStringAsync();
+        //        Debug.WriteLine("UPDATED PROFILE: " + endpointContentString);
+        //        result = true;
+        //    }
+
+        //}
+
         //public void AppleLogInClick(System.Object sender, System.EventArgs e)
         //{
         //    SignIn?.Invoke(sender, e);
@@ -800,4 +1163,7 @@ namespace ServingFresh.Models
         //public void InvokeSignInEvent(object sender, EventArgs e)
         //    => SignIn?.Invoke(sender, e);
     }
+
+    
+
 }

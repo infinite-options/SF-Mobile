@@ -22,6 +22,7 @@ namespace ServingFresh.Views
 {
     public partial class LogInPage : ContentPage
     {
+        public static string direction = "";
         public event EventHandler SignIn;
         public bool createAccount = false;
         INotifications appleNotification = DependencyService.Get<INotifications>();
@@ -57,13 +58,12 @@ namespace ServingFresh.Views
             }
         }
 
-        public LogInPage(double height)
+        public LogInPage(double height, string direction)
         {
-            //grids.BackgroundColor = Color.FromHex("AB000000");
             InitializeComponent();
-            //grids.BackgroundColor = Color.FromHex("AB000000");
             BackgroundColor = Color.FromHex("AB000000");
             logInFrame.Margin = new Thickness(0, height, 0, 0);
+            LogInPage.direction = direction;
             if (Device.RuntimePlatform == Device.Android)
             {
                 System.Diagnostics.Debug.WriteLine("Running on Android: Line 32");
@@ -161,6 +161,8 @@ namespace ServingFresh.Views
                                 user.setUserLatitude(userData.result[0].customer_lat);
                                 user.setUserLongitude(userData.result[0].customer_long);
 
+
+
                                 if (Device.RuntimePlatform == Device.iOS)
                                 {
                                     deviceId = Preferences.Get("guid", null);
@@ -199,7 +201,15 @@ namespace ServingFresh.Views
                                         await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
                                     }
                                 }
-                                Application.Current.MainPage = new SelectionPage();
+                                if(direction == "")
+                                {
+                                    Application.Current.MainPage = new SelectionPage();
+                                }
+                                else
+                                {
+                                    await Application.Current.MainPage.Navigation.PopModalAsync();
+                                }
+
                             }catch (Exception ex){
 
                                 System.Diagnostics.Debug.WriteLine(ex.Message);
@@ -360,7 +370,12 @@ namespace ServingFresh.Views
             {
                 try
                 {
-                    Application.Current.MainPage = new SelectionPage(e.Account.Properties["access_token"], "", null, null, "FACEBOOK");
+                   // Application.Current.MainPage = new SelectionPage(e.Account.Properties["access_token"], "", null, null, "FACEBOOK");
+
+                    var client = new SignIn();
+                    UserDialogs.Instance.ShowLoading("Retrieving your SF account...");
+                    var status = await client.VerifyUserCredentials(e.Account.Properties["access_token"], "", null, null, "FACEBOOK");
+                    RedirectUserBasedOnVerification(status, direction);
                 }
                 catch (Exception g)
                 {
@@ -374,7 +389,65 @@ namespace ServingFresh.Views
             }
         }
 
-        
+
+        public async void AppleLogIn(string accessToken = "", string refreshToken = "", AuthenticatorCompletedEventArgs googleAccount = null, AppleAccount appleCredentials = null, string platform = "")
+        {
+            var client = new SignIn();
+            UserDialogs.Instance.ShowLoading("Retring your SF account...");
+            var status = await client.VerifyUserCredentials(accessToken, refreshToken, googleAccount, appleCredentials, platform);
+            RedirectUserBasedOnVerification(status, direction);
+        }
+
+        public async void RedirectUserBasedOnVerification(string status, string direction)
+        {
+            if (status == "LOGIN USER")
+            {
+                UserDialogs.Instance.HideLoading();
+                await Application.Current.MainPage.DisplayAlert("Great!", "You have successfully loged in!", "OK");
+                if (direction == "")
+                {
+                    Application.Current.MainPage = new SelectionPage();
+                }
+                else
+                {
+                    var root = Application.Current.MainPage;
+                    Application.Current.MainPage = root;
+                }
+                
+            }
+            else if (status == "USER NEEDS TO SIGN UP")
+            {
+                UserDialogs.Instance.HideLoading();
+                await Application.Current.MainPage.DisplayAlert("Oops", "It looks like you don't have an account with Serving Fresh. Please sign up!", "OK");
+                await Application.Current.MainPage.Navigation.PushModalAsync(new AddressPage(), true);
+            }
+            else if (status == "WRONG SOCIAL MEDIA TO SIGN IN")
+            {
+                UserDialogs.Instance.HideLoading();
+                await Application.Current.MainPage.DisplayAlert("Oops", "Our records show that you have attempted to log in with a different social media account. Please log in through the correct social media platform. Thanks!", "OK");
+            }
+            else if (status == "SIGN IN DIRECTLY")
+            {
+                UserDialogs.Instance.HideLoading();
+                await Application.Current.MainPage.DisplayAlert("Oops", "Our records show that you have attempted to log in with a social media account. Please log in through our direct log in. Thanks!", "OK");
+            }
+            else if (status == "ERROR1")
+            {
+                UserDialogs.Instance.HideLoading();
+                await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
+            }
+            else if (status == "ERROR2")
+            {
+                UserDialogs.Instance.HideLoading();
+                await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
+            }
+            else
+            {
+                UserDialogs.Instance.HideLoading();
+                await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
+            }
+        }
+
 
         private async void FacebookAutheticatorError(object sender, AuthenticatorErrorEventArgs e)
         {
@@ -432,8 +505,10 @@ namespace ServingFresh.Views
             {
                 try
                 {
-                    Application.Current.MainPage = new SelectionPage(e.Account.Properties["access_token"], e.Account.Properties["refresh_token"],e,null,"GOOGLE");
-                    //GoogleUserProfileAsync(e.Account.Properties["access_token"], e.Account.Properties["refresh_token"], e);
+                    var client = new SignIn();
+                    UserDialogs.Instance.ShowLoading("Retring your SF account...");
+                    var status = await client.VerifyUserCredentials(e.Account.Properties["access_token"], e.Account.Properties["refresh_token"], e, null, "GOOGLE");
+                    RedirectUserBasedOnVerification(status, direction);
                 }
                 catch(Exception g)
                 {
@@ -464,9 +539,7 @@ namespace ServingFresh.Views
 
         public void AppleLogInClick(System.Object sender, System.EventArgs e)
         {
-            SignIn?.Invoke(sender, e);
-            var c = (ImageButton)sender;
-            c.Command?.Execute(c.CommandParameter);
+            OnAppleSignInRequest();
         }
 
         public void InvokeSignInEvent(object sender, EventArgs e)
@@ -477,6 +550,93 @@ namespace ServingFresh.Views
             await DisplayAlert("Error", "We weren't able to set an account for you", "OK");
         }
 
+
+        public async void OnAppleSignInRequest()
+        {
+            try
+            {
+                IAppleSignInService appleSignInService = DependencyService.Get<IAppleSignInService>();
+                var account = await appleSignInService.SignInAsync();
+                if (account != null)
+                {
+                    Preferences.Set(App.LoggedInKey, true);
+                    await SecureStorage.SetAsync(App.AppleUserIdKey, account.UserId);
+
+                    if (account.Token == null) { account.Token = ""; }
+                    if (account.Email != null)
+                    {
+                        if (Application.Current.Properties.ContainsKey(account.UserId.ToString()))
+                        {
+                            //Application.Current.Properties[account.UserId.ToString()] = account.Email;
+                            Debug.WriteLine((string)Application.Current.Properties[account.UserId.ToString()]);
+                        }
+                        else
+                        {
+                            Application.Current.Properties[account.UserId.ToString()] = account.Email;
+                        }
+                    }
+                    if (account.Email == null) { account.Email = ""; }
+                    if (account.Name == null) { account.Name = ""; }
+
+                    if (Application.Current.Properties.ContainsKey(account.UserId.ToString()))
+                    {
+                        account.Email = (string)Application.Current.Properties[account.UserId.ToString()];
+                        //Application.Current.MainPage = new SelectionPage("", "", null, account, "APPLE");
+                        //var root = (LogInPage)Application.Current.MainPage;
+                        //root.AppleLogIn("", "", null, account, "APPLE");
+
+                        var client = new SignIn();
+                        UserDialogs.Instance.ShowLoading("Retring your SF account...");
+                        var status = await client.VerifyUserCredentials("", "", null, account, "APPLE");
+                        RedirectUserBasedOnVerification(status, direction);
+                        //AppleUserProfileAsync(account.UserId, account.Token, (string)Application.Current.Properties[account.UserId.ToString()], account.Name);
+                    }
+                    else
+                    {
+                        var client = new HttpClient();
+                        var getAppleEmail = new AppleEmail();
+                        getAppleEmail.social_id = account.UserId;
+
+                        var socialLogInPostSerialized = JsonConvert.SerializeObject(getAppleEmail);
+
+                        System.Diagnostics.Debug.WriteLine(socialLogInPostSerialized);
+
+                        var postContent = new StringContent(socialLogInPostSerialized, Encoding.UTF8, "application/json");
+                        var RDSResponse = await client.PostAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/AppleEmail", postContent);
+                        var responseContent = await RDSResponse.Content.ReadAsStringAsync();
+
+                        System.Diagnostics.Debug.WriteLine(responseContent);
+                        if (RDSResponse.IsSuccessStatusCode)
+                        {
+                            var data = JsonConvert.DeserializeObject<AppleUser>(responseContent);
+                            Application.Current.Properties[account.UserId.ToString()] = data.result[0].customer_email;
+                            account.Email = (string)Application.Current.Properties[account.UserId.ToString()];
+                            //var root = (LogInPage)Application.Current.MainPage;
+                            //root.AppleLogIn("", "", null, account, "APPLE");
+                            //Application.Current.MainPage = new SelectionPage("", "", null, account, "APPLE");
+                            //AppleUserProfileAsync(account.UserId, account.Token, (string)Application.Current.Properties[account.UserId.ToString()], account.Name);
+                            var client1 = new SignIn();
+                            UserDialogs.Instance.ShowLoading("Retring your SF account...");
+                            var status = await client1.VerifyUserCredentials("", "", null, account, "APPLE");
+                            RedirectUserBasedOnVerification(status, direction);
+                        }
+                        else
+                        {
+                            await Application.Current.MainPage.DisplayAlert("Ooops", "Our system is not working. We can't process your request at this moment", "OK");
+                        }
+                    }
+                }
+                else
+                {
+                    //AppleError?.Invoke(this, default(EventArgs));
+
+                }
+            }
+            catch (Exception apple)
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", apple.Message, "OK");
+            }
+        }
 
         void ReturnBackToPrincipalPage(System.Object sender, System.EventArgs e)
         {
@@ -501,6 +661,46 @@ namespace ServingFresh.Views
         void ImageButton_Clicked(System.Object sender, System.EventArgs e)
         {
             Application.Current.MainPage.Navigation.PopModalAsync();
+        }
+
+        void ResetPassword(System.Object sender, System.EventArgs e)
+        {
+            UpdatePassword(sender, e);
+        }
+
+        async void UpdatePassword(System.Object sender, System.EventArgs e)
+        {
+            if (!String.IsNullOrEmpty(userEmailAddress.Text))
+            {
+                var client = new SignIn();
+                var password = new ResetPassword();
+                password.email = userEmailAddress.Text;
+
+                var result = await client.ResetPassword(password);
+                if(result != "")
+                {
+                    if(result.Contains("\"Need to do login via social\""))
+                    {
+                        await DisplayAlert("Oops", "We can't reset the password for the given email since it is associated with a media social log-in. Please log in via social media.", "");
+                    }
+                    else if (result.Contains("\"message\": \"A temporary password has been sent\""))
+                    {
+                        await DisplayAlert("Great!", "We have reset your password. A temporary password has been sent to your email.", "OK");
+                    }
+                    else if (result.Contains("\"message\": \"No such email exists\""))
+                    {
+                        await DisplayAlert("Oops", "Our records show that this email is invalid", "");
+                    }
+                }
+                else
+                {
+                    await DisplayAlert("Oops", "We were not able to fulfill your request. Please try again.", "OK");
+                }
+            }
+            else
+            {
+                await DisplayAlert("Oops","Plese enter the email address associated with your Serving Fresh account","OK");
+            }
         }
     }
 }

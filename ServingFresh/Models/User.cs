@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+
 namespace ServingFresh.Models
 {
     public class User
@@ -19,6 +21,7 @@ namespace ServingFresh.Models
         private string platform;
         private string deviceID;
         private DateTime sessionTime;
+        private string uspsDVPType;
 
 
         public User()
@@ -39,6 +42,7 @@ namespace ServingFresh.Models
             platform = "";
             deviceID = "";
             sessionTime = new DateTime();
+            uspsDVPType = "";
         }
 
         public void setUserFromProfile(UserProfile profile)
@@ -58,6 +62,11 @@ namespace ServingFresh.Models
             longitude = profile.result[0].customer_long;
             platform = profile.result[0].user_social_media;
             deviceID = "";
+        }
+
+        public string getUserUSPSType()
+        {
+            return uspsDVPType;
         }
 
         public string getUserType()
@@ -220,7 +229,7 @@ namespace ServingFresh.Models
             this.platform = platform;
         }
 
-        public void  setUserDeviceID(string deviceID)
+        public void setUserDeviceID(string deviceID)
         {
             this.deviceID = deviceID;
         }
@@ -233,6 +242,32 @@ namespace ServingFresh.Models
         public void setUserSessionTime(DateTime sessionTime)
         {
             this.sessionTime = sessionTime;
+        }
+
+        public void setUserUSPSType(string uspsDVPType)
+        {
+            this.uspsDVPType = uspsDVPType;
+        }
+
+        public void printUser()
+        {
+            Debug.WriteLine("userType: " + userType);
+            Debug.WriteLine("id: " + id);
+            Debug.WriteLine("firstName: " + firstName);
+            Debug.WriteLine("lastName: " + lastName);
+            Debug.WriteLine("address: " + address);
+            Debug.WriteLine("unit: " + unit);
+            Debug.WriteLine("city: " + city);
+            Debug.WriteLine("state: " + state);
+            Debug.WriteLine("zipcode: " + zipcode);
+            Debug.WriteLine("email: " + email);
+            Debug.WriteLine("phoneNumber: " + phoneNumber);
+            Debug.WriteLine("latitude: " + latitude);
+            Debug.WriteLine("longitude: " + longitude);
+            Debug.WriteLine("platform: " + platform);
+            Debug.WriteLine("deviceID: " + deviceID);
+            Debug.WriteLine("sessionTime: " + sessionTime);
+            Debug.WriteLine("uspsDVPType: " + uspsDVPType);
         }
     }
 }

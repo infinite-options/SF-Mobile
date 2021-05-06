@@ -32,7 +32,6 @@ namespace ServingFresh.Views
             //GetCurrentLocation();
         }
 
-
         public async void GetCurrentLocation()
         {
             try
@@ -103,6 +102,7 @@ namespace ServingFresh.Views
                                     user.setUserUnit(addressToValidate.Unit == null? "": addressToValidate.Unit);
                                     user.setUserState(addressToValidate.State);
                                     user.setUserZipcode(addressToValidate.ZipCode);
+                                    user.setUserUSPSType(addressStatus);
                                     SetUser(location);
                                 }
                                 else
@@ -254,197 +254,6 @@ namespace ServingFresh.Views
             AddressEntry.TextChanged += OnAddressChanged;
         }
 
-        async void SignInDirectUser(System.Object sender, System.EventArgs e)
-        {
-            var client = new SignIn();
-            var result = await client.SignInDirectUser(logInButton, userEmailAddress, userPassword);
-            if(result != null)
-            {
-                Debug.WriteLine("You have an acccount");
-       
-
-                user.setUserID(result.getUserID());
-                user.setUserSessionTime(result.getUserSessionTime());
-                user.setUserPlatform(result.getUserPlatform());
-                user.setUserType(result.getUserType());
-                user.setUserEmail(result.getUserEmail());
-                user.setUserFirstName(result.getUserFirstName());
-                user.setUserLastName(result.getUserLastName());
-                user.setUserPhoneNumber(result.getUserPhoneNumber());
-                user.setUserAddress(result.getUserAddress());
-                user.setUserUnit(result.getUserUnit());
-                user.setUserCity(result.getUserCity());
-                user.setUserState(result.getUserState());
-                user.setUserZipcode(result.getUserZipcode());
-                user.setUserLatitude(result.getUserLatitude());
-                user.setUserLongitude(result.getUserLongitude());
-                Application.Current.MainPage = new SelectionPage();
-            }
-            else
-            {
-                Debug.WriteLine("Not Log In");
-            }
-        }
-
-        void HideLogInUI(System.Object sender, System.EventArgs e)
-        {
-            Application.Current.MainPage.Navigation.PopModalAsync();
-            //logInRow.Height = 0;
-            //logInFrame.Margin = new Thickness(5, 0, 5, 0);
-        }
-
-        void HideSignUpUI(System.Object sender, System.EventArgs e)
-        {
-            //signUpRow.Height = 0;
-            //signUpFrame.Margin = new Thickness(5, 0, 5, 0);
-            Application.Current.MainPage.Navigation.PopModalAsync();
-        }
-
-        void ShowHidePassword(System.Object sender, System.EventArgs e)
-        {
-            Label label = (Label)sender;
-            if (label.Text == "Show password")
-            {
-                userPassword.IsPassword = false;
-                label.Text = "Hide password";
-            }
-            else
-            {
-                userPassword.IsPassword = true;
-                label.Text = "Show password";
-            }
-        }
-
-        void SignInWithFacebookFromPrincipal(System.Object sender, System.EventArgs e)
-        {
-            var client = new SignIn();
-            client.SignInWithFacebook();
-        }
-
-        void SignInWithGoogleFromPrincipal(System.Object sender, System.EventArgs e)
-        {
-            var client = new SignIn();
-            client.SignInWithGoogle();
-        }
-
-        void SignInWithAppleFromPricipal(System.Object sender, System.EventArgs e)
-        {
-            var client = new SignIn();
-        }
-
-        async void SignUpDirectUserFromPrincipal(System.Object sender, System.EventArgs e)
-        {
-            if (ValidateSignUpInfo(newUserFirstName, newUserLastName, newUserEmail1, newUserEmail2, newUserPassword1, newUserPassword2))
-            {
-                if(ValidateEmail(newUserEmail1, newUserEmail2))
-                {
-                    if(ValidatePassword(newUserPassword1, newUserPassword2))
-                    {
-                        // user is ready to be sign in.
-                        var client = new SignUp();
-                        var content = client.SetDirectUser(user, newUserPassword1.Text);
-                        var signUpStatus = await SignUp.SignUpNewUser(content);
-
-                        if(signUpStatus != "" && signUpStatus != "USER ALREADY EXIST")
-                        {
-                            user.setUserID(signUpStatus);
-                            user.setUserPlatform("DIRECT");
-                            user.setUserType("CUSTOMER");
-                            client.SendUserToSelectionPage();
-                        }
-                        else if (signUpStatus != "" && signUpStatus == "USER ALREADY EXIST")
-                        {
-                            await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
-                        }
-                    }
-                    else
-                    {
-                        await DisplayAlert("Oops", "Please check that your password is the same in both entries", "OK");
-                        return;
-                    }
-                }
-                else
-                {
-                    await DisplayAlert("Oops", "Please check that your email is the same in both entries", "OK");
-                    return;
-                }
-            }
-            else
-            {
-                await DisplayAlert("Oops", "Please enter all the required information. Thanks!", "OK");
-                return;
-            }
-        }
-
-        async void ContinueWithSignUp(System.Object sender, System.EventArgs e)
-        {
-
-            if (ValidateSignUpInfo(signUpFirstName, signUpLastName, signUpEmail, signUpPhone, signUpAddress1Entry, signUpCityEntry, signUpStateEntry, signUpZipcodeEntry))
-            {
-                //try to validate address if address doesn't return true ask to enter unit number and try again
-                var client = new AddressValidation();
-                var addressStatus = client.ValidateAddressString(signUpAddress1Entry.Text, signUpAddress2Entry.Text, signUpCityEntry.Text, signUpStateEntry.Text, signUpZipcodeEntry.Text);
-
-                if(addressStatus != null)
-                {
-                    if(addressStatus == "Y" || addressStatus == "S")
-                    {
-
-                        var location = await client.ConvertAddressToGeoCoordiantes(signUpAddress1Entry.Text, signUpCityEntry.Text, signUpStateEntry.Text);
-                        if(location != null)
-                        {
-                            var isAddressInZones = await client.getZoneFromLocation(location.Latitude.ToString(), location.Longitude.ToString());
-
-                            if (isAddressInZones != "" && isAddressInZones != "OUTSIDE ZONE RANGE")
-                            {
-                                addressRow.Height = 0;
-                                addressFrameSignUp.Margin = new Thickness(5, 0, 5, 0);
-                                signUpRow.Height = this.Height - 200;
-                                signUpFrame.Margin = new Thickness(5, -this.Height + 400, 5, 0);
-
-                                user.setUserFirstName(signUpFirstName.Text);
-                                user.setUserLastName(signUpLastName.Text);
-                                user.setUserEmail(signUpEmail.Text);
-                                user.setUserPhoneNumber(signUpPhone.Text);
-                                user.setUserAddress(signUpAddress1Entry.Text);
-                                user.setUserUnit(signUpAddress2Entry.Text);
-                                user.setUserCity(signUpCityEntry.Text);
-                                user.setUserState(signUpStateEntry.Text);
-                                user.setUserZipcode(signUpZipcodeEntry.Text);
-                                user.setUserLatitude(location.Latitude.ToString());
-                                user.setUserLongitude(location.Longitude.ToString());
-
-                                newUserFirstName.Text = user.getUserFirstName();
-                                newUserLastName.Text = user.getUserLastName();
-                                newUserEmail1.Text = user.getUserEmail();
-                                newUserEmail2.Text = user.getUserEmail();
-                            }
-                            else
-                            {
-                                await DisplayAlert("Oops","You address is outside our delivery areas","OK");
-                                return;
-                            }
-                        }
-                        else
-                        {
-                            await DisplayAlert("We were not able to find your location in our system.", "Try again", "OK");
-                            return;
-                        }
-
-                    }else if (addressStatus == "D")
-                    {
-                        await DisplayAlert("Oops", "Please enter your address unit number", "OK");
-                        return;
-                    }
-                }
-            }
-            else
-            {
-                await DisplayAlert("Oops", "Please enter all the required information. Thanks!", "OK");
-                return;
-            }
-        }
-
         public bool ValidateSignUpInfo(Entry firstName, Entry lastName, Entry email, Entry phoneNumber,  Entry address1, Entry city, Entry state, Entry zipcode)
         {
             bool result = false;
@@ -530,156 +339,13 @@ namespace ServingFresh.Views
             return result;
         }
 
-        void HideAddressModal(System.Object sender, System.EventArgs e)
-        {
-            addressRow.Height = 0;
-            addressFrameSignUp.Margin = new Thickness(5, 0, 5, 0);
-        }
-
-        async void signUpAddress1Entry_TextChanged(System.Object sender, Xamarin.Forms.TextChangedEventArgs e)
-        {
-            SignUpAddressList.ItemsSource = await addr.GetPlacesPredictionsAsync(signUpAddress1Entry.Text);
-        }
-
-        void signUpAddress1Entry_Focused(System.Object sender, Xamarin.Forms.FocusEventArgs e)
-        {
-            if (!String.IsNullOrEmpty(AddressEntry.Text))
-            {
-                addr.addressEntryFocused(SignUpAddressList, signUpAddressFrame);
-            }
-            
-        }
-
-        void signUpAddress1Entry_Unfocused(System.Object sender, Xamarin.Forms.FocusEventArgs e)
-        {
-            addr.addressEntryUnfocused(SignUpAddressList, signUpAddressFrame);
-        }
-
-        async void SignUpAddressList_ItemSelected(System.Object sender, Xamarin.Forms.SelectedItemChangedEventArgs e)
-        {
-            addressToValidate = addr.addressSelected(SignUpAddressList, signUpAddress1Entry, signUpAddressFrame);
-            string zipcode = await addr.getZipcode(addressToValidate.PredictionID);
-            if (zipcode != null)
-            {
-                addressToValidate.ZipCode = zipcode;
-            }
-            addr.addressSelectedFillEntries(addressToValidate, signUpAddress1Entry, signUpAddress2Entry, signUpCityEntry, signUpStateEntry, signUpZipcodeEntry);
-            addr.addressEntryUnfocused(SignUpAddressList, signUpAddressFrame);
-        }
-
-        void ContinueWithFacebook(System.Object sender, System.EventArgs e)
-        {
-            var client = new SignIn();
-            var authenticator = client.GetFacebookAuthetication();
-            var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
-                authenticator.Completed += FacebookAuthetication;
-                authenticator.Error += Authenticator_Error;
-            presenter.Login(authenticator);
-        }
-
-        void ContinueWithGoogle(System.Object sender, System.EventArgs e)
-        {
-            var client = new SignIn();
-            var authenticator = client.GetGoogleAuthetication();
-            var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
-            AuthenticationState.Authenticator = authenticator;
-            authenticator.Completed += GoogleAuthetication;
-            authenticator.Error += Authenticator_Error;
-            presenter.Login(authenticator);
-        }
-
-        private async void FacebookAuthetication(object sender, Xamarin.Auth.AuthenticatorCompletedEventArgs e)
-        {
-            var authenticator = sender as OAuth2Authenticator;
-
-            if (authenticator != null)
-            {
-                authenticator.Completed -= FacebookAuthetication;
-                authenticator.Error -= Authenticator_Error;
-            }
-
-            if (e.IsAuthenticated)
-            {
-                try
-                {
-                    var clientLogIn = new SignIn();
-                    var clientSignUp = new SignUp();
-
-                    var facebookUser = clientLogIn.GetFacebookUser(e.Account.Properties["access_token"]);
-                    var content = clientSignUp.SetDirectUser(user, e.Account.Properties["access_token"], "", facebookUser.id, facebookUser.email, "FACEBOOK");
-                    var signUpStatus = await SignUp.SignUpNewUser(content);
-
-                    if (signUpStatus != "" && signUpStatus != "USER ALREADY EXIST")
-                    {
-                        user.setUserID(signUpStatus);
-                        user.setUserPlatform("FACEBOOK");
-                        user.setUserType("CUSTOMER");
-                        clientSignUp.SendUserToSelectionPage();
-                    }
-                    else if (signUpStatus != "" && signUpStatus == "USER ALREADY EXIST")
-                    {
-                        await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
-                    }
-                }
-                catch (Exception g)
-                {
-                    Debug.WriteLine(g.Message);
-                }
-            }
-        }
-
-        private async void GoogleAuthetication(object sender, AuthenticatorCompletedEventArgs e)
-        {
-            var authenticator = sender as OAuth2Authenticator;
-
-            if (authenticator != null)
-            {
-                authenticator.Completed -= GoogleAuthetication;
-                authenticator.Error -= Authenticator_Error;
-            }
-
-            if (e.IsAuthenticated)
-            {
-                try
-                {
-                    var clientLogIn = new SignIn();
-                    var clientSignUp = new SignUp();
-
-                    var googleUser = await clientLogIn.GetGoogleUser(e);
-                    var content = clientSignUp.SetDirectUser(user, e.Account.Properties["access_token"], e.Account.Properties["refresh_token"], googleUser.id, googleUser.email, "GOOGLE");
-                    var signUpStatus = await SignUp.SignUpNewUser(content);
-
-                    if (signUpStatus != "" && signUpStatus != "USER ALREADY EXIST")
-                    {
-                        user.setUserID(signUpStatus);
-                        user.setUserPlatform("GOOGLE");
-                        user.setUserType("CUSTOMER");
-                        clientSignUp.SendUserToSelectionPage();
-                    }
-                    else if (signUpStatus != "" && signUpStatus == "USER ALREADY EXIST")
-                    {
-                        await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
-                    }
-                }
-                catch (Exception g)
-                {
-                    Debug.WriteLine(g.Message);
-                }
-            }
-        }
-
-        private async void Authenticator_Error(object sender, Xamarin.Auth.AuthenticatorErrorEventArgs e)
-        {
-            await DisplayAlert("An error occur when authenticating", "Please try again", "OK");
-        }
-
         public async void GetBusinesses()
         {
             var userLat = "37.227124";
             var userLong = "-121.886943";
 
-            Debug.WriteLine("INPUT 1: " + userLat);
-            Debug.WriteLine("INPUT 2: " + userLong);
+            //Debug.WriteLine("INPUT 1: " + userLat);
+            //Debug.WriteLine("INPUT 2: " + userLong);
 
             //if (userLat == "0" && userLong == "0"){ userLong = "-121.8866517"; userLat = "37.2270928";}
 
@@ -687,10 +353,10 @@ namespace ServingFresh.Views
             var response = await client.GetAsync(Constant.ProduceByLocation + userLong + "," + userLat);
             var result = await response.Content.ReadAsStringAsync();
 
-            Debug.WriteLine("URL: " + Constant.ProduceByLocation + userLong + "," + userLat);
+            //Debug.WriteLine("URL: " + Constant.ProduceByLocation + userLong + "," + userLat);
 
-            Debug.WriteLine("CALL TO ENDPOINT SUCCESSFULL?: " + response.IsSuccessStatusCode);
-            Debug.WriteLine("JSON RETURNED: " + result);
+            //Debug.WriteLine("CALL TO ENDPOINT SUCCESSFULL?: " + response.IsSuccessStatusCode);
+            //Debug.WriteLine("JSON RETURNED: " + result);
 
             if (response.IsSuccessStatusCode)
             {
@@ -734,9 +400,9 @@ namespace ServingFresh.Views
                             else
                             {
                                 List<DateTime> creationDates = new List<DateTime>();
-                                Debug.WriteLine("NAME {0}, {1}", savedItem.item_name, a.item_name);
-                                Debug.WriteLine("SAVED ITEM UID {0}, SAVED TIME STAMP {1}", savedItem.item_uid, savedItem.created_at);
-                                Debug.WriteLine("NEW ITEM UID {0}, NEW TIME STAMP {1}", a.item_uid, a.created_at);
+                                //Debug.WriteLine("NAME {0}, {1}", savedItem.item_name, a.item_name);
+                                //Debug.WriteLine("SAVED ITEM UID {0}, SAVED TIME STAMP {1}", savedItem.item_uid, savedItem.created_at);
+                                //Debug.WriteLine("NEW ITEM UID {0}, NEW TIME STAMP {1}", a.item_uid, a.created_at);
 
                                 creationDates.Add(DateTime.Parse(savedItem.created_at));
                                 creationDates.Add(DateTime.Parse(a.created_at));
@@ -744,7 +410,7 @@ namespace ServingFresh.Views
 
                                 if (creationDates[0] != creationDates[1])
                                 {
-                                    Debug.WriteLine("CREATED FIRST {0}, STRING DATETIME INDEX 0 {1}", creationDates[0], creationDates[0].ToString("yyyy-MM-dd HH:mm:ss"));
+                                    //Debug.WriteLine("CREATED FIRST {0}, STRING DATETIME INDEX 0 {1}", creationDates[0], creationDates[0].ToString("yyyy-MM-dd HH:mm:ss"));
 
                                     if (savedItem.created_at != creationDates[0].ToString("yyyy-MM-dd HH:mm:ss"))
                                     {
@@ -767,7 +433,7 @@ namespace ServingFresh.Views
                                         savedItem = a;
                                     }
                                 }
-                                Debug.WriteLine("SELECTED ITEM UID: " + savedItem.item_uid);
+                                //Debug.WriteLine("SELECTED ITEM UID: " + savedItem.item_uid);
                                 uniqueItems[key] = savedItem;
                             }
                         }

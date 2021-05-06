@@ -8,6 +8,7 @@ using ServingFresh.Config;
 using ServingFresh.LogIn.Classes;
 using ServingFresh.Models.Interfaces;
 using ServingFresh.Views;
+using Xamarin.Essentials;
 using Xamarin.Forms;
 
 namespace ServingFresh.Models
@@ -19,6 +20,8 @@ namespace ServingFresh.Models
 
         }
 
+
+        // NON EXISTING ACCOUNT...
         public SignUpPost SetDirectUser(User user, string password)
         {
             // takes a user object and sign it as customer
@@ -50,6 +53,7 @@ namespace ServingFresh.Models
             return userContent;
         }
 
+        // EXISTING ACCOUNT...
         public UpdateProfile UpdateDirectUser(User user, string password)
         {
             // takes a user object and sign it as customer
@@ -82,7 +86,8 @@ namespace ServingFresh.Models
             return userContent;
         }
 
-        public SignUpPost SetDirectUser(User user, string accessToken, string refreshToken, string socialID, string email, string platform)
+        // NON EXISTING ACCOUNT...
+        public SignUpPost SignUpSocialUser(User user, string accessToken, string refreshToken, string socialID, string email, string platform)
         {
             // takes a user object and sign it as customer
 
@@ -113,6 +118,7 @@ namespace ServingFresh.Models
             return userContent;
         }
 
+        // EXISTING ACCOUNT...
         public UpdateProfile UpdateSocialUser(User user, string accessToken, string refreshToken, string socialID, string platform)
         {
             // takes a user object and sign it as customer
@@ -259,6 +265,23 @@ namespace ServingFresh.Models
             return result;
         }
 
+        public bool ValidateSignUpInfo(Entry firstName, Entry lastName, Entry phoneNumber, Entry address1, Entry city, Entry state, Entry zipcode)
+        {
+            bool result = false;
+            if (!(String.IsNullOrEmpty(firstName.Text)
+                || String.IsNullOrEmpty(lastName.Text)
+                || String.IsNullOrEmpty(phoneNumber.Text)
+                || String.IsNullOrEmpty(address1.Text)
+                || String.IsNullOrEmpty(city.Text)
+                || String.IsNullOrEmpty(state.Text)
+                || String.IsNullOrEmpty(zipcode.Text)
+                ))
+            {
+                result = true;
+            }
+            return result;
+        }
+
         public bool GuestCheckAllRequiredEntries(Entry firstName, Entry lastName, Entry email, Entry phoneNumber, Entry cardHolderName, Entry cardNumber, Entry cardCvv, Entry cardMonth, Entry cardYear, Entry cardZipcode)
         {
             bool result = false;
@@ -368,6 +391,50 @@ namespace ServingFresh.Models
             }
 
             return result;
+        }
+
+        public async void WriteDeviceID(User user)
+        {
+            var deviceId = "";
+            var client = new HttpClient();
+            if (Device.RuntimePlatform == Device.iOS)
+            {
+                deviceId = Preferences.Get("guid", null);
+                if (deviceId != null) { Debug.WriteLine("This is the iOS GUID from Log in: " + deviceId); }
+            }
+            else
+            {
+                deviceId = Preferences.Get("guid", null);
+                if (deviceId != null) { Debug.WriteLine("This is the Android GUID from Log in " + deviceId); }
+            }
+
+            if (deviceId != null)
+            {
+                NotificationPost notificationPost = new NotificationPost();
+
+                notificationPost.uid = user.getUserID();
+                notificationPost.guid = deviceId.Substring(5);
+                user.setUserDeviceID(deviceId.Substring(5));
+                notificationPost.notification = "TRUE";
+
+                var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
+                Debug.WriteLine("Notification JSON Object to send: " + notificationSerializedObject);
+
+                var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
+
+                var clientResponse = await client.PostAsync(Constant.NotificationsUrl, notificationContent);
+
+                Debug.WriteLine("Status code: " + clientResponse.IsSuccessStatusCode);
+
+                if (clientResponse.IsSuccessStatusCode)
+                {
+                    System.Diagnostics.Debug.WriteLine("We have post the guid to the database");
+                }
+                else
+                {
+                    //await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
+                }
+            }
         }
 
         public static SignUpPost GetUserFrom(Purchase purchase)

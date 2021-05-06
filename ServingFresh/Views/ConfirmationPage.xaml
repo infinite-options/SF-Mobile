@@ -41,7 +41,7 @@
                     </RelativeLayout>
                 </StackLayout>
             </Grid>
-            <Frame Grid.Row="1" CornerRadius="20" HasShadow="False">
+            <Frame Grid.Row="1" CornerRadius="20" HasShadow="False" Padding="10">
                 <StackLayout>
                     <!--<StackLayout Margin="0,-15,0,0" HeightRequest="50" Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
                             <Label VerticalTextAlignment="Center" Text="Enter Delivery Details" TextColor="#136D74" TextDecorations="Underline" FontSize="9" FontAttributes="Bold" Opacity="0.5"></Label>
@@ -51,18 +51,19 @@
                             <Label VerticalTextAlignment="Center" Text="Order Confirmation" TextColor="#136D74" TextDecorations="Underline" FontSize="9" FontAttributes="Bold"></Label>
                         </StackLayout>-->
                         <ScrollView>
-                            <StackLayout>
+                            <StackLayout Spacing="16">
                                 <StackLayout>
                                     <Label Text="Order Confirmed" TextColor="#136D74" FontSize="20" FontAttributes="Bold" TextDecorations="Underline"></Label>
                                 </StackLayout>
                                 <StackLayout>
-                                    <Label x:Name="contactMessage" Text="If we have question. We will contact you at devanshimehra@gmail.com or 6264897132" TextColor="Gray" FontSize="18" FontAttributes="None" ></Label>
+                                    <Label x:Name="contactMessage" Text="If we have question. We will contact you at devanshimehra@gmail.com or 6264897132" TextColor="Gray" FontSize="16" FontAttributes="None" ></Label>
+                                </StackLayout>
+                                <StackLayout Spacing="0">
+                                     <Label Text="Your order will be delivered on:" TextColor="Gray" FontSize="16" FontAttributes="None" ></Label>
+                                    <Label x:Name="expectedDeliveryMessage" Text="Wednesday, Sep 20, 2020" TextColor="Gray" FontSize="16" FontAttributes="None" ></Label>
                                 </StackLayout>
                                 <StackLayout>
-                                    <Label x:Name="expectedDeliveryMessage" Text="Your order will be delivered on: Wednesday, Sep 20, 2020" TextColor="Gray" FontSize="18" FontAttributes="None" ></Label>
-                                </StackLayout>
-                                <StackLayout>
-                                    <Label Text="To your address" TextColor="Gray" FontSize="18" FontAttributes="None" ></Label>
+                                    <Label Text="To your address" TextColor="Gray" FontSize="16" FontAttributes="None" ></Label>
                                     <Frame Margin="1,5,1,10" HeightRequest="100" BackgroundColor="LightGray" CornerRadius="20" HasShadow="False" Padding="0" IsClippedToBounds="True">
                                         <maps:Map HeightRequest="1"
                                             x:Name="map"
@@ -73,32 +74,36 @@
                                 <StackLayout>
                                     <Label Text="What to Expect" TextColor="#136D74" FontSize="18" FontAttributes="Bold" TextDecorations="Underline"></Label>
                                 </StackLayout>
-                                <StackLayout>
-                                    <Label Text="Your order will be delivered to your doorstep on the day shown above. If you have ordered with us before, please place the previous delivery box outside by 9:30 am on delivery day." TextColor="Gray" FontSize="18" FontAttributes="None" ></Label>
+                                <StackLayout Spacing="16">
+                                    <Label Text="Your order will be delivered to your doorstep on the day shown above." TextColor="Gray" FontSize="16" FontAttributes="None" ></Label>
+                                    <Label Text="If you have ordered with us before, please place the previous delivery box outside by 9:30 am on delivery day."  TextColor="Gray" FontSize="16" FontAttributes="None" ></Label>
                                 </StackLayout>
-                                 <StackLayout Margin="0,50,0,50">
-                                    <Label Text="You are so close to unlocking the full potential of Serving Fresh" TextColor="#136D74" FontSize="18" FontAttributes="Bold" TextDecorations="Underline"></Label>
+                                 <StackLayout Margin="0,16,0,16">
+                                    <Label Text="Unlock the full potential of Serving Fresh" TextColor="#136D74" LineBreakMode="CharacterWrap" FontSize="18" FontAttributes="Bold" TextDecorations="Underline"></Label>
                                 </StackLayout>
-                                <StackLayout Margin="0,0,0,30">
+                                <StackLayout Margin="0,0,0,16">
                                     <Label Text="Sign up via social media" HorizontalTextAlignment="Center" TextColor="Black" FontSize="18" FontAttributes="Bold" ></Label>
                                 </StackLayout>
                                 <StackLayout HorizontalOptions="Center">
-                                    <StackLayout Margin="0,0,0,13">
+                                    <StackLayout Margin="0,0,0,20">
                                         <ImageButton x:Name="appleLogInButton" Source="continueWithApple.png" HeightRequest="52"></ImageButton>
                                         <ImageButton Source="continueWithFacebook.png" Clicked="ContinuteWithFacebook" HeightRequest="52"></ImageButton>
                                         <ImageButton Source="continueWithGoogle.png" Clicked="ContinueWithGoogle" HeightRequest="53"></ImageButton>
                                     </StackLayout>
                                 </StackLayout>
-                                <BoxView Margin="0,20,0,20" HeightRequest="1" Color="#136D74"></BoxView>
+                               
                                 <StackLayout>
-                                    <Label Text="Or enter password to sign up" HorizontalTextAlignment="Center" TextColor="Black"  FontSize="18" FontAttributes="Bold"></Label>
-                                </StackLayout>
-                                <StackLayout Margin="0,20,0,0">
+                                    <Label Margin="0,0,0,16" Text="Or enter password to sign up" HorizontalTextAlignment="Center" TextColor="Black"  FontSize="18" FontAttributes="Bold"></Label>
                                     <Entry Placeholder="Create Password" HeightRequest="49" x:Name="passsword1" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
                                     <Entry Placeholder="Confirm Password" HeightRequest="49" x:Name="passsword2" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
-                                    <Button Margin="0,15,0,0" HeightRequest="56" CornerRadius="14" Text="Sign up" Clicked="SignUpUser" Font="20" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold"></Button>
-                                    <Button Margin="0,5,0,0" HeightRequest="56" CornerRadius="14" Text="View Order History" Font="20" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold"></Button>
-                                    <Button Margin="0,5,0,0" HeightRequest="56" CornerRadius="14" Text="Back to Store" Clicked="ReturnToStore" Font="20" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold"></Button>
+                                    <Button Margin="0,15,0,0" WidthRequest="250" HorizontalOptions="Center" HeightRequest="54" CornerRadius="14" Text="Sign up" Clicked="SignUpUser" Font="20" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold"></Button>
+                                   
+                                </StackLayout>
+
+                                <StackLayout >
+                                    <Label Margin="0,20,0,20" Text="Or proceed without signing up" TextColor="#136D74" FontSize="18" FontAttributes="Bold" TextDecorations="Underline"></Label>
+                                    <Button Margin="0,5,0,0" WidthRequest="250" HorizontalOptions="Center" HeightRequest="54" CornerRadius="14" Text="View Order History" Clicked="NavigateToHistory" Font="20" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold"></Button>
+                                    <Button Margin="0,5,0,0" WidthRequest="250" HorizontalOptions="Center" HeightRequest="54" CornerRadius="14" Text="Back to Store" Clicked="ReturnToStore" Font="20" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold"></Button>
                                 </StackLayout>
                             </StackLayout>
                         </ScrollView>

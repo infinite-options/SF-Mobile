@@ -18,7 +18,7 @@ namespace ServingFresh.Views
         async void ContinueWithSignUp(System.Object sender, System.EventArgs e)
         {
             var client1 = new SignUp();
-            if (client1.ValidateSignUpInfo(signUpPhone, signUpAddress1Entry, signUpCityEntry, signUpStateEntry, signUpZipcodeEntry))
+            if (client1.ValidateSignUpInfo(firstName,lastName, signUpPhone, signUpAddress1Entry, signUpCityEntry, signUpStateEntry, signUpZipcodeEntry))
             {
                 //try to validate address if address doesn't return true ask to enter unit number and try again
                 var client = new AddressValidation();
@@ -36,10 +36,12 @@ namespace ServingFresh.Views
 
                             if (isAddressInZones != "" && isAddressInZones != "OUTSIDE ZONE RANGE")
                             {
-
+                                user.setUserUSPSType(addressStatus);
+                                user.setUserFirstName(firstName.Text);
+                                user.setUserLastName(lastName.Text);
                                 user.setUserPhoneNumber(signUpPhone.Text);
                                 user.setUserAddress(signUpAddress1Entry.Text);
-                                user.setUserUnit(signUpAddress2Entry.Text);
+                                user.setUserUnit(signUpAddress2Entry.Text == null? "": signUpAddress2Entry.Text);
                                 user.setUserCity(signUpCityEntry.Text);
                                 user.setUserState(signUpStateEntry.Text);
                                 user.setUserZipcode(signUpZipcodeEntry.Text);
@@ -88,26 +90,47 @@ namespace ServingFresh.Views
             }
         }
 
-        async void signUpAddress1Entry_TextChanged(System.Object sender, Xamarin.Forms.TextChangedEventArgs e)
-        {
-            SignUpAddressList.ItemsSource = await addr.GetPlacesPredictionsAsync(signUpAddress1Entry.Text);
-        }
-
-        void signUpAddress1Entry_Focused(System.Object sender, Xamarin.Forms.FocusEventArgs e)
+        async void signUpAddress1Entry_TextChanged(System.Object sender, EventArgs eventArgs)
         {
             if (!String.IsNullOrEmpty(signUpAddress1Entry.Text))
             {
-                addr.addressEntryFocused(SignUpAddressList, signUpAddressFrame);
+                if (addressToValidate != null)
+                {
+                    if (addressToValidate.Street != signUpAddress1Entry.Text)
+                    {
+                        SignUpAddressList.ItemsSource = await addr.GetPlacesPredictionsAsync(signUpAddress1Entry.Text);
+                        signUpAddress1Entry_Focused(sender, eventArgs);
+                    }
+                }
+                else
+                {
+                    SignUpAddressList.ItemsSource = await addr.GetPlacesPredictionsAsync(signUpAddress1Entry.Text);
+                    signUpAddress1Entry_Focused(sender, eventArgs);
+                }
+            }
+            else
+            {
+                signUpAddress1Entry_Unfocused(sender, eventArgs);
+                addressToValidate = null;
             }
         }
 
-        void signUpAddress1Entry_Unfocused(System.Object sender, Xamarin.Forms.FocusEventArgs e)
+        void signUpAddress1Entry_Focused(System.Object sender, EventArgs eventArgs)
+        {
+            if (!String.IsNullOrEmpty(signUpAddress1Entry.Text)) {
+                addr.addressEntryFocused(SignUpAddressList, signUpAddressFrame);
+            }
+
+        }
+
+        void signUpAddress1Entry_Unfocused(System.Object sender, EventArgs eventArgs)
         {
             addr.addressEntryUnfocused(SignUpAddressList, signUpAddressFrame);
         }
 
         async void SignUpAddressList_ItemSelected(System.Object sender, Xamarin.Forms.SelectedItemChangedEventArgs e)
         {
+            signUpAddress1Entry.TextChanged -= signUpAddress1Entry_TextChanged;
             addressToValidate = addr.addressSelected(SignUpAddressList, signUpAddress1Entry, signUpAddressFrame);
             string zipcode = await addr.getZipcode(addressToValidate.PredictionID);
             if (zipcode != null)
@@ -116,6 +139,8 @@ namespace ServingFresh.Views
             }
             addr.addressSelectedFillEntries(addressToValidate, signUpAddress1Entry, signUpAddress2Entry, signUpCityEntry, signUpStateEntry, signUpZipcodeEntry);
             addr.addressEntryUnfocused(SignUpAddressList, signUpAddressFrame);
+            signUpAddress1Entry.TextChanged += signUpAddress1Entry_TextChanged;
+
         }
 
         void CloseSignUpPage(System.Object sender, System.EventArgs e)

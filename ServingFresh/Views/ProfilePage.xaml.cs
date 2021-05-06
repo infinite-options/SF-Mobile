@@ -77,6 +77,8 @@ namespace ServingFresh.Views
         public Profile profile = new Profile();
         
         private bool isAddressValidated;
+        private Address addr = new Address();
+        private AddressAutocomplete addressToValidate = null;
 
         public ProfilePage()
         {
@@ -100,7 +102,9 @@ namespace ServingFresh.Views
             {
                 notificationButton.IsToggled = false;
             }
+            userAddress.TextChanged -= signUpAddress1Entry_TextChanged;
             userAddress.Text = user.getUserAddress();
+            userAddress.TextChanged += signUpAddress1Entry_TextChanged;
             userUnitNumber.Text = user.getUserUnit();
             userCity.Text = user.getUserCity();
             userState.Text = user.getUserState();
@@ -126,48 +130,132 @@ namespace ServingFresh.Views
             ValidateAddressClick(sender,e);
         }
 
-        async void ValidateAddressClick(object sender, System.EventArgs e)
-        {
-            if(userFirstName.Text != "" && userLastName.Text != "" && userAddress.Text != "" && userCity.Text != "" && userState.Text != "" && userPhoneNumber.Text != "" && userZipcode.Text != "")
-            {
-                if(userUnitNumber == null)
-                {
-                    userUnitNumber.Text = "";
-                }
 
-                if(userPhoneNumber.Text.Length != 10)
+        async void signUpAddress1Entry_TextChanged(System.Object sender, EventArgs eventArgs)
+        {
+            if (!String.IsNullOrEmpty(userAddress.Text))
+            {
+                if (addressToValidate != null)
                 {
-                    return;
+                    if (addressToValidate.Street != userAddress.Text)
+                    {
+                        SignUpAddressList.ItemsSource = await addr.GetPlacesPredictionsAsync(userAddress.Text);
+                        signUpAddress1Entry_Focused(sender, eventArgs);
+                    }
                 }
                 else
                 {
-                    var client = new AddressValidation();
-                    var locationValidated = await client.ValidateAddress(userAddress.Text, userUnitNumber.Text, userCity.Text, userState.Text, userZipcode.Text);
-                    if(locationValidated != null)
-                    {
-                        var zoneStatus = await client.isLocationInZones(zone, locationValidated.Latitude.ToString(), locationValidated.Longitude.ToString());
+                    SignUpAddressList.ItemsSource = await addr.GetPlacesPredictionsAsync(userAddress.Text);
+                    signUpAddress1Entry_Focused(sender, eventArgs);
+                }
+            }
+            else
+            {
+                signUpAddress1Entry_Unfocused(sender, eventArgs);
+                addressToValidate = null;
+            }
+        }
 
-                        if(zoneStatus == "INSIDE CURRENT ZONE" || zoneStatus == "INSIDE DIFFERENT ZONE")
+        void signUpAddress1Entry_Focused(System.Object sender, EventArgs eventArgs)
+        {
+            if (!String.IsNullOrEmpty(userAddress.Text))
+            {
+                addr.addressEntryFocused(SignUpAddressList, signUpAddressFrame);
+            }
+
+        }
+
+        void signUpAddress1Entry_Unfocused(System.Object sender, EventArgs eventArgs)
+        {
+            addr.addressEntryUnfocused(SignUpAddressList, signUpAddressFrame);
+        }
+
+        async void SignUpAddressList_ItemSelected(System.Object sender, Xamarin.Forms.SelectedItemChangedEventArgs e)
+        {
+            userAddress.TextChanged -= signUpAddress1Entry_TextChanged;
+            addressToValidate = addr.addressSelected(SignUpAddressList, userAddress, signUpAddressFrame);
+            string zipcode = await addr.getZipcode(addressToValidate.PredictionID);
+            if (zipcode != null)
+            {
+                addressToValidate.ZipCode = zipcode;
+            }
+            addr.addressSelectedFillEntries(addressToValidate, userAddress, userUnitNumber, userCity, userState, userZipcode);
+            addr.addressEntryUnfocused(SignUpAddressList, signUpAddressFrame);
+            userAddress.TextChanged += signUpAddress1Entry_TextChanged;
+
+        }
+
+        async void ValidateAddressClick(object sender, System.EventArgs e)
+        {
+            var client1 = new SignUp();
+            if (userFirstName.Text != "" && userLastName.Text != "" && userAddress.Text != "" && userCity.Text != "" && userState.Text != "" && userPhoneNumber.Text != "" && userZipcode.Text != "")
+            {
+                //try to validate address if address doesn't return true ask to enter unit number and try again
+                var client = new AddressValidation();
+                var addressStatus = client.ValidateAddressString(userAddress.Text, userUnitNumber.Text, userCity.Text, userCity.Text, userZipcode.Text);
+
+                if (addressStatus != null)
+                {
+                    if (addressStatus == "Y" || addressStatus == "S")
+                    {
+
+                        var location = await client.ConvertAddressToGeoCoordiantes(userAddress.Text, userCity.Text, userZipcode.Text);
+                        if (location != null)
                         {
-                            if(zone == "INSIDE CURRENT ZONE")
+                            var zoneStatus = await client.isLocationInZones(zone, location.Latitude.ToString(), location.Longitude.ToString());
+
+                            if (zoneStatus == "INSIDE CURRENT ZONE" || zoneStatus == "INSIDE DIFFERENT ZONE")
                             {
-                                var updateStatus = await UpdateUserProfile(user, userFirstName.Text, userLastName.Text, userPhoneNumber.Text, userAddress.Text, userUnitNumber.Text, userCity.Text, userState.Text, userZipcode.Text, locationValidated.Latitude.ToString(), locationValidated.Longitude.ToString());
-                                if (updateStatus)
+                                if (zone == "INSIDE CURRENT ZONE")
                                 {
-                                    await DisplayAlert("We have updated your profile successfully!", "", "OK");
+                                    client.SetPinOnMap(map, location, userAddress.Text);
+                                    var updateStatus = await UpdateUserProfile(user, userFirstName.Text, userLastName.Text, userPhoneNumber.Text, userAddress.Text, userUnitNumber.Text, userCity.Text, userState.Text, userZipcode.Text, location.Latitude.ToString(), location.Longitude.ToString());
+                                    if (updateStatus)
+                                    {
+                                        //user.setUserUSPSType(addressStatus);
+                                        //user.setUserFirstName(userFirstName.Text);
+                                        //user.setUserLastName(userLastName.Text);
+                                        //user.setUserPhoneNumber(userPhoneNumber.Text);
+                                        //user.setUserAddress(userAddress.Text);
+                                        //user.setUserUnit(userUnitNumber.Text == null ? "" : userUnitNumber.Text);
+                                        //user.setUserCity(userCity.Text);
+                                        //user.setUserState(userState.Text);
+                                        //user.setUserZipcode(userZipcode.Text);
+                                        //user.setUserLatitude(location.Latitude.ToString());
+                                        //user.setUserLongitude(location.Longitude.ToString());
+                                        await DisplayAlert("We have updated your profile successfully!", "", "OK");
+                                    }
+                                    else
+                                    {
+                                        await DisplayAlert("We were not able to update your profile", "", "OK");
+                                    }
+                                    return;
                                 }
                                 else
                                 {
-                                    await DisplayAlert("We were not able to update your profile", "", "OK");
+                                    client.SetPinOnMap(map, location, userAddress.Text);
+                                    bool proceed = await DisplayAlert("Great! You have updated your address", "Since, you address is located in a different delivery area we have to reset your shoping cart", "Save changes", "Don't save changes");
+                                    if (proceed)
+                                    {
+                                        var updateStatus = await UpdateUserProfile(user, userFirstName.Text, userLastName.Text, userPhoneNumber.Text, userAddress.Text, userUnitNumber.Text, userCity.Text, userState.Text, userZipcode.Text, location.Latitude.ToString(), location.Longitude.ToString());
+                                        if (updateStatus)
+                                        {
+                                            await DisplayAlert("We have updated your profile successfully!", "", "OK");
+                                        }
+                                        else
+                                        {
+                                            await DisplayAlert("We were not able to update your profile", "", "OK");
+                                        }
+                                    }
+                                    return;
                                 }
-                                return;
                             }
                             else
                             {
-                                bool proceed = await DisplayAlert("Great! You have updated your address", "Since, you address is located in a different delivery area we have to reset your shoping cart", "Save changes", "Don't save changes");
+                                bool proceed = await DisplayAlert("Your address is outside our supported areas", "We can still update your profile, but there will not be any available business for your account", "Save changes", "Don't save changes");
                                 if (proceed)
                                 {
-                                    var updateStatus = await UpdateUserProfile(user, userFirstName.Text, userLastName.Text, userPhoneNumber.Text, userAddress.Text, userUnitNumber.Text, userCity.Text, userState.Text, userZipcode.Text, locationValidated.Latitude.ToString(), locationValidated.Longitude.ToString());
+                                    var updateStatus = await UpdateUserProfile(user, userFirstName.Text, userLastName.Text, userPhoneNumber.Text, userAddress.Text, userUnitNumber.Text, userCity.Text, userState.Text, userZipcode.Text, location.Latitude.ToString(), location.Longitude.ToString());
                                     if (updateStatus)
                                     {
                                         await DisplayAlert("We have updated your profile successfully!", "", "OK");
@@ -177,39 +265,28 @@ namespace ServingFresh.Views
                                         await DisplayAlert("We were not able to update your profile", "", "OK");
                                     }
                                 }
-                                return;
                             }
                         }
                         else
                         {
-                            bool proceed = await DisplayAlert("Your address is outside our supported areas", "We can still update your profile, but there will not be any available business for your account", "Save changes", "Don't save changes");
-                            if (proceed)
-                            {
-                                var updateStatus = await UpdateUserProfile(user, userFirstName.Text, userLastName.Text, userPhoneNumber.Text, userAddress.Text, userUnitNumber.Text, userCity.Text, userState.Text, userZipcode.Text, locationValidated.Latitude.ToString(), locationValidated.Longitude.ToString());
-                                if (updateStatus)
-                                {
-                                    await DisplayAlert("We have updated your profile successfully!", "", "OK");
-                                }
-                                else
-                                {
-                                    await DisplayAlert("We were not able to update your profile", "", "OK");
-                                }
-                            }
+                            await DisplayAlert("We were not able to find your location in our system.", "Try again", "OK");
+                            return;
                         }
+
                     }
-                    else
+                    else if (addressStatus == "D")
                     {
-                        
-                        await DisplayAlert("Looks like we can't deliver to given address", "Please verify your address and try again", "OK");
+                        await DisplayAlert("Oops", "Please enter your address unit number", "OK");
                         return;
                     }
                 }
             }
             else
             {
-                await DisplayAlert("It looks like one of the entries may be empty", "Please check your new information", "OK");
+                await DisplayAlert("Oops", "Please enter all the required information. Thanks!", "OK");
                 return;
             }
+
         }
 
 
@@ -225,7 +302,7 @@ namespace ServingFresh.Views
             profile.customer_last_name = lastName;
             profile.customer_phone_num = phoneNumber;
             profile.customer_address = address;
-            profile.customer_unit = unit;
+            profile.customer_unit = unit == null ? "" : unit;
             profile.customer_city = city;
             profile.customer_state = state;
             profile.customer_zip = zipcode;
@@ -235,7 +312,7 @@ namespace ServingFresh.Views
 
             var serializeProfile = JsonConvert.SerializeObject(profile);
             var content = new StringContent(serializeProfile, Encoding.UTF8, "application/json");
-
+            Debug.WriteLine("PROFILE: " + serializeProfile);
             var endpointCall = await client.PostAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/update_Profile", content);
             Debug.WriteLine("ENDPOINT @ PROFILE WAS: " + endpointCall.IsSuccessStatusCode);
             if (endpointCall.IsSuccessStatusCode)

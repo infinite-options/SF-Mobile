@@ -68,7 +68,7 @@ namespace ServingFresh.Views
         public static void NavigateToSignIn(System.Object sender, System.EventArgs e)
         {
             Application.Current.MainPage.Navigation.PopModalAsync();
-            Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(94), true);
+            Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(94, "1"), true);
         }
 
         public static void NavigateToSignUp(System.Object sender, System.EventArgs e)

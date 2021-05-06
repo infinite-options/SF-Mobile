@@ -40,62 +40,81 @@ namespace ServingFresh.Views
             Debug.WriteLine("WEBVIEW SOURCE: " + source.Url);
             if (source.Url.Contains("https://servingfresh.me/"))
             {
-               
-                Debug.WriteLine("SUCCESSFULL REDIRECT FROM PAYPAL TO SF WEB TO MOBILE APP");
-                purchase.setPurchasePaymentType("PAYPAL");
-                var client1 = new SignIn();
-                var isEmailUnused = await client1.ValidateExistingAccountFromEmail(purchase.getPurchaseEmail());
-                if (isEmailUnused == null)
+                if(user.getUserType() == "GUEST")
                 {
-                    var userID = await SignUp.SignUpNewUser(SignUp.GetUserFrom(purchase));
-                    if (userID != "") { purchase.setPurchaseCustomerUID(userID); }
+                    Debug.WriteLine("SUCCESSFULL REDIRECT FROM PAYPAL TO SF WEB TO MOBILE APP");
+                    purchase.setPurchasePaymentType("PAYPAL");
+                    var client1 = new SignIn();
+                    var isEmailUnused = await client1.ValidateExistingAccountFromEmail(purchase.getPurchaseEmail());
+                    if (isEmailUnused == null)
+                    {
+                        var userID = await SignUp.SignUpNewUser(SignUp.GetUserFrom(purchase));
+                        if (userID != "") { purchase.setPurchaseCustomerUID(userID); }
+                        var paymentIsSuccessful = await paymentClient.captureOrder(paymentClient.getTransactionID());
+                        await WriteFavorites(GetFavoritesList(), userID);
+                        if (paymentIsSuccessful)
+                        {
+                            purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
+                            purchase.setPurchaseChargeID(paymentClient.getTransactionID());
+                            _ = paymentClient.SendPurchaseToDatabase(purchase);
+                            order.Clear();
+                            Application.Current.MainPage = new ConfirmationPage();
+                        }
+                        else
+                        {
+                            await DisplayAlert("Issue with payment via PayPal", "", "OK");
+                        }
+                    }
+                    else
+                    {
+                        if (isEmailUnused.result.Count != 0)
+                        {
+                            var role = isEmailUnused.result[0].role;
+                            if (role == "CUSTOMER")
+                            {
+                                await DisplayAlert("Oops", "You are not a guest. We are sending you to the checkout page where you can sign in to proceed with your purchase", "OK");
+                                await Application.Current.MainPage.Navigation.PopModalAsync();
+                                await Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(94, "1"), true);
+                            }
+                            else if (role == "GUEST")
+                            {
+                                // we don't sign up but get user id
+                                user.setUserID(isEmailUnused.result[0].customer_uid);
+                                purchase.setPurchaseCustomerUID(user.getUserID());
+                                user.setUserFromProfile(isEmailUnused);
+                                var paymentIsSuccessful = await paymentClient.captureOrder(paymentClient.getTransactionID());
+                                await WriteFavorites(GetFavoritesList(), user.getUserID());
+                                if (paymentIsSuccessful)
+                                {
+                                    purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
+                                    purchase.setPurchaseChargeID(paymentClient.getTransactionID());
+                                    _ = paymentClient.SendPurchaseToDatabase(purchase);
+                                    order.Clear();
+                                    Application.Current.MainPage = new ConfirmationPage();
+                                }
+                                else
+                                {
+                                    await DisplayAlert("Issue with payment via PayPal", "", "OK");
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (user.getUserType() == "CUSTOMER")
+                {
                     var paymentIsSuccessful = await paymentClient.captureOrder(paymentClient.getTransactionID());
-                    await WriteFavorites(GetFavoritesList(), userID);
+                    await WriteFavorites(GetFavoritesList(), user.getUserID());
                     if (paymentIsSuccessful)
                     {
                         purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
                         purchase.setPurchaseChargeID(paymentClient.getTransactionID());
                         _ = paymentClient.SendPurchaseToDatabase(purchase);
                         order.Clear();
-                        Application.Current.MainPage = new ConfirmationPage();
+                        Application.Current.MainPage = new HistoryPage();
                     }
                     else
                     {
                         await DisplayAlert("Issue with payment via PayPal", "", "OK");
-                    }
-                }
-                else
-                {
-                    if (isEmailUnused.result.Count != 0)
-                    {
-                        var role = isEmailUnused.result[0].role;
-                        if (role == "CUSTOMER")
-                        {
-                            await DisplayAlert("Oops", "You are not a guest. We are sending you to the checkout page where you can sign in to proceed with your purchase", "OK");
-                            await Application.Current.MainPage.Navigation.PopModalAsync();
-                            await Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(94), true);
-                        }
-                        else if (role == "GUEST")
-                        {
-                            // we don't sign up but get user id
-                            user.setUserID(isEmailUnused.result[0].customer_uid);
-                            purchase.setPurchaseCustomerUID(user.getUserID());
-                            user.setUserFromProfile(isEmailUnused);
-                            var paymentIsSuccessful = await paymentClient.captureOrder(paymentClient.getTransactionID());
-                            await WriteFavorites(GetFavoritesList(), user.getUserID());
-                            if (paymentIsSuccessful)
-                            {
-                                purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
-                                purchase.setPurchaseChargeID(paymentClient.getTransactionID());
-                                _ = paymentClient.SendPurchaseToDatabase(purchase);
-                                order.Clear();
-                                Application.Current.MainPage = new ConfirmationPage();
-                            }
-                            else
-                            {
-                                await DisplayAlert("Issue with payment via PayPal", "", "OK");
-                            }
-                        }
                     }
                 }
             }

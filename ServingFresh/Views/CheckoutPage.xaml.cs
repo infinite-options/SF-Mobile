@@ -79,8 +79,8 @@ namespace ServingFresh.Views
         {
             public string key { get;set; }
         }
-
-
+        public double ambassadorDiscount = 0;
+        public static string couponsUIDs = "";
         public static Purchase purchase = new Purchase(user);
         public ObservableCollection<ItemObject> cartItems = new ObservableCollection<ItemObject>();
         public ObservableCollection<CouponItem> couponsList = new ObservableCollection<CouponItem>();
@@ -136,7 +136,7 @@ namespace ServingFresh.Views
         public CheckoutPage()
         {
             InitializeComponent();
-            SelectionPage.SetMenu(guestMenuSection, customerMenuSection, historyLabel, profileLabel);
+
 
             if (selectedDeliveryDate != null && order.Count != 0)
             {
@@ -164,10 +164,10 @@ namespace ServingFresh.Views
                         validatedAddress.State = user.getUserState();
                         validatedAddress.ZipCode = user.getUserZipcode();
 
-                        addressToValidate = validatedAddress;
-                        addr.addressSelectedFillEntries(addressToValidate, AddressEntry, newUserUnitNumber, newUserCity, newUserState, newUserZipcode);
+                        //addressToValidate = validatedAddress;
+                        addr.addressSelectedFillEntries(validatedAddress, AddressEntry, newUserUnitNumber, newUserCity, newUserState, newUserZipcode);
                         var client = new AddressValidation();
-                        client.SetPinOnMap(map, user.getUserLatitude(), user.getUserLongitude(), addressToValidate.Street);
+                        client.SetPinOnMap(map, user.getUserLatitude(), user.getUserLongitude(), validatedAddress.Street);
                     }
                 }
                 else
@@ -512,7 +512,7 @@ namespace ServingFresh.Views
                     subtotal += (item.qty * item.price);
                 }
             }
-
+            subtotal = subtotal - ambassadorDiscount;
             SubTotal.Text = "$" + subtotal.ToString("N2");
             this.discount = discount;
             Discount.Text = "$" + discount.ToString("N2");
@@ -818,16 +818,7 @@ namespace ServingFresh.Views
                 availableCoupons = ApplyBestAvailableCoupon(CouponItem.MergeActiveNonActiveCouponLists(activeCoupons, nonactiveCoupons));
                 coupon_list.ItemsSource = availableCoupons;
         }
-   
-
-
-        public async void ValidateAddressClick(System.Object sender, System.EventArgs e)
-        {
-            
-       
-        }
-
-
+  
         void GetDeliveryTips(System.Object sender, System.EventArgs e)
         {
 
@@ -903,6 +894,8 @@ namespace ServingFresh.Views
 
                 if (paymentIsSuccessful)
                 {
+                    var coupond = purchase.getPurchaseCoupoID();
+                    purchase.setPurchaseCoupoID(coupond + couponsUIDs);
                     purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
                     purchase.setPurchaseChargeID(paymentClient.getTransactionID());
                     _ = paymentClient.SendPurchaseToDatabase(purchase);
@@ -990,8 +983,6 @@ namespace ServingFresh.Views
             }
         }
 
-        //await Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(94), true);
-
         async void GuestCompletePaymentWithPayPal(System.Object sender, System.EventArgs e)
         {
             var client1 = new SignUp();
@@ -999,11 +990,13 @@ namespace ServingFresh.Views
             if (client1.GuestCheckAllRequiredEntries(firstName, lastName, emailAddress, phoneNumber))
             {
 
+
                 purchase.setPurchaseFirstName(firstName.Text);
                 purchase.setPurchaseLastName(lastName.Text);
                 purchase.setPurchaseEmail(emailAddress.Text);
                 purchase.setPurchasePhoneNumber(phoneNumber.Text);
-
+                var coupond = purchase.getPurchaseCoupoID();
+                purchase.setPurchaseCoupoID(coupond + couponsUIDs);
                 var button = (Button)sender;
 
                 if (button.BackgroundColor == Color.FromHex("#FF8500"))
@@ -1058,6 +1051,8 @@ namespace ServingFresh.Views
 
                             if (paymentIsSuccessful)
                             {
+                                var coupond = purchase.getPurchaseCoupoID();
+                                purchase.setPurchaseCoupoID(coupond + couponsUIDs);
                                 purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
                                 purchase.setPurchaseChargeID(paymentClient.getTransactionID());
                                 purchase.printPurchase();
@@ -1082,7 +1077,7 @@ namespace ServingFresh.Views
                             {
                                 UserDialogs.Instance.HideLoading();
                                 await DisplayAlert("Great!", "It looks like you already have an account. Please log in to find out if you have any additional discounts", "OK");
-                                await Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(94), true);
+                                await Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(94, "1"), true);
                             }
                             else if (role == "GUEST")
                             {
@@ -1103,6 +1098,8 @@ namespace ServingFresh.Views
                                 await WriteFavorites(GetFavoritesList(), user.getUserID());
                                 if (paymentIsSuccessful)
                                 {
+                                    var coupond = purchase.getPurchaseCoupoID();
+                                    purchase.setPurchaseCoupoID(coupond + couponsUIDs);
                                     purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
                                     purchase.setPurchaseChargeID(paymentClient.getTransactionID());
                                     _ = paymentClient.SendPurchaseToDatabase(purchase);
@@ -1140,6 +1137,7 @@ namespace ServingFresh.Views
                 button.BackgroundColor = Color.FromHex("#2B6D74");
                 customerStripeInformationView.HeightRequest = 194;
 
+
             }
             else
             {
@@ -1150,40 +1148,13 @@ namespace ServingFresh.Views
 
         async void CheckoutViaPayPal(System.Object sender, System.EventArgs e)
         {
-            paypalRow.Height = this.Height - 136;
 
-            webView.Source = await paymentClient.PayViaPayPal(purchase.getPurchaseAmountDue());
-            webView.Navigated += WebViewPage_Navigated;
+            FinalizePurchase(purchase, selectedDeliveryDate);
+            purchase.setPurchasePaymentType("PAYPAL");
+            var coupond = purchase.getPurchaseCoupoID();
+            purchase.setPurchaseCoupoID(coupond + couponsUIDs);
+            await Application.Current.MainPage.Navigation.PushModalAsync(new PayPalPage(), true);
         }
-
-        private async void WebViewPage_Navigated(object sender, WebNavigatedEventArgs e)
-        {
-            var source = webView.Source as UrlWebViewSource;
-            Debug.WriteLine("WEBVIEW SOURCE: " + source.Url);
-            if (source.Url.Contains("https://servingfresh.me/"))
-            {
-                paypalRow.Height = 0;
-                FinalizePurchase(purchase, selectedDeliveryDate);
-                string mode = Payments.getMode(purchase.getPurchaseDeliveryInstructions(), "PAYPAL");
-                paymentClient = new Payments(mode);
-                purchase.setPurchasePaymentType("PAYPAL");
-                var paymentIsSuccessful = await paymentClient.captureOrder(paymentClient.getTransactionID());
-                await WriteFavorites(GetFavoritesList(), purchase.getPurchaseCustomerUID());
-                if (paymentIsSuccessful)
-                {
-                    purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
-                    purchase.setPurchaseChargeID(paymentClient.getTransactionID());
-                    _ = paymentClient.SendPurchaseToDatabase(purchase);
-                    order.Clear();
-                    Application.Current.MainPage = new HistoryPage();
-                }
-                else
-                {
-                    await DisplayAlert("Issue with payment via PayPal", "", "OK");
-                }
-            }
-        }
-
 
         public static async Task<bool> WriteFavorites(List<string> favorites, string userID)
         {
@@ -1213,35 +1184,6 @@ namespace ServingFresh.Views
         }
 
         Models.Address addr = new Models.Address();
-
-        private ObservableCollection<AddressAutocomplete> _addresses;
-        public ObservableCollection<AddressAutocomplete> Addresses
-        {
-            get => _addresses ?? (_addresses = new ObservableCollection<AddressAutocomplete>());
-            set
-            {
-                if (_addresses != value)
-                {
-                    _addresses = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private string _addressText;
-        public string AddressText
-        {
-            get => _addressText;
-            set
-            {
-                if (_addressText != value)
-                {
-                    _addressText = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
 
         public async void OnAddressChanged(object sender, EventArgs eventArgs)
         {
@@ -1297,6 +1239,7 @@ namespace ServingFresh.Views
             newUserUnitNumber.IsVisible = true;
             gridAddressView.IsVisible = true;
             addressToValidate = addr.addressSelected(addressList, addressFrame);
+            addressToValidate.isValidated = false;
             AddressEntry.Text = addressToValidate.Street;
             if(user.getUserType() == "GUEST")
             {
@@ -1330,6 +1273,7 @@ namespace ServingFresh.Views
 
                         if (isAddressInZones != "" && isAddressInZones != "OUTSIDE ZONE RANGE")
                         {
+                            addressToValidate.isValidated = true;
                             addressToValidate.Unit = newUserUnitNumber.Text == null ? "" : newUserUnitNumber.Text;
                             client.SetPinOnMap(map, location, addressToValidate.Street);
                             purchase.setPurchaseAddress(addressToValidate.Street);
@@ -1339,6 +1283,7 @@ namespace ServingFresh.Views
                             purchase.setPurchaseZipcode(addressToValidate.ZipCode);
                             purchase.setPurchaseLatitude(location.Latitude.ToString());
                             purchase.setPurchaseLongitude(location.Longitude.ToString());
+                            
                             if (user.getUserType() == "CUSTOMER")
                             {
                                 DeliveryAddress1.Text = purchase.getPurchaseAddress() + ",";
@@ -1379,6 +1324,7 @@ namespace ServingFresh.Views
 
                                     if (isAddressInZones != "" && isAddressInZones != "OUTSIDE ZONE RANGE")
                                     {
+                                        addressToValidate.isValidated = true;
                                         addressToValidate.Unit = newUserUnitNumber.Text == null ? "" : newUserUnitNumber.Text;
                                         client.SetPinOnMap(map, location, addressToValidate.Street);
                                         purchase.setPurchaseAddress(addressToValidate.Street);
@@ -1484,22 +1430,12 @@ namespace ServingFresh.Views
 
         void ShowLogInModal(System.Object sender, System.EventArgs e)
         {
-            Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(94), true);
+            Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(94, "1"), true);
         }
 
         void ShowSignUpModal(System.Object sender, System.EventArgs e)
         {
             Application.Current.MainPage.Navigation.PushModalAsync(new SignUpPage(94), true);
-        }
-
-        void HideLogInUI(System.Object sender, System.EventArgs e)
-        {
-            loginRow.Height = 0;
-        }
-
-        void HideSignUpUI(System.Object sender, System.EventArgs e)
-        {
-            signUpRow.Height = 0;
         }
 
         void NavigateToInfoFromCheckout(System.Object sender, System.EventArgs e)
@@ -1535,427 +1471,189 @@ namespace ServingFresh.Views
         {
             Application.Current.MainPage.Navigation.PushModalAsync(new MenuPage(), true);
 
-            //var height = new GridLength(0);
-            //if (menuFrame.Height.Equals(height))
-            //{
-            //    menuFrame.Height = this.Height - 180;
-            //}
-            //else
-            //{
-            //    menuFrame.Height = 0;
-            //}
         }
 
-        void ShowHidePassword(System.Object sender, System.EventArgs e)
-        {
-            Label label = (Label)sender;
-            if(label.Text == "Show password")
-            {
-                userPassword.IsPassword = false;
-                label.Text = "Hide password";
-            }
-            else
-            {
-                userPassword.IsPassword = true;
-                label.Text = "Show password";
-            }
-        }
-
-
-        async void SignInDirectUser(System.Object sender, System.EventArgs e)
-        {
-            var logInClient = new PrincipalPage();
-            if(logInClient.ValidateDirectSignInCredentials(userEmailAddress, userPassword))
-            {
-                var isEmailValid = await DeliveryDetailsPage.ValidateExistingAccountFromEmail(userEmailAddress.Text);
-                if (isEmailValid != null)
-                {
-                    if (isEmailValid.result.Count != 0)
-                    {
-                        var role = isEmailValid.result[0].role;
-                        if (role == "CUSTOMER")
-                        {
-                            var status = await SignInDirectUser(logInButton, userEmailAddress, userPassword);
-                            if (status)
-                            {
-                                await DisplayAlert("Great!", "You have signed in to your account", "OK");
-                            }
-                            else
-                            {
-                                await DisplayAlert("Oops!", "We were not able to sign you in", "OK");
-                            }
-                        }
-                        else if (role == "GUEST")
-                        {
-                            // we don't sign up but get user id
-                            user.setUserID(isEmailValid.result[0].customer_uid);
-                            user.setUserFromProfile(isEmailValid);
-                            var updateClient = new SignUp();
-                            var content = updateClient.UpdateDirectUser(user, userPassword.Text);
-                            var signUpStatus = await SignUp.SignUpNewUser(content);
-
-                            if (signUpStatus)
-                            {
-                                await DisplayAlert("Great!", "We have created your account! Congratulations", "OK");
-                                user.setUserType("CUSTOMER");
-                                Application.Current.MainPage = new SelectionPage();
-                            }
-                            else
-                            {
-                                await DisplayAlert("Oops", "We were not able to sign you up. Try again.", "OK");
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        async Task<bool> SignInDirectUser(Button logInButton, Entry userEmailAddress, Entry userPassword)
-        {
-            var status = false;
-            var client = new SignIn();
-            var result = await client.SignInDirectUser(logInButton, userEmailAddress, userPassword);
-            if (result != null)
-            {
-                Debug.WriteLine("You have an acccount");
-
-                user.setUserID(result.getUserID());
-                user.setUserSessionTime(result.getUserSessionTime());
-                user.setUserPlatform(result.getUserPlatform());
-                user.setUserType(result.getUserType());
-                user.setUserEmail(result.getUserEmail());
-                user.setUserFirstName(result.getUserFirstName());
-                user.setUserLastName(result.getUserLastName());
-                user.setUserPhoneNumber(result.getUserPhoneNumber());
-                user.setUserAddress(result.getUserAddress());
-                user.setUserUnit(result.getUserUnit());
-                user.setUserCity(result.getUserCity());
-                user.setUserState(result.getUserState());
-                user.setUserZipcode(result.getUserZipcode());
-                user.setUserLatitude(result.getUserLatitude());
-                user.setUserLongitude(result.getUserLongitude());
-                
-                status = true;
-            }
-            return status;
-        }
-
-        void SignInWithFacebook(System.Object sender, System.EventArgs e)
-        {
-            var client = new SignIn();
-            var authenticator = client.GetFacebookAuthetication();
-            var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
-            authenticator.Completed += SignInFacebookAuth;
-            authenticator.Error += Authenticator_Error;
-            presenter.Login(authenticator);
-        }
-
-        void SignInWithGoogle(System.Object sender, System.EventArgs e)
-        {
-            var client = new SignIn();
-            var authenticator = client.GetGoogleAuthetication();
-            var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
-            AuthenticationState.Authenticator = authenticator;
-            authenticator.Completed += SignInGoogleAuth;
-            authenticator.Error += Authenticator_Error;
-            presenter.Login(authenticator);
-        }
-
-        private async void SignInFacebookAuth(object sender, AuthenticatorCompletedEventArgs e)
-        {
-            var authenticator = sender as OAuth2Authenticator;
-
-            if (authenticator != null)
-            {
-                authenticator.Completed -= FacebookAuthetication;
-                authenticator.Error -= Authenticator_Error;
-            }
-
-            if (e.IsAuthenticated)
-            {
-                try
-                {
-                    var clientLogIn = new SignIn();
-                    var facebookUser = clientLogIn.GetFacebookUser(e.Account.Properties["access_token"]);
-                    var result = await clientLogIn.VerifyUserCredentials(facebookUser.email, facebookUser.id,"FACEBOOK");
-                    if(result != null)
-                    {
-                        user.setUserID(result.getUserID());
-                        user.setUserSessionTime(result.getUserSessionTime());
-                        user.setUserPlatform(result.getUserPlatform());
-                        user.setUserType(result.getUserType());
-                        user.setUserEmail(result.getUserEmail());
-                        user.setUserFirstName(result.getUserFirstName());
-                        user.setUserLastName(result.getUserLastName());
-                        user.setUserPhoneNumber(result.getUserPhoneNumber());
-                        user.setUserAddress(result.getUserAddress());
-                        user.setUserUnit(result.getUserUnit());
-                        user.setUserCity(result.getUserCity());
-                        user.setUserState(result.getUserState());
-                        user.setUserZipcode(result.getUserZipcode());
-                        user.setUserLatitude(result.getUserLatitude());
-                        user.setUserLongitude(result.getUserLongitude());
-
-                        if(user.getUserType() == "GUEST")
-                        {
-                            var updateClient = new SignUp();
-                            var content = updateClient.UpdateSocialUser(user, e.Account.Properties["access_token"], "", facebookUser.id, "FACEBOOK");
-                            var signUpStatus = await SignUp.SignUpNewUser(content);
-
-                            if (signUpStatus)
-                            {
-                                user.setUserType("CUSTOMER");
-                            }
-                            else
-                            {
-                                await DisplayAlert("Oops", "We were not able to sign you up. Try again.", "OK");
-                            }
-                        }
-                        await DisplayAlert("Great!", "You have signed in to your account", "OK");
-                        Application.Current.MainPage = new CheckoutPage();
-                    }
-                    else
-                    {
-                        await DisplayAlert("Oops","We were not able to sign you in. Please sign in witht the correct social medial sign in button","OK");
-                    }
-                }
-                catch (Exception g)
-                {
-                    Debug.WriteLine(g.Message);
-                }
-            }
-        }
-
-        private async void SignInGoogleAuth(object sender, AuthenticatorCompletedEventArgs e)
-        {
-            var authenticator = sender as OAuth2Authenticator;
-
-            if (authenticator != null)
-            {
-                authenticator.Completed -= GoogleAuthetication;
-                authenticator.Error -= Authenticator_Error;
-            }
-
-            if (e.IsAuthenticated)
-            {
-                try
-                {
-                    var clientLogIn = new SignIn();
-                    var googleUser = await clientLogIn.GetGoogleUser(e);
-                    var result = await clientLogIn.VerifyUserCredentials(googleUser.email, googleUser.id, "GOOGLE");
-                    if (result != null)
-                    {
-                        user.setUserID(result.getUserID());
-                        user.setUserSessionTime(result.getUserSessionTime());
-                        user.setUserPlatform(result.getUserPlatform());
-                        user.setUserType(result.getUserType());
-                        user.setUserEmail(result.getUserEmail());
-                        user.setUserFirstName(result.getUserFirstName());
-                        user.setUserLastName(result.getUserLastName());
-                        user.setUserPhoneNumber(result.getUserPhoneNumber());
-                        user.setUserAddress(result.getUserAddress());
-                        user.setUserUnit(result.getUserUnit());
-                        user.setUserCity(result.getUserCity());
-                        user.setUserState(result.getUserState());
-                        user.setUserZipcode(result.getUserZipcode());
-                        user.setUserLatitude(result.getUserLatitude());
-                        user.setUserLongitude(result.getUserLongitude());
-
-                        if (user.getUserType() == "GUEST")
-                        {
-                            var updateClient = new SignUp();
-                            var content = updateClient.UpdateSocialUser(user, e.Account.Properties["access_token"], e.Account.Properties["refresh_token"], googleUser.id, "GOOGLE");
-                            var signUpStatus = await SignUp.SignUpNewUser(content);
-
-                            if (signUpStatus)
-                            {
-                                user.setUserType("CUSTOMER");
-                            }
-                            else
-                            {
-                                await DisplayAlert("Oops", "We were not able to sign you up. Try again.", "OK");
-                            }
-                        }
-                        await DisplayAlert("Great!", "You have signed in to your account", "OK");
-                        Application.Current.MainPage = new CheckoutPage();
-
-                    }
-                    else
-                    {
-                        await DisplayAlert("Oops", "We were not able to sign you in. Please sign in witht the correct social medial sign in button", "OK");
-                    }
-                }
-                catch (Exception g)
-                {
-                    Debug.WriteLine(g.Message);
-                }
-            }
-        }
-
-        async void SignUpDirectUser(System.Object sender, System.EventArgs e)
-        {
-            var client = new PrincipalPage();
-
-            if (client.ValidateSignUpInfo(newUserFirstName, newUserLastName, newUserEmail1, newUserEmail2, newUserPassword1, newUserPassword2))
-            {
-                if (client.ValidateEmail(newUserEmail1, newUserEmail2))
-                {
-                    if (client.ValidatePassword(newUserPassword1, newUserPassword2))
-                    {
-                        // user is ready to be sign in.
-                        var clientSignUp = new SignUp();
-                        var content = clientSignUp.SetDirectUser(user, newUserPassword1.Text);
-                        var signUpStatus = await SignUp.SignUpNewUser(content);
-
-                        if (signUpStatus != "" && signUpStatus != "USER ALREADY EXIST")
-                        {
-                            user.setUserID(signUpStatus);
-                            user.setUserPlatform("DIRECT");
-                            user.setUserType("CUSTOMER");
-                            clientSignUp.SendUserToCheckoutPage();
-                        }
-                        else if (signUpStatus != "" && signUpStatus == "USER ALREADY EXIST")
-                        {
-                            await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
-                        }
-                    }
-                    else
-                    {
-                        await DisplayAlert("Oops", "Please check that your password is the same in both entries", "OK");
-                        return;
-                    }
-                }
-                else
-                {
-                    await DisplayAlert("Oops", "Please check that your email is the same in both entries", "OK");
-                    return;
-                }
-            }
-            else
-            {
-                await DisplayAlert("Oops", "Please enter all the required information. Thanks!", "OK");
-                return;
-            }
-        }
-
-        void UpdateAddressForCustomer(System.Object sender, System.EventArgs e)
+        async void UpdateAddressForCustomer(System.Object sender, System.EventArgs e)
         {
             if(guestAddressInfoView.HeightRequest != 0)
             {
+                var label = (Label)sender;
+                var reconizer = (TapGestureRecognizer)label.GestureRecognizers[0];
+
+                label.Text = "Change delivery address";
                 guestAddressInfoView.HeightRequest = 0;
                 guestDeliveryAddressLabel.IsVisible = false;
                 guestMap.IsVisible = false;
+
+                if (addressToValidate != null)
+                {
+                    var client = new SignIn();
+                    var profile = await client.ValidateExistingAccountFromEmail(user.getUserEmail());
+
+                    if (profile != null)
+                    {
+                        if (addressToValidate.isValidated)
+                        {
+                            if (profile.result.Count != 0)
+                            {
+                                profile.result[0].customer_address = addressToValidate.Street;
+                                profile.result[0].customer_unit = addressToValidate.Unit;
+                                profile.result[0].customer_city = addressToValidate.City;
+                                profile.result[0].customer_state = addressToValidate.State;
+                                profile.result[0].customer_zip = addressToValidate.ZipCode;
+
+                                var updateStatus = await client.UpdateProfile(profile);
+                                if (updateStatus)
+                                {
+                                    await DisplayAlert("Great!", "We have updated your address successfully", "OK");
+
+                                    user.setUserAddress(addressToValidate.Street);
+                                    user.setUserUnit(addressToValidate.Unit == null ? "" : addressToValidate.Unit);
+                                    user.setUserCity(addressToValidate.City);
+                                    user.setUserState(addressToValidate.State);
+                                    user.setUserZipcode(addressToValidate.ZipCode);
+
+                                    purchase = new Purchase(user);
+                                }
+                                else
+                                {
+                                    await DisplayAlert("Oops", "We were not able to update your address successfully", "OK");
+                                }
+                                // make the update
+
+                            }
+                        }
+                        else
+                        {
+                            await DisplayAlert("Oops", "The address you entered was not validated. Please try again", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await DisplayAlert("Oops", "We faced some issues updating your address. Please try again", "OK");
+                    }
+                }
+
             }
             else
             {
                 guestAddressInfoView.HeightRequest = 140;
-            }
-        }
+                var label = (Label)sender;
+                label.Text = "Save delivery address";
 
-        void SignUpWithFacebook(System.Object sender, System.EventArgs e)
-        {
-            var client = new SignIn();
-            var authenticator = client.GetFacebookAuthetication();
-            var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
-            authenticator.Completed += FacebookAuthetication;
-            authenticator.Error += Authenticator_Error;
-            presenter.Login(authenticator);
-        }
-
-        void SignUpWithGoogle(System.Object sender, System.EventArgs e)
-        {
-            var client = new SignIn();
-            var authenticator = client.GetGoogleAuthetication();
-            var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
-            AuthenticationState.Authenticator = authenticator;
-            authenticator.Completed += GoogleAuthetication;
-            authenticator.Error += Authenticator_Error;
-            presenter.Login(authenticator);
-        }
-
-        private async void FacebookAuthetication(object sender, Xamarin.Auth.AuthenticatorCompletedEventArgs e)
-        {
-            var authenticator = sender as OAuth2Authenticator;
-
-            if (authenticator != null)
-            {
-                authenticator.Completed -= FacebookAuthetication;
-                authenticator.Error -= Authenticator_Error;
+                
             }
 
-            if (e.IsAuthenticated)
+           
+        }
+
+        async void VerifyAmbassadorCode(System.Object sender, Xamarin.Forms.FocusEventArgs e)
+        {
+
+            if (!String.IsNullOrEmpty(ambassadorCode.Text))
             {
-                try
+                string ambassadorStatus = "";
+                if (user.getUserType() == "CUSTOMER")
                 {
-                    var clientLogIn = new SignIn();
-                    var clientSignUp = new SignUp();
-
-                    var facebookUser = clientLogIn.GetFacebookUser(e.Account.Properties["access_token"]);
-                    var content = clientSignUp.SetDirectUser(user, e.Account.Properties["access_token"], "", facebookUser.id, facebookUser.email, "FACEBOOK");
-                    var signUpStatus = await SignUp.SignUpNewUser(content);
-
-                    if (signUpStatus != "" && signUpStatus != "USER ALREADY EXIST")
-                    {
-                        user.setUserID(signUpStatus);
-                        user.setUserPlatform("FACEBOOK");
-                        user.setUserType("CUSTOMER");
-                        clientSignUp.SendUserToCheckoutPage();
-                    }
-                    else if (signUpStatus != "" && signUpStatus == "USER ALREADY EXIST")
-                    {
-                        await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
-                    }
+                    var client = new Ambassador();
+                    Debug.WriteLine("INPUTS -> CODE: {0}, INFO: {1}. IS GUEST: {2}", ambassadorCode.Text, user.getUserEmail(), "False");
+                    ambassadorStatus = await client.ValidateAmbassadorCode(ambassadorCode.Text, user.getUserEmail(), "False");
+                    Debug.WriteLine("OUTPUT FROM VALIDATING AMBASSADOR CODE: " + ambassadorStatus);
                 }
-                catch (Exception g)
+                else if (user.getUserType() == "GUEST")
                 {
-                    Debug.WriteLine(g.Message);
+                    var client = new Ambassador();
+                    var info = purchase.getPurchaseAddress() + ", " + purchase.getPurchaseCity() + ", " + purchase.getPurchaseState() + " " + purchase.getPurchaseZipcode();
+                    Debug.WriteLine("INPUTS -> CODE: {0}, INFO: {1}. IS GUEST: {2}", ambassadorCode.Text, info, "True");
+                    
+                    ambassadorStatus = await client.ValidateAmbassadorCode(ambassadorCode.Text, info, "True");
+                    Debug.WriteLine("OUTPUT FROM VALIDATING AMBASSADOR CODE: " + ambassadorStatus);
                 }
-            }
-        }
 
-        private async void GoogleAuthetication(object sender, AuthenticatorCompletedEventArgs e)
-        {
-            var authenticator = sender as OAuth2Authenticator;
-
-            if (authenticator != null)
-            {
-                authenticator.Completed -= GoogleAuthetication;
-                authenticator.Error -= Authenticator_Error;
-            }
-
-            if (e.IsAuthenticated)
-            {
-                try
+                if(ambassadorStatus != "")
                 {
-                    var clientLogIn = new SignIn();
-                    var clientSignUp = new SignUp();
-
-                    var googleUser = await clientLogIn.GetGoogleUser(e);
-                    var content = clientSignUp.SetDirectUser(user, e.Account.Properties["access_token"], e.Account.Properties["refresh_token"], googleUser.id, googleUser.email, "GOOGLE");
-                    var signUpStatus = await SignUp.SignUpNewUser(content);
-
-                    if (signUpStatus != "" && signUpStatus != "USER ALREADY EXIST")
+                    if(ambassadorStatus.Contains("200"))
                     {
-                        user.setUserID(signUpStatus);
-                        user.setUserPlatform("GOOGLE");
-                        user.setUserType("CUSTOMER");
-                        clientSignUp.SendUserToCheckoutPage();
+                        var ambassadorResponse = JsonConvert.DeserializeObject<AmbassadorResponseA>(ambassadorStatus);
+                        if(ambassadorResponse.code == 200)
+                        {
+                            await DisplayAlert("Great!", "We have verified your code! We are just checking if you meet the threshold to apply for an additional discount.", "OK");
+                            if (GetSubTotal() >= ambassadorResponse.sub.threshold)
+                            {
+                                await DisplayAlert("Great!", "Your purchase meets the threshold to apply an additional discount", "OK");
+                                discountFromAmbassador.Text = "$" + ambassadorResponse.sub.discount_amount.ToString("N2");
+                                couponsUIDs = "";
+                                ambassadorDiscount = ambassadorResponse.sub.discount_amount;
+                                foreach (string uid in ambassadorResponse.uids)
+                                {
+                                    couponsUIDs += "," +uid;
+                                }
+
+                                if (appliedCoupon != null)
+                                {
+                                    updateTotals(appliedCoupon.discount, appliedCoupon.shipping);
+                                }
+                                else
+                                {
+                                    updateTotals(0, 0);
+                                }
+
+                            }
+                            else
+                            {
+                                await DisplayAlert("Oops!", "Your purchase is under the threshold to have an additional discount. You can save this code for another purchase or increase your subtotal by $" + (GetSubTotal()-ambassadorResponse.sub.threshold), "OK");
+                            }
+                        }
                     }
-                    else if (signUpStatus != "" && signUpStatus == "USER ALREADY EXIST")
+                    else
                     {
-                        await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
+                        var ambassadorResponse = JsonConvert.DeserializeObject<AmbassadorResponseB>(ambassadorStatus);
+                        await DisplayAlert("Oops", ambassadorResponse.message, "OK");
                     }
                 }
-                catch (Exception g)
-                {
-                    Debug.WriteLine(g.Message);
-                }
             }
         }
 
-        private async void Authenticator_Error(object sender, Xamarin.Auth.AuthenticatorErrorEventArgs e)
+        async void AmbassadorShowInformation(System.Object sender, System.EventArgs e)
         {
-            await DisplayAlert("An error occur when authenticating", "Please try again", "OK");
+            if(user.getUserType() == "GUEST")
+            {
+                //await DisplayAlert("Love Serving Fresh?", "Become an Ambassador\n\nGive 20, Get 20\n\nRefer a friend and both you and your friend get $10 off on your next two orders.", "Login", "Sign Up");
+                string action = await DisplayActionSheet("Love Serving Fresh?\n\nBecome an Ambassador\n\nGive 20, Get 20\n\nRefer a friend and both you and your friend get $10 off on your next two orders.", "Cancel", null, "Login", "Sign Up");
+                if(action == "Login")
+                {
+                    await Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(94, "1"), true);
+                }else if (action == "Sign Up")
+                {
+                    await Application.Current.MainPage.Navigation.PushModalAsync(new SignUpPage(94), true);
+                }
+
+            }
+            else if(user.getUserType() == "CUSTOMER")
+            {
+                
+                string action = await DisplayPromptAsync("Love Serving Fresh?", "\n\nBecome an Ambassador\n\nGive 20, Get 20\n\nRefer a friend and both you and your friend get $10 off on your next two orders.", "OK","Cancel",null,-1,Keyboard.Email,null);
+                if (!String.IsNullOrEmpty(action))
+                {
+                    // Make input an ambassador...
+
+                    var client = new Ambassador();
+                    var createAmbassadorStatus = await client.CreateAmbassadorFromCode(action.ToLower());
+                    if (createAmbassadorStatus)
+                    {
+                        await DisplayAlert("Congratulations!", "You are now an ambassador! Share this email: "+ action + "with your friends and get $10 on your next two orders", "OK");
+                    }
+                    else
+                    {
+                        await DisplayAlert("Oops", "Something went wrong. Please try again", "OK");
+                    }
+
+                }
+                else if (action == "Sign Up")
+                {
+                    
+                }
+            }
         }
     }
 }

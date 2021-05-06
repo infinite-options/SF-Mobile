@@ -7,7 +7,7 @@
                 <ImageButton Padding="0,0,2,0" HeightRequest="30" Source="closeFrameIcon.png" HorizontalOptions="End" Clicked="ImageButton_Clicked"></ImageButton>
             </StackLayout>
             <Label Margin="0,0,0,20" Text="Log In" TextColor="#136D74" FontSize="32" FontAttributes="Bold" TextDecorations="Underline" HorizontalTextAlignment="Center" ></Label>
-        <ScrollView>
+        <ScrollView x:Name="scrollView">
 
        
         <StackLayout x:Name="grids" BackgroundColor="WhiteSmoke"  HorizontalOptions="Center" >
@@ -72,93 +72,39 @@
                     BackgroundColor="#FF8500"
                     Clicked="DirectLogInClick">
             </Button>
-            <Button Text="Reset password" TextColor="#6D7278" BackgroundColor="Transparent"></Button>
-            <!--<StackLayout Grid.Row="1" Padding="21,50,21,0" >
+            <Button Text="Reset password" TextColor="#6D7278" Clicked="ResetPassword" BackgroundColor="Transparent"></Button>
+            <StackLayout x:Name="resetPasswordStackLayout" IsVisible="false">
+                <Grid>
                 <Entry
-                    x:Name="userEmailAddress"
+                    x:Name="newPassword"
                     HeightRequest="52"
-                    Placeholder="Email address"
+                    WidthRequest="372"
+                    HorizontalOptions="Center"
+                    Placeholder="Enter New Password"
+                    IsPassword="True"
                     HorizontalTextAlignment="Start"
                     Keyboard="Email"
                     PlaceholderColor="#6D7278"
                     TextColor="Gray"
-                    FontSize="18"
-                    FontAttributes="Bold">
+                    FontSize="18">
                 </Entry>
-                <Grid>
-                    <Entry
-                        x:Name="userPassword"
-                        HeightRequest="52"
-                        Placeholder="Enter Password"
-                        IsPassword="True"
-                        HorizontalTextAlignment="Start"
-                        Keyboard="Email"
-                        PlaceholderColor="#6D7278"
-                        TextColor="Gray"
-                        FontSize="18"
-                        FontAttributes="Bold">
-                    </Entry>
-                    <Label Text="Show password" Margin="0,0,26,0" TextColor="#6D7278" FontSize="14"  VerticalOptions="Center" HorizontalOptions="End">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="ShowHidePassword"></TapGestureRecognizer>
-                        </Label.GestureRecognizers>
-                    </Label>
-                </Grid>
-                <Button
-                    x:Name="logInButton"
-                    Margin="50,20,50,0"
-                    Text="Login"
+                <Label Text="Show password" Margin="0,0,26,0" TextColor="#6D7278" FontSize="14"  VerticalOptions="Center" HorizontalOptions="End">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="ShowHidePassword"></TapGestureRecognizer>
+                    </Label.GestureRecognizers>
+                </Label>
+               
+            </Grid>
+                 <Button
+                    Margin="50,10,50,0"
+                    Text="Update password"
                     FontSize="20"
                     FontAttributes="Bold"
                     TextColor="White"
                     BackgroundColor="#FF8500"
-                    Clicked="DirectLogInClick">
+                    Clicked="UpdatePassword">
                 </Button>
-                <Label
-                    Text="Reset password"
-                    TextColor="#6D7278"
-                    FontSize="14"
-                    FontAttributes="Bold"
-                    HorizontalOptions="Center"
-                    Margin="0,20,0,20">
-                </Label>
-                <Label
-                    Text="Or login with"
-                    TextColor="#136D74"
-                    FontSize="24"
-                    FontAttributes="Bold"
-                    HorizontalOptions="Center"
-                    Margin="0,0,0,20">
-                </Label>
-                <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand">
-                    <StackLayout >
-                        <ImageButton
-                            HeightRequest="40"
-                            Source="facebookIcon.png"
-                            BackgroundColor="Transparent"
-                            Clicked="FacebookLogInClick">
-                        </ImageButton>
-                    </StackLayout>
-                    <StackLayout Margin="50,0,50,0">
-                        <ImageButton
-                            HeightRequest="40"
-                            Source="googleIcon.png"
-                            BackgroundColor="Transparent"
-                            Clicked="GoogleLogInClick">
-                        </ImageButton>
-                    </StackLayout>
-                    <StackLayout>
-                        <ImageButton
-                            HeightRequest="40"
-                            x:Name="appleLogInButton"
-                            Source="appleIcon.png"
-                            BackgroundColor="Transparent"
-                            Clicked="AppleLogInClick"
-                            Command = "{Binding SignInWithAppleCommand}">
-                        </ImageButton>
-                    </StackLayout>
-                </StackLayout>
-            </StackLayout>-->
+            </StackLayout>
         </StackLayout>
        </ScrollView>
             </StackLayout>

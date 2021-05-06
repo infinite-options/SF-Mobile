@@ -12,7 +12,7 @@ using Xamarin.Forms;
 using ServingFresh.Models;
 using System.Diagnostics;
 using System.Collections.Generic;
-
+using static ServingFresh.Views.LogInPage;
 namespace ServingFresh.LogIn.Apple
 {
     public class Info
@@ -85,7 +85,11 @@ namespace ServingFresh.LogIn.Apple
                     if (Application.Current.Properties.ContainsKey(account.UserId.ToString()))
                     {
                         account.Email = (string)Application.Current.Properties[account.UserId.ToString()];
-                        Application.Current.MainPage = new SelectionPage("", "", null, account, "APPLE");
+                        //Application.Current.MainPage = new SelectionPage("", "", null, account, "APPLE");
+                        var root = (LogInPage)Application.Current.MainPage;
+                        root.AppleLogIn("", "", null, account, "APPLE");
+
+
                         //AppleUserProfileAsync(account.UserId, account.Token, (string)Application.Current.Properties[account.UserId.ToString()], account.Name);
                     }
                     else
@@ -108,7 +112,9 @@ namespace ServingFresh.LogIn.Apple
                             var data = JsonConvert.DeserializeObject<AppleUser>(responseContent);
                             Application.Current.Properties[account.UserId.ToString()] = data.result[0].customer_email;
                             account.Email = (string)Application.Current.Properties[account.UserId.ToString()];
-                            Application.Current.MainPage = new SelectionPage("", "", null, account, "APPLE");
+                            var root = (LogInPage)Application.Current.MainPage;
+                            root.AppleLogIn("", "", null, account, "APPLE");
+                            //Application.Current.MainPage = new SelectionPage("", "", null, account, "APPLE");
                             //AppleUserProfileAsync(account.UserId, account.Token, (string)Application.Current.Properties[account.UserId.ToString()], account.Name);
                         }
                         else

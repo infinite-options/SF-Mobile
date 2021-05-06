@@ -226,7 +226,7 @@ namespace ServingFresh.Models
                 var contentString = await endpointCall.Content.ReadAsStringAsync();
                 var data = JsonConvert.DeserializeObject<ServingFreshBusiness>(contentString);
                 Debug.WriteLine("PRODUCE BY LOCATION ENDPOINT CONTENT: " + contentString);
-                if (contentString.Contains("280") && data.result.Count != 0)
+                if (data.result.Count != 0)
                 {
 
                     if (zone == data.business_details[0].zone)
