@@ -22,6 +22,7 @@ namespace ServingFresh.Models
         private string deviceID;
         private DateTime sessionTime;
         private string uspsDVPType;
+        private string socialMediaImage;
 
 
         public User()
@@ -43,6 +44,7 @@ namespace ServingFresh.Models
             deviceID = "";
             sessionTime = new DateTime();
             uspsDVPType = "";
+            socialMediaImage = "";
         }
 
         public void setUserFromProfile(UserProfile profile)
@@ -149,6 +151,11 @@ namespace ServingFresh.Models
             return sessionTime;
         }
 
+        public string getUserImage()
+        {
+            return socialMediaImage;
+        }
+
         public void setUserType(string userType)
         {
             this.userType = userType;
@@ -249,6 +256,11 @@ namespace ServingFresh.Models
             this.uspsDVPType = uspsDVPType;
         }
 
+        public void setUserImage(string socialMediaImage)
+        {
+            this.socialMediaImage = socialMediaImage;
+        }
+
         public void printUser()
         {
             Debug.WriteLine("userType: " + userType);
@@ -268,6 +280,7 @@ namespace ServingFresh.Models
             Debug.WriteLine("deviceID: " + deviceID);
             Debug.WriteLine("sessionTime: " + sessionTime);
             Debug.WriteLine("uspsDVPType: " + uspsDVPType);
+            Debug.WriteLine("userImage: " + socialMediaImage);
         }
     }
 }

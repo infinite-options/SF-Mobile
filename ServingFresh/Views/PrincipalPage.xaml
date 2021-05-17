@@ -52,7 +52,7 @@
                                 RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
                                 RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
                                 <Label Margin="0,15,0,15" Text="Local produce delivered to your doorstep" TextColor="White" FontSize="18" HorizontalTextAlignment="Center" FontAttributes="Bold"></Label>
-                                <Frame WidthRequest="287" HorizontalOptions="Center" HeightRequest="40" Padding="0" BorderColor="#136D74" HasShadow="False">
+                                <Frame WidthRequest="287" HorizontalOptions="Center" HeightRequest="45" Padding="0" BorderColor="#136D74" HasShadow="False">
                                     <Grid ColumnSpacing="0">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="34"></ColumnDefinition>
@@ -60,8 +60,8 @@
                                             <ColumnDefinition Width="34"></ColumnDefinition>
                                         </Grid.ColumnDefinitions>
                                         <Image Grid.Column="0" Margin="3" Source="locationIcon.png" BackgroundColor="White"></Image>
-                                        <Frame Padding="0" Grid.Column="1" HasShadow="False" BorderColor="White">
-                                             <Entry HeightRequest="40" x:Name="AddressEntry" FontSize="14" HorizontalTextAlignment="Center" Placeholder="Search for your address" PlaceholderColor="Gray"  Keyboard="Text" TextColor="Black" TextChanged="OnAddressChanged" Focused="addressEntryFocused" Unfocused="addressEntryUnfocused"/>
+                                        <Frame Padding="0" Grid.Column="1" HasShadow="False" BorderColor="White" VerticalOptions="CenterAndExpand">
+                                             <Entry HeightRequest="35" x:Name="AddressEntry" FontSize="14" HorizontalTextAlignment="Center" Placeholder="Search for your address" PlaceholderColor="Gray"  Keyboard="Text" TextColor="Black" TextChanged="OnAddressChanged" Focused="addressEntryFocused" Unfocused="addressEntryUnfocused"/>
                                         </Frame>
                                     </Grid>
                                 </Frame>
@@ -110,13 +110,13 @@
                                     Margin="20,20,0,0"
                                     Grid.Column="0"
                                     VerticalOptions="Start">
-                                    <ImageButton Scale="0.9" Source="loginLeafIcon.png" Clicked="NavigateToLogIn" ></ImageButton>
+                                    <ImageButton Scale="0.9" Source="loginLeafIcon.png" Clicked="NavigateToLogIn" BackgroundColor="Transparent" ></ImageButton>
                                 </StackLayout>
                                 <StackLayout
                                     Margin="0,0,25,20"
                                     Grid.Column="1"
                                     VerticalOptions="End">
-                                    <ImageButton Source="signUpLeafIcon.png" Clicked="NavigateToSignUp"></ImageButton>
+                                    <ImageButton Source="signUpLeafIcon.png" Clicked="NavigateToSignUp" BackgroundColor="Transparent"></ImageButton>
                                 </StackLayout>
                             </Grid>
                         </RelativeLayout>

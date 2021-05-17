@@ -175,12 +175,15 @@ namespace ServingFresh.Models
 
                     socialLogInPost.email = googleData.email;
                     socialLogInPost.social_id = googleData.id;
+                    Debug.WriteLine("IMAGE: " + googleData.picture);
+                    user.setUserImage(googleData.picture);
                 }
                 else if (platform == "FACEBOOK")
                 {
                     var facebookResponse = client.GetStringAsync(Constant.FacebookUserInfoUrl + accessToken);
                     var facebookUserData = facebookResponse.Result;
 
+                    Debug.WriteLine("FACEBOOK DATA: " + facebookUserData);
                     facebookData = JsonConvert.DeserializeObject<FacebookResponse>(facebookUserData);
 
                     socialLogInPost.email = facebookData.email;

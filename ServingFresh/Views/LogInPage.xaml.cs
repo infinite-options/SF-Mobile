@@ -22,7 +22,8 @@ namespace ServingFresh.Views
 {
     public partial class LogInPage : ContentPage
     {
-        public static string direction = "";
+        public string direction = "";
+        public Page realod = null;
         public event EventHandler SignIn;
         public bool createAccount = false;
         INotifications appleNotification = DependencyService.Get<INotifications>();
@@ -40,11 +41,7 @@ namespace ServingFresh.Views
                 Console.WriteLine("guid: " + Preferences.Get("guid", null));
                 appleLogInButton.IsEnabled = false;
             }
-            else
-            {
-                InitializedAppleLogin();
-                appleNotification.IsNotifications();
-            }
+
 
             if (Device.RuntimePlatform == Device.iOS)
             {
@@ -63,18 +60,16 @@ namespace ServingFresh.Views
             InitializeComponent();
             BackgroundColor = Color.FromHex("AB000000");
             logInFrame.Margin = new Thickness(0, height, 0, 0);
-            LogInPage.direction = direction;
+            this.direction = direction;
+            //realod = toload;
+
             if (Device.RuntimePlatform == Device.Android)
             {
                 System.Diagnostics.Debug.WriteLine("Running on Android: Line 32");
                 Console.WriteLine("guid: " + Preferences.Get("guid", null));
                 appleLogInButton.IsEnabled = false;
             }
-            else
-            {
-                InitializedAppleLogin();
-                appleNotification.IsNotifications();
-            }
+
 
             if (Device.RuntimePlatform == Device.iOS)
             {
@@ -95,13 +90,6 @@ namespace ServingFresh.Views
             await DisplayAlert(title, message, "OK");
         }
 
-
-        public void InitializedAppleLogin()
-        {
-            var vm = new LoginViewModel();
-            vm.AppleError += AppleError;
-            BindingContext = vm;
-        }
 
         public async void AddMessage(string body)
         {
@@ -393,7 +381,7 @@ namespace ServingFresh.Views
         public async void AppleLogIn(string accessToken = "", string refreshToken = "", AuthenticatorCompletedEventArgs googleAccount = null, AppleAccount appleCredentials = null, string platform = "")
         {
             var client = new SignIn();
-            UserDialogs.Instance.ShowLoading("Retring your SF account...");
+            UserDialogs.Instance.ShowLoading("Retrieving your SF account...");
             var status = await client.VerifyUserCredentials(accessToken, refreshToken, googleAccount, appleCredentials, platform);
             RedirectUserBasedOnVerification(status, direction);
         }
@@ -404,14 +392,26 @@ namespace ServingFresh.Views
             {
                 UserDialogs.Instance.HideLoading();
                 await Application.Current.MainPage.DisplayAlert("Great!", "You have successfully loged in!", "OK");
+
+                Debug.WriteLine("DIRECTION VALUE: " + direction);
                 if (direction == "")
                 {
                     Application.Current.MainPage = new SelectionPage();
                 }
                 else
                 {
+                    Dictionary<string, Page> array = new Dictionary<string, Page>();
+                    array.Add("ServingFresh.Views.CheckoutPage", new CheckoutPage());
+                    array.Add("ServingFresh.Views.SelectionPage", new SelectionPage());
+                    array.Add("ServingFresh.Views.HistoryPage", new HistoryPage());
+                    array.Add("ServingFresh.Views.RefundPage", new RefundPage());
+                    array.Add("ServingFresh.Views.ProfilePage", new ProfilePage());
+                    array.Add("ServingFresh.Views.ConfirmationPage", new ConfirmationPage());
+                    array.Add("ServingFresh.Views.InfoPage", new InfoPage());
+
                     var root = Application.Current.MainPage;
-                    Application.Current.MainPage = root;
+                    Debug.WriteLine("ROOT VALUE: " + root);
+                    Application.Current.MainPage = array[root.ToString()];
                 }
                 
             }
@@ -506,7 +506,7 @@ namespace ServingFresh.Views
                 try
                 {
                     var client = new SignIn();
-                    UserDialogs.Instance.ShowLoading("Retring your SF account...");
+                    UserDialogs.Instance.ShowLoading("Retrieving your SF account...");
                     var status = await client.VerifyUserCredentials(e.Account.Properties["access_token"], e.Account.Properties["refresh_token"], e, null, "GOOGLE");
                     RedirectUserBasedOnVerification(status, direction);
                 }
@@ -539,7 +539,10 @@ namespace ServingFresh.Views
 
         public void AppleLogInClick(System.Object sender, System.EventArgs e)
         {
-            OnAppleSignInRequest();
+            if (Device.RuntimePlatform != Device.Android)
+            {
+                OnAppleSignInRequest();
+            }
         }
 
         public void InvokeSignInEvent(object sender, EventArgs e)
@@ -586,7 +589,7 @@ namespace ServingFresh.Views
                         //root.AppleLogIn("", "", null, account, "APPLE");
 
                         var client = new SignIn();
-                        UserDialogs.Instance.ShowLoading("Retring your SF account...");
+                        UserDialogs.Instance.ShowLoading("Retrieving your SF account...");
                         var status = await client.VerifyUserCredentials("", "", null, account, "APPLE");
                         RedirectUserBasedOnVerification(status, direction);
                         //AppleUserProfileAsync(account.UserId, account.Token, (string)Application.Current.Properties[account.UserId.ToString()], account.Name);
@@ -616,7 +619,7 @@ namespace ServingFresh.Views
                             //Application.Current.MainPage = new SelectionPage("", "", null, account, "APPLE");
                             //AppleUserProfileAsync(account.UserId, account.Token, (string)Application.Current.Properties[account.UserId.ToString()], account.Name);
                             var client1 = new SignIn();
-                            UserDialogs.Instance.ShowLoading("Retring your SF account...");
+                            UserDialogs.Instance.ShowLoading("Retrieving your SF account...");
                             var status = await client1.VerifyUserCredentials("", "", null, account, "APPLE");
                             RedirectUserBasedOnVerification(status, direction);
                         }

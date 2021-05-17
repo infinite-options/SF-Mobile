@@ -60,6 +60,7 @@
     <MtouchLink>None</MtouchLink>
     <MtouchInterpreter>-all</MtouchInterpreter>
     <CodesignProvision>VS: com.servingfresh Development</CodesignProvision>
+    <MtouchSdkVersion>14.5</MtouchSdkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>none</DebugType>
@@ -228,6 +229,9 @@
     <BundleResource Include="Resources\ambassadorIcon.png" />
     <BundleResource Include="Resources\giftCardIcon.png" />
     <BundleResource Include="Resources\closeMenuIcon.png" />
+    <BundleResource Include="Resources\signedGoogleIcon.png" />
+    <BundleResource Include="Resources\signedFacebookIcon.png" />
+    <BundleResource Include="Resources\signedAppleIcon.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AppleSignIn\" />

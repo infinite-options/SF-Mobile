@@ -68,7 +68,7 @@ namespace ServingFresh.Views
         public static void NavigateToSignIn(System.Object sender, System.EventArgs e)
         {
             Application.Current.MainPage.Navigation.PopModalAsync();
-            Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(94, "1"), true);
+            Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(94, null), true);
         }
 
         public static void NavigateToSignUp(System.Object sender, System.EventArgs e)
@@ -101,6 +101,7 @@ namespace ServingFresh.Views
             user.setUserPlatform("");
             user.setUserDeviceID("");
             user.setUserSessionTime(new DateTime());
+            user.setUserImage("");
         }
 
         void NavigateToMainFromSelection(System.Object sender, System.EventArgs e)

@@ -132,7 +132,7 @@ namespace ServingFresh.Views
                 guestPaymentsView.HeightRequest = 0;
             }
         }
-
+        
         public CheckoutPage()
         {
             InitializeComponent();
@@ -338,17 +338,19 @@ namespace ServingFresh.Views
                     //Debug.WriteLine("COUPON IDS: " + c.coupon_uid);
                     coupon.couponId = c.coupon_uid;
                     // INITIALLY, THE IMAGE OF EVERY COUPON IS GRAY. (PLATFORM DEPENDENT)
-                    if (Device.RuntimePlatform == Device.Android)
-                    {
-                        coupon.image = "CouponIconGray.png";
-                    }
-                    else
-                    {
-                        coupon.image = "nonEligibleCoupon.png";
-                    }
+                    //if (Device.RuntimePlatform == Device.Android)
+                    //{
+                    //    coupon.image = "CouponIconGray.png";
+                    //}
+                    //else
+                    //{
+                    //    coupon.image = "nonEligibleCoupon.png";
+                    //}
+
+                    coupon.image = "nonEligibleCoupon.png";
 
                     // SET TITLE LABEL OF COUPON
-                    if(c.coupon_title != null)
+                    if (c.coupon_title != null)
                     {
                         coupon.title = (string)c.coupon_title;
                     }
@@ -755,17 +757,19 @@ namespace ServingFresh.Views
 
                     coupon.couponId = c.coupon_uid;
                     // INITIALLY, THE IMAGE OF EVERY COUPON IS GRAY. (PLATFORM DEPENDENT)
-                    if (Device.RuntimePlatform == Device.Android)
-                    {
-                        coupon.image = "CouponIconGray.png";
-                    }
-                    else
-                    {
-                        coupon.image = "nonEligibleCoupon.png";
-                    }
+                    //if (Device.RuntimePlatform == Device.Android)
+                    //{
+                    //    coupon.image = "CouponIconGray.png";
+                    //}
+                    //else
+                    //{
+                    //    coupon.image = "nonEligibleCoupon.png";
+                    //}
 
-                    // SET TITLE LABEL OF COUPON
-                    coupon.couponNote = c.notes;
+                coupon.image = "nonEligibleCoupon.png";
+
+                // SET TITLE LABEL OF COUPON
+                coupon.couponNote = c.notes;
                     // SET THRESHOLD LABEL BASED ON THRESHOLD VALUE: 0 = NO MINIMUM PURCHASE, GREATER THAN 0 = SPEND THE AMOUNT OF THRESHOLD
                     if ((double)c.threshold == 0)
                     {

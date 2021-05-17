@@ -83,25 +83,64 @@ namespace ServingFresh.Views
         public ProfilePage()
         {
             InitializeComponent();
-            SelectionPage.SetMenu(guestMenuSection, customerMenuSection, historyLabel, profileLabel);
+            //SelectionPage.SetMenu(guestMenuSection, customerMenuSection, historyLabel, profileLabel);
             CartTotal.Text = order.Count.ToString();
             userEmailAddress.Text = user.getUserEmail();
             userEmailAddress.TextColor = Color.Black;
             userFirstName.Text = user.getUserFirstName();
             userLastName.Text = user.getUserLastName();
-            if(user.getUserPlatform() != "DIRECT")
+            if(user.getUserPlatform() == "DIRECT")
             {
-                passwordCredentials.HeightRequest = 0;
-            }
+                var firstNameInitial = user.getUserFirstName() != null && user.getUserFirstName().Length >= 1 ? user.getUserFirstName().Substring(0, 1) : "";
+                var lastNameInitial = user.getUserLastName() != null && user.getUserLastName().Length >= 1 ? user.getUserLastName().Substring(0, 1) : "";
 
-            if (user.getUserDeviceID() != "")
-            {
-                notificationButton.IsToggled = true;
+                userInitials.Text = firstNameInitial + lastNameInitial;
+                directUserReset.IsVisible = true;
+                userInitialsCircle.IsVisible = true;
             }
             else
             {
-                notificationButton.IsToggled = false;
+                //Debug.WriteLine("IMAGE @ PROFILE: " + user.getUserImage());
+                socialUserSignedIcon.IsVisible = true;
+
+                if (user.getUserImage() == "")
+                {
+                    userInitialsCircle.IsVisible = true;
+                    var firstNameInitial = user.getUserFirstName() != null && user.getUserFirstName().Length >= 1 ? user.getUserFirstName().Substring(0, 1) : "";
+                    var lastNameInitial = user.getUserLastName() != null && user.getUserLastName().Length >= 1 ? user.getUserLastName().Substring(0, 1) : "";
+
+                    userInitials.Text = firstNameInitial + lastNameInitial;
+                }
+                else
+                {
+                    userImageCircle.IsVisible = true;
+                    imageUser.Source = user.getUserImage();
+                }
+
+                if(user.getUserPlatform()== "GOOGLE")
+                {
+                    signedIcon.Source = "signedGoogleIcon";
+                }
+                else if(user.getUserPlatform() == "FACEBOOK")
+                {
+                    signedIcon.Source = "signedFacebookIcon";
+                }
+                else if (user.getUserPlatform() == "APPLE")
+                {
+                    signedIcon.Source = "signedAppleIcon";
+                }
+                
+                //passwordCredentials.HeightRequest = 0;
             }
+
+            //if (user.getUserDeviceID() != "")
+            //{
+            //    notificationButton.IsToggled = true;
+            //}
+            //else
+            //{
+            //    notificationButton.IsToggled = false;
+            //}
             userAddress.TextChanged -= signUpAddress1Entry_TextChanged;
             userAddress.Text = user.getUserAddress();
             userAddress.TextChanged += signUpAddress1Entry_TextChanged;
@@ -127,6 +166,11 @@ namespace ServingFresh.Views
 
         void SaveChangesClick(System.Object sender, System.EventArgs e)
         {
+            if (!(String.IsNullOrEmpty(userPassword.Text) && String.IsNullOrEmpty(userConfirmPassword.Text)))
+            {
+                UpdatePasswordClick(sender, e);
+            }
+
             ValidateAddressClick(sender,e);
         }
 
@@ -455,6 +499,18 @@ namespace ServingFresh.Views
         void NavigateToRefundsFromProfile(System.Object sender, System.EventArgs e)
         {
             NavigateToRefunds(sender, e);
+        }
+
+        void TapGestureRecognizer_Tapped(System.Object sender, System.EventArgs e)
+        {
+            if (passwordCredentials.IsVisible)
+            {
+                passwordCredentials.IsVisible = false;
+            }
+            else
+            {
+                passwordCredentials.IsVisible = true;
+            }
         }
     }
 }

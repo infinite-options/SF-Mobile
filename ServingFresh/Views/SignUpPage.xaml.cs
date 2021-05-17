@@ -159,7 +159,18 @@ namespace ServingFresh.Views
                                             Application.Current.MainPage = new SelectionPage();
                                         }else if (direction != "")
                                         {
-                                            await Application.Current.MainPage.Navigation.PopModalAsync();
+                                            Dictionary<string, Page> array = new Dictionary<string, Page>();
+                                            array.Add("ServingFresh.Views.CheckoutPage", new CheckoutPage());
+                                            array.Add("ServingFresh.Views.SelectionPage", new SelectionPage());
+                                            array.Add("ServingFresh.Views.HistoryPage", new HistoryPage());
+                                            array.Add("ServingFresh.Views.RefundPage", new RefundPage());
+                                            array.Add("ServingFresh.Views.ProfilePage", new ProfilePage());
+                                            array.Add("ServingFresh.Views.ConfirmationPage", new ConfirmationPage());
+                                            array.Add("ServingFresh.Views.InfoPage", new InfoPage());
+
+                                            var root = Application.Current.MainPage;
+                                            Debug.WriteLine("ROOT VALUE: " + root);
+                                            Application.Current.MainPage = array[root.ToString()];
                                         }
                                         user.printUser();
                                     }
@@ -191,7 +202,18 @@ namespace ServingFresh.Views
                                 }
                                 else if (direction != "")
                                 {
-                                    await Application.Current.MainPage.Navigation.PopModalAsync();
+                                    Dictionary<string, Page> array = new Dictionary<string, Page>();
+                                    array.Add("ServingFresh.Views.CheckoutPage", new CheckoutPage());
+                                    array.Add("ServingFresh.Views.SelectionPage", new SelectionPage());
+                                    array.Add("ServingFresh.Views.HistoryPage", new HistoryPage());
+                                    array.Add("ServingFresh.Views.RefundPage", new RefundPage());
+                                    array.Add("ServingFresh.Views.ProfilePage", new ProfilePage());
+                                    array.Add("ServingFresh.Views.ConfirmationPage", new ConfirmationPage());
+                                    array.Add("ServingFresh.Views.InfoPage", new InfoPage());
+
+                                    var root = Application.Current.MainPage;
+                                    Debug.WriteLine("ROOT VALUE: " + root);
+                                    Application.Current.MainPage = array[root.ToString()];
                                 }
                                 
                             }
@@ -266,7 +288,7 @@ namespace ServingFresh.Views
                     user.setUserEmail(facebookUser.email);
                     user.setUserFirstName(newUserFirstName.Text);
                     user.setUserLastName(newUserLastName.Text);
-
+                    
                     var profile = await clientLogIn.ValidateExistingAccountFromEmail(facebookUser.email);
 
                     if (profile != null)
@@ -290,7 +312,18 @@ namespace ServingFresh.Views
                                     }
                                     else if (direction != "")
                                     {
-                                        await Application.Current.MainPage.Navigation.PopModalAsync();
+                                        Dictionary<string, Page> array = new Dictionary<string, Page>();
+                                        array.Add("ServingFresh.Views.CheckoutPage", new CheckoutPage());
+                                        array.Add("ServingFresh.Views.SelectionPage", new SelectionPage());
+                                        array.Add("ServingFresh.Views.HistoryPage", new HistoryPage());
+                                        array.Add("ServingFresh.Views.RefundPage", new RefundPage());
+                                        array.Add("ServingFresh.Views.ProfilePage", new ProfilePage());
+                                        array.Add("ServingFresh.Views.ConfirmationPage", new ConfirmationPage());
+                                        array.Add("ServingFresh.Views.InfoPage", new InfoPage());
+
+                                        var root = Application.Current.MainPage;
+                                        Debug.WriteLine("ROOT VALUE: " + root);
+                                        Application.Current.MainPage = array[root.ToString()];
                                     }
                                 }
                                 else
@@ -318,13 +351,63 @@ namespace ServingFresh.Views
                                 }
                                 else if (direction != "")
                                 {
-                                    await Application.Current.MainPage.Navigation.PopModalAsync();
+                                    Dictionary<string, Page> array = new Dictionary<string, Page>();
+                                    array.Add("ServingFresh.Views.CheckoutPage", new CheckoutPage());
+                                    array.Add("ServingFresh.Views.SelectionPage", new SelectionPage());
+                                    array.Add("ServingFresh.Views.HistoryPage", new HistoryPage());
+                                    array.Add("ServingFresh.Views.RefundPage", new RefundPage());
+                                    array.Add("ServingFresh.Views.ProfilePage", new ProfilePage());
+                                    array.Add("ServingFresh.Views.ConfirmationPage", new ConfirmationPage());
+                                    array.Add("ServingFresh.Views.InfoPage", new InfoPage());
+
+                                    var root = Application.Current.MainPage;
+                                    Debug.WriteLine("ROOT VALUE: " + root);
+                                    Application.Current.MainPage = array[root.ToString()];
                                 }
                             }
                             else if (signUpStatus != "" && signUpStatus == "USER ALREADY EXIST")
                             {
                                 await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
                             }
+                        }
+                    }
+                    else
+                    {
+                        user.setUserDeviceID(Preferences.Get("guid", ""));
+
+                        var content = clientSignUp.SignUpSocialUser(user, e.Account.Properties["access_token"], "", facebookUser.id, facebookUser.email, "FACEBOOK");
+                        var signUpStatus = await SignUp.SignUpNewUser(content);
+
+                        if (signUpStatus != "" && signUpStatus != "USER ALREADY EXIST")
+                        {
+                            user.setUserID(signUpStatus);
+                            user.setUserPlatform("FACEBOOK");
+                            user.setUserType("CUSTOMER");
+                            user.printUser();
+                            clientSignUp.WriteDeviceID(user);
+                            if (direction == "")
+                            {
+                                Application.Current.MainPage = new SelectionPage();
+                            }
+                            else if (direction != "")
+                            {
+                                Dictionary<string, Page> array = new Dictionary<string, Page>();
+                                array.Add("ServingFresh.Views.CheckoutPage", new CheckoutPage());
+                                array.Add("ServingFresh.Views.SelectionPage", new SelectionPage());
+                                array.Add("ServingFresh.Views.HistoryPage", new HistoryPage());
+                                array.Add("ServingFresh.Views.RefundPage", new RefundPage());
+                                array.Add("ServingFresh.Views.ProfilePage", new ProfilePage());
+                                array.Add("ServingFresh.Views.ConfirmationPage", new ConfirmationPage());
+                                array.Add("ServingFresh.Views.InfoPage", new InfoPage());
+
+                                var root = Application.Current.MainPage;
+                                Debug.WriteLine("ROOT VALUE: " + root);
+                                Application.Current.MainPage = array[root.ToString()];
+                            }
+                        }
+                        else if (signUpStatus != "" && signUpStatus == "USER ALREADY EXIST")
+                        {
+                            await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
                         }
                     }
                 }
@@ -334,8 +417,6 @@ namespace ServingFresh.Views
                 }
             }
         }
-
-
 
         private async void GoogleAuthetication(object sender, AuthenticatorCompletedEventArgs e)
         {
@@ -358,7 +439,7 @@ namespace ServingFresh.Views
                     user.setUserEmail(googleUser.email);
                     user.setUserFirstName(newUserFirstName.Text);
                     user.setUserLastName(newUserLastName.Text);
-
+                    user.setUserImage(googleUser.picture);
                     var profile = await clientLogIn.ValidateExistingAccountFromEmail(googleUser.email);
 
                     if (profile != null)
@@ -382,7 +463,18 @@ namespace ServingFresh.Views
                                     }
                                     else if (direction != "")
                                     {
-                                        await Application.Current.MainPage.Navigation.PopModalAsync();
+                                        Dictionary<string, Page> array = new Dictionary<string, Page>();
+                                        array.Add("ServingFresh.Views.CheckoutPage", new CheckoutPage());
+                                        array.Add("ServingFresh.Views.SelectionPage", new SelectionPage());
+                                        array.Add("ServingFresh.Views.HistoryPage", new HistoryPage());
+                                        array.Add("ServingFresh.Views.RefundPage", new RefundPage());
+                                        array.Add("ServingFresh.Views.ProfilePage", new ProfilePage());
+                                        array.Add("ServingFresh.Views.ConfirmationPage", new ConfirmationPage());
+                                        array.Add("ServingFresh.Views.InfoPage", new InfoPage());
+
+                                        var root = Application.Current.MainPage;
+                                        Debug.WriteLine("ROOT VALUE: " + root);
+                                        Application.Current.MainPage = array[root.ToString()];
                                     }
                                 }
                                 else
@@ -410,7 +502,18 @@ namespace ServingFresh.Views
                                 }
                                 else if (direction != "")
                                 {
-                                    await Application.Current.MainPage.Navigation.PopModalAsync();
+                                    Dictionary<string, Page> array = new Dictionary<string, Page>();
+                                    array.Add("ServingFresh.Views.CheckoutPage", new CheckoutPage());
+                                    array.Add("ServingFresh.Views.SelectionPage", new SelectionPage());
+                                    array.Add("ServingFresh.Views.HistoryPage", new HistoryPage());
+                                    array.Add("ServingFresh.Views.RefundPage", new RefundPage());
+                                    array.Add("ServingFresh.Views.ProfilePage", new ProfilePage());
+                                    array.Add("ServingFresh.Views.ConfirmationPage", new ConfirmationPage());
+                                    array.Add("ServingFresh.Views.InfoPage", new InfoPage());
+
+                                    var root = Application.Current.MainPage;
+                                    Debug.WriteLine("ROOT VALUE: " + root);
+                                    Application.Current.MainPage = array[root.ToString()];
                                 }
                             }
                             else if (signUpStatus != "" && signUpStatus == "USER ALREADY EXIST")
@@ -419,6 +522,45 @@ namespace ServingFresh.Views
                             }
                         }
                     }
+                    else
+                    {
+                        user.setUserDeviceID(Preferences.Get("guid", ""));
+                        var content = clientSignUp.SignUpSocialUser(user, e.Account.Properties["access_token"], e.Account.Properties["refresh_token"], googleUser.id, googleUser.email, "GOOGLE");
+                        var signUpStatus = await SignUp.SignUpNewUser(content);
+
+                        if (signUpStatus != "" && signUpStatus != "USER ALREADY EXIST")
+                        {
+                            user.setUserID(signUpStatus);
+                            user.setUserPlatform("GOOGLE");
+                            user.setUserType("CUSTOMER");
+                            user.printUser();
+                            clientSignUp.WriteDeviceID(user);
+                            if (direction == "")
+                            {
+                                Application.Current.MainPage = new SelectionPage();
+                            }
+                            else if (direction != "")
+                            {
+                                Dictionary<string, Page> array = new Dictionary<string, Page>();
+                                array.Add("ServingFresh.Views.CheckoutPage", new CheckoutPage());
+                                array.Add("ServingFresh.Views.SelectionPage", new SelectionPage());
+                                array.Add("ServingFresh.Views.HistoryPage", new HistoryPage());
+                                array.Add("ServingFresh.Views.RefundPage", new RefundPage());
+                                array.Add("ServingFresh.Views.ProfilePage", new ProfilePage());
+                                array.Add("ServingFresh.Views.ConfirmationPage", new ConfirmationPage());
+                                array.Add("ServingFresh.Views.InfoPage", new InfoPage());
+
+                                var root = Application.Current.MainPage;
+                                Debug.WriteLine("ROOT VALUE: " + root);
+                                Application.Current.MainPage = array[root.ToString()];
+                            }
+                        }
+                        else if (signUpStatus != "" && signUpStatus == "USER ALREADY EXIST")
+                        {
+                            await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
+                        }
+                    }
+
                 }
                 catch (Exception g)
                 {
@@ -439,7 +581,10 @@ namespace ServingFresh.Views
         public event EventHandler SignIn;
         void appleLogInButton_Clicked(System.Object sender, System.EventArgs e)
         {
-            OnAppleSignInRequest();
+            if (Device.RuntimePlatform != Device.Android)
+            {
+                OnAppleSignInRequest();
+            }
         }
 
         public void InvokeSignInEvent(object sender, EventArgs e)
@@ -490,9 +635,20 @@ namespace ServingFresh.Views
                         {
                             Application.Current.MainPage = new SelectionPage();
                         }
-                        else if (direction != "")
+                        else
                         {
-                            await Application.Current.MainPage.Navigation.PopModalAsync();
+                            Dictionary<string, Page> array = new Dictionary<string, Page>();
+                            array.Add("ServingFresh.Views.CheckoutPage", new CheckoutPage());
+                            array.Add("ServingFresh.Views.SelectionPage", new SelectionPage());
+                            array.Add("ServingFresh.Views.HistoryPage", new HistoryPage());
+                            array.Add("ServingFresh.Views.RefundPage", new RefundPage());
+                            array.Add("ServingFresh.Views.ProfilePage", new ProfilePage());
+                            array.Add("ServingFresh.Views.ConfirmationPage", new ConfirmationPage());
+                            array.Add("ServingFresh.Views.InfoPage", new InfoPage());
+
+                            var root = Application.Current.MainPage;
+                            Debug.WriteLine("ROOT VALUE: " + root);
+                            Application.Current.MainPage = array[root.ToString()];
                         }
                     }
                     else if (signUpStatus != "" && signUpStatus == "USER ALREADY EXIST")

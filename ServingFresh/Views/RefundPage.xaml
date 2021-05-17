@@ -19,7 +19,7 @@
                     <ColumnDefinition Width="100"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <StackLayout Grid.Column="0" Margin="0,40,0,0" Spacing="0">
-                     <ImageButton Source="menuIcon.png" Clicked="ShowMenuFromRefunds">
+                     <ImageButton Source="menuIcon.png" Clicked="ShowMenuFromRefunds" BackgroundColor="Transparent">
                          <ImageButton.Effects>
                             <servingfresh:TintImageEffect TintColor="White"/>
                          </ImageButton.Effects>
@@ -32,10 +32,16 @@
                     <RelativeLayout
                         RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}"
                         RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}">
-                        <Image Margin="0,20,0,0" Source="CartIcon.png" HeightRequest="40">
+                        <Image Source="CartIcon.png" HeightRequest="40">
                             <Image.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="NavigateToCartFromRefunds"></TapGestureRecognizer>
                             </Image.GestureRecognizers>
+                            <Image.Margin>
+                                <OnPlatform x:TypeArguments="Thickness">
+                                  <On Platform="iOS" Value="0,20,0,0" />
+                                  <On Platform="Android" Value="4,20,0,0" />
+                                </OnPlatform>
+                            </Image.Margin>
                         </Image>
                         <Frame Margin="30,20,0,0" HeightRequest="20" MinimumWidthRequest="20" CornerRadius="10"  Padding="0" HasShadow="False">
                             <Label x:Name="CartTotal" Margin="5,1,5,0" Text="0"  TextColor="#FF8500" FontSize="14" FontAttributes="Bold"></Label>

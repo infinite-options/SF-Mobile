@@ -19,7 +19,7 @@ namespace ServingFresh.Droid.Renderers
             {
                 var nativeEditText = (global::Android.Widget.EditText)Control;
                 var shape = new ShapeDrawable(new Android.Graphics.Drawables.Shapes.RectShape());
-                shape.Paint.Color = Xamarin.Forms.Color.White.ToAndroid();
+                shape.Paint.Color = Xamarin.Forms.Color.Black.ToAndroid();
                 shape.Paint.SetStyle(Paint.Style.Stroke);
                 nativeEditText.Background = shape;
             }
