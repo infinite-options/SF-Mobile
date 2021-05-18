@@ -8,11 +8,17 @@
     <ContentPage.Content>
       <Frame x:Name="signUpFrame" Margin="0,180,0,0" BackgroundColor="WhiteSmoke">
         <StackLayout>
-            <StackLayout HeightRequest="30" >
-                <ImageButton Padding="0,0,2,0" HeightRequest="30" Source="closeFrameIcon.png" HorizontalOptions="End" Clicked="CloseSignUpPage"></ImageButton>
-            </StackLayout>
-            <Label Margin="0,0,0,20" Text="Sign Up" TextColor="#136D74" FontSize="32" FontAttributes="Bold" TextDecorations="Underline" HorizontalTextAlignment="Center" ></Label>
-            <ScrollView>
+            <Grid HeightRequest="60">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="100"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="1" Margin="0,0,0,0" Text="Sign Up" TextColor="#136D74" FontSize="32" FontAttributes="Bold" TextDecorations="Underline" HorizontalTextAlignment="Center" ></Label>
+                <ImageButton Grid.Column="2" Padding="0,0,2,0" HeightRequest="30" Source="closeFrameIcon.png" HorizontalOptions="End" Clicked="CloseSignUpPage"></ImageButton>
+            </Grid>
+            
+            <ScrollView Margin="0,5,0,0">
                 <StackLayout>
                     <StackLayout>
                         <!--<Grid>
@@ -33,7 +39,7 @@
                     </StackLayout>
                     <BoxView Margin="0,0,0,13" HeightRequest="1" Color="#136D74"></BoxView>
                     <Label Margin="0,0,0,13" Text="Or continue with email" TextColor="Black" FontSize="19" HorizontalTextAlignment="Center" ></Label>
-                    <StackLayout Spacing="10" Margin="0,0,0,20">
+                    <StackLayout Spacing="5" Margin="0,0,0,20">
                         <Entry WidthRequest="372" HeightRequest="44" x:Name="newUserFirstName" Placeholder="First name (so we can address you)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
                         <Entry WidthRequest="372" HeightRequest="44" x:Name="newUserLastName" Placeholder="Last name (in case you want to be formal)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
                         <Entry WidthRequest="372" HeightRequest="44" Keyboard="Email" x:Name="newUserEmail1" Placeholder="Email address (for order confirmation)" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>

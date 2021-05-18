@@ -6,14 +6,20 @@
 <ContentPage.Content>
       <Frame Margin="0,180,0,0" BackgroundColor="WhiteSmoke">
         <StackLayout>
-            <StackLayout HeightRequest="30" >
-                <ImageButton Padding="0,0,2,0" HeightRequest="30" Source="closeFrameIcon.png" HorizontalOptions="End" Clicked="CloseSignUpPage"></ImageButton>
-            </StackLayout>
-            <Label Margin="0,0,0,20" Text="Sign up" TextColor="#136D74" FontSize="32" FontAttributes="Bold" TextDecorations="Underline" HorizontalTextAlignment="Center" ></Label>
-            <ScrollView>
+            <Grid HeightRequest="40" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="100"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="1" Margin="0,0,0,0" Text="Sign up" TextColor="#136D74" FontSize="32" FontAttributes="Bold" TextDecorations="Underline" HorizontalTextAlignment="Center" ></Label>
+                <ImageButton Grid.Column="2" Padding="0,0,2,0" HeightRequest="30" Source="closeFrameIcon.png" HorizontalOptions="End" Clicked="CloseSignUpPage"></ImageButton>
+            </Grid>
+            
+            <ScrollView Margin="0,10,0,0">
                 <StackLayout>
                     <StackLayout Spacing="10">
-                        <Label Margin="0,0,0,20" Text="Let’s first make sure we deliver to you."  TextColor="#000000" FontSize="18" HorizontalTextAlignment="Center"></Label>
+                        <!--<Label Margin="0,0,0,20" Text="Let’s first make sure we deliver to you."  TextColor="#000000" FontSize="18" HorizontalTextAlignment="Center"></Label>-->
                         <Entry HeightRequest="44" x:Name="firstName" Placeholder="First Name" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
                         <Entry HeightRequest="44" x:Name="lastName" Placeholder="Last Name" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
                         <StackLayout HeightRequest="150">

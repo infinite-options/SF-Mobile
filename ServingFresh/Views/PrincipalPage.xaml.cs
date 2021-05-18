@@ -188,7 +188,7 @@ namespace ServingFresh.Views
         void NavigateToLogIn(System.Object sender, System.EventArgs e)
         {
             bool animate = false;
-            scrollView.ScrollToAsync(0, 50, animate);
+            scrollView.ScrollToAsync(0, 5, animate);
             Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(),true);
             //logInRow.Height = this.Height - 200;
             //logInFrame.Margin = new Thickness(5, -this.Height + 400, 5, 0);
@@ -197,7 +197,7 @@ namespace ServingFresh.Views
         void NavigateToSignUp(System.Object sender, System.EventArgs e)
         {
             bool animate = false;
-            scrollView.ScrollToAsync(0, 50, animate);
+            scrollView.ScrollToAsync(0, 5, animate);
             Application.Current.MainPage.Navigation.PushModalAsync(new AddressPage(), true);
             //addressRow.Height = this.Height - 200;
             //addressFrameSignUp.Margin = new Thickness(5, -this.Height + 400, 5, 0);
@@ -491,6 +491,19 @@ namespace ServingFresh.Views
                 list.Add(itemToInsert);
             }
             return list;
+        }
+
+        async void BecomeAnAmbassador(System.Object sender, System.EventArgs e)
+        {
+            string action = await DisplayActionSheet("Love Serving Fresh?\n\nBecome an Ambassador\n\nGive 20, Get 20\n\nRefer a friend and both you and your friend get $10 off on your next two orders.", "Cancel", null, "Login", "Sign Up");
+            if (action == "Login")
+            {
+                await Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(94, "1"), true);
+            }
+            else if (action == "Sign Up")
+            {
+                NavigateToSignUp(sender,e);
+            }
         }
     }
 }

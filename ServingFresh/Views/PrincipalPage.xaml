@@ -5,22 +5,22 @@
             <StackLayout>
                 <Grid RowSpacing="0">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="320"></RowDefinition>
+                        <RowDefinition Height="225"></RowDefinition>
                         <RowDefinition Height="200"></RowDefinition>
                         <RowDefinition Height="210"></RowDefinition>
                         <RowDefinition Height="298"></RowDefinition>
                         <RowDefinition Height="223"></RowDefinition>
                     </Grid.RowDefinitions>
-                    <StackLayout Grid.Row="0" Margin="0,-20,0,0">
+                    <StackLayout Grid.Row="0" Margin="0,-25,0,0">
                         <RelativeLayout>
                             <Frame HasShadow="false"
                                 RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}"
                                 RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
                                 Padding="0">
-                                <Image Source="fruitsVegetablesImage.png" Aspect="AspectFill"></Image>
+                                <Image Margin="-30,-20,0,0" Source="fruitsVegetablesImage.png" Aspect="Fill"></Image>
                             </Frame>
                             <Grid
-                                Margin="0,-40,0,0"
+                                Margin="0,0,0,0"
                                 RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}"
                                 RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}">
                                 <Grid.ColumnDefinitions>
@@ -41,7 +41,7 @@
                             </Grid>
                         </RelativeLayout>
                     </StackLayout>
-                    <StackLayout Grid.Row="1" BackgroundColor="#FF8500" HeightRequest="200" VerticalOptions="CenterAndExpand">
+                    <StackLayout Grid.Row="1" Margin="0,0,0,0" BackgroundColor="#FF8500" HeightRequest="200" VerticalOptions="CenterAndExpand">
                         <StackLayout Margin="0,15,0,0" VerticalOptions="Center" HeightRequest="200">
                         <RelativeLayout
                             
@@ -165,7 +165,7 @@
                     <StackLayout Grid.Row="4" HeightRequest="223" Spacing="0">
                           <StackLayout VerticalOptions="CenterAndExpand">
                               <Button HeightRequest="46" WidthRequest="287" HorizontalOptions="Center" TextColor="white" Text="Buy a gift card" FontSize="Medium"  BackgroundColor="#136D74"></Button>
-                              <Button HeightRequest="46" WidthRequest="287" HorizontalOptions="Center"  TextColor="white" Text="Become an ambassador" FontSize="Medium"  BackgroundColor="#136D74"></Button>
+                              <Button HeightRequest="46" WidthRequest="287" HorizontalOptions="Center"  TextColor="white" Text="Become an ambassador" FontSize="Medium"  BackgroundColor="#136D74" Clicked="BecomeAnAmbassador"></Button>
                               <StackLayout Orientation="Horizontal" Spacing="20" HeightRequest="36" Margin="0,20,0,20"  HorizontalOptions="CenterAndExpand" VerticalOptions="End">
                                   <Image Source="facebookWhiteIcon"></Image>
                                   <Image Source="instagramIcon.png"></Image>

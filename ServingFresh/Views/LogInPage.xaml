@@ -3,20 +3,23 @@
     <ContentPage.Content><!--#E0E6E6F2-->
     <Frame x:Name="logInFrame" Margin="0,180,0,0" BackgroundColor="WhiteSmoke">
         <StackLayout>
-            <StackLayout HeightRequest="30" >
-                <ImageButton Padding="0,0,2,0" HeightRequest="30" Source="closeFrameIcon.png" HorizontalOptions="End" Clicked="ImageButton_Clicked"></ImageButton>
-            </StackLayout>
-            <Label Margin="0,0,0,20" Text="Log In" TextColor="#136D74" FontSize="32" FontAttributes="Bold" TextDecorations="Underline" HorizontalTextAlignment="Center" ></Label>
-        <ScrollView x:Name="scrollView">
-
-       
+            <Grid HeightRequest="40" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="100"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="1" Margin="0,0,0,0" Text="Log In" TextColor="#136D74" FontSize="32" FontAttributes="Bold" TextDecorations="Underline" HorizontalTextAlignment="Center" ></Label>
+                <ImageButton Grid.Column="2" Padding="0,0,2,0" HeightRequest="30" Source="closeFrameIcon.png" HorizontalOptions="End" Clicked="ImageButton_Clicked"></ImageButton>
+            </Grid>
+        <ScrollView x:Name="scrollView" Margin="0,5,0,0">
         <StackLayout x:Name="grids" BackgroundColor="WhiteSmoke"  HorizontalOptions="Center" >
            
            
             <StackLayout>
-                <ImageButton x:Name="appleLogInButton" BackgroundColor="Transparent" Clicked="AppleLogInClick" Command = "{Binding SignInWithAppleCommand}" Source="continueWithApple.png" HeightRequest="52"></ImageButton>
-                <ImageButton Clicked="FacebookLogInClick" BackgroundColor="Transparent" Source="continueWithFacebook.png" HeightRequest="52"></ImageButton>
-                <ImageButton Clicked="GoogleLogInClick" BackgroundColor="Transparent" Source="continueWithGoogle.png" HeightRequest="53"></ImageButton>
+                <ImageButton x:Name="appleLogInButton" BackgroundColor="Transparent" Clicked="AppleLogInClick" Command = "{Binding SignInWithAppleCommand}" Source="continueWithApple.png" HeightRequest="48"></ImageButton>
+                <ImageButton Clicked="FacebookLogInClick" BackgroundColor="Transparent" Source="continueWithFacebook.png" HeightRequest="48"></ImageButton>
+                <ImageButton Clicked="GoogleLogInClick" BackgroundColor="Transparent" Source="continueWithGoogle.png" HeightRequest="48"></ImageButton>
                 <!--<Grid>
                     <Button CornerRadius="13" Clicked="AppleLogInClick" Command = "{Binding SignInWithAppleCommand}" HorizontalOptions="Center" WidthRequest="241" HeightRequest="52" Padding="25,0,0,0" Text="Sign up with Apple" TextColor="White" FontSize="16" BackgroundColor="#466DED"></Button>
                     <Image Margin="55,0,0,0" Source="appleWhiteIcon.png" HorizontalOptions="Start"></Image>
@@ -34,7 +37,7 @@
             <Label Text="Or continue with email" HorizontalTextAlignment="Center" TextColor="Black" FontSize="17"></Label>
             <Entry
                 x:Name="userEmailAddress"
-                HeightRequest="52"
+                HeightRequest="40"
                 Placeholder="Email address"
                 HorizontalTextAlignment="Start"
                 Keyboard="Email"
@@ -45,7 +48,7 @@
             <Grid>
                 <Entry
                     x:Name="userPassword"
-                    HeightRequest="52"
+                    HeightRequest="40"
                     WidthRequest="372"
                     HorizontalOptions="Center"
                     Placeholder="Enter Password"
