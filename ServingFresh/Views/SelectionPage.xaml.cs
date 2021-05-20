@@ -226,6 +226,7 @@ namespace ServingFresh.Views
             InitializeComponent();
             GetBusinesses();
             _ = SetFavoritesList();
+            _ = CheckVersion();
         }
 
         public static void SetMenu(StackLayout guest, StackLayout customer, Label history, Label profile)
@@ -473,18 +474,20 @@ namespace ServingFresh.Views
 
         public async Task CheckVersion()
         {
-            var isLatest = await CrossLatestVersion.Current.IsUsingLatestVersion();
-
-            if (!isLatest)
+            try
             {
-                await DisplayAlert("Serving Fresh\nhas gotten even better!", "Please visit the App Store to get the latest version.", "OK");
-                await CrossLatestVersion.Current.OpenAppInStore();
+                var isLatest = await CrossLatestVersion.Current.IsUsingLatestVersion();
+
+                if (!isLatest)
+                {
+                    await DisplayAlert("Serving Fresh\nhas gotten even better!", "Please visit the App Store to get the latest version.", "OK");
+                    //await CrossLatestVersion.Current.OpenAppInStore();
+                }
             }
-            else
+            catch (Exception issueVersionChecking)
             {
-                GetBusinesses();
+                string str = issueVersionChecking.Message;
 
-                CartTotal.Text = CheckoutPage.total_qty.ToString();
             }
         }
 
@@ -1228,7 +1231,7 @@ namespace ServingFresh.Views
 
         void SubtractItem(System.Object sender, System.EventArgs e)
         {
-            var button = (Button)sender;
+            var button = (ImageButton)sender;
             var itemModelObject = (SingleItem)button.CommandParameter;
             var itemSelected = new ItemPurchased();
 
@@ -1281,7 +1284,7 @@ namespace ServingFresh.Views
 
         void AddItem(System.Object sender, System.EventArgs e)
         {
-            var button = (Button)sender;
+            var button = (ImageButton)sender;
             var itemModelObject = (SingleItem)button.CommandParameter;
             var itemSelected = new ItemPurchased();
             if (itemModelObject != null)
@@ -1363,7 +1366,7 @@ namespace ServingFresh.Views
         void SubtractItemLeft(System.Object sender, System.EventArgs e)
         {
 
-            var button = (Button)sender;
+            var button = (ImageButton)sender;
             var itemModelObject = (ItemsModel)button.CommandParameter;
             ItemPurchased itemSelected = new ItemPurchased();
             if (itemModelObject != null)
@@ -1419,7 +1422,7 @@ namespace ServingFresh.Views
         void AddItemLeft(System.Object sender, System.EventArgs e)
         {
 
-            var button = (Button)sender;
+            var button = (ImageButton)sender;
             var itemModelObject = (ItemsModel)button.CommandParameter;
             ItemPurchased itemSelected = new ItemPurchased();
             if (itemModelObject != null)
@@ -1462,7 +1465,7 @@ namespace ServingFresh.Views
         void SubtractItemRight(System.Object sender, System.EventArgs e)
         {
 
-            var button = (Button)sender;
+            var button = (ImageButton)sender;
             var itemModelObject = (ItemsModel)button.CommandParameter;
             ItemPurchased itemSelected = new ItemPurchased();
             if (itemModelObject != null)
@@ -1515,7 +1518,7 @@ namespace ServingFresh.Views
         void AddItemRight(System.Object sender, System.EventArgs e)
         {
 
-            var button = (Button)sender;
+            var button = (ImageButton)sender;
             var itemModelObject = (ItemsModel)button.CommandParameter;
             ItemPurchased itemSelected = new ItemPurchased();
             if (itemModelObject != null)

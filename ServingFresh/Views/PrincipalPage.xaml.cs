@@ -438,11 +438,19 @@ namespace ServingFresh.Views
                             }
                         }
                     }
+                    string[] arrayTypes = new[] { "vegetable", "fruit" };
 
-                    foreach (string key in uniqueItems.Keys)
+                    foreach(string t in arrayTypes)
                     {
-                        listUniqueItems.Add(uniqueItems[key]);
+                        foreach (string key in uniqueItems.Keys)
+                        {
+                            if(t == uniqueItems[key].item_type)
+                            {
+                                listUniqueItems.Add(uniqueItems[key]);
+                            }
+                        }
                     }
+                    
 
                     listOfItems = listUniqueItems;
 

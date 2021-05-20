@@ -41,6 +41,7 @@ namespace ServingFresh.Models
         public string delivery_fee;
         public string driver_tip;
         public string taxes;
+        public string ambassador_code;
 
         public Purchase(User user)
         {
@@ -79,6 +80,7 @@ namespace ServingFresh.Models
             delivery_fee = "";
             driver_tip = "";
             taxes = "";
+            ambassador_code = "0.00";
         }
 
         public string getPurchaseCustomerUID()
@@ -256,6 +258,11 @@ namespace ServingFresh.Models
             return taxes;
         }
 
+        public string getAmbassadorCode()
+        {
+            return ambassador_code;
+        }
+
         public void setPurchaseCustomerUID(string pur_customer_uid)
         {
             this.pur_customer_uid = pur_customer_uid;
@@ -429,6 +436,11 @@ namespace ServingFresh.Models
         public void setPurchaseTaxes(string taxes)
         {
             this.taxes = taxes;
+        }
+
+        public void setAmbassadorCode(string ambassador_code)
+        {
+            this.ambassador_code = ambassador_code;
         }
 
         public void printPurchase()

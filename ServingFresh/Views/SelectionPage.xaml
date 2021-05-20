@@ -182,23 +182,25 @@
                                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                                     </Grid.ColumnDefinitions>
                                                     <StackLayout Grid.Column="0" Orientation="Horizontal">
-                                                        <Button  WidthRequest="20" Text="-" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="SubtractItem" CommandParameter="{Binding .}">
+                                                        <!--<Button  WidthRequest="20" Text="-" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="SubtractItem" CommandParameter="{Binding .}">
                                                             <Button.Padding>
                                                                 <OnPlatform x:TypeArguments="Thickness">
                                                                     <On Platform="iOS" Value="0,-2,0,0" />
                                                                     <On Platform="Android" Value="0,-6,0,0" />
                                                                 </OnPlatform>
                                                             </Button.Padding>
-                                                        </Button>
+                                                        </Button>-->
+                                                        <ImageButton Source="minusIcon" BackgroundColor="Transparent" Clicked="SubtractItem" CommandParameter="{Binding .}"></ImageButton>
                                                         <Label Text="{Binding itemQuantity}" VerticalTextAlignment="Center" HorizontalTextAlignment="Center" FontSize="10" FontAttributes="Bold" TextColor="Black" WidthRequest="15"></Label>
-                                                        <Button WidthRequest="20" Text="+" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="AddItem" CommandParameter="{Binding .}">
+                                                        <!--<Button WidthRequest="20" Text="+" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="AddItem" CommandParameter="{Binding .}">
                                                             <Button.Padding>
                                                                 <OnPlatform x:TypeArguments="Thickness">
                                                                     <On Platform="iOS" Value="0,-2,0,0" />
                                                                     <On Platform="Android" Value="0,-6,0,0" />
                                                                 </OnPlatform>
                                                             </Button.Padding>
-                                                        </Button>
+                                                        </Button>-->
+                                                        <ImageButton Source="plusIcon" BackgroundColor="Transparent" Clicked="AddItem" CommandParameter="{Binding .}"></ImageButton>
                                                     </StackLayout>
                                                     <Label Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceWithUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
                                                 </Grid>
@@ -274,23 +276,25 @@
                                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                                     </Grid.ColumnDefinitions>
                                                     <StackLayout Grid.Column="0" Orientation="Horizontal">
-                                                        <Button WidthRequest="20" Text="-" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="SubtractItemLeft" CommandParameter="{Binding .}">
+                                                        <!--<Button WidthRequest="20" Text="-" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="SubtractItemLeft" CommandParameter="{Binding .}">
                                                             <Button.Padding>
                                                                 <OnPlatform x:TypeArguments="Thickness">
                                                                     <On Platform="iOS" Value="0,-2,0,0" />
                                                                     <On Platform="Android" Value="0,-6,0,0" />
                                                                 </OnPlatform>
                                                             </Button.Padding>
-                                                        </Button>
+                                                        </Button>-->
+                                                        <ImageButton Source="minusIcon" BackgroundColor="Transparent" Clicked="SubtractItemLeft" CommandParameter="{Binding .}"></ImageButton>
                                                         <Label Text="{Binding quantityLeft}" VerticalTextAlignment="Center" HorizontalTextAlignment="Center" FontSize="10" FontAttributes="Bold" TextColor="Black" WidthRequest="15"></Label>
-                                                        <Button WidthRequest="20" Text="+" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="AddItemLeft" CommandParameter="{Binding .}">
+                                                        <!--<Button WidthRequest="20" Text="+" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="AddItemLeft" CommandParameter="{Binding .}">
                                                             <Button.Padding>
                                                                 <OnPlatform x:TypeArguments="Thickness">
                                                                     <On Platform="iOS" Value="0,-2,0,0" />
                                                                     <On Platform="Android" Value="0,-6,0,0" />
                                                                 </OnPlatform>
                                                             </Button.Padding>
-                                                        </Button>
+                                                        </Button>-->
+                                                        <ImageButton Source="plusIcon" BackgroundColor="Transparent" Clicked="AddItemLeft" CommandParameter="{Binding .}"></ImageButton>
                                                     </StackLayout>
                                                     <Label Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceLeftUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
                                                 </Grid>
@@ -351,23 +355,25 @@
                                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                                     </Grid.ColumnDefinitions>
                                                     <StackLayout Grid.Column="0" Orientation="Horizontal">
-                                                        <Button WidthRequest="20" Text="-" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="SubtractItemRight" CommandParameter="{Binding .}">
+                                                        <!--<Button WidthRequest="20" Text="-" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="SubtractItemRight" CommandParameter="{Binding .}">
                                                             <Button.Padding>
                                                                 <OnPlatform x:TypeArguments="Thickness">
                                                                     <On Platform="iOS" Value="0,-2,0,0" />
                                                                     <On Platform="Android" Value="0,-6,0,0" />
                                                                 </OnPlatform>
                                                             </Button.Padding>
-                                                        </Button>
+                                                        </Button>-->
+                                                        <ImageButton Source="minusIcon" BackgroundColor="Transparent" Clicked="SubtractItemRight" CommandParameter="{Binding .}"></ImageButton>
                                                         <Label Text="{Binding quantityRight}" VerticalTextAlignment="Center" HorizontalTextAlignment="Center" FontSize="10" FontAttributes="Bold" TextColor="Black" WidthRequest="15"></Label>
-                                                        <Button WidthRequest="20" Text="+" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="AddItemRight" CommandParameter="{Binding .}">
+                                                        <!--<Button WidthRequest="20" Text="+" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="AddItemRight" CommandParameter="{Binding .}">
                                                             <Button.Padding>
                                                                 <OnPlatform x:TypeArguments="Thickness">
                                                                     <On Platform="iOS" Value="0,-2,0,0" />
                                                                     <On Platform="Android" Value="0,-6,0,0" />
                                                                 </OnPlatform>
                                                             </Button.Padding>
-                                                        </Button>
+                                                        </Button>-->
+                                                        <ImageButton Source="plusIcon" BackgroundColor="Transparent" Clicked="AddItemRight" CommandParameter="{Binding .}"></ImageButton>
                                                     </StackLayout>
                                                     <Label Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceRightUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
                                                 </Grid>
@@ -453,23 +459,25 @@
                                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                                     </Grid.ColumnDefinitions>
                                                     <StackLayout Grid.Column="0" Orientation="Horizontal">
-                                                        <Button WidthRequest="20" Text="-" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="SubtractItem" CommandParameter="{Binding .}">
+                                                        <!--<Button WidthRequest="20" Text="-" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="SubtractItem" CommandParameter="{Binding .}">
                                                             <Button.Padding>
                                                                 <OnPlatform x:TypeArguments="Thickness">
                                                                     <On Platform="iOS" Value="0,-2,0,0" />
                                                                     <On Platform="Android" Value="0,-6,0,0" />
                                                                 </OnPlatform>
                                                             </Button.Padding>
-                                                        </Button>
+                                                        </Button>-->
+                                                        <ImageButton Source="minusIcon" BackgroundColor="Transparent" Clicked="SubtractItem" CommandParameter="{Binding .}"></ImageButton>
                                                         <Label Text="{Binding itemQuantity}" VerticalTextAlignment="Center" HorizontalTextAlignment="Center" FontSize="10" FontAttributes="Bold" TextColor="Black" WidthRequest="15"></Label>
-                                                        <Button  WidthRequest="20" Text="+" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="AddItem" CommandParameter="{Binding .}">
+                                                        <!--<Button  WidthRequest="20" Text="+" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="AddItem" CommandParameter="{Binding .}">
                                                             <Button.Padding>
                                                                 <OnPlatform x:TypeArguments="Thickness">
                                                                     <On Platform="iOS" Value="0,-2,0,0" />
                                                                     <On Platform="Android" Value="0,-6,0,0" />
                                                                 </OnPlatform>
                                                             </Button.Padding>
-                                                        </Button>
+                                                        </Button>-->
+                                                        <ImageButton Source="plusIcon" BackgroundColor="Transparent" Clicked="AddItem" CommandParameter="{Binding .}"></ImageButton>
                                                     </StackLayout>
                                                     <Label Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceWithUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
                                                 </Grid>
@@ -545,23 +553,25 @@
                                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                                     </Grid.ColumnDefinitions>
                                                     <StackLayout Grid.Column="0" Orientation="Horizontal">
-                                                        <Button WidthRequest="20" Text="-" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="SubtractItemLeft" CommandParameter="{Binding .}">
+                                                        <!--<Button WidthRequest="20" Text="-" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="SubtractItemLeft" CommandParameter="{Binding .}">
                                                             <Button.Padding>
                                                                 <OnPlatform x:TypeArguments="Thickness">
                                                                     <On Platform="iOS" Value="0,-2,0,0" />
                                                                     <On Platform="Android" Value="0,-6,0,0" />
                                                                 </OnPlatform>
                                                             </Button.Padding>
-                                                        </Button>
+                                                        </Button>-->
+                                                        <ImageButton Source="minusIcon" BackgroundColor="Transparent" Clicked="SubtractItemLeft" CommandParameter="{Binding .}"></ImageButton>
                                                         <Label Text="{Binding quantityLeft}" VerticalTextAlignment="Center" HorizontalTextAlignment="Center" FontSize="10" FontAttributes="Bold" TextColor="Black" WidthRequest="15"></Label>
-                                                        <Button WidthRequest="20" Text="+" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="AddItemLeft" CommandParameter="{Binding .}">
+                                                        <!--<Button WidthRequest="20" Text="+" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="AddItemLeft" CommandParameter="{Binding .}">
                                                             <Button.Padding>
                                                                 <OnPlatform x:TypeArguments="Thickness">
                                                                     <On Platform="iOS" Value="0,-2,0,0" />
                                                                     <On Platform="Android" Value="0,-6,0,0" />
                                                                 </OnPlatform>
                                                             </Button.Padding>
-                                                        </Button>
+                                                        </Button>-->
+                                                        <ImageButton Source="plusIcon" BackgroundColor="Transparent" Clicked="AddItemLeft" CommandParameter="{Binding .}"></ImageButton>
                                                     </StackLayout>
                                                     <Label Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceLeftUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
                                                 </Grid>
@@ -622,23 +632,25 @@
                                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                                     </Grid.ColumnDefinitions>
                                                     <StackLayout Grid.Column="0" Orientation="Horizontal">
-                                                        <Button WidthRequest="20" Text="-" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="SubtractItemRight" CommandParameter="{Binding .}">
+                                                        <!--<Button WidthRequest="20" Text="-" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="SubtractItemRight" CommandParameter="{Binding .}">
                                                             <Button.Padding>
                                                                 <OnPlatform x:TypeArguments="Thickness">
                                                                     <On Platform="iOS" Value="0,-2,0,0" />
                                                                     <On Platform="Android" Value="0,-6,0,0" />
                                                                 </OnPlatform>
                                                             </Button.Padding>
-                                                        </Button>
+                                                        </Button>-->
+                                                        <ImageButton Source="minusIcon" BackgroundColor="Transparent" Clicked="SubtractItemRight" CommandParameter="{Binding .}"></ImageButton>
                                                         <Label Text="{Binding quantityRight}" VerticalTextAlignment="Center" HorizontalTextAlignment="Center" FontSize="10" FontAttributes="Bold" TextColor="Black" WidthRequest="15"></Label>
-                                                        <Button WidthRequest="20" Text="+" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="AddItemRight" CommandParameter="{Binding .}">
+                                                        <!--<Button WidthRequest="20" Text="+" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="AddItemRight" CommandParameter="{Binding .}">
                                                             <Button.Padding>
                                                                 <OnPlatform x:TypeArguments="Thickness">
                                                                     <On Platform="iOS" Value="0,-2,0,0" />
                                                                     <On Platform="Android" Value="0,-6,0,0" />
                                                                 </OnPlatform>
                                                             </Button.Padding>
-                                                        </Button>
+                                                        </Button>-->
+                                                        <ImageButton Source="plusIcon" BackgroundColor="Transparent" Clicked="AddItemRight" CommandParameter="{Binding .}"></ImageButton>
                                                     </StackLayout>
                                                     <Label Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceRightUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
                                                 </Grid>
@@ -724,23 +736,25 @@
                                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                                     </Grid.ColumnDefinitions>
                                                     <StackLayout Grid.Column="0" Orientation="Horizontal">
-                                                        <Button WidthRequest="20" Text="-" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="SubtractItem" CommandParameter="{Binding .}">
+                                                        <!--<Button WidthRequest="20" Text="-" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="SubtractItem" CommandParameter="{Binding .}">
                                                             <Button.Padding>
                                                                 <OnPlatform x:TypeArguments="Thickness">
                                                                     <On Platform="iOS" Value="0,-2,0,0" />
                                                                     <On Platform="Android" Value="0,-6,0,0" />
                                                                 </OnPlatform>
                                                             </Button.Padding>
-                                                        </Button>
+                                                        </Button>-->
+                                                        <ImageButton Source="minusIcon" BackgroundColor="Transparent" Clicked="SubtractItem" CommandParameter="{Binding .}"></ImageButton>
                                                         <Label Text="{Binding itemQuantity}" VerticalTextAlignment="Center" HorizontalTextAlignment="Center" FontSize="10" FontAttributes="Bold" TextColor="Black" WidthRequest="15"></Label>
-                                                        <Button WidthRequest="20" Text="+" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="AddItem" CommandParameter="{Binding .}">
+                                                        <!--<Button WidthRequest="20" Text="+" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="AddItem" CommandParameter="{Binding .}">
                                                             <Button.Padding>
                                                                 <OnPlatform x:TypeArguments="Thickness">
                                                                     <On Platform="iOS" Value="0,-2,0,0" />
                                                                     <On Platform="Android" Value="0,-6,0,0" />
                                                                 </OnPlatform>
                                                             </Button.Padding>
-                                                        </Button>
+                                                        </Button>-->
+                                                        <ImageButton Source="plusIcon" BackgroundColor="Transparent" Clicked="AddItem" CommandParameter="{Binding .}"></ImageButton>
                                                     </StackLayout>
                                                     <Label Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceWithUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
                                                 </Grid>
@@ -816,23 +830,25 @@
                                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                                     </Grid.ColumnDefinitions>
                                                     <StackLayout Grid.Column="0" Orientation="Horizontal">
-                                                        <Button WidthRequest="20" Text="-" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="SubtractItemLeft" CommandParameter="{Binding .}">
+                                                        <!--<Button WidthRequest="20" Text="-" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="SubtractItemLeft" CommandParameter="{Binding .}">
                                                             <Button.Padding>
                                                                 <OnPlatform x:TypeArguments="Thickness">
                                                                     <On Platform="iOS" Value="0,-2,0,0" />
                                                                     <On Platform="Android" Value="0,-6,0,0" />
                                                                 </OnPlatform>
                                                             </Button.Padding>
-                                                        </Button>
+                                                        </Button>-->
+                                                        <ImageButton Source="minusIcon" BackgroundColor="Transparent" Clicked="SubtractItemLeft" CommandParameter="{Binding .}"></ImageButton>
                                                         <Label Text="{Binding quantityLeft}" VerticalTextAlignment="Center" HorizontalTextAlignment="Center" FontSize="10" FontAttributes="Bold" TextColor="Black" WidthRequest="15"></Label>
-                                                        <Button WidthRequest="20" Text="+" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="AddItemLeft" CommandParameter="{Binding .}">
+                                                        <!--<Button WidthRequest="20" Text="+" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="AddItemLeft" CommandParameter="{Binding .}">
                                                             <Button.Padding>
                                                                 <OnPlatform x:TypeArguments="Thickness">
                                                                     <On Platform="iOS" Value="0,-2,0,0" />
                                                                     <On Platform="Android" Value="0,-6,0,0" />
                                                                 </OnPlatform>
                                                             </Button.Padding>
-                                                        </Button>
+                                                        </Button>-->
+                                                        <ImageButton Source="plusIcon" BackgroundColor="Transparent" Clicked="AddItemLeft" CommandParameter="{Binding .}"></ImageButton>
                                                     </StackLayout>
                                                     <Label Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceLeftUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
                                                 </Grid>
@@ -893,23 +909,25 @@
                                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                                     </Grid.ColumnDefinitions>
                                                     <StackLayout Grid.Column="0" Orientation="Horizontal">
-                                                        <Button WidthRequest="20" Text="-" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="SubtractItemRight" CommandParameter="{Binding .}">
+                                                        <!--<Button WidthRequest="20" Text="-" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="SubtractItemRight" CommandParameter="{Binding .}">
                                                             <Button.Padding>
                                                                 <OnPlatform x:TypeArguments="Thickness">
                                                                     <On Platform="iOS" Value="0,-2,0,0" />
                                                                     <On Platform="Android" Value="0,-6,0,0" />
                                                                 </OnPlatform>
                                                             </Button.Padding>
-                                                        </Button>
+                                                        </Button>-->
+                                                        <ImageButton Source="minusIcon" BackgroundColor="Transparent" Clicked="SubtractItemRight" CommandParameter="{Binding .}"></ImageButton>
                                                         <Label Text="{Binding quantityRight}" VerticalTextAlignment="Center" HorizontalTextAlignment="Center" FontSize="10" FontAttributes="Bold" TextColor="Black" WidthRequest="15"></Label>
-                                                        <Button WidthRequest="20" Text="+" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="AddItemRight" CommandParameter="{Binding .}">
+                                                        <!--<Button WidthRequest="20" Text="+" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="AddItemRight" CommandParameter="{Binding .}">
                                                             <Button.Padding>
                                                                 <OnPlatform x:TypeArguments="Thickness">
                                                                     <On Platform="iOS" Value="0,-2,0,0" />
                                                                     <On Platform="Android" Value="0,-6,0,0" />
                                                                 </OnPlatform>
                                                             </Button.Padding>
-                                                        </Button>
+                                                        </Button>-->
+                                                        <ImageButton Source="plusIcon" BackgroundColor="Transparent" Clicked="AddItemRight" CommandParameter="{Binding .}"></ImageButton>
                                                     </StackLayout>
                                                     <Label Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceRightUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
                                                 </Grid>
@@ -995,23 +1013,25 @@
                                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                                     </Grid.ColumnDefinitions>
                                                     <StackLayout Grid.Column="0" Orientation="Horizontal">
-                                                        <Button WidthRequest="20" Text="-" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="SubtractItem" CommandParameter="{Binding .}">
+                                                        <!--<Button WidthRequest="20" Text="-" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="SubtractItem" CommandParameter="{Binding .}">
                                                             <Button.Padding>
                                                                 <OnPlatform x:TypeArguments="Thickness">
                                                                     <On Platform="iOS" Value="0,-2,0,0" />
                                                                     <On Platform="Android" Value="0,-6,0,0" />
                                                                 </OnPlatform>
                                                             </Button.Padding>
-                                                        </Button>
+                                                        </Button>-->
+                                                        <ImageButton Source="minusIcon" BackgroundColor="Transparent" Clicked="SubtractItem" CommandParameter="{Binding .}"></ImageButton>
                                                         <Label Text="{Binding itemQuantity}" VerticalTextAlignment="Center" HorizontalTextAlignment="Center" FontSize="10" FontAttributes="Bold" TextColor="Black" WidthRequest="15"></Label>
-                                                        <Button WidthRequest="20" Text="+" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="AddItem" CommandParameter="{Binding .}">
+                                                        <!--<Button WidthRequest="20" Text="+" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="AddItem" CommandParameter="{Binding .}">
                                                             <Button.Padding>
                                                                 <OnPlatform x:TypeArguments="Thickness">
                                                                     <On Platform="iOS" Value="0,-2,0,0" />
                                                                     <On Platform="Android" Value="0,-6,0,0" />
                                                                 </OnPlatform>
                                                             </Button.Padding>
-                                                        </Button>
+                                                        </Button>-->
+                                                        <ImageButton Source="plusIcon" BackgroundColor="Transparent" Clicked="AddItem" CommandParameter="{Binding .}"></ImageButton>
                                                     </StackLayout>
                                                     <Label Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceWithUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
                                                 </Grid>
@@ -1087,23 +1107,25 @@
                                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                                     </Grid.ColumnDefinitions>
                                                     <StackLayout Grid.Column="0" Orientation="Horizontal">
-                                                        <Button WidthRequest="20" Text="-" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="SubtractItemLeft" CommandParameter="{Binding .}">
+                                                        <!--<Button WidthRequest="20" Text="-" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="SubtractItemLeft" CommandParameter="{Binding .}">
                                                             <Button.Padding>
                                                                 <OnPlatform x:TypeArguments="Thickness">
                                                                     <On Platform="iOS" Value="0,-2,0,0" />
                                                                     <On Platform="Android" Value="0,-6,0,0" />
                                                                 </OnPlatform>
                                                             </Button.Padding>
-                                                        </Button>
+                                                        </Button>-->
+                                                        <ImageButton Source="minusIcon" BackgroundColor="Transparent" Clicked="SubtractItemLeft" CommandParameter="{Binding .}"></ImageButton>
                                                         <Label Text="{Binding quantityLeft}" VerticalTextAlignment="Center" HorizontalTextAlignment="Center" FontSize="10" FontAttributes="Bold" TextColor="Black" WidthRequest="15"></Label>
-                                                        <Button WidthRequest="20" Text="+" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="AddItemLeft" CommandParameter="{Binding .}">
+                                                        <!--<Button WidthRequest="20" Text="+" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="AddItemLeft" CommandParameter="{Binding .}">
                                                             <Button.Padding>
                                                                 <OnPlatform x:TypeArguments="Thickness">
                                                                     <On Platform="iOS" Value="0,-2,0,0" />
                                                                     <On Platform="Android" Value="0,-6,0,0" />
                                                                 </OnPlatform>
                                                             </Button.Padding>
-                                                        </Button>
+                                                        </Button>-->
+                                                        <ImageButton Source="plusIcon" BackgroundColor="Transparent" Clicked="AddItemLeft" CommandParameter="{Binding .}"></ImageButton>
                                                     </StackLayout>
                                                     <Label Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceLeftUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
                                                 </Grid>
@@ -1164,23 +1186,25 @@
                                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                                     </Grid.ColumnDefinitions>
                                                     <StackLayout Grid.Column="0" Orientation="Horizontal">
-                                                        <Button WidthRequest="20" Text="-" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="SubtractItemRight" CommandParameter="{Binding .}">
+                                                        <!--<Button WidthRequest="20" Text="-" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="SubtractItemRight" CommandParameter="{Binding .}">
                                                             <Button.Padding>
                                                                 <OnPlatform x:TypeArguments="Thickness">
                                                                     <On Platform="iOS" Value="0,-2,0,0" />
                                                                     <On Platform="Android" Value="0,-6,0,0" />
                                                                 </OnPlatform>
                                                             </Button.Padding>
-                                                        </Button>
+                                                        </Button>-->
+                                                        <ImageButton Source="minusIcon" BackgroundColor="Transparent" Clicked="SubtractItemRight" CommandParameter="{Binding .}"></ImageButton>
                                                         <Label Text="{Binding quantityRight}" VerticalTextAlignment="Center" HorizontalTextAlignment="Center" FontSize="10" FontAttributes="Bold" TextColor="Black" WidthRequest="15"></Label>
-                                                        <Button WidthRequest="20" Text="+" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="AddItemRight" CommandParameter="{Binding .}">
+                                                        <!--<Button WidthRequest="20" Text="+" FontAttributes="Bold" FontSize="Large" TextColor="#FF8500" BackgroundColor="#136D74" Clicked="AddItemRight" CommandParameter="{Binding .}">
                                                             <Button.Padding>
                                                                 <OnPlatform x:TypeArguments="Thickness">
                                                                     <On Platform="iOS" Value="0,-2,0,0" />
                                                                     <On Platform="Android" Value="0,-6,0,0" />
                                                                 </OnPlatform>
                                                             </Button.Padding>
-                                                        </Button>
+                                                        </Button>-->
+                                                        <ImageButton Source="plusIcon" BackgroundColor="Transparent" Clicked="AddItemRight" CommandParameter="{Binding .}"></ImageButton>
                                                     </StackLayout>
                                                     <Label Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceRightUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
                                                 </Grid>
