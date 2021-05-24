@@ -53,16 +53,30 @@
                     </RelativeLayout>
                 </StackLayout>
             </Grid>
-            <ScrollView Grid.Row="1">
+            <ScrollView Grid.Row="1" Margin="0,0,0,10">
                 <StackLayout>
-                    <Frame Margin="0,20,0,0" HeightRequest="100" WidthRequest="100" HorizontalOptions="Center">
-
+                    
+                    <Frame Margin="0,20,0,0" HeightRequest="160" CornerRadius="10" HasShadow="False" WidthRequest="200" Padding="0" HorizontalOptions="Center">
+                        <StackLayout>
+                            <Frame HeightRequest="125" CornerRadius="10" HasShadow="False" Padding="0" IsClippedToBounds="True">
+                                <Image Source="fruitsVegetablesImage" Aspect="Fill"></Image>
+                            </Frame>
+                            <Label Text="$10.00" TextColor="Black" FontSize="18" HorizontalTextAlignment="Center" FontAttributes="Bold"></Label>
+                        </StackLayout>
                     </Frame>
                     <StackLayout Margin="50,0,50,0" Spacing="0">
                        <Label HorizontalOptions="Center" Text="Give your friends and family the" FontSize="18" TextColor="#2F787F"></Label>
                        <Label HorizontalOptions="Center" Text="gift of fresh, organic produce with" FontSize="18" TextColor="#2F787F"></Label>
                        <Label HorizontalOptions="Center" Text="a Serving Fresh eGift card" FontSize="18" TextColor="#2F787F"></Label>
                     </StackLayout>
+                    <Grid Margin="10,0,10,0">
+                        <Button Grid.Column="0" Text="$10" TextColor="Black" BackgroundColor="White"></Button>
+                        <Button Grid.Column="1" Text="$20" TextColor="Black" BackgroundColor="White"></Button>
+                        <Button Grid.Column="2" Text="$30" TextColor="Black" BackgroundColor="White"></Button>
+                        <Button Grid.Column="3" Text="$40" TextColor="Black" BackgroundColor="White"></Button>
+                        <Button Grid.Column="4" Text="$50" TextColor="Black" BackgroundColor="White"></Button>
+                    </Grid>
+                    <Entry HorizontalOptions="CenterAndExpand"  WidthRequest="204" BackgroundColor="White" HorizontalTextAlignment="Center" Keyboard="Numeric" Placeholder="$ Enter Amount" PlaceholderColor="Gray"></Entry>
                     <StackLayout Margin="0,20,0,0" Orientation="Horizontal" HorizontalOptions="Center">
                         <Button Text="Send via Email" TextColor="White" FontAttributes="Bold" Padding="5,0,5,0" BackgroundColor="#FF8500"></Button>
                         <!--<Button Text="Send via Text" TextColor="White" FontAttributes="Bold" Padding="5,0,5,0" BackgroundColor="#FF8500"></Button>-->
@@ -70,21 +84,28 @@
                     <StackLayout Padding="50,0,50,0">
                         <Label Text="To" TextColor="Black" FontSize="18"></Label>
                         <Frame Padding="0" HasShadow="False" BorderColor="#136D74">
-                            <Entry Placeholder="Enter email for recipient"></Entry>
+                            <Entry Placeholder="Enter email for recipient" PlaceholderColor="Gray" TextColor="Black"></Entry>
                         </Frame>
                         <Label Text="From" TextColor="Black" FontSize="18"></Label>
                         <Frame Padding="0" HasShadow="False" BorderColor="#136D74">
-                            <Entry Placeholder="Enter email for recipient"></Entry>
+                            <Entry Placeholder="Enter email for recipient" PlaceholderColor="Gray" TextColor="Black"></Entry>
                         </Frame>
                         <Label Text="Message" TextColor="Black" FontSize="18"></Label>
                         <Frame Padding="0" HasShadow="False" BorderColor="#136D74">
-                            <Editor Placeholder="Hope you enjoy this Serving Fresh gift card!" HeightRequest="80"></Editor>
+                            <Editor Placeholder="Hope you enjoy this Serving Fresh gift card!" PlaceholderColor="Gray" TextColor="Black" HeightRequest="80"></Editor>
                         </Frame>
-                        <Label Text="Delivery Date" TextColor="Black" FontSize="18"></Label>
-                        <Frame Padding="0" HasShadow="False" BorderColor="#136D74">
-                            <Entry Placeholder="Enter email for recipient"></Entry>
-                        </Frame>
-                        <Button Margin="0,30,0,0" Text="Buy Now" TextColor="White" FontAttributes="Bold" Padding="5,0,5,0" BackgroundColor="#FF8500"></Button>
+                    </StackLayout>
+
+                    <StackLayout Padding="50,15,50,0" Spacing="10">
+                        <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
+                            <CheckBox x:Name="customerAreTermAccepted" Color="Black"></CheckBox>
+                            <StackLayout Orientation="Horizontal" Spacing="0" VerticalOptions="Center">
+                                <Label Text="I've read and accept the " TextColor="Black" FontSize="12"></Label>
+                                <Label Text="Terms and Conditions" TextDecorations="Underline" TextColor="Black" FontSize="12"></Label>
+                            </StackLayout>
+                        </StackLayout>
+                        <Button Text="Checkout with Stripe" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="Button_Clicked"></Button>
+                        <Button Text="Checkout with PayPal" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold"></Button>
                     </StackLayout>
                 </StackLayout>
             </ScrollView>

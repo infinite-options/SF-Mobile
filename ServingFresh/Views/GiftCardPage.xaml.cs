@@ -26,5 +26,10 @@ namespace ServingFresh.Views
             //    menuFrame.Height = 0;
             //}
         }
+
+        void Button_Clicked(System.Object sender, System.EventArgs e)
+        {
+           // var purchase = new 
+        }
     }
 }
