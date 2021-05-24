@@ -98,123 +98,132 @@ namespace ServingFresh.Views
 
         private async void DirectLogInClick(System.Object sender, System.EventArgs e)
         {
-            logInButton.IsEnabled = false;
-            if (String.IsNullOrEmpty(userEmailAddress.Text) || String.IsNullOrEmpty(userPassword.Text))
-            { 
-                await DisplayAlert("Error", "Please fill in all fields", "OK");
-                logInButton.IsEnabled = true;
-            }
-            else
+            try
             {
-                var accountSalt = await RetrieveAccountSalt(userEmailAddress.Text.ToLower().Trim());
-
-                if (accountSalt != null)
+                logInButton.IsEnabled = false;
+                if (String.IsNullOrEmpty(userEmailAddress.Text) || String.IsNullOrEmpty(userPassword.Text))
                 {
-                    var loginAttempt = await LogInUser(userEmailAddress.Text.ToLower().Trim(), userPassword.Text, accountSalt);
+                    await DisplayAlert("Error", "Please fill in all fields", "OK");
+                    logInButton.IsEnabled = true;
+                }
+                else
+                {
+                    var accountSalt = await RetrieveAccountSalt(userEmailAddress.Text.ToLower().Trim());
 
-                    if (loginAttempt != null && loginAttempt.message != "Request failed, wrong password.")
+                    if (accountSalt != null)
                     {
-                        var client = new HttpClient();
-                        var request = new RequestUserInfo();
-                        request.uid = loginAttempt.result[0].customer_uid;
+                        var loginAttempt = await LogInUser(userEmailAddress.Text.ToLower().Trim(), userPassword.Text, accountSalt);
 
-                        var requestSelializedObject = JsonConvert.SerializeObject(request);
-                        var requestContent = new StringContent(requestSelializedObject, Encoding.UTF8, "application/json");
-
-                        var clientRequest = await client.PostAsync(Constant.GetUserInfoUrl, requestContent);
-
-                        if (clientRequest.IsSuccessStatusCode)
+                        if (loginAttempt != null && loginAttempt.message != "Request failed, wrong password.")
                         {
-                            try
+                            var client = new HttpClient();
+                            var request = new RequestUserInfo();
+                            request.uid = loginAttempt.result[0].customer_uid;
+
+                            var requestSelializedObject = JsonConvert.SerializeObject(request);
+                            var requestContent = new StringContent(requestSelializedObject, Encoding.UTF8, "application/json");
+
+                            var clientRequest = await client.PostAsync(Constant.GetUserInfoUrl, requestContent);
+
+                            if (clientRequest.IsSuccessStatusCode)
                             {
-                                var SFUser = await clientRequest.Content.ReadAsStringAsync();
-                                var userData = JsonConvert.DeserializeObject<UserInfo>(SFUser);
-
-                                DateTime today = DateTime.Now;
-                                DateTime expDate = today.AddDays(Constant.days);
-
-                                user.setUserID(userData.result[0].customer_uid);
-                                user.setUserSessionTime(expDate);
-                                user.setUserPlatform("DIRECT");
-                                user.setUserType("CUSTOMER");
-                                user.setUserEmail(userData.result[0].customer_email);
-                                user.setUserFirstName(userData.result[0].customer_first_name);
-                                user.setUserLastName(userData.result[0].customer_last_name);
-                                user.setUserPhoneNumber(userData.result[0].customer_phone_num);
-                                user.setUserAddress(userData.result[0].customer_address);
-                                user.setUserUnit(userData.result[0].customer_unit);
-                                user.setUserCity(userData.result[0].customer_city);
-                                user.setUserState(userData.result[0].customer_state);
-                                user.setUserZipcode(userData.result[0].customer_zip);
-                                user.setUserLatitude(userData.result[0].customer_lat);
-                                user.setUserLongitude(userData.result[0].customer_long);
-
-
-
-                                if (Device.RuntimePlatform == Device.iOS)
+                                try
                                 {
-                                    deviceId = Preferences.Get("guid", null);
-                                    if (deviceId != null) { Debug.WriteLine("This is the iOS GUID from Log in: " + deviceId); }
-                                }
-                                else
-                                {
-                                    deviceId = Preferences.Get("guid", null);
-                                    if (deviceId != null) { Debug.WriteLine("This is the Android GUID from Log in " + deviceId); }
-                                }
+                                    var SFUser = await clientRequest.Content.ReadAsStringAsync();
+                                    var userData = JsonConvert.DeserializeObject<UserInfo>(SFUser);
 
-                                if (deviceId != null)
-                                {
-                                    NotificationPost notificationPost = new NotificationPost();
+                                    DateTime today = DateTime.Now;
+                                    DateTime expDate = today.AddDays(Constant.days);
 
-                                    notificationPost.uid = user.getUserID();
-                                    notificationPost.guid = deviceId.Substring(5);
-                                    user.setUserDeviceID(deviceId.Substring(5));
-                                    notificationPost.notification = "TRUE";
+                                    user.setUserID(userData.result[0].customer_uid);
+                                    user.setUserSessionTime(expDate);
+                                    user.setUserPlatform("DIRECT");
+                                    user.setUserType("CUSTOMER");
+                                    user.setUserEmail(userData.result[0].customer_email);
+                                    user.setUserFirstName(userData.result[0].customer_first_name);
+                                    user.setUserLastName(userData.result[0].customer_last_name);
+                                    user.setUserPhoneNumber(userData.result[0].customer_phone_num);
+                                    user.setUserAddress(userData.result[0].customer_address);
+                                    user.setUserUnit(userData.result[0].customer_unit);
+                                    user.setUserCity(userData.result[0].customer_city);
+                                    user.setUserState(userData.result[0].customer_state);
+                                    user.setUserZipcode(userData.result[0].customer_zip);
+                                    user.setUserLatitude(userData.result[0].customer_lat);
+                                    user.setUserLongitude(userData.result[0].customer_long);
 
-                                    var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
-                                    Debug.WriteLine("Notification JSON Object to send: " + notificationSerializedObject);
 
-                                    var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
 
-                                    var clientResponse = await client.PostAsync(Constant.NotificationsUrl, notificationContent);
-
-                                    Debug.WriteLine("Status code: " + clientResponse.IsSuccessStatusCode);
-
-                                    if (clientResponse.IsSuccessStatusCode)
+                                    if (Device.RuntimePlatform == Device.iOS)
                                     {
-                                        System.Diagnostics.Debug.WriteLine("We have post the guid to the database");
+                                        deviceId = Preferences.Get("guid", null);
+                                        if (deviceId != null) { Debug.WriteLine("This is the iOS GUID from Log in: " + deviceId); }
                                     }
                                     else
                                     {
-                                        await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
+                                        deviceId = Preferences.Get("guid", null);
+                                        if (deviceId != null) { Debug.WriteLine("This is the Android GUID from Log in " + deviceId); }
                                     }
-                                }
-                                if(direction == "")
-                                {
-                                    Application.Current.MainPage = new SelectionPage();
-                                }
-                                else
-                                {
-                                    await Application.Current.MainPage.Navigation.PopModalAsync();
-                                }
 
-                            }catch (Exception ex){
+                                    if (deviceId != null)
+                                    {
+                                        NotificationPost notificationPost = new NotificationPost();
 
-                                System.Diagnostics.Debug.WriteLine(ex.Message);
+                                        notificationPost.uid = user.getUserID();
+                                        notificationPost.guid = deviceId.Substring(5);
+                                        user.setUserDeviceID(deviceId.Substring(5));
+                                        notificationPost.notification = "TRUE";
+
+                                        var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
+                                        Debug.WriteLine("Notification JSON Object to send: " + notificationSerializedObject);
+
+                                        var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
+
+                                        var clientResponse = await client.PostAsync(Constant.NotificationsUrl, notificationContent);
+
+                                        Debug.WriteLine("Status code: " + clientResponse.IsSuccessStatusCode);
+
+                                        if (clientResponse.IsSuccessStatusCode)
+                                        {
+                                            System.Diagnostics.Debug.WriteLine("We have post the guid to the database");
+                                        }
+                                        else
+                                        {
+                                            await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
+                                        }
+                                    }
+                                    if (direction == "")
+                                    {
+                                        Application.Current.MainPage = new SelectionPage();
+                                    }
+                                    else
+                                    {
+                                        await Application.Current.MainPage.Navigation.PopModalAsync();
+                                    }
+
+                                }
+                                catch (Exception ex)
+                                {
+
+                                    System.Diagnostics.Debug.WriteLine(ex.Message);
+                                }
+                            }
+                            else
+                            {
+                                await DisplayAlert("Alert!", "Our internal system was not able to retrieve your user information. We are working to solve this issue.", "OK");
                             }
                         }
                         else
                         {
-                            await DisplayAlert("Alert!", "Our internal system was not able to retrieve your user information. We are working to solve this issue.", "OK");
+                            await DisplayAlert("Error", "Wrong password was entered", "OK");
+                            logInButton.IsEnabled = true;
                         }
                     }
-                    else
-                    {
-                        await DisplayAlert("Error", "Wrong password was entered", "OK");
-                        logInButton.IsEnabled = true;
-                    }
+                    logInButton.IsEnabled = true;
                 }
-                logInButton.IsEnabled = true;
+            }catch(Exception errorDirectLogIn)
+            {
+                var client = new Diagnostic();
+                client.parseException(errorDirectLogIn.ToString(), user);
             }
         }
 
@@ -269,9 +278,10 @@ namespace ServingFresh.Views
 
                 return userInformation;
             }
-            catch (Exception ex)
+            catch (Exception errorRetrieveAccountSalt)
             {
-                System.Diagnostics.Debug.WriteLine(ex.Message);
+                var client = new Diagnostic();
+                client.parseException(errorRetrieveAccountSalt.ToString(), user);
                 return null;
             }
         }
@@ -310,9 +320,10 @@ namespace ServingFresh.Views
                     return null;
                 }
             }
-            catch (Exception e)
+            catch (Exception errorLogInUser)
             {
-                Debug.WriteLine("Exception message: " + e.Message);
+                var client = new Diagnostic();
+                client.parseException(errorLogInUser.ToString(), user);
                 return null;
             }
         }
@@ -365,9 +376,10 @@ namespace ServingFresh.Views
                     var status = await client.VerifyUserCredentials(e.Account.Properties["access_token"], "", null, null, "FACEBOOK");
                     RedirectUserBasedOnVerification(status, direction);
                 }
-                catch (Exception g)
+                catch (Exception errorFacebookAuthenticatorCompleted)
                 {
-                    Debug.WriteLine(g.Message);
+                    var client = new Diagnostic();
+                    client.parseException(errorFacebookAuthenticatorCompleted.ToString(), user);
                 }
             }
             else
@@ -388,63 +400,70 @@ namespace ServingFresh.Views
 
         public async void RedirectUserBasedOnVerification(string status, string direction)
         {
-            if (status == "LOGIN USER")
+            try
             {
-                UserDialogs.Instance.HideLoading();
-                await Application.Current.MainPage.DisplayAlert("Great!", "You have successfully loged in!", "OK");
-
-                Debug.WriteLine("DIRECTION VALUE: " + direction);
-                if (direction == "")
+                if (status == "LOGIN USER")
                 {
-                    Application.Current.MainPage = new SelectionPage();
+                    UserDialogs.Instance.HideLoading();
+                    //await Application.Current.MainPage.DisplayAlert("Great!", "You have successfully loged in!", "OK");
+
+                    Debug.WriteLine("DIRECTION VALUE: " + direction);
+                    if (direction == "")
+                    {
+                        Application.Current.MainPage = new SelectionPage();
+                    }
+                    else
+                    {
+                        Dictionary<string, Page> array = new Dictionary<string, Page>();
+                        array.Add("ServingFresh.Views.CheckoutPage", new CheckoutPage());
+                        array.Add("ServingFresh.Views.SelectionPage", new SelectionPage());
+                        array.Add("ServingFresh.Views.HistoryPage", new HistoryPage());
+                        array.Add("ServingFresh.Views.RefundPage", new RefundPage());
+                        array.Add("ServingFresh.Views.ProfilePage", new ProfilePage());
+                        array.Add("ServingFresh.Views.ConfirmationPage", new ConfirmationPage());
+                        array.Add("ServingFresh.Views.InfoPage", new InfoPage());
+
+                        var root = Application.Current.MainPage;
+                        Debug.WriteLine("ROOT VALUE: " + root);
+                        Application.Current.MainPage = array[root.ToString()];
+                    }
+
+                }
+                else if (status == "USER NEEDS TO SIGN UP")
+                {
+                    UserDialogs.Instance.HideLoading();
+                    await Application.Current.MainPage.DisplayAlert("Oops", "It looks like you don't have an account with Serving Fresh. Please sign up!", "OK");
+                    await Application.Current.MainPage.Navigation.PushModalAsync(new AddressPage(), true);
+                }
+                else if (status == "WRONG SOCIAL MEDIA TO SIGN IN")
+                {
+                    UserDialogs.Instance.HideLoading();
+                    await Application.Current.MainPage.DisplayAlert("Oops", "Our records show that you have attempted to log in with a different social media account. Please log in through the correct social media platform. Thanks!", "OK");
+                }
+                else if (status == "SIGN IN DIRECTLY")
+                {
+                    UserDialogs.Instance.HideLoading();
+                    await Application.Current.MainPage.DisplayAlert("Oops", "Our records show that you have attempted to log in with a social media account. Please log in through our direct log in. Thanks!", "OK");
+                }
+                else if (status == "ERROR1")
+                {
+                    UserDialogs.Instance.HideLoading();
+                    await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
+                }
+                else if (status == "ERROR2")
+                {
+                    UserDialogs.Instance.HideLoading();
+                    await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
                 }
                 else
                 {
-                    Dictionary<string, Page> array = new Dictionary<string, Page>();
-                    array.Add("ServingFresh.Views.CheckoutPage", new CheckoutPage());
-                    array.Add("ServingFresh.Views.SelectionPage", new SelectionPage());
-                    array.Add("ServingFresh.Views.HistoryPage", new HistoryPage());
-                    array.Add("ServingFresh.Views.RefundPage", new RefundPage());
-                    array.Add("ServingFresh.Views.ProfilePage", new ProfilePage());
-                    array.Add("ServingFresh.Views.ConfirmationPage", new ConfirmationPage());
-                    array.Add("ServingFresh.Views.InfoPage", new InfoPage());
-
-                    var root = Application.Current.MainPage;
-                    Debug.WriteLine("ROOT VALUE: " + root);
-                    Application.Current.MainPage = array[root.ToString()];
+                    UserDialogs.Instance.HideLoading();
+                    await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
                 }
-                
-            }
-            else if (status == "USER NEEDS TO SIGN UP")
+            }catch(Exception errorRedirectUserBaseOnVerification)
             {
-                UserDialogs.Instance.HideLoading();
-                await Application.Current.MainPage.DisplayAlert("Oops", "It looks like you don't have an account with Serving Fresh. Please sign up!", "OK");
-                await Application.Current.MainPage.Navigation.PushModalAsync(new AddressPage(), true);
-            }
-            else if (status == "WRONG SOCIAL MEDIA TO SIGN IN")
-            {
-                UserDialogs.Instance.HideLoading();
-                await Application.Current.MainPage.DisplayAlert("Oops", "Our records show that you have attempted to log in with a different social media account. Please log in through the correct social media platform. Thanks!", "OK");
-            }
-            else if (status == "SIGN IN DIRECTLY")
-            {
-                UserDialogs.Instance.HideLoading();
-                await Application.Current.MainPage.DisplayAlert("Oops", "Our records show that you have attempted to log in with a social media account. Please log in through our direct log in. Thanks!", "OK");
-            }
-            else if (status == "ERROR1")
-            {
-                UserDialogs.Instance.HideLoading();
-                await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
-            }
-            else if (status == "ERROR2")
-            {
-                UserDialogs.Instance.HideLoading();
-                await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
-            }
-            else
-            {
-                UserDialogs.Instance.HideLoading();
-                await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
+                var client = new Diagnostic();
+                client.parseException(errorRedirectUserBaseOnVerification.ToString(), user);
             }
         }
 
@@ -510,9 +529,10 @@ namespace ServingFresh.Views
                     var status = await client.VerifyUserCredentials(e.Account.Properties["access_token"], e.Account.Properties["refresh_token"], e, null, "GOOGLE");
                     RedirectUserBasedOnVerification(status, direction);
                 }
-                catch(Exception g)
+                catch(Exception errorGoogleAutheticatorCompleted)
                 {
-                    Debug.WriteLine(g.Message);
+                    var client = new Diagnostic();
+                    client.parseException(errorGoogleAutheticatorCompleted.ToString(), user);
                 }
                 
             }
@@ -635,9 +655,10 @@ namespace ServingFresh.Views
 
                 }
             }
-            catch (Exception apple)
+            catch (Exception errorAppleSignInRequest)
             {
-                await Application.Current.MainPage.DisplayAlert("Error", apple.Message, "OK");
+                var client = new Diagnostic();
+                client.parseException(errorAppleSignInRequest.ToString(), user);
             }
         }
 

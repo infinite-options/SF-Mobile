@@ -8,7 +8,7 @@
 
                 <StackLayout Spacing="10">
                     <StackLayout HeightRequest="30" >
-                        <ImageButton  Padding="2,0,2,0" HeightRequest="30" Source="closeMenuIcon.png" HorizontalOptions="End" Clicked="ImageButton_Clicked"></ImageButton>
+                        <ImageButton  Padding="2,0,2,0" HeightRequest="30" Source="closeMenuIcon.png" BackgroundColor="Transparent" HorizontalOptions="End" Clicked="ImageButton_Clicked"></ImageButton>
                     </StackLayout>
                     <StackLayout Orientation="Horizontal" Spacing="20">
                         <Frame HasShadow="False" BackgroundColor="Transparent" Padding="0" HeightRequest="32" WidthRequest="32" >
@@ -85,7 +85,7 @@
                         </Frame>
                         <Label VerticalOptions="Center" Text="Buy a Gift Card" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
                         <StackLayout.GestureRecognizers>
-                            <TapGestureRecognizer></TapGestureRecognizer>
+                            <TapGestureRecognizer Tapped="NavigateToGiftCardStore"></TapGestureRecognizer>
                         </StackLayout.GestureRecognizers>
                     </StackLayout>
 

@@ -61,13 +61,13 @@
                                         </Grid.ColumnDefinitions>
                                         <Image Grid.Column="0" Margin="3" Source="locationIcon.png" BackgroundColor="White"></Image>
                                         <Frame Padding="0" Grid.Column="1" HasShadow="False" BorderColor="White" VerticalOptions="CenterAndExpand">
-                                             <Entry HeightRequest="35" x:Name="AddressEntry" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" Placeholder="Search for your address" PlaceholderColor="Gray"  Keyboard="Text" TextColor="Black" TextChanged="OnAddressChanged" Focused="addressEntryFocused" Unfocused="addressEntryUnfocused"/>
+                                             <Entry x:Name="AddressEntry" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" Placeholder="Search for your address" PlaceholderColor="Gray"  Keyboard="Text" TextColor="Black" TextChanged="OnAddressChanged" Focused="addressEntryFocused" Unfocused="addressEntryUnfocused"/>
                                         </Frame>
                                     </Grid>
                                 </Frame>
                                 <!--<Label Text="OR" TextColor="White"  FontSize="Medium" HorizontalTextAlignment="Center" FontAttributes="Bold" ></Label>
                                 <Entry Margin="70,0,70,0" x:Name="zipcodeEntry" Placeholder="Enter Zip Code" FontSize="14" PlaceholderColor="Gray"  HorizontalTextAlignment="Center"></Entry>-->
-                                <Button WidthRequest="287" HorizontalOptions="Center" HeightRequest="40" Font="14" TextColor="white" Text="Find Local Produce" FontSize="Medium"  BackgroundColor="#136D74" Clicked="FindLocalProduceBaseOnLocation"></Button>
+                                <Button WidthRequest="287" HorizontalOptions="Center"  Font="14" TextColor="white" Text="Find Local Produce" FontSize="Medium"  BackgroundColor="#136D74" Clicked="FindLocalProduceBaseOnLocation"></Button>
                                 <Frame Margin="0,-68,0,0" Padding="2" HorizontalOptions="CenterAndExpand" BackgroundColor="#E0EBEC" CornerRadius="0" x:Name="addressFrame" IsVisible="false">
                                     <ListView x:Name="addressList" IsVisible="false" HasUnevenRows="True" SeparatorVisibility="None" RowHeight="40" BackgroundColor="#E0EBEC" HorizontalOptions="CenterAndExpand" WidthRequest="280" HeightRequest="80" ItemSelected="addressSelected">
                                         <ListView.ItemTemplate>
@@ -164,14 +164,15 @@
                     </StackLayout>
                     <StackLayout Grid.Row="4" HeightRequest="223" Spacing="0">
                           <StackLayout VerticalOptions="CenterAndExpand">
-                              <Button HeightRequest="46" WidthRequest="287" HorizontalOptions="Center" Font="14" TextColor="white" Text="Buy a gift card" FontSize="Medium"  BackgroundColor="#136D74"></Button>
-                              <Button HeightRequest="46" WidthRequest="287" HorizontalOptions="Center" Font="14" TextColor="white" Text="Become an ambassador" FontSize="Medium"  BackgroundColor="#136D74" Clicked="BecomeAnAmbassador"></Button>
+                              <Button WidthRequest="287" HorizontalOptions="Center" Font="14" TextColor="white" Text="Buy a gift card" FontSize="Medium"  BackgroundColor="#136D74"></Button>
+                              <Button WidthRequest="287" HorizontalOptions="Center" Font="14" TextColor="white" Text="Become an ambassador" FontSize="Medium"  BackgroundColor="#136D74" Clicked="BecomeAnAmbassador"></Button>
                               <StackLayout Orientation="Horizontal" Spacing="20" HeightRequest="36" Margin="0,20,0,20"  HorizontalOptions="CenterAndExpand" VerticalOptions="End">
                                   <Image Source="facebookWhiteIcon"></Image>
                                   <Image Source="instagramIcon.png"></Image>
                               </StackLayout>
                           </StackLayout>
                     </StackLayout>
+
                 </Grid>
             </StackLayout>
         </ScrollView>

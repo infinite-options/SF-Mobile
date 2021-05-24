@@ -67,72 +67,80 @@ namespace ServingFresh.Views
                 }
 
             }
-            catch (Exception c)
+            catch (Exception errorGetCurrentLocation)
             {
-                // Handle not supported on device exception
-                Debug.WriteLine("LOCATION MESSAGE CA:" + c.Message);
+                var client = new Diagnostic();
+                client.parseException(errorGetCurrentLocation.ToString(), user);
             }
 
         }
 
         async void FindLocalProduceBaseOnLocation(System.Object sender, System.EventArgs e)
         {
-            if(addressToValidate != null)
+            try
             {
-                if (!String.IsNullOrEmpty(AddressEntry.Text))
+                if (addressToValidate != null)
                 {
-                    var client = new AddressValidation();
-                    var addressStatus = client.ValidateAddressString(addressToValidate.Street, addressToValidate.Unit, addressToValidate.City, addressToValidate.State, addressToValidate.ZipCode);
-
-                    if (addressStatus != null)
+                    if (!String.IsNullOrEmpty(AddressEntry.Text))
                     {
-                        if (addressStatus == "Y" || addressStatus == "S")
+                        var client = new AddressValidation();
+                        var addressStatus = client.ValidateAddressString(addressToValidate.Street, addressToValidate.Unit, addressToValidate.City, addressToValidate.State, addressToValidate.ZipCode);
+
+                        if (addressStatus != null)
                         {
-
-                            var location = await client.ConvertAddressToGeoCoordiantes(addressToValidate.Street, addressToValidate.City, addressToValidate.State);
-                            if (location != null)
+                            if (addressStatus == "Y" || addressStatus == "S")
                             {
-                                var isAddressInZones = await client.getZoneFromLocation(location.Latitude.ToString(), location.Longitude.ToString());
 
-                                if (isAddressInZones != "" && isAddressInZones != "OUTSIDE ZONE RANGE")
+                                var location = await client.ConvertAddressToGeoCoordiantes(addressToValidate.Street, addressToValidate.City, addressToValidate.State);
+                                if (location != null)
                                 {
+                                    var isAddressInZones = await client.getZoneFromLocation(location.Latitude.ToString(), location.Longitude.ToString());
 
-                                    user.setUserAddress(addressToValidate.Street);
-                                    user.setUserCity(addressToValidate.City);
-                                    user.setUserUnit(addressToValidate.Unit == null? "": addressToValidate.Unit);
-                                    user.setUserState(addressToValidate.State);
-                                    user.setUserZipcode(addressToValidate.ZipCode);
-                                    user.setUserUSPSType(addressStatus);
-                                    SetUser(location);
+                                    if (isAddressInZones != "" && isAddressInZones != "OUTSIDE ZONE RANGE")
+                                    {
+
+                                        user.setUserAddress(addressToValidate.Street);
+                                        user.setUserCity(addressToValidate.City);
+                                        user.setUserUnit(addressToValidate.Unit == null ? "" : addressToValidate.Unit);
+                                        user.setUserState(addressToValidate.State);
+                                        user.setUserZipcode(addressToValidate.ZipCode);
+                                        user.setUserUSPSType(addressStatus);
+                                        SetUser(location);
+                                    }
+                                    else
+                                    {
+                                        await DisplayAlert("Oops", "You address is outside our delivery areas", "OK");
+                                        return;
+                                    }
                                 }
                                 else
                                 {
-                                    await DisplayAlert("Oops", "You address is outside our delivery areas", "OK");
+                                    await DisplayAlert("We were not able to find your location in our system.", "Try again", "OK");
                                     return;
                                 }
+
                             }
-                            else
+                            else if (addressStatus == "D")
                             {
-                                await DisplayAlert("We were not able to find your location in our system.", "Try again", "OK");
+                                var unit = await DisplayPromptAsync("It looks like your address is missing its unit number", "Please enter your address unit number in the space below", "OK", "Cancel");
+                                if (unit != null)
+                                {
+                                    addressToValidate.Unit = unit;
+                                }
                                 return;
                             }
-
-                        }
-                        else if (addressStatus == "D")
-                        {
-                            var unit = await DisplayPromptAsync("It looks like your address is missing its unit number", "Please enter your address unit number in the space below", "OK","Cancel");
-                            if(unit != null)
-                            {
-                                addressToValidate.Unit = unit;
-                            }
-                            return;
                         }
                     }
                 }
+                else
+                {
+                    SetUser(currentLocation);
+                }
             }
-            else
+            catch (Exception errorFindLocalProduceBaseOnLocation)
             {
-                SetUser(currentLocation);
+                var client = new Diagnostic();
+                client.parseException(errorFindLocalProduceBaseOnLocation.ToString(), user);
             }
         }
 
@@ -341,33 +349,40 @@ namespace ServingFresh.Views
 
         public async void GetBusinesses()
         {
-            var userLat = "37.227124";
-            var userLong = "-121.886943";
-
-            //Debug.WriteLine("INPUT 1: " + userLat);
-            //Debug.WriteLine("INPUT 2: " + userLong);
-
-            //if (userLat == "0" && userLong == "0"){ userLong = "-121.8866517"; userLat = "37.2270928";}
-
-            var client = new HttpClient();
-            var response = await client.GetAsync(Constant.ProduceByLocation + userLong + "," + userLat);
-            var result = await response.Content.ReadAsStringAsync();
-
-            //Debug.WriteLine("URL: " + Constant.ProduceByLocation + userLong + "," + userLat);
-
-            //Debug.WriteLine("CALL TO ENDPOINT SUCCESSFULL?: " + response.IsSuccessStatusCode);
-            //Debug.WriteLine("JSON RETURNED: " + result);
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                var data = JsonConvert.DeserializeObject<ServingFreshBusiness>(result);
+                var userLat = "37.227124";
+                var userLong = "-121.886943";
 
-                GetDataForSingleList(data.result, data.types);
-            }
-            else
+                //Debug.WriteLine("INPUT 1: " + userLat);
+                //Debug.WriteLine("INPUT 2: " + userLong);
+
+                //if (userLat == "0" && userLong == "0"){ userLong = "-121.8866517"; userLat = "37.2270928";}
+
+                var client = new HttpClient();
+                var response = await client.GetAsync(Constant.ProduceByLocation + userLong + "," + userLat);
+                var result = await response.Content.ReadAsStringAsync();
+
+                //Debug.WriteLine("URL: " + Constant.ProduceByLocation + userLong + "," + userLat);
+
+                //Debug.WriteLine("CALL TO ENDPOINT SUCCESSFULL?: " + response.IsSuccessStatusCode);
+                //Debug.WriteLine("JSON RETURNED: " + result);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var data = JsonConvert.DeserializeObject<ServingFreshBusiness>(result);
+
+                    GetDataForSingleList(data.result, data.types);
+                }
+                else
+                {
+                    //await DisplayAlert("Oops!", "Our system is down. We are working to fix this issue.", "OK");
+                    return;
+                }
+            }catch(Exception errorGetBusiness)
             {
-                //await DisplayAlert("Oops!", "Our system is down. We are working to fix this issue.", "OK");
-                return;
+                var client = new Diagnostic();
+                client.parseException(errorGetBusiness.ToString(), user);
             }
         }
 
@@ -458,9 +473,10 @@ namespace ServingFresh.Views
                 }
 
             }
-            catch (Exception ex)
+            catch (Exception errorGetDataForSingleList)
             {
-                Debug.WriteLine(ex.Message);
+                var client = new Diagnostic();
+                client.parseException(errorGetDataForSingleList.ToString(), user);
             }
         }
 

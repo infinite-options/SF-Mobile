@@ -7,7 +7,7 @@
     xmlns:local="clr-namespace:ServingFresh.Models"
     xmlns:servingfresh="clr-namespace:ServingFresh.Effects">
      <ContentPage.Content>
-        <Grid RowSpacing="0">
+        <Grid RowSpacing="0" BackgroundColor="White" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="94"></RowDefinition>
                 <RowDefinition Height="60"></RowDefinition>
@@ -104,11 +104,11 @@
                                                 RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
 
                                                 <Entry x:Name="AddressEntry" HeightRequest="35" Placeholder="Street Address (so we can find you)" PlaceholderColor="Gray" FontSize="14" FontAttributes="Bold" Keyboard="Text" TextColor="Black" TextChanged="OnAddressChanged" Focused="addressEntryFocused" Unfocused="addressEntryUnfocused"/>
-                                                <Entry x:Name="newUserUnitNumber" IsVisible="false" HeightRequest="35" Placeholder="Apt number" PlaceholderColor="Gray" FontSize="14" FontAttributes="Bold"></Entry>
+                                                <Entry x:Name="newUserUnitNumber" IsVisible="false" HeightRequest="35" Placeholder="Apt number" PlaceholderColor="Gray" TextColor="Black" FontSize="14" FontAttributes="Bold"></Entry>
                                                 <Grid IsVisible="false" x:Name="gridAddressView">
-                                                    <Entry Grid.Column="0" x:Name="newUserCity" HeightRequest="35" Placeholder="City" PlaceholderColor="Gray" FontSize="14" FontAttributes="Bold"></Entry>
-                                                    <Entry Grid.Column="1" x:Name="newUserState" HeightRequest="35" Placeholder="State" PlaceholderColor="Gray" FontSize="14" FontAttributes="Bold"></Entry>
-                                                    <Entry Grid.Column="2" x:Name="newUserZipcode" HeightRequest="35" Placeholder="Zip" PlaceholderColor="Gray" FontSize="14" FontAttributes="Bold"></Entry>
+                                                    <Entry Grid.Column="0" x:Name="newUserCity" HeightRequest="35" Placeholder="City" PlaceholderColor="Gray" TextColor="Black" FontSize="14" FontAttributes="Bold"></Entry>
+                                                    <Entry Grid.Column="1" x:Name="newUserState" HeightRequest="35" Placeholder="State" PlaceholderColor="Gray" TextColor="Black" FontSize="14" FontAttributes="Bold"></Entry>
+                                                    <Entry Grid.Column="2" x:Name="newUserZipcode" HeightRequest="35" Placeholder="Zip" PlaceholderColor="Gray" TextColor="Black" FontSize="14" FontAttributes="Bold"></Entry>
                                                 </Grid>
                                                 <Frame Margin="5,0,5,0" x:Name="guestMap" HeightRequest="100" BackgroundColor="LightGray" CornerRadius="20" HasShadow="False" Padding="0" IsClippedToBounds="True">
                                                     <maps:Map HeightRequest="1"
@@ -258,10 +258,10 @@
                                         <Label Grid.Column="1" x:Name="DriverTip" HorizontalTextAlignment="End" Text="$2.00" TextColor="Black" FontSize="14"></Label>
                                     </Grid>
                                     <StackLayout Orientation="Horizontal" HeightRequest="35" Spacing="15" x:Name="driverTipOptions">
-                                        <Button Grid.Column="0" WidthRequest="55" HorizontalOptions="Center" Text="No tip" TextColor="Black" FontSize="14" BorderWidth="1" BorderColor="#136D74" Clicked="GetDeliveryTips"></Button>
-                                        <Button Grid.Column="1" WidthRequest="55" HorizontalOptions="Center" Text="$2" TextColor="White" BackgroundColor="#FF8500" FontSize="14" BorderWidth="1" BorderColor="#136D74" Clicked="GetDeliveryTips"></Button>
-                                        <Button Grid.Column="2" WidthRequest="55" HorizontalOptions="Center" Text="$3" TextColor="Black" FontSize="14" BorderWidth="1" BorderColor="#136D74" Clicked="GetDeliveryTips"></Button>
-                                        <Button Grid.Column="3" WidthRequest="55" HorizontalOptions="Center" Text="$5" TextColor="Black" FontSize="14" BorderWidth="1" BorderColor="#136D74" Clicked="GetDeliveryTips"></Button>
+                                        <Button Grid.Column="0" WidthRequest="55" BackgroundColor="Transparent" HorizontalOptions="Center" Text="No tip" TextColor="Black" FontSize="14" BorderWidth="1" BorderColor="#136D74" Clicked="GetDeliveryTips"></Button>
+                                        <Button Grid.Column="1" WidthRequest="55"  HorizontalOptions="Center" Text="$2" TextColor="White" BackgroundColor="#FF8500" FontSize="14" BorderWidth="1" BorderColor="#136D74" Clicked="GetDeliveryTips"></Button>
+                                        <Button Grid.Column="2" WidthRequest="55" BackgroundColor="Transparent" HorizontalOptions="Center" Text="$3" TextColor="Black" FontSize="14" BorderWidth="1" BorderColor="#136D74" Clicked="GetDeliveryTips"></Button>
+                                        <Button Grid.Column="3" WidthRequest="55" BackgroundColor="Transparent" HorizontalOptions="Center" Text="$5" TextColor="Black" FontSize="14" BorderWidth="1" BorderColor="#136D74" Clicked="GetDeliveryTips"></Button>
                                     </StackLayout>
                                 </StackLayout>
                                 <BoxView HeightRequest="1" Color="LightGray"></BoxView>
@@ -302,19 +302,27 @@
                                         <Entry x:Name="phoneNumber" TextColor="Black"  HeightRequest="43" WidthRequest="372" HorizontalOptions="Center" Keyboard="Numeric" Placeholder="Phone number (so we can call if there is an issue)" MaxLength="10" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
                                     </StackLayout>
                                     <StackLayout Margin="0,25,0,25" Spacing="15" x:Name="guestCheckoutView" IsVisible="false">
+                                        <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
+                                            <CheckBox x:Name="areTermsAccepted" Color="Black"></CheckBox>
+                                            <StackLayout Orientation="Horizontal" Spacing="0" VerticalOptions="Center">
+                                                <Label Text="I've read and accept the " TextColor="Black" FontSize="12"></Label>
+                                                <Label Text="Terms and Conditions" TextDecorations="Underline" TextColor="Black" FontSize="12"></Label>
+                                            </StackLayout>
+                                            
+                                        </StackLayout>
                                         <Button Text="Checkout with Stripe" BorderWidth="4" BorderColor="#FF8500" HeightRequest="36" WidthRequest="264" HorizontalOptions="Center" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="GuestCheckoutWithStripe"></Button>
                                         <Button Text="Checkout with PayPal" HeightRequest="36" WidthRequest="264" HorizontalOptions="Center"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="GuestCompletePaymentWithPayPal"></Button>
                                     </StackLayout>
                                    
                                     <StackLayout x:Name="guestStripeView" Spacing="10" IsVisible="false">                             
-                                            <Entry x:Name="guestCardHolderName" HeightRequest="43" WidthRequest="372" Placeholder="Cardholder Name" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
+                                            <Entry x:Name="guestCardHolderName" HeightRequest="43" WidthRequest="372" Placeholder="Cardholder Name" PlaceholderColor="Gray" TextColor="Black" FontSize="13" FontAttributes="Bold"></Entry>
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="*"></ColumnDefinition>
                                                     <ColumnDefinition Width="100"></ColumnDefinition>
                                                 </Grid.ColumnDefinitions>
                                                 <Entry Grid.Column="0" x:Name="guestCardHolderNumber" TextColor="Black"  Keyboard="Numeric" HeightRequest="43" MaxLength="16" Placeholder="Card Number" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
-                                                <Entry Grid.Column="1" x:Name="guestCardCVV" TextColor="Black"  Keyboard="Numeric" HeightRequest="43"  Placeholder="CVV" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
+                                                <Entry Grid.Column="1" x:Name="guestCardCVV" TextColor="Black" MaxLength="3" Keyboard="Numeric" HeightRequest="43"  Placeholder="CVV" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
                                             </Grid>
                                             <Grid>
                                                 <Entry Grid.Column="0" x:Name="guestCardExpMonth" TextColor="Black"  Keyboard="Numeric" HeightRequest="43"  MaxLength="2" Placeholder="Exp MM" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
@@ -328,25 +336,32 @@
                                     <Button Text="Checkout" BorderWidth="4" BorderColor="#FF8500" HeightRequest="36" WidthRequest="264" HorizontalOptions="Center" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="PurchaseBalanceIsZero"></Button>
                                 </StackLayout>
                                 <StackLayout Margin="0,15,0,0" x:Name="customerPaymentsView">
-                                    <StackLayout Padding="20,0,20,0" Spacing="30">
+                                    <StackLayout Orientation="Horizontal" HorizontalOptions="Center">
+                                        <CheckBox x:Name="customerAreTermAccepted" Color="Black"></CheckBox>
+                                        <StackLayout Orientation="Horizontal" Spacing="0" VerticalOptions="Center">
+                                            <Label Text="I've read and accept the " TextColor="Black" FontSize="12"></Label>
+                                            <Label Text="Terms and Conditions" TextDecorations="Underline" TextColor="Black" FontSize="12"></Label>
+                                        </StackLayout>
+                                    </StackLayout>
+                                    <StackLayout Padding="20,0,20,0" Spacing="15">
                                         <Button Text="Checkout with Stripe" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="CheckoutViaStripe"></Button>
                                         <Button Text="Checkout with PayPal" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="CheckoutViaPayPal"></Button>
                                     </StackLayout>
                                 </StackLayout>
                                 <StackLayout Margin="0,30,0,0" x:Name="customerStripeInformationView" HeightRequest="0">
-                                    <Entry x:Name="cardHolderName" Placeholder="Cardholder Name" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
+                                    <Entry x:Name="cardHolderName" Placeholder="Cardholder Name" PlaceholderColor="Gray" FontSize="16" TextColor="Black" FontAttributes="Bold"></Entry>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"></ColumnDefinition>
                                             <ColumnDefinition Width="100"></ColumnDefinition>
                                         </Grid.ColumnDefinitions>
                                         <Entry Grid.Column="0" x:Name="cardHolderNumber" TextColor="Black"  MaxLength="16" Placeholder="Card Number" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
-                                        <Entry Grid.Column="1" x:Name="cardCVV" TextColor="Black"  Placeholder="CVV" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
+                                        <Entry Grid.Column="1" x:Name="cardCVV" TextColor="Black" Keyboard="Numeric" MaxLength="3" Placeholder="CVV" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
                                     </Grid>
                                     <Grid>
-                                        <Entry Grid.Column="0" x:Name="cardExpMonth" Placeholder="Exp MM" TextColor="Black"  PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
-                                        <Entry Grid.Column="1" x:Name="cardExpYear" Placeholder="Exp YY" TextColor="Black" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
-                                        <Entry Grid.Column="2" x:Name="cardZip" Placeholder="ZIP" TextColor="Black"  PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
+                                        <Entry Grid.Column="0" x:Name="cardExpMonth" Placeholder="Exp MM" TextColor="Black" Keyboard="Numeric" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
+                                        <Entry Grid.Column="1" x:Name="cardExpYear" Placeholder="Exp YY" TextColor="Black" Keyboard="Numeric" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
+                                        <Entry Grid.Column="2" x:Name="cardZip" Placeholder="ZIP" TextColor="Black" Keyboard="Numeric" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
                                     </Grid>
                                     <Button Margin="0,15,0,0" HeightRequest="59" Text="Complete Payment with Stripe" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="CompletePaymentWithStripe"></Button>
                                 </StackLayout>

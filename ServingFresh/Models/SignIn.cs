@@ -132,9 +132,10 @@ namespace ServingFresh.Models
                                 //}
                                 //Application.Current.MainPage = new SelectionPage();
                             }
-                            catch (Exception ex)
+                            catch (Exception errorSignInDirectUser)
                             {
-                                Debug.WriteLine(ex.Message);
+                                var client1 = new Diagnostic();
+                                client1.parseException(errorSignInDirectUser.ToString(), user);
                             }
                         }
                         else
@@ -398,10 +399,11 @@ namespace ServingFresh.Models
                 //test.Hide();
                 return isUserVerified;
             }
-            catch (Exception first)
+            catch (Exception errorVerifyUserCredentials)
             {
-                
-                Debug.WriteLine(first.Message);
+
+                var client = new Diagnostic();
+                client.parseException(errorVerifyUserCredentials.ToString(), user);
                 isUserVerified = "ERROR";
                 return isUserVerified;
             }
@@ -409,22 +411,30 @@ namespace ServingFresh.Models
 
         public async Task<string> ResetPassword(ResetPassword request)
         {
-            string result = "";
-            var client = new HttpClient();
-            var serializedObject = JsonConvert.SerializeObject(request);
-            var content = new StringContent(serializedObject, Encoding.UTF8, "application/json");
-            var endpointCall = await client.PostAsync(Constant.ResetPasswork, content);
-
-            Debug.WriteLine("JSON TO BE SENT " + serializedObject);
-
-            if (endpointCall.IsSuccessStatusCode)
+            try
             {
-                var endpointContentString = await endpointCall.Content.ReadAsStringAsync();
-                Debug.WriteLine("RESPONSE " + endpointContentString);
-                result = endpointContentString;
-            }
+                string result = "";
+                var client = new HttpClient();
+                var serializedObject = JsonConvert.SerializeObject(request);
+                var content = new StringContent(serializedObject, Encoding.UTF8, "application/json");
+                var endpointCall = await client.PostAsync(Constant.ResetPasswork, content);
 
-            return result;
+                Debug.WriteLine("JSON TO BE SENT " + serializedObject);
+
+                if (endpointCall.IsSuccessStatusCode)
+                {
+                    var endpointContentString = await endpointCall.Content.ReadAsStringAsync();
+                    Debug.WriteLine("RESPONSE " + endpointContentString);
+                    result = endpointContentString;
+                }
+
+                return result;
+            }catch(Exception errorResetPassword)
+            {
+                var client = new Diagnostic();
+                client.parseException(errorResetPassword.ToString(), user);
+                return "";
+            }
         }
 
         //private string platform;
@@ -560,9 +570,10 @@ namespace ServingFresh.Models
 
                 return userInformation;
             }
-            catch (Exception ex)
+            catch (Exception errorRetrieveAccountSalt)
             {
-                System.Diagnostics.Debug.WriteLine(ex.Message);
+                var client = new Diagnostic();
+                client.parseException(errorRetrieveAccountSalt.ToString(), user);
                 return null;
             }
         }
@@ -601,9 +612,10 @@ namespace ServingFresh.Models
                     return null;
                 }
             }
-            catch (Exception e)
+            catch (Exception errorLogInUser)
             {
-                Debug.WriteLine("Exception message: " + e.Message);
+                var client = new Diagnostic();
+                client.parseException(errorLogInUser.ToString(), user);
                 return null;
             }
         }
@@ -1087,50 +1099,67 @@ namespace ServingFresh.Models
 
         public async Task<UserProfile> ValidateExistingAccountFromEmail(string email)
         {
-            UserProfile result = null;
-
-            var client = new System.Net.Http.HttpClient();
-            var endpointCall = await client.GetAsync(Constant.UpdateUserProfile + email);
-
-
-            if (endpointCall.IsSuccessStatusCode)
+            try
             {
-                var endpointContent = await endpointCall.Content.ReadAsStringAsync();
-                Debug.WriteLine("PROFILE: " + endpointContent);
-                var profile = JsonConvert.DeserializeObject<UserProfile>(endpointContent);
-                if (profile.result.Count != 0)
+                UserProfile result = null;
+
+                var client = new System.Net.Http.HttpClient();
+                var endpointCall = await client.GetAsync(Constant.UpdateUserProfile + email);
+
+
+                if (endpointCall.IsSuccessStatusCode)
                 {
-                    result = profile;
+                    var endpointContent = await endpointCall.Content.ReadAsStringAsync();
+                    Debug.WriteLine("PROFILE: " + endpointContent);
+                    var profile = JsonConvert.DeserializeObject<UserProfile>(endpointContent);
+                    if (profile.result.Count != 0)
+                    {
+                        result = profile;
+                    }
+
                 }
 
+                return result;
+            }catch(Exception errorValidateExistingAccountFromEmail)
+            {
+                var client = new Diagnostic();
+                client.parseException(errorValidateExistingAccountFromEmail.ToString(), user);
+                UserProfile result = null;
+                return result;
             }
-
-            return result;
         }
 
         
         public async Task<bool> UpdateProfile(UserProfile profile)
         {
-            bool result = false;
-
-            var client = new HttpClient();
-            var updateClient = new UpdatedProfile();
-            var updatedProfile = updateClient.GetUpdatedProfile(profile);
-
-            var serializedObject = JsonConvert.SerializeObject(updatedProfile);
-            var content = new StringContent(serializedObject, Encoding.UTF8, "application/json");
-            var endpointCall = await client.PostAsync(Constant.UpdateUserProfileAddress, content);
-
-            Debug.WriteLine("JSON TO BE SEND: " + serializedObject);
-
-            if (endpointCall.IsSuccessStatusCode)
+            try
             {
-                var endpointContentString = await endpointCall.Content.ReadAsStringAsync();
-                Debug.WriteLine("UPDATED PROFILE: " + endpointContentString);
-                result = true;
-            }
+                bool result = false;
 
-            return result;
+                var client = new HttpClient();
+                var updateClient = new UpdatedProfile();
+                var updatedProfile = updateClient.GetUpdatedProfile(profile);
+
+                var serializedObject = JsonConvert.SerializeObject(updatedProfile);
+                var content = new StringContent(serializedObject, Encoding.UTF8, "application/json");
+                var endpointCall = await client.PostAsync(Constant.UpdateUserProfileAddress, content);
+
+                Debug.WriteLine("JSON TO BE SEND: " + serializedObject);
+
+                if (endpointCall.IsSuccessStatusCode)
+                {
+                    var endpointContentString = await endpointCall.Content.ReadAsStringAsync();
+                    Debug.WriteLine("UPDATED PROFILE: " + endpointContentString);
+                    result = true;
+                }
+
+                return result;
+            }catch(Exception errorUpdateProfile)
+            {
+                var client = new Diagnostic();
+                client.parseException(errorUpdateProfile.ToString(), user);
+                return false;
+            }
         }
 
         //public async Task<string> ResetPassword(string email)

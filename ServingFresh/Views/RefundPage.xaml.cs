@@ -9,6 +9,8 @@ using Acr.UserDialogs;
 using System.Text;
 using static ServingFresh.Views.SelectionPage;
 using static ServingFresh.Views.PrincipalPage;
+using ServingFresh.Models;
+
 namespace ServingFresh.Views
 {
     public partial class RefundPage : ContentPage
@@ -43,8 +45,10 @@ namespace ServingFresh.Views
                     refundItemImage.Scale = 1;
                 }
             }
-            catch
+            catch(Exception errorTakePicture)
             {
+                var client = new Diagnostic();
+                client.parseException(errorTakePicture.ToString(), user);
                 await DisplayAlert("Permission required", "We'll need permission to access your camara, so that you can take a photo of the damaged product.", "OK");
                 return;
             }
@@ -63,8 +67,10 @@ namespace ServingFresh.Views
                     refundItemImage.Scale = 1;
                 }
             }
-            catch
+            catch(Exception errorChoosePicture)
             {
+                var client = new Diagnostic();
+                client.parseException(errorChoosePicture.ToString(), user);
                 await DisplayAlert("Permission required", "We'll need permission to access your camara roll, so that you can select a photo of the damaged product.", "OK");
                 return;
             }
@@ -141,9 +147,10 @@ namespace ServingFresh.Views
                 }
                 return;
             }
-            catch (Exception exception)
+            catch (Exception errorSendRefundRequest)
             {
-                Debug.WriteLine("Exception Caught: " + exception.ToString());
+                var client = new Diagnostic();
+                client.parseException(errorSendRefundRequest.ToString(), user);
                 return;
             }
         }

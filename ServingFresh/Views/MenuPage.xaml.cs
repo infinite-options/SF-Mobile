@@ -119,5 +119,10 @@ namespace ServingFresh.Views
         {
             Application.Current.MainPage.Navigation.PopModalAsync();
         }
+
+        void NavigateToGiftCardStore(System.Object sender, System.EventArgs e)
+        {
+            Application.Current.MainPage = new GiftCardPage();
+        }
     }
 }

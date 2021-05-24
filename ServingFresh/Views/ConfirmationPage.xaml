@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:maps="clr-namespace:Xamarin.Forms.Maps;assembly=Xamarin.Forms.Maps" xmlns:servingfresh="clr-namespace:ServingFresh.Effects"
     x:Class="ServingFresh.Views.ConfirmationPage">
     <ContentPage.Content>
-        <Grid RowSpacing="0">
+        <Grid RowSpacing="0" BackgroundColor="White">
             <Grid.RowDefinitions>
                 <RowDefinition Height="94"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>

@@ -501,330 +501,338 @@ namespace ServingFresh.Views
 
         public async void GetBusinesses()
         {
-            var userLat = user.getUserLatitude();
-            var userLong = user.getUserLongitude();
-
-            Debug.WriteLine("INPUT 1: " + userLat);
-            Debug.WriteLine("INPUT 2: " + userLong);
-
-            //if (userLat == "0" && userLong == "0"){ userLong = "-121.8866517"; userLat = "37.2270928";}
-
-            var client = new HttpClient();
-            var response = await client.GetAsync(Constant.ProduceByLocation + userLong + "," + userLat);
-            var result = await response.Content.ReadAsStringAsync();
-
-            Debug.WriteLine("URL: " + Constant.ProduceByLocation + userLong + "," + userLat);
-
-            Debug.WriteLine("CALL TO ENDPOINT SUCCESSFULL?: " + response.IsSuccessStatusCode);
-            Debug.WriteLine("JSON RETURNED: " + result);
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                data = JsonConvert.DeserializeObject<ServingFreshBusiness>(result);
+                var userLat = user.getUserLatitude();
+                var userLong = user.getUserLongitude();
 
-                var currentDate = DateTime.Now;
-                var tempDateTable = GetTable(currentDate);
+                Debug.WriteLine("INPUT 1: " + userLat);
+                Debug.WriteLine("INPUT 2: " + userLong);
 
-                foreach (Business a in data.business_details)
+                //if (userLat == "0" && userLong == "0"){ userLong = "-121.8866517"; userLat = "37.2270928";}
+
+                var client = new HttpClient();
+                var response = await client.GetAsync(Constant.ProduceByLocation + userLong + "," + userLat);
+                var result = await response.Content.ReadAsStringAsync();
+
+                Debug.WriteLine("URL: " + Constant.ProduceByLocation + userLong + "," + userLat);
+
+                Debug.WriteLine("CALL TO ENDPOINT SUCCESSFULL?: " + response.IsSuccessStatusCode);
+                Debug.WriteLine("JSON RETURNED: " + result);
+
+                if (response.IsSuccessStatusCode)
                 {
-                    var acceptingDate = LastAcceptingOrdersDate(tempDateTable, a.z_accepting_day, a.z_accepting_time);
-                    var deliveryDate = new DateTime();
-                    //Debug.WriteLine("CURRENT DATE: " + currentDate);
-                    //Debug.WriteLine("LAST ACCEPTING DATE: " + acceptingDate);
+                    data = JsonConvert.DeserializeObject<ServingFreshBusiness>(result);
 
-                    if (currentDate < acceptingDate)
+                    var currentDate = DateTime.Now;
+                    var tempDateTable = GetTable(currentDate);
+
+                    foreach (Business a in data.business_details)
                     {
-                        //Debug.WriteLine("ONTIME");
+                        var acceptingDate = LastAcceptingOrdersDate(tempDateTable, a.z_accepting_day, a.z_accepting_time);
+                        var deliveryDate = new DateTime();
+                        //Debug.WriteLine("CURRENT DATE: " + currentDate);
+                        //Debug.WriteLine("LAST ACCEPTING DATE: " + acceptingDate);
 
-                        deliveryDate = bussinesDeliveryDate(a.z_delivery_day, a.z_delivery_time);
-                        if (deliveryDate < acceptingDate)
+                        if (currentDate < acceptingDate)
                         {
-                            deliveryDate = deliveryDate.AddDays(7);
-                        }
-                        if (!deliverySchedule.Contains(deliveryDate))
-                        {
-                            var element = new ScheduleInfo();
+                            //Debug.WriteLine("ONTIME");
 
-                            element.business_uids = new List<string>();
-                            element.business_uids.Add(a.z_biz_id);
-                            element.delivery_date = deliveryDate.ToString("MMM dd");
-                            element.delivery_dayofweek = deliveryDate.DayOfWeek.ToString();
-                            element.delivery_shortname = deliveryDate.DayOfWeek.ToString().Substring(0, 3).ToUpper();
-                            element.delivery_time = a.z_delivery_time;
-                            element.deliveryTimeStamp = deliveryDate;
-                            element.orderExpTime = "Order by " + acceptingDate.ToString("dddd") + ", " + acceptingDate.ToString("htt").ToLower();
+                            deliveryDate = bussinesDeliveryDate(a.z_delivery_day, a.z_delivery_time);
+                            if (deliveryDate < acceptingDate)
+                            {
+                                deliveryDate = deliveryDate.AddDays(7);
+                            }
+                            if (!deliverySchedule.Contains(deliveryDate))
+                            {
+                                var element = new ScheduleInfo();
 
-                            //Debug.WriteLine("element.delivery_date: " + element.delivery_date);
-                            //Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
-                            //Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
-                            //Debug.WriteLine("element.delivery_time: " + element.delivery_time);
-                            //Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
-                            //Debug.WriteLine("business_uids list: ");
+                                element.business_uids = new List<string>();
+                                element.business_uids.Add(a.z_biz_id);
+                                element.delivery_date = deliveryDate.ToString("MMM dd");
+                                element.delivery_dayofweek = deliveryDate.DayOfWeek.ToString();
+                                element.delivery_shortname = deliveryDate.DayOfWeek.ToString().Substring(0, 3).ToUpper();
+                                element.delivery_time = a.z_delivery_time;
+                                element.deliveryTimeStamp = deliveryDate;
+                                element.orderExpTime = "Order by " + acceptingDate.ToString("dddd") + ", " + acceptingDate.ToString("htt").ToLower();
 
-                            //foreach(string ID in element.business_uids)
-                            //{
-                            //    Debug.WriteLine(ID);
-                            //}
+                                //Debug.WriteLine("element.delivery_date: " + element.delivery_date);
+                                //Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
+                                //Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
+                                //Debug.WriteLine("element.delivery_time: " + element.delivery_time);
+                                //Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
+                                //Debug.WriteLine("business_uids list: ");
 
-                            deliverySchedule.Add(deliveryDate);
-                            displaySchedule.Add(element);
+                                //foreach(string ID in element.business_uids)
+                                //{
+                                //    Debug.WriteLine(ID);
+                                //}
+
+                                deliverySchedule.Add(deliveryDate);
+                                displaySchedule.Add(element);
+                            }
+                            else
+                            {
+                                foreach (ScheduleInfo element in displaySchedule)
+                                {
+                                    if (element.deliveryTimeStamp == deliveryDate)
+                                    {
+                                        var e = element;
+
+                                        e.business_uids.Add(a.z_biz_id);
+                                        element.business_uids = e.business_uids;
+
+                                        //Debug.WriteLine("element.delivery_date: " + element.delivery_date);
+                                        //Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
+                                        //Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
+                                        //Debug.WriteLine("element.delivery_time: " + element.delivery_time);
+                                        //Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
+                                        //Debug.WriteLine("business_uids list: ");
+
+                                        //foreach (string ID in element.business_uids)
+                                        //{
+                                        //    Debug.WriteLine(ID);
+                                        //}
+
+                                        break;
+                                    }
+                                }
+                            }
                         }
                         else
                         {
-                            foreach (ScheduleInfo element in displaySchedule)
+                            //Debug.WriteLine("NON ONTIME! -> ROLL OVER TO NEXT DELIVERY DATE");
+
+                            deliveryDate = bussinesDeliveryDate(a.z_delivery_day, a.z_delivery_time);
+
+                            if (!deliverySchedule.Contains(deliveryDate.AddDays(7)))
                             {
-                                if (element.deliveryTimeStamp == deliveryDate)
+                                var nextDeliveryDate = deliveryDate.AddDays(7);
+                                var element = new ScheduleInfo();
+
+                                element.business_uids = new List<string>();
+                                element.business_uids.Add(a.z_biz_id);
+                                element.delivery_date = nextDeliveryDate.ToString("MMM dd");
+                                element.delivery_dayofweek = nextDeliveryDate.DayOfWeek.ToString();
+                                element.delivery_shortname = nextDeliveryDate.DayOfWeek.ToString().Substring(0, 3).ToUpper();
+                                element.delivery_time = a.z_delivery_time;
+                                element.deliveryTimeStamp = nextDeliveryDate;
+                                element.orderExpTime = "Order by " + acceptingDate.AddDays(7).ToString("ddd") + " " + acceptingDate.AddDays(7).ToString("htt").ToLower();
+
+                                //Debug.WriteLine("element.delivery_date: " + element.delivery_date);
+                                //Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
+                                //Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
+                                //Debug.WriteLine("element.delivery_time: " + element.delivery_time);
+                                //Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
+                                //Debug.Write("business_uids list: ");
+
+                                //foreach (string ID in element.business_uids)
+                                //{
+                                //    Debug.Write(ID + ", ");
+                                //}
+
+                                deliverySchedule.Add(nextDeliveryDate);
+                                displaySchedule.Add(element);
+                            }
+                            else
+                            {
+                                var nextDeliveryDate = deliveryDate.AddDays(7);
+
+                                foreach (ScheduleInfo element in displaySchedule)
                                 {
-                                    var e = element;
+                                    if (element.deliveryTimeStamp == nextDeliveryDate)
+                                    {
+                                        var e = element;
 
-                                    e.business_uids.Add(a.z_biz_id);
-                                    element.business_uids = e.business_uids;
+                                        e.business_uids.Add(a.z_biz_id);
+                                        element.business_uids = e.business_uids;
 
-                                    //Debug.WriteLine("element.delivery_date: " + element.delivery_date);
-                                    //Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
-                                    //Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
-                                    //Debug.WriteLine("element.delivery_time: " + element.delivery_time);
-                                    //Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
-                                    //Debug.WriteLine("business_uids list: ");
+                                        //Debug.WriteLine("element.delivery_date: " + element.delivery_date);
+                                        //Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
+                                        //Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
+                                        //Debug.WriteLine("element.delivery_time: " + element.delivery_time);
+                                        //Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
+                                        //Debug.Write("business_uids list: ");
 
-                                    //foreach (string ID in element.business_uids)
-                                    //{
-                                    //    Debug.WriteLine(ID);
-                                    //}
+                                        //foreach (string ID in element.business_uids)
+                                        //{
+                                        //    Debug.Write(ID + ", ");
+                                        //}
 
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    deliverySchedule.Sort();
+                    List<ScheduleInfo> sortedSchedule = new List<ScheduleInfo>();
+
+                    foreach (DateTime deliveryElement in deliverySchedule)
+                    {
+                        foreach (ScheduleInfo scheduleElement in displaySchedule)
+                        {
+                            if (deliveryElement == scheduleElement.deliveryTimeStamp)
+                            {
+                                sortedSchedule.Add(scheduleElement);
+                            }
+                        }
+                    }
+
+                    displaySchedule = sortedSchedule;
+
+                    if (data.business_details.Count != 0)
+                    {
+                        // Parse it
+                        zone = data.business_details[0].zone;
+
+                        deliveryDays.Clear();
+                        businessList.Clear();
+
+                        foreach (Business business in data.business_details)
+                        {
+                            DeliveryInfo element = new DeliveryInfo();
+                            element.delivery_day = business.z_delivery_day;
+                            element.delivery_time = business.z_delivery_time;
+
+                            bool addElement = false;
+
+                            if (deliveryDays.Count != 0)
+                            {
+                                foreach (DeliveryInfo i in deliveryDays)
+                                {
+                                    if (element.delivery_time == i.delivery_time && element.delivery_day == i.delivery_day)
+                                    {
+                                        addElement = true;
+                                        break;
+                                    }
+                                }
+                                if (!addElement)
+                                {
+                                    deliveryDays.Add(element);
+                                }
+                            }
+                            else
+                            {
+                                deliveryDays.Add(element);
+                            }
+
+                            if (!businessList.Contains(business.z_biz_id))
+                            {
+                                businessList.Add(business.z_biz_id);
+                            }
+                        }
+
+                        foreach (string id in businessList)
+                        {
+                            //Debug.WriteLine(id + " :");
+                            IDictionary<string, IList<string>> days = new Dictionary<string, IList<string>>();
+                            foreach (Business b in data.business_details)
+                            {
+                                if (id == b.z_biz_id)
+                                {
+                                    if (!days.ContainsKey(b.z_delivery_day.ToUpper()))
+                                    {
+                                        IList<string> times = new List<string>();
+                                        times.Add(b.z_delivery_time);
+                                        days.Add(b.z_delivery_day.ToUpper(), times);
+                                    }
+                                    else
+                                    {
+                                        List<string> times = (List<string>)days[b.z_delivery_day.ToUpper()];
+                                        times.Add(b.z_delivery_time);
+                                        days[b.z_delivery_day.ToUpper()] = times;
+                                    }
+
+                                }
+                            }
+
+                            foreach (Business i in data.business_details)
+                            {
+                                if (id == i.z_biz_id)
+                                {
+                                    i.delivery_days = days;
+                                    businesses.Add(unselectedBusiness(i));
                                     break;
                                 }
                             }
+                        }
+
+                        foreach (ScheduleInfo i in displaySchedule)
+                        {
+                            i.colorSchedule = Color.FromHex("#E0E6E6");
+                            i.textColor = Color.FromHex("#136D74");
+                        }
+
+                        delivery_list.ItemsSource = displaySchedule;
+
+                        if (displaySchedule.Count != 0)
+                        {
+                            if (selectedDeliveryDate == null)
+                            {
+                                selectedDeliveryDate = displaySchedule[0];
+                                displaySchedule[0].colorScheduleUpdate = Color.FromHex("#FF8500");
+                                displaySchedule[0].textColorUpdate = Color.FromHex("#FFFFFF");
+                                Debug.WriteLine("FILL SELECTED SCHEDULE WITH DEFAULT DELIVERY DATE");
+                            }
+                            else
+                            {
+                                var i = FindSelectedDeliveryDate(displaySchedule, selectedDeliveryDate);
+                                displaySchedule[i].colorScheduleUpdate = Color.FromHex("#FF8500");
+                                displaySchedule[i].textColorUpdate = Color.FromHex("#FFFFFF");
+                            }
+
+                            //displaySchedule[0].colorScheduleUpdate = Color.FromHex("#FF8500");
+                            //displaySchedule[0].textColorUpdate = Color.FromHex("#FFFFFF");
+
+                            var day = DateTime.Parse(displaySchedule[0].deliveryTimeStamp.ToString());
+
+                            title.Text = day.ToString("ddd") + ", " + displaySchedule[0].delivery_date.ToString();
+                            deliveryTime.Text = "Delivery time: " + displaySchedule[0].delivery_time;
+                            orderBy.Text = "(" + displaySchedule[0].orderExpTime + ")";
+
+                            //GetData(data.result);
+
+                            GetDataForSingleList(data.result, data.types);
+                            //GetDataForVegetables(vegetableDoubleList);
+                            //GetDataForFruits(fruitDoubleList);
+                            //GetDataForOthers(otherDoubleList);
+                            //GetDataForDesserts(dessetDoubleList);
+                            //updateItemsBackgroundColorAndQuantity(vegetablesList, selectedDeliveryDate);
+
+
+                            updateItemsBackgroundColorAndQuantity(vegetablesList, selectedDeliveryDate);
+                            updateItemsBackgroundColorAndQuantity(fruitsList, selectedDeliveryDate);
+                            updateItemsBackgroundColorAndQuantity(dessertsList, selectedDeliveryDate);
+                            updateItemsBackgroundColorAndQuantity(othersList, selectedDeliveryDate);
+
+                            SetVerticalView(vegetablesList, itemList);
+                            //updateItemsBackgroundColorAndQuantity(fruitsList, selectedDeliveryDate);
+                            SetVerticalView(fruitsList, fruitsVerticalView);
+                            //updateItemsBackgroundColorAndQuantity(dessertsList, selectedDeliveryDate);
+                            SetVerticalView(dessertsList, dessertsVerticalView);
+                            //updateItemsBackgroundColorAndQuantity(othersList, selectedDeliveryDate);
+                            SetVerticalView(othersList, othersVerticalView);
+                            UpdateNumberOfItemsInCart();
                         }
                     }
                     else
                     {
-                        //Debug.WriteLine("NON ONTIME! -> ROLL OVER TO NEXT DELIVERY DATE");
-
-                        deliveryDate = bussinesDeliveryDate(a.z_delivery_day, a.z_delivery_time);
-
-                        if (!deliverySchedule.Contains(deliveryDate.AddDays(7)))
-                        {
-                            var nextDeliveryDate = deliveryDate.AddDays(7);
-                            var element = new ScheduleInfo();
-
-                            element.business_uids = new List<string>();
-                            element.business_uids.Add(a.z_biz_id);
-                            element.delivery_date = nextDeliveryDate.ToString("MMM dd");
-                            element.delivery_dayofweek = nextDeliveryDate.DayOfWeek.ToString();
-                            element.delivery_shortname = nextDeliveryDate.DayOfWeek.ToString().Substring(0, 3).ToUpper();
-                            element.delivery_time = a.z_delivery_time;
-                            element.deliveryTimeStamp = nextDeliveryDate;
-                            element.orderExpTime = "Order by " + acceptingDate.AddDays(7).ToString("ddd") + " " + acceptingDate.AddDays(7).ToString("htt").ToLower();
-
-                            //Debug.WriteLine("element.delivery_date: " + element.delivery_date);
-                            //Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
-                            //Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
-                            //Debug.WriteLine("element.delivery_time: " + element.delivery_time);
-                            //Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
-                            //Debug.Write("business_uids list: ");
-
-                            //foreach (string ID in element.business_uids)
-                            //{
-                            //    Debug.Write(ID + ", ");
-                            //}
-
-                            deliverySchedule.Add(nextDeliveryDate);
-                            displaySchedule.Add(element);
-                        }
-                        else
-                        {
-                            var nextDeliveryDate = deliveryDate.AddDays(7);
-
-                            foreach (ScheduleInfo element in displaySchedule)
-                            {
-                                if (element.deliveryTimeStamp == nextDeliveryDate)
-                                {
-                                    var e = element;
-
-                                    e.business_uids.Add(a.z_biz_id);
-                                    element.business_uids = e.business_uids;
-
-                                    //Debug.WriteLine("element.delivery_date: " + element.delivery_date);
-                                    //Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
-                                    //Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
-                                    //Debug.WriteLine("element.delivery_time: " + element.delivery_time);
-                                    //Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
-                                    //Debug.Write("business_uids list: ");
-
-                                    //foreach (string ID in element.business_uids)
-                                    //{
-                                    //    Debug.Write(ID + ", ");
-                                    //}
-
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                deliverySchedule.Sort();
-                List<ScheduleInfo> sortedSchedule = new List<ScheduleInfo>();
-
-                foreach (DateTime deliveryElement in deliverySchedule)
-                {
-                    foreach (ScheduleInfo scheduleElement in displaySchedule)
-                    {
-                        if (deliveryElement == scheduleElement.deliveryTimeStamp)
-                        {
-                            sortedSchedule.Add(scheduleElement);
-                        }
-                    }
-                }
-
-                displaySchedule = sortedSchedule;
-
-                if (data.business_details.Count != 0)
-                {
-                    // Parse it
-                    zone = data.business_details[0].zone;
-
-                    deliveryDays.Clear();
-                    businessList.Clear();
-
-                    foreach (Business business in data.business_details)
-                    {
-                        DeliveryInfo element = new DeliveryInfo();
-                        element.delivery_day = business.z_delivery_day;
-                        element.delivery_time = business.z_delivery_time;
-
-                        bool addElement = false;
-
-                        if (deliveryDays.Count != 0)
-                        {
-                            foreach (DeliveryInfo i in deliveryDays)
-                            {
-                                if (element.delivery_time == i.delivery_time && element.delivery_day == i.delivery_day)
-                                {
-                                    addElement = true;
-                                    break;
-                                }
-                            }
-                            if (!addElement)
-                            {
-                                deliveryDays.Add(element);
-                            }
-                        }
-                        else
-                        {
-                            deliveryDays.Add(element);
-                        }
-
-                        if (!businessList.Contains(business.z_biz_id))
-                        {
-                            businessList.Add(business.z_biz_id);
-                        }
-                    }
-
-                    foreach (string id in businessList)
-                    {
-                        //Debug.WriteLine(id + " :");
-                        IDictionary<string, IList<string>> days = new Dictionary<string, IList<string>>();
-                        foreach (Business b in data.business_details)
-                        {
-                            if (id == b.z_biz_id)
-                            {
-                                if (!days.ContainsKey(b.z_delivery_day.ToUpper()))
-                                {
-                                    IList<string> times = new List<string>();
-                                    times.Add(b.z_delivery_time);
-                                    days.Add(b.z_delivery_day.ToUpper(), times);
-                                }
-                                else
-                                {
-                                    List<string> times = (List<string>)days[b.z_delivery_day.ToUpper()];
-                                    times.Add(b.z_delivery_time);
-                                    days[b.z_delivery_day.ToUpper()] = times;
-                                }
-
-                            }
-                        }
-
-                        foreach (Business i in data.business_details)
-                        {
-                            if (id == i.z_biz_id)
-                            {
-                                i.delivery_days = days;
-                                businesses.Add(unselectedBusiness(i));
-                                break;
-                            }
-                        }
-                    }
-
-                    foreach (ScheduleInfo i in displaySchedule)
-                    {
-                        i.colorSchedule = Color.FromHex("#E0E6E6");
-                        i.textColor = Color.FromHex("#136D74");
-                    }
-
-                    delivery_list.ItemsSource = displaySchedule;
-
-                    if (displaySchedule.Count != 0)
-                    {
-                        if(selectedDeliveryDate == null)
-                        {
-                            selectedDeliveryDate = displaySchedule[0];
-                            displaySchedule[0].colorScheduleUpdate = Color.FromHex("#FF8500");
-                            displaySchedule[0].textColorUpdate = Color.FromHex("#FFFFFF");
-                            Debug.WriteLine("FILL SELECTED SCHEDULE WITH DEFAULT DELIVERY DATE");
-                        }
-                        else
-                        {
-                            var i = FindSelectedDeliveryDate(displaySchedule, selectedDeliveryDate);
-                            displaySchedule[i].colorScheduleUpdate = Color.FromHex("#FF8500");
-                            displaySchedule[i].textColorUpdate = Color.FromHex("#FFFFFF");
-                        }
-
-                        //displaySchedule[0].colorScheduleUpdate = Color.FromHex("#FF8500");
-                        //displaySchedule[0].textColorUpdate = Color.FromHex("#FFFFFF");
-
-                        var day = DateTime.Parse(displaySchedule[0].deliveryTimeStamp.ToString());
-
-                        title.Text = day.ToString("ddd") + ", " + displaySchedule[0].delivery_date.ToString();
-                        deliveryTime.Text = "Delivery time: " + displaySchedule[0].delivery_time;
-                        orderBy.Text = "(" + displaySchedule[0].orderExpTime + ")";
-
-                        //GetData(data.result);
-
-                        GetDataForSingleList(data.result, data.types);
-                        //GetDataForVegetables(vegetableDoubleList);
-                        //GetDataForFruits(fruitDoubleList);
-                        //GetDataForOthers(otherDoubleList);
-                        //GetDataForDesserts(dessetDoubleList);
-                        //updateItemsBackgroundColorAndQuantity(vegetablesList, selectedDeliveryDate);
-
-
-                        updateItemsBackgroundColorAndQuantity(vegetablesList, selectedDeliveryDate);
-                        updateItemsBackgroundColorAndQuantity(fruitsList, selectedDeliveryDate);
-                        updateItemsBackgroundColorAndQuantity(dessertsList, selectedDeliveryDate);
-                        updateItemsBackgroundColorAndQuantity(othersList, selectedDeliveryDate);
-
-                        SetVerticalView(vegetablesList, itemList);
-                        //updateItemsBackgroundColorAndQuantity(fruitsList, selectedDeliveryDate);
-                        SetVerticalView(fruitsList, fruitsVerticalView);
-                        //updateItemsBackgroundColorAndQuantity(dessertsList, selectedDeliveryDate);
-                        SetVerticalView(dessertsList, dessertsVerticalView);
-                        //updateItemsBackgroundColorAndQuantity(othersList, selectedDeliveryDate);
-                        SetVerticalView(othersList, othersVerticalView);
-                        UpdateNumberOfItemsInCart();
+                        await DisplayAlert("Oops", "We don't have a business that can delivery to your location at the moment", "OK");
+                        return;
                     }
                 }
                 else
                 {
-                    await DisplayAlert("Oops", "We don't have a business that can delivery to your location at the moment", "OK");
+                    //await DisplayAlert("Oops!", "Our system is down. We are working to fix this issue.", "OK");
                     return;
                 }
             }
-            else
+            catch (Exception errorGetBusinesses)
             {
-                //await DisplayAlert("Oops!", "Our system is down. We are working to fix this issue.", "OK");
-                return;
+                var client = new Diagnostic();
+                client.parseException(errorGetBusinesses.ToString(), user);
             }
         }
 
@@ -1176,9 +1184,10 @@ namespace ServingFresh.Views
                 dessertsListView.ItemsSource = dessertsList;
 
             }
-            catch (Exception ex)
+            catch (Exception errorGetDataForSigleList)
             {
-                Debug.WriteLine(ex.Message);
+                var client = new Diagnostic();
+                client.parseException(errorGetDataForSigleList.ToString(), user);
             }
         }
 

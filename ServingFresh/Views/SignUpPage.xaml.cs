@@ -114,132 +114,140 @@ namespace ServingFresh.Views
 
         async void SignUpUserDirect(System.Object sender, System.EventArgs e)
         {
-            
+
             // STEP 1: CHECK THAT ALL ENTRIES ARE FILLED
             // STEP 2: CHECK THAT EMAIL1 AND EMAIL2 ARE THE SAME
             // STEP 3: CHECK THAT PASSWORD1 AND PASSWORD2 ARE THE SAME
             // STEP 4: CHECK IF EMAIL EXISTS IF SO UPDATE
             // STEP 5: ELSE SIGN THE USER DIRECT WAY
-
-            var signUpClient = new SignUp();
-            var signInClient = new SignIn();
-  
-            if (signUpClient.ValidateSignUpInfo(newUserFirstName, newUserLastName, newUserEmail1, newUserEmail2, newUserPassword1, newUserPassword2))
+            try
             {
+                var signUpClient = new SignUp();
+                var signInClient = new SignIn();
 
-                if (signUpClient.ValidateEmail(newUserEmail1, newUserEmail2))
+                if (signUpClient.ValidateSignUpInfo(newUserFirstName, newUserLastName, newUserEmail1, newUserEmail2, newUserPassword1, newUserPassword2))
                 {
-                    if (signUpClient.ValidatePassword(newUserPassword1, newUserPassword2))
+
+                    if (signUpClient.ValidateEmail(newUserEmail1, newUserEmail2))
                     {
-
-                        user.setUserEmail(newUserEmail1.Text);
-                        user.setUserFirstName(newUserFirstName.Text);
-                        user.setUserLastName(newUserLastName.Text);
-
-                        var profile = await signInClient.ValidateExistingAccountFromEmail(user.getUserEmail());
-
-                        if(profile != null)
+                        if (signUpClient.ValidatePassword(newUserPassword1, newUserPassword2))
                         {
-                            if(profile.result.Count != 0)
+
+                            user.setUserEmail(newUserEmail1.Text);
+                            user.setUserFirstName(newUserFirstName.Text);
+                            user.setUserLastName(newUserLastName.Text);
+
+                            var profile = await signInClient.ValidateExistingAccountFromEmail(user.getUserEmail());
+
+                            if (profile != null)
                             {
-                                if(profile.result[0].role == "GUEST")
+                                if (profile.result.Count != 0)
                                 {
-                                    user.setUserID(profile.result[0].customer_uid);
-                                    var content = signUpClient.UpdateDirectUser(user, newUserPassword1.Text);
-                                    var signUpStatus = await SignUp.SignUpNewUser(content);
-
-                                    if (signUpStatus)
+                                    if (profile.result[0].role == "GUEST")
                                     {
-                                        user.setUserPlatform("DIRECT");
-                                        user.setUserType("CUSTOMER");
-                                        user.printUser();
-                                        await DisplayAlert("Sign Up", "Confirmation email sent. Please check and click the link included.", "Okay, continue");
-                                        if(direction == "")
-                                        {
-                                            Application.Current.MainPage = new SelectionPage();
-                                        }else if (direction != "")
-                                        {
-                                            Dictionary<string, Page> array = new Dictionary<string, Page>();
-                                            array.Add("ServingFresh.Views.CheckoutPage", new CheckoutPage());
-                                            array.Add("ServingFresh.Views.SelectionPage", new SelectionPage());
-                                            array.Add("ServingFresh.Views.HistoryPage", new HistoryPage());
-                                            array.Add("ServingFresh.Views.RefundPage", new RefundPage());
-                                            array.Add("ServingFresh.Views.ProfilePage", new ProfilePage());
-                                            array.Add("ServingFresh.Views.ConfirmationPage", new ConfirmationPage());
-                                            array.Add("ServingFresh.Views.InfoPage", new InfoPage());
+                                        user.setUserID(profile.result[0].customer_uid);
+                                        var content = signUpClient.UpdateDirectUser(user, newUserPassword1.Text);
+                                        var signUpStatus = await SignUp.SignUpNewUser(content);
 
-                                            var root = Application.Current.MainPage;
-                                            Debug.WriteLine("ROOT VALUE: " + root);
-                                            Application.Current.MainPage = array[root.ToString()];
+                                        if (signUpStatus)
+                                        {
+                                            user.setUserPlatform("DIRECT");
+                                            user.setUserType("CUSTOMER");
+                                            user.printUser();
+                                            await DisplayAlert("Sign Up", "Confirmation email sent. Please check and click the link included.", "Okay, continue");
+                                            if (direction == "")
+                                            {
+                                                Application.Current.MainPage = new SelectionPage();
+                                            }
+                                            else if (direction != "")
+                                            {
+                                                Dictionary<string, Page> array = new Dictionary<string, Page>();
+                                                array.Add("ServingFresh.Views.CheckoutPage", new CheckoutPage());
+                                                array.Add("ServingFresh.Views.SelectionPage", new SelectionPage());
+                                                array.Add("ServingFresh.Views.HistoryPage", new HistoryPage());
+                                                array.Add("ServingFresh.Views.RefundPage", new RefundPage());
+                                                array.Add("ServingFresh.Views.ProfilePage", new ProfilePage());
+                                                array.Add("ServingFresh.Views.ConfirmationPage", new ConfirmationPage());
+                                                array.Add("ServingFresh.Views.InfoPage", new InfoPage());
+
+                                                var root = Application.Current.MainPage;
+                                                Debug.WriteLine("ROOT VALUE: " + root);
+                                                Application.Current.MainPage = array[root.ToString()];
+                                            }
+                                            user.printUser();
                                         }
-                                        user.printUser();
+                                        else
+                                        {
+                                            await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
+                                        }
                                     }
-                                    else
+                                }
+                            }
+                            else
+                            {
+
+                                var content = signUpClient.SetDirectUser(user, newUserPassword1.Text);
+                                var signUpStatus = await SignUp.SignUpNewUser(content);
+
+                                if (signUpStatus != "" && signUpStatus != "USER ALREADY EXIST")
+                                {
+                                    user.setUserID(signUpStatus);
+                                    user.setUserPlatform("DIRECT");
+                                    user.setUserType("CUSTOMER");
+                                    user.printUser();
+                                    signUpClient.WriteDeviceID(user);
+                                    await DisplayAlert("Sign Up", "Confirmation email sent. Please check and click the link included.", "Okay, continue");
+
+                                    if (direction == "")
                                     {
-                                        await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
+                                        Application.Current.MainPage = new SelectionPage();
                                     }
+                                    else if (direction != "")
+                                    {
+                                        Dictionary<string, Page> array = new Dictionary<string, Page>();
+                                        array.Add("ServingFresh.Views.CheckoutPage", new CheckoutPage());
+                                        array.Add("ServingFresh.Views.SelectionPage", new SelectionPage());
+                                        array.Add("ServingFresh.Views.HistoryPage", new HistoryPage());
+                                        array.Add("ServingFresh.Views.RefundPage", new RefundPage());
+                                        array.Add("ServingFresh.Views.ProfilePage", new ProfilePage());
+                                        array.Add("ServingFresh.Views.ConfirmationPage", new ConfirmationPage());
+                                        array.Add("ServingFresh.Views.InfoPage", new InfoPage());
+
+                                        var root = Application.Current.MainPage;
+                                        Debug.WriteLine("ROOT VALUE: " + root);
+                                        Application.Current.MainPage = array[root.ToString()];
+                                    }
+
+                                }
+                                else if (signUpStatus != "" && signUpStatus == "USER ALREADY EXIST")
+                                {
+                                    await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
                                 }
                             }
                         }
                         else
                         {
-                            
-                            var content = signUpClient.SetDirectUser(user, newUserPassword1.Text);
-                            var signUpStatus = await SignUp.SignUpNewUser(content);
-
-                            if (signUpStatus != "" && signUpStatus != "USER ALREADY EXIST")
-                            {
-                                user.setUserID(signUpStatus);
-                                user.setUserPlatform("DIRECT");
-                                user.setUserType("CUSTOMER");
-                                user.printUser();
-                                signUpClient.WriteDeviceID(user);
-                                await DisplayAlert("Sign Up", "Confirmation email sent. Please check and click the link included.", "Okay, continue");
-  
-                                if (direction == "")
-                                {
-                                    Application.Current.MainPage = new SelectionPage();
-                                }
-                                else if (direction != "")
-                                {
-                                    Dictionary<string, Page> array = new Dictionary<string, Page>();
-                                    array.Add("ServingFresh.Views.CheckoutPage", new CheckoutPage());
-                                    array.Add("ServingFresh.Views.SelectionPage", new SelectionPage());
-                                    array.Add("ServingFresh.Views.HistoryPage", new HistoryPage());
-                                    array.Add("ServingFresh.Views.RefundPage", new RefundPage());
-                                    array.Add("ServingFresh.Views.ProfilePage", new ProfilePage());
-                                    array.Add("ServingFresh.Views.ConfirmationPage", new ConfirmationPage());
-                                    array.Add("ServingFresh.Views.InfoPage", new InfoPage());
-
-                                    var root = Application.Current.MainPage;
-                                    Debug.WriteLine("ROOT VALUE: " + root);
-                                    Application.Current.MainPage = array[root.ToString()];
-                                }
-                                
-                            }
-                            else if (signUpStatus != "" && signUpStatus == "USER ALREADY EXIST")
-                            {
-                                await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
-                            }
+                            await DisplayAlert("Oops", "Please check that your password is the same in both entries", "OK");
+                            return;
                         }
                     }
                     else
                     {
-                        await DisplayAlert("Oops", "Please check that your password is the same in both entries", "OK");
+                        await DisplayAlert("Oops", "Please check that your email is the same in both entries", "OK");
                         return;
                     }
+
                 }
                 else
                 {
-                    await DisplayAlert("Oops", "Please check that your email is the same in both entries", "OK");
+                    await DisplayAlert("Oops", "Please enter all the required information. Thanks!", "OK");
                     return;
                 }
-
             }
-            else
+            catch (Exception errorSignUpUserDirect)
             {
-                await DisplayAlert("Oops", "Please enter all the required information. Thanks!", "OK");
-                return;
+                var client = new Diagnostic();
+                client.parseException(errorSignUpUserDirect.ToString(), user);
             }
         }
 
@@ -411,9 +419,10 @@ namespace ServingFresh.Views
                         }
                     }
                 }
-                catch (Exception g)
+                catch (Exception errorFacebookAuthetication)
                 {
-                    Debug.WriteLine(g.Message);
+                    var client = new Diagnostic();
+                    client.parseException(errorFacebookAuthetication.ToString(), user);
                 }
             }
         }
@@ -562,9 +571,10 @@ namespace ServingFresh.Views
                     }
 
                 }
-                catch (Exception g)
+                catch (Exception errorGoogleAuthetication)
                 {
-                    Debug.WriteLine(g.Message);
+                    var client = new Diagnostic();
+                    client.parseException(errorGoogleAuthetication.ToString(), user);
                 }
             }
         }
@@ -690,9 +700,10 @@ namespace ServingFresh.Views
                     //AppleError?.Invoke(this, default(EventArgs));
                 }
             }
-            catch (Exception apple)
+            catch (Exception errorAppleSignInRequest)
             {
-                await Application.Current.MainPage.DisplayAlert("Error", apple.Message, "OK");
+                var client = new Diagnostic();
+                client.parseException(errorAppleSignInRequest.ToString(), user);
             }
         }
 

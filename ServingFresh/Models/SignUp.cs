@@ -10,7 +10,7 @@ using ServingFresh.Models.Interfaces;
 using ServingFresh.Views;
 using Xamarin.Essentials;
 using Xamarin.Forms;
-
+using static ServingFresh.Views.PrincipalPage;
 namespace ServingFresh.Models
 {
     public class SignUp
@@ -190,30 +190,38 @@ namespace ServingFresh.Models
         {
             //var handler = new HttpClientHandler();
             //handler.AllowAutoRedirect = true;
-            var userID = "";
-            var client = new HttpClient();
-            var serializedObject = JsonConvert.SerializeObject(newUser);
-            var content = new StringContent(serializedObject, Encoding.UTF8, "application/json");
-            var endpointCall = await client.PostAsync(Constant.SignUpUrl, content);
-
-            Debug.WriteLine("USER ROLE: " + newUser.role);
-            Debug.WriteLine("JSON TO SEND VIA SIGN UP ENDPOINT: " + serializedObject);
-
-            if (endpointCall.IsSuccessStatusCode)
+            try
             {
-                var endpointContentString = await endpointCall.Content.ReadAsStringAsync();
-                var parsedData = JsonConvert.DeserializeObject<SignUpResponse>(endpointContentString);
-                if (parsedData.code != Constant.EmailAlreadyExist)
-                {
-                    userID = parsedData.result.customer_uid;
-                }
-                else
-                {
-                    userID = "USER ALREADY EXIST";
-                }
-            }
+                var userID = "";
+                var client = new HttpClient();
+                var serializedObject = JsonConvert.SerializeObject(newUser);
+                var content = new StringContent(serializedObject, Encoding.UTF8, "application/json");
+                var endpointCall = await client.PostAsync(Constant.SignUpUrl, content);
 
-            return userID;
+                Debug.WriteLine("USER ROLE: " + newUser.role);
+                Debug.WriteLine("JSON TO SEND VIA SIGN UP ENDPOINT: " + serializedObject);
+
+                if (endpointCall.IsSuccessStatusCode)
+                {
+                    var endpointContentString = await endpointCall.Content.ReadAsStringAsync();
+                    var parsedData = JsonConvert.DeserializeObject<SignUpResponse>(endpointContentString);
+                    if (parsedData.code != Constant.EmailAlreadyExist)
+                    {
+                        userID = parsedData.result.customer_uid;
+                    }
+                    else
+                    {
+                        userID = "USER ALREADY EXIST";
+                    }
+                }
+
+                return userID;
+            }catch(Exception errorSignUpNewUser)
+            {
+                var client = new Diagnostic();
+                client.parseException(errorSignUpNewUser.ToString(), user);
+                return "";
+            }
         }
 
         public bool ValidateSignUpInfo(Entry phoneNumber, Entry address1, Entry city, Entry state, Entry zipcode)
@@ -374,66 +382,81 @@ namespace ServingFresh.Models
 
         public static async Task<bool> SignUpNewUser(UpdateProfile existingUser)
         {
-            bool result = false;
-            var client = new HttpClient();
-            var serializedObject = JsonConvert.SerializeObject(existingUser);
-            var content = new StringContent(serializedObject, Encoding.UTF8, "application/json");
-            var endpointCall = await client.PostAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/createAccountGuestToCustomer", content);
-
-            Debug.WriteLine("USER ROLE: " + existingUser.role);
-            Debug.WriteLine("JSON TO SEND VIA SIGN UP ENDPOINT: " + serializedObject);
-
-            if (endpointCall.IsSuccessStatusCode)
+            try
             {
-                var endpointContentString = await endpointCall.Content.ReadAsStringAsync();
-                Debug.WriteLine("UPDATED PROFILE: " + endpointContentString);
-                result = true;
-            }
+                bool result = false;
+                var client = new HttpClient();
+                var serializedObject = JsonConvert.SerializeObject(existingUser);
+                var content = new StringContent(serializedObject, Encoding.UTF8, "application/json");
+                var endpointCall = await client.PostAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/createAccountGuestToCustomer", content);
 
-            return result;
+                Debug.WriteLine("USER ROLE: " + existingUser.role);
+                Debug.WriteLine("JSON TO SEND VIA SIGN UP ENDPOINT: " + serializedObject);
+
+                if (endpointCall.IsSuccessStatusCode)
+                {
+                    var endpointContentString = await endpointCall.Content.ReadAsStringAsync();
+                    Debug.WriteLine("UPDATED PROFILE: " + endpointContentString);
+                    result = true;
+                }
+
+                return result;
+            }catch(Exception errorSignUpNewUser)
+            {
+                var client = new Diagnostic();
+                client.parseException(errorSignUpNewUser.ToString(), user);
+                return false;
+            }
         }
 
         public async void WriteDeviceID(User user)
         {
-            var deviceId = "";
-            var client = new HttpClient();
-            if (Device.RuntimePlatform == Device.iOS)
+            try
             {
-                deviceId = Preferences.Get("guid", null);
-                if (deviceId != null) { Debug.WriteLine("This is the iOS GUID from Log in: " + deviceId); }
-            }
-            else
-            {
-                deviceId = Preferences.Get("guid", null);
-                if (deviceId != null) { Debug.WriteLine("This is the Android GUID from Log in " + deviceId); }
-            }
-
-            if (deviceId != null)
-            {
-                NotificationPost notificationPost = new NotificationPost();
-
-                notificationPost.uid = user.getUserID();
-                notificationPost.guid = deviceId.Substring(5);
-                user.setUserDeviceID(deviceId.Substring(5));
-                notificationPost.notification = "TRUE";
-
-                var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
-                Debug.WriteLine("Notification JSON Object to send: " + notificationSerializedObject);
-
-                var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
-
-                var clientResponse = await client.PostAsync(Constant.NotificationsUrl, notificationContent);
-
-                Debug.WriteLine("Status code: " + clientResponse.IsSuccessStatusCode);
-
-                if (clientResponse.IsSuccessStatusCode)
+                var deviceId = "";
+                var client = new HttpClient();
+                if (Device.RuntimePlatform == Device.iOS)
                 {
-                    System.Diagnostics.Debug.WriteLine("We have post the guid to the database");
+                    deviceId = Preferences.Get("guid", null);
+                    if (deviceId != null) { Debug.WriteLine("This is the iOS GUID from Log in: " + deviceId); }
                 }
                 else
                 {
-                    //await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
+                    deviceId = Preferences.Get("guid", null);
+                    if (deviceId != null) { Debug.WriteLine("This is the Android GUID from Log in " + deviceId); }
                 }
+
+                if (deviceId != null)
+                {
+                    NotificationPost notificationPost = new NotificationPost();
+
+                    notificationPost.uid = user.getUserID();
+                    notificationPost.guid = deviceId.Substring(5);
+                    user.setUserDeviceID(deviceId.Substring(5));
+                    notificationPost.notification = "TRUE";
+
+                    var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
+                    Debug.WriteLine("Notification JSON Object to send: " + notificationSerializedObject);
+
+                    var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
+
+                    var clientResponse = await client.PostAsync(Constant.NotificationsUrl, notificationContent);
+
+                    Debug.WriteLine("Status code: " + clientResponse.IsSuccessStatusCode);
+
+                    if (clientResponse.IsSuccessStatusCode)
+                    {
+                        System.Diagnostics.Debug.WriteLine("We have post the guid to the database");
+                    }
+                    else
+                    {
+                        //await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
+                    }
+                }
+            }catch(Exception errorWriteDeviceID)
+            {
+                var client = new Diagnostic();
+                client.parseException(errorWriteDeviceID.ToString(), user);
             }
         }
 

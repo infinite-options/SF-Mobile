@@ -228,26 +228,33 @@ namespace ServingFresh.Views
 
         public async Task<string> GetDeliveryInstructions(Models.User user)
         {
-
-            var result = "";
-            var client = new System.Net.Http.HttpClient();
-            var ID = user.getUserID();
-            Debug.WriteLine("USER ID: " + ID);
-            var RDSResponse = await client.GetAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/last_delivery_instruction/" + ID);
-            var content = await RDSResponse.Content.ReadAsStringAsync();
-            if (RDSResponse.IsSuccessStatusCode)
+            try
             {
-                var data = JsonConvert.DeserializeObject<InfoObject>(content);
-                if(data.result.Count != 0)
+                var result = "";
+                var client = new System.Net.Http.HttpClient();
+                var ID = user.getUserID();
+                Debug.WriteLine("USER ID: " + ID);
+                var RDSResponse = await client.GetAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/last_delivery_instruction/" + ID);
+                var content = await RDSResponse.Content.ReadAsStringAsync();
+                if (RDSResponse.IsSuccessStatusCode)
                 {
-                    Debug.WriteLine("USER DELIVERY INSTRUCTIONS: " + data.result[0].delivery_instructions);
-                    if (data.result[0].delivery_instructions != "")
+                    var data = JsonConvert.DeserializeObject<InfoObject>(content);
+                    if (data.result.Count != 0)
                     {
-                        result = data.result[0].delivery_instructions;
+                        Debug.WriteLine("USER DELIVERY INSTRUCTIONS: " + data.result[0].delivery_instructions);
+                        if (data.result[0].delivery_instructions != "")
+                        {
+                            result = data.result[0].delivery_instructions;
+                        }
                     }
                 }
+                return result;
+            }catch(Exception errorGetDeliveryInstruction)
+            {
+                var client = new Diagnostic();
+                client.parseException(errorGetDeliveryInstruction.ToString(), user);
+                return "";
             }
-            return result;
         }
 
         public void InitializeMap()
@@ -292,128 +299,136 @@ namespace ServingFresh.Views
                     updateTotals(0, 0);
                 }
             }
-            catch (Exception fees)
+            catch (Exception errorGetFees)
             {
-                Debug.WriteLine(fees.Message);
+                var client = new Diagnostic();
+                client.parseException(errorGetFees.ToString(), user);
             }
         }
 
         public async void GetAvailiableCoupons(Models.User user)
         {
-            var client = new System.Net.Http.HttpClient();
-            var email = user.getUserEmail();
-            var RDSResponse = new HttpResponseMessage();
-            if (user.getUserType() != "GUEST")
+            try
             {
-                RDSResponse = await client.GetAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/available_Coupons/" + email);
-            }
-            else
-            {
-                RDSResponse = await client.GetAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/available_Coupons/guest");
-            }
-            
-            if (RDSResponse.IsSuccessStatusCode)
-            {
-                var result = await RDSResponse.Content.ReadAsStringAsync();
-                couponData = JsonConvert.DeserializeObject<CouponResponse>(result);
-                
-                couponsList.Clear();
-
-                Debug.WriteLine(result);
-
-                double initialSubTotal = GetSubTotal();
-                double initialDeliveryFee = GetDeliveryFee();
-                double initialServiceFee = GetServiceFee();
-                double initialTaxes = GetTaxes();
-                double initialTotal = initialSubTotal + initialDeliveryFee + initialServiceFee + initialTaxes;
-                
-
-                foreach (Models.Coupon c in couponData.result)
+                var client = new System.Net.Http.HttpClient();
+                var email = user.getUserEmail();
+                var RDSResponse = new HttpResponseMessage();
+                if (user.getUserType() != "GUEST")
                 {
-                    if (c.coupon_id != "SFReferral" && c.coupon_id != "SFGiftCard")
+                    RDSResponse = await client.GetAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/available_Coupons/" + email);
+                }
+                else
+                {
+                    RDSResponse = await client.GetAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/available_Coupons/guest");
+                }
+
+                if (RDSResponse.IsSuccessStatusCode)
+                {
+                    var result = await RDSResponse.Content.ReadAsStringAsync();
+                    couponData = JsonConvert.DeserializeObject<CouponResponse>(result);
+
+                    couponsList.Clear();
+
+                    Debug.WriteLine(result);
+
+                    double initialSubTotal = GetSubTotal();
+                    double initialDeliveryFee = GetDeliveryFee();
+                    double initialServiceFee = GetServiceFee();
+                    double initialTaxes = GetTaxes();
+                    double initialTotal = initialSubTotal + initialDeliveryFee + initialServiceFee + initialTaxes;
+
+
+                    foreach (Models.Coupon c in couponData.result)
                     {
-                        // IF THRESHOLD IS NULL SET IT TO ZERO, OTHERWISE INITIAL VALUE STAYS THE SAME
-                        if (c.threshold == null) { c.threshold = 0.0; }
-                        double discount = 0;
-                        //double newTotal = 0;
-
-                        var coupon = new CouponItem();
-                        //Debug.WriteLine("COUPON IDS: " + c.coupon_uid);
-                        coupon.couponId = c.coupon_uid;
-                        // INITIALLY, THE IMAGE OF EVERY COUPON IS GRAY. (PLATFORM DEPENDENT)
-                        //if (Device.RuntimePlatform == Device.Android)
-                        //{
-                        //    coupon.image = "CouponIconGray.png";
-                        //}
-                        //else
-                        //{
-                        //    coupon.image = "nonEligibleCoupon.png";
-                        //}
-
-                        coupon.image = "nonEligibleCoupon.png";
-
-                        // SET TITLE LABEL OF COUPON
-                        if (c.coupon_title != null)
+                        if (c.coupon_id != "SFReferral" && c.coupon_id != "SFGiftCard")
                         {
-                            coupon.title = (string)c.coupon_title;
-                        }
-                        coupon.couponNote = c.notes;
-                        // SET THRESHOLD LABEL BASED ON THRESHOLD VALUE: 0 = NO MINIMUM PURCHASE, GREATER THAN 0 = SPEND THE AMOUNT OF THRESHOLD
-                        if ((double)c.threshold == 0)
-                        {
-                            coupon.threshold = 0;
-                            coupon.thresholdNote = "No minimum purchase";
-                        }
-                        else
-                        {
-                            coupon.threshold = (double)c.threshold;
-                            coupon.thresholdNote = "$" + coupon.threshold.ToString("N2") + " minimum purchase";
-                        }
+                            // IF THRESHOLD IS NULL SET IT TO ZERO, OTHERWISE INITIAL VALUE STAYS THE SAME
+                            if (c.threshold == null) { c.threshold = 0.0; }
+                            double discount = 0;
+                            //double newTotal = 0;
 
-                        // SET EXPIRATION DATE
-                        coupon.expNote = "Expires: " + DateTime.Parse(c.expire_date).ToString("MM/dd/yyyy");
-                        coupon.index = 0;
+                            var coupon = new CouponItem();
+                            //Debug.WriteLine("COUPON IDS: " + c.coupon_uid);
+                            coupon.couponId = c.coupon_uid;
+                            // INITIALLY, THE IMAGE OF EVERY COUPON IS GRAY. (PLATFORM DEPENDENT)
+                            //if (Device.RuntimePlatform == Device.Android)
+                            //{
+                            //    coupon.image = "CouponIconGray.png";
+                            //}
+                            //else
+                            //{
+                            //    coupon.image = "nonEligibleCoupon.png";
+                            //}
 
-                        // CALCULATING DISCOUNT, SHIPPING, AND COUPON STATUS
-                        if (initialSubTotal >= (double)c.threshold)
-                        {
-                            if (initialSubTotal >= c.discount_amount)
+                            coupon.image = "nonEligibleCoupon.png";
+
+                            // SET TITLE LABEL OF COUPON
+                            if (c.coupon_title != null)
                             {
-                                // All
-                                discount = initialSubTotal - ((initialSubTotal - c.discount_amount) * (1.0 - (c.discount_percent / 100.0)));
+                                coupon.title = (string)c.coupon_title;
+                            }
+                            coupon.couponNote = c.notes;
+                            // SET THRESHOLD LABEL BASED ON THRESHOLD VALUE: 0 = NO MINIMUM PURCHASE, GREATER THAN 0 = SPEND THE AMOUNT OF THRESHOLD
+                            if ((double)c.threshold == 0)
+                            {
+                                coupon.threshold = 0;
+                                coupon.thresholdNote = "No minimum purchase";
                             }
                             else
                             {
-                                // Partly apply coupon: % discount and $ shipping
-                                discount = initialSubTotal;
+                                coupon.threshold = (double)c.threshold;
+                                coupon.thresholdNote = "$" + coupon.threshold.ToString("N2") + " minimum purchase";
                             }
-                            //newTotal = initialSubTotal - discount + initialServiceFee + (initialDeliveryFee - c.discount_shipping) + initialTaxes;
-                            coupon.discount = discount;
-                            coupon.shipping = c.discount_shipping;
-                            coupon.status = "ACTIVE";
-                            coupon.totalDiscount = coupon.discount + coupon.shipping;
+
+                            // SET EXPIRATION DATE
+                            coupon.expNote = "Expires: " + DateTime.Parse(c.expire_date).ToString("MM/dd/yyyy");
+                            coupon.index = 0;
+
+                            // CALCULATING DISCOUNT, SHIPPING, AND COUPON STATUS
+                            if (initialSubTotal >= (double)c.threshold)
+                            {
+                                if (initialSubTotal >= c.discount_amount)
+                                {
+                                    // All
+                                    discount = initialSubTotal - ((initialSubTotal - c.discount_amount) * (1.0 - (c.discount_percent / 100.0)));
+                                }
+                                else
+                                {
+                                    // Partly apply coupon: % discount and $ shipping
+                                    discount = initialSubTotal;
+                                }
+                                //newTotal = initialSubTotal - discount + initialServiceFee + (initialDeliveryFee - c.discount_shipping) + initialTaxes;
+                                coupon.discount = discount;
+                                coupon.shipping = c.discount_shipping;
+                                coupon.status = "ACTIVE";
+                                coupon.totalDiscount = coupon.discount + coupon.shipping;
+                            }
+                            else
+                            {
+                                coupon.discount = 0;
+                                coupon.shipping = 0;
+                                coupon.status = "NOT-ACTIVE";
+                                coupon.totalDiscount = coupon.discount + coupon.shipping;
+                            }
+                            couponsList.Add(coupon);
                         }
-                        else
-                        {
-                            coupon.discount = 0;
-                            coupon.shipping = 0;
-                            coupon.status = "NOT-ACTIVE";
-                            coupon.totalDiscount = coupon.discount + coupon.shipping;
-                        }
-                        couponsList.Add(coupon);
                     }
+
+
+
+                    //couponsList.Clear();
+                    var activeCoupons = CouponItem.GetActiveCoupons(couponsList);
+                    var nonactiveCoupons = CouponItem.GetNonActiveCoupons(couponsList, initialSubTotal);
+                    CouponItem.SortActiveCoupons(activeCoupons);
+                    CouponItem.SortNonActiveCoupons(nonactiveCoupons);
+                    availableCoupons = ApplyBestAvailableCoupon(CouponItem.MergeActiveNonActiveCouponLists(activeCoupons, nonactiveCoupons));
+                    coupon_list.ItemsSource = availableCoupons;
+
                 }
-
-
-
-                //couponsList.Clear();
-                var activeCoupons = CouponItem.GetActiveCoupons(couponsList);
-                var nonactiveCoupons = CouponItem.GetNonActiveCoupons(couponsList, initialSubTotal);
-                CouponItem.SortActiveCoupons(activeCoupons);
-                CouponItem.SortNonActiveCoupons(nonactiveCoupons);
-                availableCoupons = ApplyBestAvailableCoupon(CouponItem.MergeActiveNonActiveCouponLists(activeCoupons, nonactiveCoupons));
-                coupon_list.ItemsSource = availableCoupons;
-
+            }catch(Exception errorGetAvailableCoupons)
+            {
+                var client = new Diagnostic();
+                client.parseException(errorGetAvailableCoupons.ToString(), user);
             }
         }
 
@@ -504,6 +519,7 @@ namespace ServingFresh.Views
 
         public void updateTotals(double discount, double discount_delivery_fee)
         {
+            
             subtotal = 0.0;
             total_qty = 0;
             var tips = 0.0;
@@ -675,39 +691,48 @@ namespace ServingFresh.Views
         
         private void FinalizePurchase(Purchase purchase, ScheduleInfo selectedDeliveryDate)
         {
-            string dateTime = DateTime.Parse(selectedDeliveryDate.delivery_date).ToString("yyyy-MM-dd");
-            string t = selectedDeliveryDate.delivery_time;
-            Debug.WriteLine("DELIVERY DATE: " + dateTime);
-            Debug.WriteLine("START DELIVERY TIME: " + t);
-            string startTime = "";
-            foreach (char a in t.ToCharArray())
+            try
             {
-                if (a != '-')
+
+
+                string dateTime = DateTime.Parse(selectedDeliveryDate.delivery_date).ToString("yyyy-MM-dd");
+                string t = selectedDeliveryDate.delivery_time;
+                Debug.WriteLine("DELIVERY DATE: " + dateTime);
+                Debug.WriteLine("START DELIVERY TIME: " + t);
+                string startTime = "";
+                foreach (char a in t.ToCharArray())
                 {
-                    startTime += a;
+                    if (a != '-')
+                    {
+                        startTime += a;
+                    }
+                    else { break; }
                 }
-                else { break; }
-            }
-            var timeStamp = new DateTime();
+                var timeStamp = new DateTime();
 
-            if (startTime != "")
+                if (startTime != "")
+                {
+                    timeStamp = DateTime.Parse(startTime.Trim());
+                }
+
+                purchase.setPurchaseItems(GetOrder(cartItems));
+                purchase.setPurchaseDeliveryDate(selectedDeliveryDate.deliveryTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"));
+                purchase.setPurchaseCoupoID(GetCouponID());
+                purchase.setPurchaseAmountDue(total.ToString("N2"));
+                purchase.setPurchaseDiscount(discount.ToString("N2"));
+                purchase.setPurchasePaid(total.ToString("N2"));
+                purchase.setPurchaseAddon("FALSE");
+                purchase.setPurchaseSubtotal(GetSubTotal().ToString("N2"));
+                purchase.setPurchaseServiceFee(service_fee.ToString("N2"));
+                purchase.setPurchaseDeliveryFee(delivery_fee_db.ToString("N2"));
+                purchase.setPurchaseDriveTip(driver_tips.ToString("N2"));
+                purchase.setPurchaseTaxes(GetTaxes().ToString("N2"));
+                purchase.setPurchaseDeliveryInstructions(deliveryInstructions.Text);
+            }catch(Exception errorFinalizePurchase)
             {
-                timeStamp = DateTime.Parse(startTime.Trim());
+                var client = new Diagnostic();
+                client.parseException(errorFinalizePurchase.ToString(), user);
             }
-
-            purchase.setPurchaseItems(GetOrder(cartItems));
-            purchase.setPurchaseDeliveryDate(selectedDeliveryDate.deliveryTimeStamp.ToString("yyyy-MM-dd HH:mm:ss"));
-            purchase.setPurchaseCoupoID(GetCouponID());
-            purchase.setPurchaseAmountDue(total.ToString("N2"));
-            purchase.setPurchaseDiscount(discount.ToString("N2"));
-            purchase.setPurchasePaid(total.ToString("N2")); 
-            purchase.setPurchaseAddon("FALSE");
-            purchase.setPurchaseSubtotal(GetSubTotal().ToString("N2"));
-            purchase.setPurchaseServiceFee(service_fee.ToString("N2"));
-            purchase.setPurchaseDeliveryFee(delivery_fee_db.ToString("N2"));
-            purchase.setPurchaseDriveTip(driver_tips.ToString("N2"));
-            purchase.setPurchaseTaxes(GetTaxes().ToString("N2"));
-            purchase.setPurchaseDeliveryInstructions(deliveryInstructions.Text);
         }
 
 
@@ -945,142 +970,101 @@ namespace ServingFresh.Views
 
         async void GuestCheckoutWithStripe(System.Object sender, System.EventArgs e)
         {
-            var client1 = new SignUp();
-
-            if (client1.GuestCheckAllRequiredEntries(firstName, lastName, emailAddress, phoneNumber))
+            if (areTermsAccepted.IsChecked)
             {
+                var client1 = new SignUp();
 
-                purchase.setPurchaseFirstName(firstName.Text);
-                purchase.setPurchaseLastName(lastName.Text);
-                purchase.setPurchaseEmail(emailAddress.Text);
-                purchase.setPurchasePhoneNumber(phoneNumber.Text);
-                guestCardHolderName.Text = firstName.Text + " " +lastName.Text;
-                guestCardZipcode.Text = purchase.getPurchaseZipcode();
-
-                var button = (Button)sender;
-
-                if (button.BorderColor == Color.FromHex("#FF8500"))
+                if (client1.GuestCheckAllRequiredEntries(firstName, lastName, emailAddress, phoneNumber))
                 {
-                    var y = scrollView.ScrollY + 120;
-                    y = y + 60;
-                    await scrollView.ScrollToAsync(0, y, true);
-                    button.BorderColor = Color.FromHex("#2F787F");
-                    guestStripeView.IsVisible = true;
+
+                    purchase.setPurchaseFirstName(firstName.Text);
+                    purchase.setPurchaseLastName(lastName.Text);
+                    purchase.setPurchaseEmail(emailAddress.Text);
+                    purchase.setPurchasePhoneNumber(phoneNumber.Text);
+                    guestCardHolderName.Text = firstName.Text + " " + lastName.Text;
+                    guestCardZipcode.Text = purchase.getPurchaseZipcode();
+
+                    var button = (Button)sender;
+
+                    if (button.BorderColor == Color.FromHex("#FF8500"))
+                    {
+                        var y = scrollView.ScrollY + 120;
+                        y = y + 60;
+                        await scrollView.ScrollToAsync(0, y, true);
+                        button.BorderColor = Color.FromHex("#2F787F");
+                        guestStripeView.IsVisible = true;
+                    }
+                    else
+                    {
+                        button.BorderColor = Color.FromHex("#FF8500");
+                        guestStripeView.IsVisible = false;
+                    }
                 }
                 else
                 {
-                    button.BorderColor = Color.FromHex("#FF8500");
-                    guestStripeView.IsVisible = false;
+                    await DisplayAlert("Oops", "You seem to forgot to fill in all entries. Please fill in all entries to continue", "OK");
                 }
-            }
-            else
-            {
-                await DisplayAlert("Oops", "You seem to forgot to fill in all entries. Please fill in all entries to continue", "OK");
             }
         }
 
         async void GuestCompletePaymentWithPayPal(System.Object sender, System.EventArgs e)
         {
-            var client1 = new SignUp();
-            
-            if (client1.GuestCheckAllRequiredEntries(firstName, lastName, emailAddress, phoneNumber))
+            if (areTermsAccepted.IsChecked)
             {
+                var client1 = new SignUp();
 
-
-                purchase.setPurchaseFirstName(firstName.Text);
-                purchase.setPurchaseLastName(lastName.Text);
-                purchase.setPurchaseEmail(emailAddress.Text);
-                purchase.setPurchasePhoneNumber(phoneNumber.Text);
-                var coupond = purchase.getPurchaseCoupoID();
-                purchase.setPurchaseCoupoID(coupond + couponsUIDs);
-                var button = (Button)sender;
-
-                if (button.BackgroundColor == Color.FromHex("#FF8500"))
+                if (client1.GuestCheckAllRequiredEntries(firstName, lastName, emailAddress, phoneNumber))
                 {
-                    button.BackgroundColor = Color.FromHex("#2B6D74");
-                    await Application.Current.MainPage.Navigation.PushModalAsync(new PayPalPage(), true);
+                    purchase.setPurchaseFirstName(firstName.Text);
+                    purchase.setPurchaseLastName(lastName.Text);
+                    purchase.setPurchaseEmail(emailAddress.Text);
+                    purchase.setPurchasePhoneNumber(phoneNumber.Text);
+                    var coupond = purchase.getPurchaseCoupoID();
+                    purchase.setPurchaseCoupoID(coupond + couponsUIDs);
+                    var button = (Button)sender;
+
+                    if (button.BackgroundColor == Color.FromHex("#FF8500"))
+                    {
+                        button.BackgroundColor = Color.FromHex("#2B6D74");
+                        await Application.Current.MainPage.Navigation.PushModalAsync(new PayPalPage(), true);
+                    }
+                    else
+                    {
+                        button.BackgroundColor = Color.FromHex("#FF8500");
+                    }
                 }
                 else
                 {
-                    button.BackgroundColor = Color.FromHex("#FF8500");
+                    await DisplayAlert("Oops", "You seem to forgot to fill in all entries. Please fill in all entries to continue", "OK");
                 }
-            }
-            else
-            {
-                await DisplayAlert("Oops", "You seem to forgot to fill in all entries. Please fill in all entries to continue", "OK");
             }
         }
 
         async void GuestCompletePaymentWithStripe(System.Object sender, System.EventArgs e)
         {
-            var client1 = new SignUp();
-            if (client1.GuestCheckAllStripeRequiredEntries(guestCardHolderName,guestCardHolderNumber,guestCardCVV,guestCardExpMonth,guestCardExpYear,guestCardZipcode))
+            try
             {
-                var button = (Button)sender;
-
-                if (button.BackgroundColor == Color.FromHex("#FF8500"))
+                var client1 = new SignUp();
+                if (client1.GuestCheckAllStripeRequiredEntries(guestCardHolderName, guestCardHolderNumber, guestCardCVV, guestCardExpMonth, guestCardExpYear, guestCardZipcode))
                 {
-                    button.BackgroundColor = Color.FromHex("#2B6D74");
-                    purchase.setPurchasePaymentType("STRIPE");
-                    UserDialogs.Instance.ShowLoading("Your payment is processing...");
-                    string mode = Payments.getMode(purchase.getPurchaseDeliveryInstructions(), "STRIPE");
-                    paymentClient = new Payments(mode);
-                    var client = new SignIn();
-                    var isEmailUnused = await client.ValidateExistingAccountFromEmail(purchase.getPurchaseEmail());
-                    if (isEmailUnused == null)
-                    {
-                        var userID = await SignUp.SignUpNewUser(SignUp.GetUserFrom(purchase));
-                        if (userID != "")
-                        {
-                            purchase.setPurchaseCustomerUID(userID);
-                            var paymentIsSuccessful = paymentClient.PayViaStripe(
-                                purchase.getPurchaseEmail(),
-                                guestCardHolderName.Text,
-                                guestCardHolderNumber.Text,
-                                guestCardCVV.Text,
-                                guestCardExpMonth.Text,
-                                guestCardExpYear.Text,
-                                purchase.getPurchaseAmountDue()
-                                );
+                    var button = (Button)sender;
 
-                            await WriteFavorites(GetFavoritesList(), userID);
-
-                            if (paymentIsSuccessful)
-                            {
-                                var coupond = purchase.getPurchaseCoupoID();
-                                purchase.setPurchaseCoupoID(coupond + couponsUIDs);
-                                purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
-                                purchase.setPurchaseChargeID(paymentClient.getTransactionID());
-                                purchase.printPurchase();
-                                _ = paymentClient.SendPurchaseToDatabase(purchase);
-                                order.Clear();
-                                UserDialogs.Instance.HideLoading();
-                                Application.Current.MainPage = new ConfirmationPage();
-                            }
-                            else
-                            {
-                                UserDialogs.Instance.HideLoading();
-                                await DisplayAlert("Oop", "It seems that your card is invalid. Try again", "OK");
-                            }
-                        }
-                    }
-                    else
+                    if (button.BackgroundColor == Color.FromHex("#FF8500"))
                     {
-                        if (isEmailUnused.result.Count != 0)
+                        button.BackgroundColor = Color.FromHex("#2B6D74");
+                        purchase.setPurchasePaymentType("STRIPE");
+                        UserDialogs.Instance.ShowLoading("Your payment is processing...");
+                        string mode = Payments.getMode(purchase.getPurchaseDeliveryInstructions(), "STRIPE");
+                        paymentClient = new Payments(mode);
+                        var client = new SignIn();
+                        var isEmailUnused = await client.ValidateExistingAccountFromEmail(purchase.getPurchaseEmail());
+                        if (isEmailUnused == null)
                         {
-                            var role = isEmailUnused.result[0].role;
-                            if (role == "CUSTOMER")
+                            var userID = await SignUp.SignUpNewUser(SignUp.GetUserFrom(purchase));
+                            if (userID != "")
                             {
-                                UserDialogs.Instance.HideLoading();
-                                await DisplayAlert("Great!", "It looks like you already have an account. Please log in to find out if you have any additional discounts", "OK");
-                                await Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(94, "1"), true);
-                            }
-                            else if (role == "GUEST")
-                            {
-                                // we don't sign up but get user id
-                                user.setUserID(isEmailUnused.result[0].customer_uid);
-                                purchase.setPurchaseCustomerUID(user.getUserID());
-                                user.setUserFromProfile(isEmailUnused);
+                                user.setUserID(userID);
+                                purchase.setPurchaseCustomerUID(userID);
                                 var paymentIsSuccessful = paymentClient.PayViaStripe(
                                     purchase.getPurchaseEmail(),
                                     guestCardHolderName.Text,
@@ -1091,13 +1075,15 @@ namespace ServingFresh.Views
                                     purchase.getPurchaseAmountDue()
                                     );
 
-                                await WriteFavorites(GetFavoritesList(), user.getUserID());
+                                await WriteFavorites(GetFavoritesList(), userID);
+
                                 if (paymentIsSuccessful)
                                 {
                                     var coupond = purchase.getPurchaseCoupoID();
                                     purchase.setPurchaseCoupoID(coupond + couponsUIDs);
                                     purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
                                     purchase.setPurchaseChargeID(paymentClient.getTransactionID());
+                                    purchase.printPurchase();
                                     _ = paymentClient.SendPurchaseToDatabase(purchase);
                                     order.Clear();
                                     UserDialogs.Instance.HideLoading();
@@ -1110,127 +1096,199 @@ namespace ServingFresh.Views
                                 }
                             }
                         }
+                        else
+                        {
+                            if (isEmailUnused.result.Count != 0)
+                            {
+                                var role = isEmailUnused.result[0].role;
+                                if (role == "CUSTOMER")
+                                {
+                                    UserDialogs.Instance.HideLoading();
+                                    await DisplayAlert("Great!", "It looks like you already have an account. Please log in to find out if you have any additional discounts", "OK");
+                                    await Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(94, "1"), true);
+                                }
+                                else if (role == "GUEST")
+                                {
+                                    // we don't sign up but get user id
+                                    user.setUserID(isEmailUnused.result[0].customer_uid);
+                                    purchase.setPurchaseCustomerUID(user.getUserID());
+                                    user.setUserFromProfile(isEmailUnused);
+                                    var paymentIsSuccessful = paymentClient.PayViaStripe(
+                                        purchase.getPurchaseEmail(),
+                                        guestCardHolderName.Text,
+                                        guestCardHolderNumber.Text,
+                                        guestCardCVV.Text,
+                                        guestCardExpMonth.Text,
+                                        guestCardExpYear.Text,
+                                        purchase.getPurchaseAmountDue()
+                                        );
+
+                                    await WriteFavorites(GetFavoritesList(), user.getUserID());
+                                    if (paymentIsSuccessful)
+                                    {
+                                        var coupond = purchase.getPurchaseCoupoID();
+                                        purchase.setPurchaseCoupoID(coupond + couponsUIDs);
+                                        purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
+                                        purchase.setPurchaseChargeID(paymentClient.getTransactionID());
+                                        _ = paymentClient.SendPurchaseToDatabase(purchase);
+                                        order.Clear();
+                                        UserDialogs.Instance.HideLoading();
+                                        Application.Current.MainPage = new ConfirmationPage();
+                                    }
+                                    else
+                                    {
+                                        UserDialogs.Instance.HideLoading();
+                                        await DisplayAlert("Oop", "It seems that your card is invalid. Try again", "OK");
+                                    }
+                                }
+                            }
+                        }
+
                     }
-                    
+                    else
+                    {
+                        button.BackgroundColor = Color.FromHex("#FF8500");
+                    }
                 }
                 else
                 {
-                    button.BackgroundColor = Color.FromHex("#FF8500");
+                    await DisplayAlert("Oops", "You seem to forgot to fill in all entries. Please fill in all entries to continue", "OK");
                 }
-            }
-            else
+            }catch(Exception errorGuestCompletePaymentWithStripe)
             {
-                await DisplayAlert("Oops","You seem to forgot to fill in all entries. Please fill in all entries to continue","OK");
+                var client = new Diagnostic();
+                client.parseException(errorGuestCompletePaymentWithStripe.ToString(), user);
             }
         }
 
         void CheckoutViaStripe(System.Object sender, System.EventArgs e)
         {
-            var button = (Button)sender;
-
-            if (button.BackgroundColor == Color.FromHex("#FF8500"))
+            if (customerAreTermAccepted.IsChecked)
             {
-                button.BackgroundColor = Color.FromHex("#2B6D74");
-                if (Device.RuntimePlatform == Device.Android)
+                var button = (Button)sender;
+
+                if (button.BackgroundColor == Color.FromHex("#FF8500"))
                 {
-                    customerStripeInformationView.HeightRequest = 250;
+                    button.BackgroundColor = Color.FromHex("#2B6D74");
+                    if (Device.RuntimePlatform == Device.Android)
+                    {
+                        customerStripeInformationView.HeightRequest = 250;
+                    }
+                    else
+                    {
+                        customerStripeInformationView.HeightRequest = 194;
+                    }
+
+
+
                 }
                 else
                 {
-                    customerStripeInformationView.HeightRequest = 194;
+                    button.BackgroundColor = Color.FromHex("#FF8500");
+                    customerStripeInformationView.HeightRequest = 0;
                 }
-               
-                
-
-            }
-            else
-            {
-                button.BackgroundColor = Color.FromHex("#FF8500");
-                customerStripeInformationView.HeightRequest = 0;
             }
         }
 
         async void CompletePaymentWithStripe(System.Object sender, System.EventArgs e)
         {
-            var button = (Button)sender;
-
-            if (button.BackgroundColor == Color.FromHex("#FF8500"))
+            try
             {
-                button.BackgroundColor = Color.FromHex("#2B6D74");
+                var button = (Button)sender;
 
-                FinalizePurchase(purchase, selectedDeliveryDate);
-                purchase.setPurchasePaymentType("STRIPE");
-
-                string mode = Payments.getMode(purchase.getPurchaseDeliveryInstructions(), "STRIPE");
-                paymentClient = new Payments(mode);
-
-                var paymentIsSuccessful = paymentClient.PayViaStripe(
-                    purchase.getPurchaseEmail(),
-                    cardHolderName.Text,
-                    cardHolderNumber.Text,
-                    cardCVV.Text,
-                    cardExpMonth.Text,
-                    cardExpYear.Text,
-                    purchase.getPurchaseAmountDue()
-                    );
-
-                if (paymentIsSuccessful)
+                if (button.BackgroundColor == Color.FromHex("#FF8500"))
                 {
-                    var coupond = purchase.getPurchaseCoupoID();
-                    purchase.setPurchaseCoupoID(coupond + couponsUIDs);
-                    purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
-                    purchase.setPurchaseChargeID(paymentClient.getTransactionID());
-                    _ = paymentClient.SendPurchaseToDatabase(purchase);
-                    order.Clear();
-                    await WriteFavorites(GetFavoritesList(), purchase.getPurchaseCustomerUID());
-                    Application.Current.MainPage = new HistoryPage();
+                    button.BackgroundColor = Color.FromHex("#2B6D74");
+
+                    FinalizePurchase(purchase, selectedDeliveryDate);
+                    purchase.setPurchasePaymentType("STRIPE");
+
+                    string mode = Payments.getMode(purchase.getPurchaseDeliveryInstructions(), "STRIPE");
+                    paymentClient = new Payments(mode);
+
+                    var paymentIsSuccessful = paymentClient.PayViaStripe(
+                        purchase.getPurchaseEmail(),
+                        cardHolderName.Text,
+                        cardHolderNumber.Text,
+                        cardCVV.Text,
+                        cardExpMonth.Text,
+                        cardExpYear.Text,
+                        purchase.getPurchaseAmountDue()
+                        );
+
+                    if (paymentIsSuccessful)
+                    {
+                        var coupond = purchase.getPurchaseCoupoID();
+                        purchase.setPurchaseCoupoID(coupond + couponsUIDs);
+                        purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
+                        purchase.setPurchaseChargeID(paymentClient.getTransactionID());
+                        _ = paymentClient.SendPurchaseToDatabase(purchase);
+                        order.Clear();
+                        await WriteFavorites(GetFavoritesList(), purchase.getPurchaseCustomerUID());
+                        Application.Current.MainPage = new HistoryPage();
+                    }
+                    else
+                    {
+                        await DisplayAlert("Make sure you fill all entries", "", "OK");
+                    }
                 }
                 else
                 {
-                    await DisplayAlert("Make sure you fill all entries", "", "OK");
+                    button.BackgroundColor = Color.FromHex("#FF8500");
                 }
-            }
-            else
+            }catch(Exception errorCompletePaymentWithStripe)
             {
-                button.BackgroundColor = Color.FromHex("#FF8500");
+                var client = new Diagnostic();
+                client.parseException(errorCompletePaymentWithStripe.ToString(), user);
             }
         }
 
         async void CheckoutViaPayPal(System.Object sender, System.EventArgs e)
         {
-
-            FinalizePurchase(purchase, selectedDeliveryDate);
-            purchase.setPurchasePaymentType("PAYPAL");
-            var coupond = purchase.getPurchaseCoupoID();
-            purchase.setPurchaseCoupoID(coupond + couponsUIDs);
-            await Application.Current.MainPage.Navigation.PushModalAsync(new PayPalPage(), true);
+            //TERMS AND CONDITIONS: http://localhost:3000/terms-and-conditions
+            if (customerAreTermAccepted.IsChecked)
+            {
+                FinalizePurchase(purchase, selectedDeliveryDate);
+                purchase.setPurchasePaymentType("PAYPAL");
+                var coupond = purchase.getPurchaseCoupoID();
+                purchase.setPurchaseCoupoID(coupond + couponsUIDs);
+                await Application.Current.MainPage.Navigation.PushModalAsync(new PayPalPage(), true);
+            }
         }
 
         public static async Task<bool> WriteFavorites(List<string> favorites, string userID)
         {
-            var taskResponse = false;
-            if(userID != null && userID != "")
+            try
             {
-                var favoritePost = new FavoritePost()
+                var taskResponse = false;
+                if (userID != null && userID != "")
                 {
-                    customer_uid = userID,
-                    favorite = favorites
-                };
+                    var favoritePost = new FavoritePost()
+                    {
+                        customer_uid = userID,
+                        favorite = favorites
+                    };
 
-                var client = new System.Net.Http.HttpClient();
-                var serializedFavoritePostObject = JsonConvert.SerializeObject(favoritePost);
-                var content = new StringContent(serializedFavoritePostObject, Encoding.UTF8, "application/json");
-                var endpointResponse = await client.PostAsync(Constant.PostUserFavorites, content);
+                    var client = new System.Net.Http.HttpClient();
+                    var serializedFavoritePostObject = JsonConvert.SerializeObject(favoritePost);
+                    var content = new StringContent(serializedFavoritePostObject, Encoding.UTF8, "application/json");
+                    var endpointResponse = await client.PostAsync(Constant.PostUserFavorites, content);
 
-                Debug.WriteLine("FAVORITES CONTENT: " + serializedFavoritePostObject);
+                    Debug.WriteLine("FAVORITES CONTENT: " + serializedFavoritePostObject);
 
-                if (endpointResponse.IsSuccessStatusCode)
-                {
-                    taskResponse = true;
+                    if (endpointResponse.IsSuccessStatusCode)
+                    {
+                        taskResponse = true;
+                    }
+                    return taskResponse;
                 }
                 return taskResponse;
+            }catch(Exception errorWriteFavorites)
+            {
+                var client = new Diagnostic();
+                client.parseException(errorWriteFavorites.ToString(), user);
+                return false;
             }
-            return taskResponse;
         }
 
         Models.Address addr = new Models.Address();
@@ -1285,6 +1343,7 @@ namespace ServingFresh.Views
 
         async void addressList_ItemSelected(System.Object sender, Xamarin.Forms.SelectedItemChangedEventArgs e)
         {
+            
             addressGrid.HeightRequest = 140 + 40 + 40;
             newUserUnitNumber.IsVisible = true;
             gridAddressView.IsVisible = true;
@@ -1599,214 +1658,226 @@ namespace ServingFresh.Views
 
         async void VerifyAmbassadorCode(System.Object sender, Xamarin.Forms.FocusEventArgs e)
         {
-
-            if (!String.IsNullOrEmpty(ambassadorCode.Text))
+            try
             {
-                string ambassadorStatus = "";
-                if (user.getUserType() == "CUSTOMER")
+                if (!String.IsNullOrEmpty(ambassadorCode.Text))
                 {
-                    var client = new Ambassador();
-                    Debug.WriteLine("INPUTS -> CODE: {0}, INFO: {1}. IS GUEST: {2}", ambassadorCode.Text, user.getUserEmail(), "False");
-                    ambassadorStatus = await client.ValidateAmbassadorCode(ambassadorCode.Text, user.getUserEmail(), "False");
-                    Debug.WriteLine("OUTPUT FROM VALIDATING AMBASSADOR CODE: " + ambassadorStatus);
-                }
-                else if (user.getUserType() == "GUEST")
-                {
-                    var client = new Ambassador();
-                    var info = purchase.getPurchaseAddress() + ", " + purchase.getPurchaseCity() + ", " + purchase.getPurchaseState() + " " + purchase.getPurchaseZipcode();
-                    Debug.WriteLine("INPUTS -> CODE: {0}, INFO: {1}. IS GUEST: {2}", ambassadorCode.Text, info, "True");
-                    
-                    ambassadorStatus = await client.ValidateAmbassadorCode(ambassadorCode.Text, info, "True");
-                    Debug.WriteLine("OUTPUT FROM VALIDATING AMBASSADOR CODE: " + ambassadorStatus);
-                }
-
-                if(ambassadorStatus != "")
-                {
-                    if(ambassadorStatus.Contains("200"))
+                    string ambassadorStatus = "";
+                    if (user.getUserType() == "CUSTOMER")
                     {
-                        var ambassadorResponse = JsonConvert.DeserializeObject<AmbassadorResponseA>(ambassadorStatus);
-                        if(ambassadorResponse.code == 200)
+                        var client = new Ambassador();
+                        Debug.WriteLine("INPUTS -> CODE: {0}, INFO: {1}. IS GUEST: {2}", ambassadorCode.Text, user.getUserEmail(), "False");
+                        ambassadorStatus = await client.ValidateAmbassadorCode(ambassadorCode.Text, user.getUserEmail(), "False");
+                        Debug.WriteLine("OUTPUT FROM VALIDATING AMBASSADOR CODE: " + ambassadorStatus);
+                    }
+                    else if (user.getUserType() == "GUEST")
+                    {
+                        var client = new Ambassador();
+                        var info = purchase.getPurchaseAddress() + ", " + purchase.getPurchaseCity() + ", " + purchase.getPurchaseState() + " " + purchase.getPurchaseZipcode();
+                        Debug.WriteLine("INPUTS -> CODE: {0}, INFO: {1}. IS GUEST: {2}", ambassadorCode.Text, info, "True");
+
+                        ambassadorStatus = await client.ValidateAmbassadorCode(ambassadorCode.Text, info, "True");
+                        Debug.WriteLine("OUTPUT FROM VALIDATING AMBASSADOR CODE: " + ambassadorStatus);
+                    }
+
+                    if (ambassadorStatus != "")
+                    {
+                        if (ambassadorStatus.Contains("200"))
                         {
-                            //await DisplayAlert("Great!", "We have verified your code! We are just checking if you meet the threshold to apply for an additional discount.", "OK");
-                            if (GetSubTotal() >= ambassadorResponse.sub.threshold)
+                            var ambassadorResponse = JsonConvert.DeserializeObject<AmbassadorResponseA>(ambassadorStatus);
+                            if (ambassadorResponse.code == 200)
                             {
-                                await DisplayAlert("Great!", "Your purchase meets the threshold to apply an additional discount", "OK");
-
-                                if(total <= ambassadorResponse.sub.discount_amount)
+                                //await DisplayAlert("Great!", "We have verified your code! We are just checking if you meet the threshold to apply for an additional discount.", "OK");
+                                if (GetSubTotal() >= ambassadorResponse.sub.threshold)
                                 {
-                                    discountFromAmbassador.Text = "$" + total.ToString("N2");
-                                    ambassadorDiscount = total;
-                                    purchase.setAmbassadorCode(ambassadorDiscount.ToString("N2"));
+                                    await DisplayAlert("Great!", "Your purchase meets the threshold to apply an additional discount", "OK");
+
+                                    if (total <= ambassadorResponse.sub.discount_amount)
+                                    {
+                                        discountFromAmbassador.Text = "$" + total.ToString("N2");
+                                        ambassadorDiscount = total;
+                                        purchase.setAmbassadorCode(ambassadorDiscount.ToString("N2"));
+                                    }
+                                    else
+                                    {
+                                        discountFromAmbassador.Text = "$" + ambassadorResponse.sub.discount_amount.ToString("N2");
+                                        ambassadorDiscount = ambassadorResponse.sub.discount_amount;
+                                        purchase.setAmbassadorCode(ambassadorDiscount.ToString("N2"));
+                                    }
+
+                                    couponsUIDs = "";
+
+                                    foreach (string uid in ambassadorResponse.uids)
+                                    {
+                                        couponsUIDs += "," + uid;
+                                    }
+
+                                    if (appliedCoupon != null)
+                                    {
+                                        updateTotals(appliedCoupon.discount, appliedCoupon.shipping);
+                                    }
+                                    else
+                                    {
+                                        updateTotals(0, 0);
+                                    }
+
                                 }
                                 else
                                 {
-                                    discountFromAmbassador.Text = "$" + ambassadorResponse.sub.discount_amount.ToString("N2");
-                                    ambassadorDiscount = ambassadorResponse.sub.discount_amount;
-                                    purchase.setAmbassadorCode(ambassadorDiscount.ToString("N2"));
+                                    await DisplayAlert("Oops!", "Your purchase is under the threshold to have an additional discount. You can save this code for another purchase or increase your subtotal by $" + (GetSubTotal() - ambassadorResponse.sub.threshold), "OK");
                                 }
-
-                                couponsUIDs = "";
-
-                                foreach (string uid in ambassadorResponse.uids)
-                                {
-                                    couponsUIDs += "," +uid;
-                                }
-
-                                if (appliedCoupon != null)
-                                {
-                                    updateTotals(appliedCoupon.discount, appliedCoupon.shipping);
-                                }
-                                else
-                                {
-                                    updateTotals(0, 0);
-                                }
-
-                            }
-                            else
-                            {
-                                await DisplayAlert("Oops!", "Your purchase is under the threshold to have an additional discount. You can save this code for another purchase or increase your subtotal by $" + (GetSubTotal()-ambassadorResponse.sub.threshold), "OK");
                             }
                         }
+                        else
+                        {
+                            var ambassadorResponse = JsonConvert.DeserializeObject<AmbassadorResponseB>(ambassadorStatus);
+                            await DisplayAlert("Oops", ambassadorResponse.message, "OK");
+                        }
                     }
-                    else
-                    {
-                        var ambassadorResponse = JsonConvert.DeserializeObject<AmbassadorResponseB>(ambassadorStatus);
-                        await DisplayAlert("Oops", ambassadorResponse.message, "OK");
-                    }
-                }
-            }
-            else
-            {
-                couponsUIDs = "";
-                ambassadorDiscount = 0.0;
-                discountFromAmbassador.Text = "$0.00";
-                purchase.setAmbassadorCode("0.00");
-
-                if (appliedCoupon != null)
-                {
-                    updateTotals(appliedCoupon.discount, appliedCoupon.shipping);
                 }
                 else
                 {
-                    updateTotals(0, 0);
+                    couponsUIDs = "";
+                    ambassadorDiscount = 0.0;
+                    discountFromAmbassador.Text = "$0.00";
+                    purchase.setAmbassadorCode("0.00");
+
+                    if (appliedCoupon != null)
+                    {
+                        updateTotals(appliedCoupon.discount, appliedCoupon.shipping);
+                    }
+                    else
+                    {
+                        updateTotals(0, 0);
+                    }
                 }
+            }catch(Exception errorVerifyAmbassadorCode)
+            {
+                var client = new Diagnostic();
+                client.parseException(errorVerifyAmbassadorCode.ToString(), user);
             }
         }
 
         async void PurchaseBalanceIsZero(System.Object sender, System.EventArgs e)
         {
-
-            if (user.getUserType() == "GUEST")
+            try
             {
-                var client1 = new SignUp();
-
-                if (client1.GuestCheckAllRequiredEntries(firstName, lastName, emailAddress, phoneNumber))
+                if (user.getUserType() == "GUEST")
                 {
-                    var button = (Button)sender;
+                    var client1 = new SignUp();
 
-                    if (button.BackgroundColor == Color.FromHex("#FF8500"))
+                    if (client1.GuestCheckAllRequiredEntries(firstName, lastName, emailAddress, phoneNumber))
                     {
-                        button.BackgroundColor = Color.FromHex("#2B6D74");
-                        FinalizePurchase(purchase, selectedDeliveryDate);
-                        purchase.setPurchaseFirstName(firstName.Text);
-                        purchase.setPurchaseLastName(lastName.Text);
-                        purchase.setPurchaseEmail(emailAddress.Text);
-                        purchase.setPurchasePhoneNumber(phoneNumber.Text);
-                        purchase.setPurchasePaymentType("SFGiftCard");
-                        UserDialogs.Instance.ShowLoading("Your payment is processing...");
+                        var button = (Button)sender;
 
-                        var client = new SignIn();
-                        var isEmailUnused = await client.ValidateExistingAccountFromEmail(purchase.getPurchaseEmail());
-                        if (isEmailUnused == null)
+                        if (button.BackgroundColor == Color.FromHex("#FF8500"))
                         {
-                            var userID = await SignUp.SignUpNewUser(SignUp.GetUserFrom(purchase));
-                            if (userID != "")
+                            button.BackgroundColor = Color.FromHex("#2B6D74");
+                            FinalizePurchase(purchase, selectedDeliveryDate);
+                            purchase.setPurchaseFirstName(firstName.Text);
+                            purchase.setPurchaseLastName(lastName.Text);
+                            purchase.setPurchaseEmail(emailAddress.Text);
+                            purchase.setPurchasePhoneNumber(phoneNumber.Text);
+                            purchase.setPurchasePaymentType("SFGiftCard");
+                            UserDialogs.Instance.ShowLoading("Your payment is processing...");
+
+                            var client = new SignIn();
+                            var isEmailUnused = await client.ValidateExistingAccountFromEmail(purchase.getPurchaseEmail());
+                            if (isEmailUnused == null)
                             {
-                                purchase.setPurchaseCustomerUID(userID);
-
-                                await WriteFavorites(GetFavoritesList(), userID);
-
-                                var coupond = purchase.getPurchaseCoupoID();
-                                purchase.setPurchaseCoupoID(coupond + couponsUIDs);
-                                purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
-                                purchase.setPurchaseChargeID("");
-                                purchase.printPurchase();
-                                paymentClient = new Payments("SFTEST");
-                                _ = paymentClient.SendPurchaseToDatabase(purchase);
-                                order.Clear();
-                                UserDialogs.Instance.HideLoading();
-                                Application.Current.MainPage = new ConfirmationPage();
-
-                            }
-                        }
-                        else
-                        {
-                            if (isEmailUnused.result.Count != 0)
-                            {
-                                var role = isEmailUnused.result[0].role;
-                                if (role == "CUSTOMER")
+                                var userID = await SignUp.SignUpNewUser(SignUp.GetUserFrom(purchase));
+                                if (userID != "")
                                 {
-                                    UserDialogs.Instance.HideLoading();
-                                    await DisplayAlert("Great!", "It looks like you already have an account. Please log in to find out if you have any additional discounts", "OK");
-                                    await Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(94, "1"), true);
-                                }
-                                else if (role == "GUEST")
-                                {
-                                    // we don't sign up but get user id
-                                    user.setUserID(isEmailUnused.result[0].customer_uid);
-                                    purchase.setPurchaseCustomerUID(user.getUserID());
-                                    user.setUserFromProfile(isEmailUnused);
-                                    //var paymentIsSuccessful = paymentClient.PayViaStripe(
-                                    //    purchase.getPurchaseEmail(),
-                                    //    guestCardHolderName.Text,
-                                    //    guestCardHolderNumber.Text,
-                                    //    guestCardCVV.Text,
-                                    //    guestCardExpMonth.Text,
-                                    //    guestCardExpYear.Text,
-                                    //    purchase.getPurchaseAmountDue()
-                                    //    );
+                                    purchase.setPurchaseCustomerUID(userID);
 
-                                    await WriteFavorites(GetFavoritesList(), user.getUserID());
+                                    await WriteFavorites(GetFavoritesList(), userID);
 
                                     var coupond = purchase.getPurchaseCoupoID();
                                     purchase.setPurchaseCoupoID(coupond + couponsUIDs);
                                     purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
                                     purchase.setPurchaseChargeID("");
+                                    purchase.printPurchase();
                                     paymentClient = new Payments("SFTEST");
                                     _ = paymentClient.SendPurchaseToDatabase(purchase);
                                     order.Clear();
                                     UserDialogs.Instance.HideLoading();
                                     Application.Current.MainPage = new ConfirmationPage();
 
-
                                 }
                             }
-                        }
+                            else
+                            {
+                                if (isEmailUnused.result.Count != 0)
+                                {
+                                    var role = isEmailUnused.result[0].role;
+                                    if (role == "CUSTOMER")
+                                    {
+                                        UserDialogs.Instance.HideLoading();
+                                        await DisplayAlert("Great!", "It looks like you already have an account. Please log in to find out if you have any additional discounts", "OK");
+                                        await Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(94, "1"), true);
+                                    }
+                                    else if (role == "GUEST")
+                                    {
+                                        // we don't sign up but get user id
+                                        user.setUserID(isEmailUnused.result[0].customer_uid);
+                                        purchase.setPurchaseCustomerUID(user.getUserID());
+                                        user.setUserFromProfile(isEmailUnused);
+                                        //var paymentIsSuccessful = paymentClient.PayViaStripe(
+                                        //    purchase.getPurchaseEmail(),
+                                        //    guestCardHolderName.Text,
+                                        //    guestCardHolderNumber.Text,
+                                        //    guestCardCVV.Text,
+                                        //    guestCardExpMonth.Text,
+                                        //    guestCardExpYear.Text,
+                                        //    purchase.getPurchaseAmountDue()
+                                        //    );
 
+                                        await WriteFavorites(GetFavoritesList(), user.getUserID());
+
+                                        var coupond = purchase.getPurchaseCoupoID();
+                                        purchase.setPurchaseCoupoID(coupond + couponsUIDs);
+                                        purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
+                                        purchase.setPurchaseChargeID("");
+                                        paymentClient = new Payments("SFTEST");
+                                        _ = paymentClient.SendPurchaseToDatabase(purchase);
+                                        order.Clear();
+                                        UserDialogs.Instance.HideLoading();
+                                        Application.Current.MainPage = new ConfirmationPage();
+
+
+                                    }
+                                }
+                            }
+
+                        }
+                        else
+                        {
+                            button.BackgroundColor = Color.FromHex("#FF8500");
+                        }
                     }
                     else
                     {
-                        button.BackgroundColor = Color.FromHex("#FF8500");
+                        await DisplayAlert("Oops", "You seem to forgot to fill in all entries. Please fill in all entries to continue", "OK");
                     }
                 }
                 else
                 {
-                    await DisplayAlert("Oops", "You seem to forgot to fill in all entries. Please fill in all entries to continue", "OK");
+                    FinalizePurchase(purchase, selectedDeliveryDate);
+                    purchase.setPurchasePaymentType("SFGiftCard");
+                    paymentClient = new Payments("SFTEST");
+                    var coupond = purchase.getPurchaseCoupoID();
+                    purchase.setPurchaseCoupoID(coupond + couponsUIDs);
+                    purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
+                    purchase.setPurchaseChargeID("");
+                    _ = paymentClient.SendPurchaseToDatabase(purchase);
+                    order.Clear();
+                    await WriteFavorites(GetFavoritesList(), purchase.getPurchaseCustomerUID());
+                    Application.Current.MainPage = new HistoryPage();
                 }
-            }
-            else
+            }catch(Exception errorPurchaseBalanceIsZero)
             {
-                FinalizePurchase(purchase, selectedDeliveryDate);
-                purchase.setPurchasePaymentType("SFGiftCard");
-                paymentClient = new Payments("SFTEST");
-                var coupond = purchase.getPurchaseCoupoID();
-                purchase.setPurchaseCoupoID(coupond + couponsUIDs);
-                purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
-                purchase.setPurchaseChargeID("");
-                _ = paymentClient.SendPurchaseToDatabase(purchase);
-                order.Clear();
-                await WriteFavorites(GetFavoritesList(), purchase.getPurchaseCustomerUID());
-                Application.Current.MainPage = new HistoryPage();
+                var client = new Diagnostic();
+                client.parseException(errorPurchaseBalanceIsZero.ToString(), user);
             }
         }
 

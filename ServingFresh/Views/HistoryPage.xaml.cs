@@ -9,6 +9,8 @@ using ServingFresh.Config;
 using Xamarin.Forms;
 using static ServingFresh.Views.SelectionPage;
 using static ServingFresh.Views.PrincipalPage;
+using ServingFresh.Models;
+
 namespace ServingFresh.Views
 {
     public partial class HistoryPage : ContentPage
@@ -234,10 +236,11 @@ namespace ServingFresh.Views
                     }) ;
                 }
             }
-            catch (Exception history)
+            catch (Exception errorLoadHistory)
             {
-                Debug.WriteLine(history.Message);
-                
+                var client1 = new Diagnostic();
+                client1.parseException(errorLoadHistory.ToString(), user);
+
             }
 
             HistoryList.ItemsSource = historyList;

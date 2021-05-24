@@ -117,49 +117,56 @@ namespace ServingFresh.Views
 
         async void SignUpUser(System.Object sender, System.EventArgs e)
         {
-            var client = new PrincipalPage();
-            if (client.ValidatePassword(passsword1, passsword2))
+            try
             {
-                DateTime today = DateTime.Now;
-                DateTime expDate = today.AddDays(Constant.days);
-                // user is ready to be sign in.
-                UserDialogs.Instance.ShowLoading("We are creating your Serving Fresh account!");
-
-                var updateClient = new SignUp();
-                user.setUserID(purchase.getPurchaseCustomerUID());
-                user.setUserSessionTime(expDate);
-                user.setUserPlatform("DIRECT");
-                user.setUserType("CUSTOMER");
-                user.setUserEmail(purchase.getPurchaseEmail());
-                user.setUserFirstName(purchase.getPurchaseFirstName());
-                user.setUserLastName(purchase.getPurchaseLastName());
-                user.setUserPhoneNumber(purchase.getPurchasePhoneNumber());
-                user.setUserAddress(purchase.getPurchaseAddress());
-                user.setUserUnit(purchase.getPurchaseUnit()== null?"": purchase.getPurchaseUnit());
-                user.setUserCity(purchase.getPurchaseCity());
-                user.setUserState(purchase.getPurchaseState());
-                user.setUserZipcode(purchase.getPurchaseZipcode());
-                user.setUserLatitude(purchase.getPurchaseLatitude());
-                user.setUserLongitude(purchase.getPurchaseLongitude());
-                var content = updateClient.UpdateDirectUser(user, passsword1.Text);
-                var signUpStatus = await SignUp.SignUpNewUser(content);
-
-                if (signUpStatus)
+                var client = new PrincipalPage();
+                if (client.ValidatePassword(passsword1, passsword2))
                 {
-                    UserDialogs.Instance.HideLoading();
-                    await DisplayAlert("Great!", "We have created your account! Congratulations", "OK");
-                    Application.Current.MainPage = new SelectionPage();
+                    DateTime today = DateTime.Now;
+                    DateTime expDate = today.AddDays(Constant.days);
+                    // user is ready to be sign in.
+                    UserDialogs.Instance.ShowLoading("We are creating your Serving Fresh account!");
+
+                    var updateClient = new SignUp();
+                    user.setUserID(purchase.getPurchaseCustomerUID());
+                    user.setUserSessionTime(expDate);
+                    user.setUserPlatform("DIRECT");
+                    user.setUserType("CUSTOMER");
+                    user.setUserEmail(purchase.getPurchaseEmail());
+                    user.setUserFirstName(purchase.getPurchaseFirstName());
+                    user.setUserLastName(purchase.getPurchaseLastName());
+                    user.setUserPhoneNumber(purchase.getPurchasePhoneNumber());
+                    user.setUserAddress(purchase.getPurchaseAddress());
+                    user.setUserUnit(purchase.getPurchaseUnit() == null ? "" : purchase.getPurchaseUnit());
+                    user.setUserCity(purchase.getPurchaseCity());
+                    user.setUserState(purchase.getPurchaseState());
+                    user.setUserZipcode(purchase.getPurchaseZipcode());
+                    user.setUserLatitude(purchase.getPurchaseLatitude());
+                    user.setUserLongitude(purchase.getPurchaseLongitude());
+                    var content = updateClient.UpdateDirectUser(user, passsword1.Text);
+                    var signUpStatus = await SignUp.SignUpNewUser(content);
+
+                    if (signUpStatus)
+                    {
+                        UserDialogs.Instance.HideLoading();
+                        await DisplayAlert("Great!", "We have created your account! Congratulations", "OK");
+                        Application.Current.MainPage = new SelectionPage();
+                    }
+                    else
+                    {
+                        UserDialogs.Instance.HideLoading();
+                        await DisplayAlert("Oops", "We were not able to sign you up. Try again.", "OK");
+                    }
                 }
                 else
                 {
-                    UserDialogs.Instance.HideLoading();
-                    await DisplayAlert("Oops", "We were not able to sign you up. Try again.", "OK");
+                    await DisplayAlert("Oops", "Please check that your password is the same in both entries", "OK");
+                    return;
                 }
-            }
-            else
+            }catch(Exception errorSignUpUser)
             {
-                await DisplayAlert("Oops", "Please check that your password is the same in both entries", "OK");
-                return;
+                var client = new Diagnostic();
+                client.parseException(errorSignUpUser.ToString(), user);
             }
         }
 
@@ -217,9 +224,10 @@ namespace ServingFresh.Views
                         await DisplayAlert("Oops", "We were not able to sign you up. Try again.", "OK");
                     }
                 }
-                catch (Exception g)
+                catch (Exception errorFacebookAuthetication)
                 {
-                    Debug.WriteLine(g.Message);
+                    var client = new Diagnostic();
+                    client.parseException(errorFacebookAuthetication.ToString(), user);
                 }
             }
         }
@@ -258,9 +266,10 @@ namespace ServingFresh.Views
                         await DisplayAlert("Oops", "We were not able to sign you up. Try again.", "OK");
                     }
                 }
-                catch (Exception g)
+                catch (Exception errorGoogleAuthetication)
                 {
-                    Debug.WriteLine(g.Message);
+                    var client = new Diagnostic();
+                    client.parseException(errorGoogleAuthetication.ToString(), user);
                 }
             }
         }

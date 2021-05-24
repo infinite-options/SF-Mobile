@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" xmlns:servingfresh="clr-namespace:ServingFresh.Effects"
+    x:Class="ServingFresh.Views.GiftCardPage">
+    <ContentPage.Content>
+           <Grid RowSpacing="0" BackgroundColor="#E1E7E7">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="94"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" ColumnSpacing="0" BackgroundColor="#136D74">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="100"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <StackLayout Grid.Column="0" Margin="0,40,0,0" Spacing="0" >
+                     <ImageButton Source="menuIcon.png" BackgroundColor="Transparent" Clicked="ShowMenuFromInfo">
+                         <ImageButton.Effects>
+                            <servingfresh:TintImageEffect TintColor="White"/>
+                         </ImageButton.Effects>
+                     </ImageButton>
+                </StackLayout>
+                <StackLayout Grid.Column="1" Margin="0,40,0,0" Spacing="0" >
+                     <Label x:Name="title" HorizontalOptions="CenterAndExpand" VerticalOptions="Center" Text="Gift Card" FontSize="26" TextColor="#FFFFFF" FontAttributes="Bold"></Label>
+                     <!--<StackLayout Orientation="Horizontal" Spacing="0" HorizontalOptions="Center">
+                        <Label  Text="Info" FontSize="34" TextColor="#FFFFFF" FontAttributes="Bold"></Label>
+                     </StackLayout>-->
+                </StackLayout>
+                <StackLayout Grid.Column="2" Margin="0,15,0,0" VerticalOptions="Center" HorizontalOptions="Center">
+                    <RelativeLayout
+                        RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}"
+                        RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}">
+                        <Image Source="CartIcon.png" HeightRequest="40">
+                            <Image.GestureRecognizers>
+                                <TapGestureRecognizer ></TapGestureRecognizer>
+                            </Image.GestureRecognizers>
+                             <Image.Effects>
+                                <servingfresh:TintImageEffect TintColor="White"/>
+                            </Image.Effects>
+                            <Image.Margin>
+                                <OnPlatform x:TypeArguments="Thickness">
+                                  <On Platform="iOS" Value="0,20,0,0" />
+                                  <On Platform="Android" Value="4,20,0,0" />
+                                </OnPlatform>
+                            </Image.Margin>
+                        </Image>
+                        <Frame Margin="30,20,0,0" HeightRequest="20" MinimumWidthRequest="20" CornerRadius="10" Padding="0" HasShadow="False">
+                            <Label x:Name="CartTotal" Margin="5,1,5,0" Text="   "  TextColor="#FF8500" FontSize="14" FontAttributes="Bold"></Label>
+                        </Frame>
+                    </RelativeLayout>
+                </StackLayout>
+            </Grid>
+            <ScrollView Grid.Row="1">
+                <StackLayout>
+                    <Frame Margin="0,20,0,0" HeightRequest="100" WidthRequest="100" HorizontalOptions="Center">
+
+                    </Frame>
+                    <StackLayout Margin="50,0,50,0" Spacing="0">
+                       <Label HorizontalOptions="Center" Text="Give your friends and family the" FontSize="18" TextColor="#2F787F"></Label>
+                       <Label HorizontalOptions="Center" Text="gift of fresh, organic produce with" FontSize="18" TextColor="#2F787F"></Label>
+                       <Label HorizontalOptions="Center" Text="a Serving Fresh eGift card" FontSize="18" TextColor="#2F787F"></Label>
+                    </StackLayout>
+                    <StackLayout Margin="0,20,0,0" Orientation="Horizontal" HorizontalOptions="Center">
+                        <Button Text="Send via Email" TextColor="White" FontAttributes="Bold" Padding="5,0,5,0" BackgroundColor="#FF8500"></Button>
+                        <!--<Button Text="Send via Text" TextColor="White" FontAttributes="Bold" Padding="5,0,5,0" BackgroundColor="#FF8500"></Button>-->
+                    </StackLayout>
+                    <StackLayout Padding="50,0,50,0">
+                        <Label Text="To" TextColor="Black" FontSize="18"></Label>
+                        <Frame Padding="0" HasShadow="False" BorderColor="#136D74">
+                            <Entry Placeholder="Enter email for recipient"></Entry>
+                        </Frame>
+                        <Label Text="From" TextColor="Black" FontSize="18"></Label>
+                        <Frame Padding="0" HasShadow="False" BorderColor="#136D74">
+                            <Entry Placeholder="Enter email for recipient"></Entry>
+                        </Frame>
+                        <Label Text="Message" TextColor="Black" FontSize="18"></Label>
+                        <Frame Padding="0" HasShadow="False" BorderColor="#136D74">
+                            <Editor Placeholder="Hope you enjoy this Serving Fresh gift card!" HeightRequest="80"></Editor>
+                        </Frame>
+                        <Label Text="Delivery Date" TextColor="Black" FontSize="18"></Label>
+                        <Frame Padding="0" HasShadow="False" BorderColor="#136D74">
+                            <Entry Placeholder="Enter email for recipient"></Entry>
+                        </Frame>
+                        <Button Margin="0,30,0,0" Text="Buy Now" TextColor="White" FontAttributes="Bold" Padding="5,0,5,0" BackgroundColor="#FF8500"></Button>
+                    </StackLayout>
+                </StackLayout>
+            </ScrollView>
+           </Grid>
+    </ContentPage.Content>
+</ContentPage>
