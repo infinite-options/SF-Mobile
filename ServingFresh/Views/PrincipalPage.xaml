@@ -17,7 +17,7 @@
                                 RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}"
                                 RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
                                 Padding="0">
-                                <Image Margin="-30,-20,0,0" Source="fruitsVegetablesImage.png" Aspect="Fill"></Image>
+                                <Image Margin="-30,-20,0,0" Source="fruitsVegetablesImage.png"  Aspect="Fill"></Image>
                             </Frame>
                             <Grid
                                 Margin="0,0,0,0"
