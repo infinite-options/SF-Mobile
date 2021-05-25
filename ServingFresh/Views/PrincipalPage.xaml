@@ -162,9 +162,9 @@
                         </StackLayout>
 
                     </StackLayout>
-                    <StackLayout Grid.Row="4" HeightRequest="223" Spacing="12">
-                          <StackLayout VerticalOptions="CenterAndExpand">
-                              <Button WidthRequest="287" HorizontalOptions="Center" Font="14" TextColor="white" Text="Buy a gift card" FontSize="Medium"  BackgroundColor="#136D74"></Button>
+                    <StackLayout Grid.Row="4" HeightRequest="223">
+                          <StackLayout VerticalOptions="CenterAndExpand" Spacing="12">
+                              <Button WidthRequest="287" HorizontalOptions="Center" Font="14" TextColor="white" Text="Buy a gift card" FontSize="Medium"  BackgroundColor="#136D74" Clicked="NavigateToGiftCardPage"></Button>
                               <Button WidthRequest="287" HorizontalOptions="Center" Font="14" TextColor="white" Text="Become an ambassador" FontSize="Medium"  BackgroundColor="#136D74" Clicked="BecomeAnAmbassador"></Button>
                               <StackLayout Orientation="Horizontal" Spacing="20" HeightRequest="36" Margin="0,20,0,20"  HorizontalOptions="CenterAndExpand" VerticalOptions="End">
                                   <Image Source="facebookWhiteIcon"></Image>

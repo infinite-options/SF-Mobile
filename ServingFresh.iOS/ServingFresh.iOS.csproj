@@ -234,6 +234,7 @@
     <BundleResource Include="Resources\signedAppleIcon.png" />
     <BundleResource Include="Resources\minusIcon.png" />
     <BundleResource Include="Resources\plusIcon.png" />
+    <BundleResource Include="Resources\giftCardA.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AppleSignIn\" />

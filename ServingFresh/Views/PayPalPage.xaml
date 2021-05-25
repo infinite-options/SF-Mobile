@@ -9,7 +9,7 @@
                 <StackLayout HeightRequest="30" >
                         <ImageButton BackgroundColor="White" Padding="2,0,2,0" HeightRequest="30" Source="closeFrameIcon.png" HorizontalOptions="End" Clicked="ImageButton_Clicked"></ImageButton>
                 </StackLayout>
-                <StackLayout BackgroundColor="Navy" VerticalOptions="FillAndExpand">
+                <StackLayout VerticalOptions="FillAndExpand">
                    <WebView x:Name="webView" VerticalOptions="FillAndExpand"></WebView>
                 </StackLayout>
             </StackLayout>

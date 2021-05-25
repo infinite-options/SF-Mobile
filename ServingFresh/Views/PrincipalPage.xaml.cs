@@ -529,5 +529,10 @@ namespace ServingFresh.Views
                 NavigateToSignUp(sender,e);
             }
         }
+
+        void NavigateToGiftCardPage(System.Object sender, System.EventArgs e)
+        {
+            Application.Current.MainPage = new GiftCardPage();
+        }
     }
 }

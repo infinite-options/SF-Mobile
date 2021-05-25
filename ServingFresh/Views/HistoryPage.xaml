@@ -145,9 +145,9 @@
                                                 </DataTemplate>
                                             </CollectionView.ItemTemplate>
                                         </CollectionView>
-                                        <FlexLayout  Margin="0,-20,0,0" JustifyContent="SpaceBetween">
-                                            <Label Text="Coupon applied" TextColor="#136D74" FontSize="14"/>
-                                            <Label Text="{Binding promo_applied}" TextColor="Black" FontSize="14"/>
+                                        <FlexLayout  Margin="0,-20,0,0" JustifyContent="SpaceBetween" HeightRequest="30">
+                                            <Label Text="Coupon applied" TextColor="#136D74" VerticalTextAlignment="End" FontSize="14"/>
+                                            <Label Text="{Binding promo_applied}" VerticalTextAlignment="End"  TextColor="Black" FontSize="14"/>
                                         </FlexLayout>
                                         <BoxView HeightRequest="1" Color="LightGray"></BoxView>
                                         <FlexLayout   JustifyContent="SpaceBetween">
@@ -161,7 +161,7 @@
                                         </FlexLayout>
                                         <BoxView HeightRequest="1" Color="LightGray"></BoxView>
                                         <FlexLayout  JustifyContent="SpaceBetween">
-                                            <Label Text="Driver Tip:" TextColor="Black" FontSize="14"/>
+                                            <Label Text="Driver Tip" TextColor="Black" FontSize="14"/>
                                             <Label Text="{Binding driver_tip}" TextColor="Black" FontSize="14"/>
                                         </FlexLayout>
                                         <BoxView HeightRequest="1" Color="LightGray"></BoxView>
