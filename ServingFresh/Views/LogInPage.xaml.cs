@@ -151,7 +151,7 @@ namespace ServingFresh.Views
                                     user.setUserLatitude(userData.result[0].customer_lat);
                                     user.setUserLongitude(userData.result[0].customer_long);
 
-
+                                    SaveUser(user);
 
                                     if (Device.RuntimePlatform == Device.iOS)
                                     {
@@ -227,6 +227,21 @@ namespace ServingFresh.Views
             }
         }
 
+        void SaveUser(Models.User user)
+        {
+            string account = JsonConvert.SerializeObject(user);
+
+            if (Application.Current.Properties.Keys.Contains(Constant.Autheticatior))
+            {
+                Application.Current.Properties[Constant.Autheticatior] = account;
+            }
+            else
+            {
+                Application.Current.Properties.Add(Constant.Autheticatior, account);
+            }
+
+            Application.Current.SavePropertiesAsync();
+        }
 
         private async Task<AccountSalt> RetrieveAccountSalt(string userEmail)
         {

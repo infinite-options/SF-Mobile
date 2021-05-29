@@ -5,24 +5,24 @@ namespace ServingFresh.Models
 {
     public class User
     {
-        private string userType;
-        private string id;
-        private string firstName;
-        private string lastName;
-        private string address;
-        private string unit;
-        private string city;
-        private string state;
-        private string zipcode;
-        private string email;
-        private string phoneNumber;
-        private string latitude;
-        private string longitude;
-        private string platform;
-        private string deviceID;
-        private DateTime sessionTime;
-        private string uspsDVPType;
-        private string socialMediaImage;
+        public string userType;
+        public string id;
+        public string firstName;
+        public string lastName;
+        public string address;
+        public string unit;
+        public string city;
+        public string state;
+        public string zipcode;
+        public string email;
+        public string phoneNumber;
+        public string latitude;
+        public string longitude;
+        public string platform;
+        public string deviceID;
+        public DateTime sessionTime;
+        public string uspsDVPType;
+        public string socialMediaImage;
 
 
         public User()

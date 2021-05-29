@@ -29,7 +29,7 @@ namespace ServingFresh.Views
             currentLocation.Latitude = 37.227124;
             currentLocation.Longitude = -121.886943;
             GetBusinesses();
-            //GetCurrentLocation();
+            GetCurrentLocation();
         }
 
         public async void GetCurrentLocation()
@@ -69,6 +69,8 @@ namespace ServingFresh.Views
             }
             catch (Exception errorGetCurrentLocation)
             {
+                currentLocation.Latitude = 37.227124;
+                currentLocation.Longitude = -121.886943;
                 var client = new Diagnostic();
                 client.parseException(errorGetCurrentLocation.ToString(), user);
             }
@@ -260,6 +262,7 @@ namespace ServingFresh.Views
             }
             AddressEntry.Text += zipcode;
             AddressEntry.TextChanged += OnAddressChanged;
+            FindLocalProduceBaseOnLocation(sender, e);
         }
 
         public bool ValidateSignUpInfo(Entry firstName, Entry lastName, Entry email, Entry phoneNumber,  Entry address1, Entry city, Entry state, Entry zipcode)
@@ -532,7 +535,7 @@ namespace ServingFresh.Views
 
         void NavigateToGiftCardPage(System.Object sender, System.EventArgs e)
         {
-            Application.Current.MainPage = new GiftCardPage();
+            FindLocalProduceBaseOnLocation(sender, e);
         }
     }
 }

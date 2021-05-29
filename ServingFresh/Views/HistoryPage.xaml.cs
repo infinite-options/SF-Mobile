@@ -65,6 +65,7 @@ namespace ServingFresh.Views
             public string cc_zip { get; set; }
             public string charge_id { get; set; }
             public string payment_type { get; set; }
+            public double ambassador_code { get; set; }
         }
 
         public class HistoryResponse
@@ -118,6 +119,7 @@ namespace ServingFresh.Views
             public string taxes { get; set; }
             public string total { get; set; }
             public string coupon_id { get; set; }
+            public string ambassador_code { get; set; }
         }
                    
 
@@ -145,104 +147,113 @@ namespace ServingFresh.Views
             Debug.WriteLine("HISTORY: " + Constant.GetHistoryUrl + userId);
             string result = await response.Content.ReadAsStringAsync();
             Debug.WriteLine(result);
-            try
+            if (response.IsSuccessStatusCode)
             {
-                var data = JsonConvert.DeserializeObject<HistoryResponse>(result);
-                foreach (HistoryObject ho in data.result)
+                try
                 {
-                    var items = JsonConvert.DeserializeObject<ObservableCollection<HistoryItemObject>>(ho.items);
-                    var date = "";
-                    var subtotal = 0.0;
-                    var promo_applied = 0.0;
-                    var delivery_fee = 0.0;
-                    var service_fee = 0.0;
-                    var driver_tip = 0.0;
-                    var taxes = 0.0;
-                    var total = 0.0;
-                    var deliveryStatus = "";
-                    var couponApplied = "None";
-                    if(ho.subtotal != null)
+                    var data = JsonConvert.DeserializeObject<HistoryResponse>(result);
+                    foreach (HistoryObject ho in data.result)
                     {
-                        subtotal = ho.subtotal;
-                    }
-                    if(ho.amount_discount != null)
-                    {
-                        promo_applied = ho.amount_discount;
-                    }
-                    if(ho.delivery_fee != null)
-                    {
-                        delivery_fee = ho.delivery_fee;
-                    }
-                    if(ho.service_fee != null)
-                    {
-                        service_fee = ho.service_fee;
-                    }
-                    if(ho.taxes != null)
-                    {
-                        taxes = ho.taxes;
-                    }
-                    if(ho.amount_paid != null)
-                    {
-                        total = ho.amount_paid;
-                    }
-                    if(ho.driver_tip != null)
-                    {
-                        driver_tip = ho.driver_tip;
-                    }
-                    if(ho.start_delivery_date != null)
-                    {
-                        date = DateTime.Parse(ho.start_delivery_date).ToString("MMM dd, yyyy") + " at " + DateTime.Parse(ho.start_delivery_date).ToString("hh:mm tt");
-                    }
-
-                    if(ho.delivery_status != null && ho.delivery_status == "TRUE")
-                    {
-                        deliveryStatus = "Delivered";
-                    }else if(ho.delivery_status != null && ho.delivery_status == "FALSE")
-                    {
-                        deliveryStatus = "Confirmed";
-                    }
-
-                    if(ho.pay_coupon_id != null)
-                    {
-                        if(ho.pay_coupon_id != "")
+                        var items = JsonConvert.DeserializeObject<ObservableCollection<HistoryItemObject>>(ho.items);
+                        var date = "";
+                        var subtotal = 0.0;
+                        var promo_applied = 0.0;
+                        var delivery_fee = 0.0;
+                        var service_fee = 0.0;
+                        var driver_tip = 0.0;
+                        var taxes = 0.0;
+                        var total = 0.0;
+                        var ambassador_code = 0.0;
+                        var deliveryStatus = "";
+                        var couponApplied = "None";
+                        if (ho.subtotal != null)
                         {
-                            couponApplied = ho.pay_coupon_id;
+                            subtotal = ho.subtotal;
                         }
+                        if (ho.amount_discount != null)
+                        {
+                            promo_applied = ho.amount_discount;
+                        }
+                        if (ho.delivery_fee != null)
+                        {
+                            delivery_fee = ho.delivery_fee;
+                        }
+                        if (ho.service_fee != null)
+                        {
+                            service_fee = ho.service_fee;
+                        }
+                        if (ho.taxes != null)
+                        {
+                            taxes = ho.taxes;
+                        }
+                        if (ho.amount_paid != null)
+                        {
+                            total = ho.amount_paid;
+                        }
+                        if (ho.driver_tip != null)
+                        {
+                            driver_tip = ho.driver_tip;
+                        }
+                        if (ho.start_delivery_date != null)
+                        {
+                            date = DateTime.Parse(ho.start_delivery_date).ToString("MMM dd, yyyy") + " at " + DateTime.Parse(ho.start_delivery_date).ToString("hh:mm tt");
+                        }
+
+                        if (ho.delivery_status != null && ho.delivery_status == "TRUE")
+                        {
+                            deliveryStatus = "Delivered";
+                        }
+                        else if (ho.delivery_status != null && ho.delivery_status == "FALSE")
+                        {
+                            deliveryStatus = "Confirmed";
+                        }
+
+                        if (ho.pay_coupon_id != null)
+                        {
+                            if (ho.pay_coupon_id != "")
+                            {
+                                couponApplied = ho.pay_coupon_id;
+                            }
+                        }
+
+                        if (ho.ambassador_code != null)
+                        {
+                            ambassador_code = ho.ambassador_code;
+                        }
+
+                        DateTime today = DateTime.Parse(ho.purchase_date);
+
+                        var localPurchaseDate = today.ToLocalTime();
+
+
+                        historyList.Add(new HistoryDisplayObject()
+                        {
+                            items = items,
+
+                            itemsHeight = 55 * items.Count,
+                            delivery_date = date,
+                            purchase_date = "Purchase Date: " + localPurchaseDate,
+                            coupon_id = "Coupon ID: " + couponApplied,
+                            purchase_id = "Order #" + ho.purchase_uid,
+                            purchase_status = "Order " + deliveryStatus,
+                            subtotal = "$" + subtotal.ToString("N2"),
+                            promo_applied = "$" + promo_applied.ToString("N2"),
+                            delivery_fee = "$" + delivery_fee.ToString("N2"),
+                            service_fee = "$" + service_fee.ToString("N2"),
+                            driver_tip = "$" + driver_tip.ToString("N2"),
+                            taxes = "$" + taxes.ToString("N2"),
+                            total = "$" + total.ToString("N2"),
+                            ambassador_code = "$" + ambassador_code.ToString("N2"),
+                        });
                     }
+                }
+                catch (Exception errorLoadHistory)
+                {
+                    var client1 = new Diagnostic();
+                    client1.parseException(errorLoadHistory.ToString(), user);
 
-                    DateTime today = DateTime.Parse(ho.purchase_date);
-
-                    var localPurchaseDate = today.ToLocalTime();
-
-
-                    historyList.Add(new HistoryDisplayObject()
-                    {
-                        items = items,
-
-                        itemsHeight = 55 * items.Count,
-                        delivery_date = date,
-                        purchase_date = "Purchase Date: " + localPurchaseDate,
-                        coupon_id = "Coupon ID: " + couponApplied,
-                        purchase_id = "Order #" + ho.purchase_uid,
-                        purchase_status = "Order " + deliveryStatus,
-                        subtotal = "$" + subtotal.ToString("N2"),
-                        promo_applied = "$" + promo_applied.ToString("N2"),
-                        delivery_fee = "$" + delivery_fee.ToString("N2"),
-                        service_fee = "$" + service_fee.ToString("N2"),
-                        driver_tip = "$" + driver_tip.ToString("N2"),
-                        taxes = "$" + taxes.ToString("N2"),
-                        total = "$" + total.ToString("N2"),
-
-                    }) ;
                 }
             }
-            catch (Exception errorLoadHistory)
-            {
-                var client1 = new Diagnostic();
-                client1.parseException(errorLoadHistory.ToString(), user);
-
-            }
-
             HistoryList.ItemsSource = historyList;
         }
 

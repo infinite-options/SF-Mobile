@@ -177,7 +177,7 @@
                                         <BoxView HeightRequest="1" Color="LightGray"></BoxView>
                                         <FlexLayout  JustifyContent="SpaceBetween">
                                             <Label Text="Ambassador Code" TextColor="Black" FontSize="14"/>
-                                            <Label Text="$0.00" TextColor="Black" FontSize="14"/>
+                                            <Label Text="{Binding ambassador_code}" TextColor="Black" FontSize="14"/>
                                         </FlexLayout>
                                         <BoxView HeightRequest="1" Color="LightGray"></BoxView>
                                         <FlexLayout   JustifyContent="SpaceBetween">

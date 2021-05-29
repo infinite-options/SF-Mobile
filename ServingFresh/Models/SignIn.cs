@@ -91,7 +91,7 @@ namespace ServingFresh.Models
                                 directUser.setUserZipcode(userData.result[0].customer_zip);
                                 directUser.setUserLatitude(userData.result[0].customer_lat);
                                 directUser.setUserLongitude(userData.result[0].customer_long);
-
+                                SaveUser(directUser);
                                 //if (Device.RuntimePlatform == Device.iOS)
                                 //{
                                 //    deviceId = Preferences.Get("guid", null);
@@ -275,10 +275,6 @@ namespace ServingFresh.Models
                                         DateTime today = DateTime.Now;
                                         DateTime expDate = today.AddDays(Constant.days);
 
-
-
-
-
                                         user.setUserID(data.result[0].customer_uid);
                                         user.setUserSessionTime(expDate);
                                         user.setUserPlatform(platform);
@@ -295,7 +291,7 @@ namespace ServingFresh.Models
                                         user.setUserLatitude(userProfile.result[0].customer_lat);
                                         user.setUserLongitude(userProfile.result[0].customer_long);
 
-
+                                        SaveUser(user);
 
                                         if (data.result[0].role == "GUEST")
                                         {
@@ -407,6 +403,22 @@ namespace ServingFresh.Models
                 isUserVerified = "ERROR";
                 return isUserVerified;
             }
+        }
+
+        void SaveUser(Models.User user)
+        {
+            string account = JsonConvert.SerializeObject(user);
+
+            if (Application.Current.Properties.Keys.Contains(Constant.Autheticatior))
+            {
+                Application.Current.Properties[Constant.Autheticatior] = account;
+            }
+            else
+            {
+                Application.Current.Properties.Add(Constant.Autheticatior, account);
+            }
+
+            Application.Current.SavePropertiesAsync();
         }
 
         public async Task<string> ResetPassword(ResetPassword request)

@@ -79,7 +79,7 @@
                         </StackLayout.GestureRecognizers>
                     </StackLayout>
 
-                    <StackLayout Orientation="Horizontal" Spacing="20">
+                    <StackLayout Orientation="Horizontal" Spacing="20" IsVisible="false">
                         <Frame HasShadow="False" BackgroundColor="Transparent" Padding="0" HeightRequest="32" WidthRequest="32">
                             <Image VerticalOptions="CenterAndExpand" Source="giftCardIcon.png" Scale="0.9"></Image>
                         </Frame>

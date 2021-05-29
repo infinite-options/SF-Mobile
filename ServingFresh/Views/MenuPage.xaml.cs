@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using static ServingFresh.Views.PrincipalPage;
 using static ServingFresh.Views.SelectionPage;
 using Xamarin.Forms;
+using ServingFresh.Config;
+using Newtonsoft.Json;
 
 namespace ServingFresh.Views
 {
@@ -81,6 +83,7 @@ namespace ServingFresh.Views
         {
             ResetUser(user);
             order.Clear();
+            
             Application.Current.MainPage = new PrincipalPage();
         }
 
@@ -100,8 +103,12 @@ namespace ServingFresh.Views
             user.setUserLongitude("");
             user.setUserPlatform("");
             user.setUserDeviceID("");
-            user.setUserSessionTime(new DateTime());
-            user.setUserImage("");
+            DateTime today = DateTime.Now;
+            user.setUserSessionTime(today);
+
+            string account = JsonConvert.SerializeObject(user);
+            Application.Current.Properties[Constant.Autheticatior] = account;
+            Application.Current.SavePropertiesAsync();
         }
 
         void NavigateToMainFromSelection(System.Object sender, System.EventArgs e)

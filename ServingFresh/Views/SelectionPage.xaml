@@ -984,9 +984,9 @@
                                                     <ColumnDefinition Width="40"></ColumnDefinition>
                                                 </Grid.ColumnDefinitions>
                                                 <StackLayout Grid.Column="0">
-                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
+                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
                                                         <StackLayout HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center">
-                                                            <ImageButton Margin="0,-2,0,0" Source="{Binding itemFavoriteImage}" Clicked="FavoriteClick"  CommandParameter="{Binding .}"></ImageButton>
+                                                            <ImageButton Margin="0,-2,0,0" Source="{Binding itemFavoriteImage}" Clicked="FavoriteClick" BackgroundColor="Transparent" CommandParameter="{Binding .}"></ImageButton>
                                                         </StackLayout>
                                                     </Frame>
                                                 </StackLayout>
@@ -1077,9 +1077,9 @@
                                                     <ColumnDefinition Width="40"></ColumnDefinition>
                                                 </Grid.ColumnDefinitions>
                                                 <StackLayout Grid.Column="0">
-                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
+                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
                                                         <StackLayout HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center">
-                                                            <ImageButton Margin="0,-2,0,0" Source="{Binding favoriteIconLeft}" Clicked="AddFavoriteLeftItemOnVerticalView"  CommandParameter="{Binding .}"></ImageButton>
+                                                            <ImageButton Margin="0,-2,0,0" Source="{Binding favoriteIconLeft}" Clicked="AddFavoriteLeftItemOnVerticalView" BackgroundColor="Transparent"   CommandParameter="{Binding .}"></ImageButton>
                                                         </StackLayout>
                                                     </Frame>
                                                 </StackLayout>
@@ -1157,9 +1157,9 @@
                                                     <ColumnDefinition Width="40"></ColumnDefinition>
                                                 </Grid.ColumnDefinitions>
                                                 <StackLayout Grid.Column="0">
-                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
+                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
                                                         <StackLayout HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center">
-                                                            <ImageButton Margin="0,-2,0,0" Source="{Binding favoriteIconRight}" Clicked="AddFavoriteRighttemOnVerticalView" CommandParameter="{Binding .}"></ImageButton>
+                                                            <ImageButton Margin="0,-2,0,0" Source="{Binding favoriteIconRight}" Clicked="AddFavoriteRighttemOnVerticalView" BackgroundColor="Transparent" CommandParameter="{Binding .}"></ImageButton>
                                                         </StackLayout>
                                                     </Frame>
                                                 </StackLayout>

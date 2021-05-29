@@ -28,7 +28,6 @@ namespace ServingFresh.Views
     public class User2
     {
         public string delivery_instructions { get; set; }
-
     }
 
     public class FavoritePost
@@ -81,7 +80,7 @@ namespace ServingFresh.Views
             public string key { get;set; }
         }
         public double ambassadorDiscount = 0;
-        public static string couponsUIDs = "";
+        public string couponsUIDs = "";
         public static Purchase purchase = new Purchase(user);
         public ObservableCollection<ItemObject> cartItems = new ObservableCollection<ItemObject>();
         public ObservableCollection<CouponItem> couponsList = new ObservableCollection<CouponItem>();
@@ -187,6 +186,7 @@ namespace ServingFresh.Views
                 }
 
                 cartItems.Clear();
+                var showGiftCardHeader = false;
                 foreach (string key in order.Keys)
                 {
                     cartItems.Add(new ItemObject()
@@ -204,7 +204,22 @@ namespace ServingFresh.Views
                         taxable = order[key].taxable,
                         isItemAvailable = order[key].isItemAvailable,
                     });
+
+                    if (order[key].item_name.Contains("GiftCard"))
+                    {
+                        showGiftCardHeader = true;
+                    }
                     orderCopy.Add(key, order[key]);
+                }
+
+                if (showGiftCardHeader)
+                {
+                    giftCardHeader.IsVisible = true;
+                    confirmationEmail.Text = user.getUserEmail();
+                }
+                else
+                {
+                    giftCardHeader.IsVisible = false;
                 }
 
                 CartItems.ItemsSource = cartItems;
@@ -1170,14 +1185,15 @@ namespace ServingFresh.Views
                 if (button.BackgroundColor == Color.FromHex("#FF8500"))
                 {
                     button.BackgroundColor = Color.FromHex("#2B6D74");
-                    if (Device.RuntimePlatform == Device.Android)
-                    {
-                        customerStripeInformationView.HeightRequest = 250;
-                    }
-                    else
-                    {
-                        customerStripeInformationView.HeightRequest = 194;
-                    }
+                    //if (Device.RuntimePlatform == Device.Android)
+                    //{
+                    //    customerStripeInformationView.HeightRequest = 250;
+                    //}
+                    //else
+                    //{
+                    //    customerStripeInformationView.HeightRequest = 194;
+                    //}
+                    customerStripeInformationView.IsVisible = true;
 
 
 
@@ -1185,7 +1201,8 @@ namespace ServingFresh.Views
                 else
                 {
                     button.BackgroundColor = Color.FromHex("#FF8500");
-                    customerStripeInformationView.HeightRequest = 0;
+                    //customerStripeInformationView.HeightRequest = 0;
+                    customerStripeInformationView.IsVisible = false;
                 }
             }
         }
@@ -1229,7 +1246,7 @@ namespace ServingFresh.Views
                     }
                     else
                     {
-                        await DisplayAlert("Make sure you fill all entries", "", "OK");
+                        await DisplayAlert("Oops", "Payment was not sucessful", "OK");
                     }
                 }
                 else
@@ -1921,6 +1938,11 @@ namespace ServingFresh.Views
                     
                 }
             }
+        }
+
+        void ShowTermsAndConditions(System.Object sender, System.EventArgs e)
+        {
+            Application.Current.MainPage.Navigation.PushModalAsync(new TermsAndConditionsPage(), false);
         }
     }
 }

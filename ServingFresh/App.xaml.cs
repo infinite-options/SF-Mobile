@@ -7,6 +7,10 @@ using Xamarin.Essentials;
 using ServingFresh.LogIn.Apple;
 using System.Diagnostics;
 using static ServingFresh.Views.PrincipalPage;
+using ServingFresh.Models;
+using Newtonsoft.Json;
+using System.Collections.Generic;
+
 namespace ServingFresh
 {
     public partial class App : Application
@@ -14,25 +18,24 @@ namespace ServingFresh
         public const string LoggedInKey = "LoggedIn";
         public const string AppleUserIdKey = "AppleUserIdKey";
         string userId;
+        public static IList<MessageResult> messageList = null;
         
         public App()
         {
             InitializeComponent();            
             try
             {
+                SetAlertMessageList();
+                if (Application.Current.Properties.Keys.Contains(Constant.Autheticatior))
+                {
+                    var tempUser = JsonConvert.DeserializeObject<User>(Current.Properties[Constant.Autheticatior].ToString());
 
-                if(user.getUserID() == "")
-                {
-                    MainPage = new PrincipalPage();
-                }
-                else
-                {
                     DateTime today = DateTime.Now;
-                    var expTime = user.getUserSessionTime();
+                    var expTime = tempUser.getUserSessionTime();
 
                     if (today <= expTime)
                     {
-                        //Console.WriteLine("guid: " + Preferences.Get("guid", null));
+                        SetUser(tempUser);
                         MainPage = new SelectionPage();
                     }
                     else
@@ -40,8 +43,8 @@ namespace ServingFresh
                         LogInPage client = new LogInPage();
                         MainPage = client;
 
-                        
-                        string socialPlatform = user.getUserPlatform();
+
+                        string socialPlatform = tempUser.getUserPlatform();
 
                         if (socialPlatform.Equals(Constant.Facebook))
                         {
@@ -59,8 +62,11 @@ namespace ServingFresh
                         {
                             MainPage = new LogInPage();
                         }
-                        
                     }
+                }
+                else
+                {
+                    MainPage = new PrincipalPage();
                 }
             }
             catch (Exception autoLoginFailed)
@@ -102,6 +108,33 @@ namespace ServingFresh
 
         protected override void OnResume()
         {
+        }
+
+        void SetUser(User temp)
+        {
+            user.setUserID(temp.getUserID());
+            user.setUserSessionTime(temp.getUserSessionTime());
+            user.setUserPlatform(temp.getUserPlatform());
+            user.setUserType(temp.getUserType());
+            user.setUserEmail(temp.getUserEmail());
+            user.setUserFirstName(temp.getUserFirstName());
+            user.setUserLastName(temp.getUserLastName());
+            user.setUserPhoneNumber(temp.getUserPhoneNumber());
+            user.setUserAddress(temp.getUserAddress());
+            user.setUserUnit(temp.getUserUnit());
+            user.setUserCity(temp.getUserCity());
+            user.setUserState(temp.getUserState());
+            user.setUserZipcode(temp.getUserZipcode());
+            user.setUserLatitude(temp.getUserLatitude());
+            user.setUserLongitude(temp.getUserLongitude());
+            user.setUserUSPSType(temp.getUserUSPSType());
+            user.setUserImage(temp.getUserImage());
+        }
+
+        async void SetAlertMessageList()
+        {
+            var messageClient = new AlertMessage();
+            messageList = await messageClient.GetMessageList();
         }
     }
 }

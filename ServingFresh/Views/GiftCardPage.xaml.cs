@@ -9,6 +9,12 @@ using System.Collections.ObjectModel;
 
 namespace ServingFresh.Views
 {
+    public class GiftCard
+    {
+        public string email { get; set; }
+        public string message { get; set; }
+    }
+
     public partial class GiftCardPage : ContentPage
     {
 
@@ -26,7 +32,6 @@ namespace ServingFresh.Views
                 purchase.setPurchaseCoupoID("");
                 purchase.setPurchaseDiscount("0.00");
                 purchase.setPurchaseAddon("FALSE");
-                purchase.setPurchaseSubtotal(giftCardAmount.ToString("N2"));
                 purchase.setPurchaseServiceFee("0.00");
                 purchase.setPurchaseDeliveryFee("0.00");
                 purchase.setPurchaseDriveTip("0.00");
@@ -45,32 +50,42 @@ namespace ServingFresh.Views
         {
             if (AreTermsAccepted.IsChecked)
             {
-                ObservableCollection<PurchasedItem> purchasedOrder = new ObservableCollection<PurchasedItem>();
-                purchasedOrder.Add(new PurchasedItem
+                if (stripeInformationView.IsVisible == false)
                 {
-                    img = "giftCardA",
-                    qty = 1,
-                    name = "Serving Fresh eGift card",
-                    unit = "each",
-                    price = giftCardAmount,
-                    item_uid = "",
-                    itm_business_uid = "",
-                    description = "",
-                    business_price = giftCardAmount,
-                });
+                    stripeInformationView.IsVisible = true;
 
-                purchase.setPurchaseItems(purchasedOrder);
-                purchase.setPurchaseDeliveryInstructions(message.Text);
-                purchase.setPurchaseAmountDue(giftCardAmount.ToString("N2"));
-                purchase.setPurchasePaid(giftCardAmount.ToString("N2"));
-                purchase.setPurchaseChargeID("test");
-                purchase.setPurchasePaymentType("STRIPE");
+                    ObservableCollection<PurchasedItem> purchasedOrder = new ObservableCollection<PurchasedItem>();
+                    purchasedOrder.Add(new PurchasedItem
+                    {
+                        img = "giftCardA",
+                        qty = 1,
+                        name = "Serving Fresh eGift card",
+                        unit = "each",
+                        price = giftCardAmount,
+                        item_uid = "",
+                        itm_business_uid = "",
+                        description = "",
+                        business_price = giftCardAmount,
+                    });
 
-                purchase.printPurchase();
-                var paymentClient = new Payments("SFTEST");
-                _ = paymentClient.SendPurchaseToDatabase(purchase);
+                    purchase.setPurchaseItems(purchasedOrder);
+                    purchase.setPurchaseDeliveryInstructions(message.Text);
+                    purchase.setPurchaseSubtotal(giftCardAmount.ToString("N2"));
+                    purchase.setPurchaseAmountDue(giftCardAmount.ToString("N2"));
+                    purchase.setPurchasePaid(giftCardAmount.ToString("N2"));
+                    purchase.setPurchaseChargeID("test");
+                    purchase.setPurchasePaymentType("STRIPE");
+
+                    purchase.printPurchase();
+                }
+                else
+                {
+                    stripeInformationView.IsVisible = false;
+                }
             }
         }
+
+
 
         async void CheckoutViaPayPal(System.Object sender, System.EventArgs e)
         {
@@ -92,6 +107,7 @@ namespace ServingFresh.Views
 
                 purchase.setPurchaseItems(purchasedOrder);
                 purchase.setPurchaseDeliveryInstructions(message.Text);
+                purchase.setPurchaseSubtotal(giftCardAmount.ToString("N2"));
                 purchase.setPurchaseAmountDue(giftCardAmount.ToString("N2"));
                 purchase.setPurchasePaid(giftCardAmount.ToString("N2"));
                 purchase.setPurchaseChargeID("test");
@@ -181,5 +197,35 @@ namespace ServingFresh.Views
             }
         }
 
+        async void CompletePaymentViaStripe(System.Object sender, System.EventArgs e)
+        {
+            //"order_instructions":[{ "email":"xyz@gmail.com","message":"GC"}]
+            var paymentClient = new Payments("SFTEST");
+            string mode = Payments.getMode(purchase.getPurchaseDeliveryInstructions(), "STRIPE");
+            paymentClient = new Payments(mode);
+
+            var paymentIsSuccessful = paymentClient.PayViaStripe(
+                purchase.getPurchaseEmail(),
+                cardHolderName.Text,
+                cardHolderNumber.Text,
+                cardCVV.Text,
+                cardExpMonth.Text,
+                cardExpYear.Text,
+                purchase.getPurchaseAmountDue()
+                );
+
+            if (paymentIsSuccessful)
+            {
+                purchase.setPurchaseChargeID(paymentClient.getTransactionID());
+                _ = paymentClient.SendPurchaseToDatabase(purchase);
+                order.Clear();
+                //await WriteFavorites(GetFavoritesList(), purchase.getPurchaseCustomerUID());
+                Application.Current.MainPage = new HistoryPage();
+            }
+            else
+            {
+                await DisplayAlert("Oops", "Payment was not sucessful", "OK");
+            }
+        }
     }
 }

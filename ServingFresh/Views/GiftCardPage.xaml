@@ -111,6 +111,25 @@
                         <Button Text="Checkout with Stripe" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="CheckoutViaStripe"></Button>
                         <Button Text="Checkout with PayPal" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="CheckoutViaPayPal"></Button>
                     </StackLayout>
+
+                    <StackLayout Margin="50,30,50,0" x:Name="stripeInformationView" IsVisible="false">
+                        <Entry x:Name="cardHolderName" Placeholder="Cardholder Name" PlaceholderColor="Gray" FontSize="16" TextColor="Black" FontAttributes="Bold"></Entry>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                <ColumnDefinition Width="100"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Entry Grid.Column="0" x:Name="cardHolderNumber" TextColor="Black"  MaxLength="16" Placeholder="Card Number" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
+                            <Entry Grid.Column="1" x:Name="cardCVV" TextColor="Black" Keyboard="Numeric" MaxLength="3" Placeholder="CVV" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
+                        </Grid>
+                        <Grid>
+                            <Entry Grid.Column="0" x:Name="cardExpMonth" Placeholder="Exp MM" TextColor="Black" Keyboard="Numeric" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
+                            <Entry Grid.Column="1" x:Name="cardExpYear" Placeholder="Exp YY" TextColor="Black" Keyboard="Numeric" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
+                            <Entry Grid.Column="2" x:Name="cardZip" Placeholder="ZIP" TextColor="Black" Keyboard="Numeric" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
+                        </Grid>
+                        <Button Margin="0,15,0,0" HeightRequest="59" Text="Complete Payment with Stripe" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="CompletePaymentViaStripe"></Button>
+                    </StackLayout>
+
                 </StackLayout>
             </ScrollView>
            </Grid>

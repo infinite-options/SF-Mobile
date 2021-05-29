@@ -84,6 +84,13 @@
                         <Label Text="support@servingfresh.me" FontSize="22" TextColor="#FF8500"></Label>
                     </StackLayout>
                     
+                    <StackLayout>
+                        <Label Text="Icons attribution:" FontSize="22" TextColor="Black"></Label>
+                        <Label Text="Students by Timo Schmid from the Noun Project" FontSize="18" TextColor="#FF8500"></Label>
+                        <Label Text="Grocery basket by Martin LEBRETON from the Noun Project" FontSize="18" TextColor="#FF8500"></Label>
+                        <Label Text="Farmer with seedling by Gan Khoon Lay from the Noun Project" FontSize="18" TextColor="#FF8500"></Label>
+                    </StackLayout>
+                    
                 </StackLayout>
                 <StackLayout VerticalOptions="EndAndExpand">
                     <Label HorizontalOptions="Center" x:Name="versionNumber" TextColor="Black" FontSize="Small" FontAttributes="Bold"></Label>

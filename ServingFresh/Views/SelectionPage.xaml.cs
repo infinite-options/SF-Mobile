@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.ComponentModel;
 using static ServingFresh.Views.PrincipalPage;
-
+using static ServingFresh.App;
 namespace ServingFresh.Views
 {
     public partial class SelectionPage : ContentPage
@@ -2367,14 +2367,18 @@ namespace ServingFresh.Views
             user.setUserLongitude("");
             user.setUserPlatform("");
             user.setUserDeviceID("");
-            user.setUserSessionTime(new DateTime());
+            DateTime today = DateTime.Now;
+            user.setUserSessionTime(today);
+
+            string account = JsonConvert.SerializeObject(user);
+            Application.Current.Properties[Constant.Autheticatior] = account;
+            Application.Current.SavePropertiesAsync();
+
         }
 
         void NavigateToMainFromSelection(System.Object sender, System.EventArgs e)
         {
             NavigateToMain(sender, e);
         }
-
-
     }
 }
