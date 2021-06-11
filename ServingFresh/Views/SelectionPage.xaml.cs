@@ -20,6 +20,8 @@ using System.IO;
 using System.ComponentModel;
 using static ServingFresh.Views.PrincipalPage;
 using static ServingFresh.App;
+using ServingFresh.Models.Interfaces;
+
 namespace ServingFresh.Views
 {
     public partial class SelectionPage : ContentPage
@@ -521,11 +523,43 @@ namespace ServingFresh.Views
         {
             try
             {
-                var isLatest = await CrossLatestVersion.Current.IsUsingLatestVersion();
+                //var isLatest = await CrossLatestVersion.Current.IsUsingLatestVersion();
 
-                Debug.WriteLine("IsUsingLaterstVersion: " + isLatest);
+                //Debug.WriteLine("IsUsingLaterstVersion: " + isLatest);
 
-                if (!isLatest)
+                //if (!isLatest)
+                //{
+                //    if (messageList != null)
+                //    {
+                //        if (messageList.ContainsKey("701-000100"))
+                //        {
+                //            Debug.WriteLine("TITLE: " + messageList["701-000100"].title);
+                //            // \\n, @
+
+                //            string title = messageList["701-000100"].title.Replace("\\n", Environment.NewLine);
+                //            string message = messageList["701-000100"].message.Replace("\\n", Environment.NewLine);
+                //            await DisplayAlert(title, message, messageList["701-000100"].responses);
+                //        }
+                //        else
+                //        {
+                //            await DisplayAlert("Serving Fresh\nhas gotten even better!", "Please visit the App Store to get the latest version.", "OK");
+                //        }
+                //    }
+                //    else
+                //    {
+                //        await DisplayAlert("Serving Fresh\nhas gotten even better!", "Please visit the App Store to get the latest version.", "OK");
+                //    }
+
+                //    await CrossLatestVersion.Current.OpenAppInStore();
+                //}
+                
+
+                var client = new AppVersion();
+                string versionStr = DependencyService.Get<IAppVersionAndBuild>().GetVersionNumber();
+                var result = await client.isRunningLatestVersion(versionStr);
+                Debug.WriteLine("isRunningLatestVersion: " + result);
+
+                if(result == "FALSE")
                 {
                     if (messageList != null)
                     {
@@ -533,7 +567,7 @@ namespace ServingFresh.Views
                         {
                             Debug.WriteLine("TITLE: " + messageList["701-000100"].title);
                             // \\n, @
-                           
+
                             string title = messageList["701-000100"].title.Replace("\\n", Environment.NewLine);
                             string message = messageList["701-000100"].message.Replace("\\n", Environment.NewLine);
                             await DisplayAlert(title, message, messageList["701-000100"].responses);
@@ -547,7 +581,6 @@ namespace ServingFresh.Views
                     {
                         await DisplayAlert("Serving Fresh\nhas gotten even better!", "Please visit the App Store to get the latest version.", "OK");
                     }
-                    
                     await CrossLatestVersion.Current.OpenAppInStore();
                 }
             }

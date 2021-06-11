@@ -177,6 +177,7 @@ namespace ServingFresh.Views
                     purchase.setPurchaseCity(user.getUserCity());
                     purchase.setPurchaseState(user.getUserState());
                     purchase.setPurchaseZipcode(user.getUserZipcode());
+                    cardHolderName.Text = user.getUserFirstName() + " " + user.getUserLastName();
                     DeliveryAddress1.Text = purchase.getPurchaseAddress() + ",";
                     DeliveryAddress2.Text = purchase.getPurchaseCity() + ", " + purchase.getPurchaseState() + ", " + purchase.getPurchaseZipcode();
                     guestAddressInfoView.HeightRequest = 0;
@@ -1118,6 +1119,10 @@ namespace ServingFresh.Views
                     }
                 }
             }
+            else
+            {
+                await DisplayAlert("Oops", "Please accept the terms and conditions", "OK");
+            }
         }
 
         async void GuestCompletePaymentWithStripe(System.Object sender, System.EventArgs e)
@@ -1309,14 +1314,7 @@ namespace ServingFresh.Views
                 if (button.BackgroundColor == Color.FromHex("#FF8500"))
                 {
                     button.BackgroundColor = Color.FromHex("#2B6D74");
-                    //if (Device.RuntimePlatform == Device.Android)
-                    //{
-                    //    customerStripeInformationView.HeightRequest = 250;
-                    //}
-                    //else
-                    //{
-                    //    customerStripeInformationView.HeightRequest = 194;
-                    //}
+                    
                     customerStripeInformationView.IsVisible = true;
 
                     var y = scrollView.ScrollY + 120;
@@ -1343,72 +1341,96 @@ namespace ServingFresh.Views
         {
             try
             {
-                var button = (Button)sender;
+                var client1 = new SignUp();
 
-                if (button.BackgroundColor == Color.FromHex("#FF8500"))
+                if (client1.GuestCheckAllStripeRequiredEntries(cardHolderName, cardHolderNumber, cardCVV, cardExpMonth, cardExpYear, cardZip))
                 {
-                    button.BackgroundColor = Color.FromHex("#2B6D74");
-                    UserDialogs.Instance.ShowLoading("Your payment is processing...");
-                    FinalizePurchase(purchase, selectedDeliveryDate);
-                    purchase.setPurchasePaymentType("STRIPE");
+                    var button = (Button)sender;
 
-                    string mode = Payments.getMode(purchase.getPurchaseDeliveryInstructions(), "STRIPE");
-                    paymentClient = new Payments(mode);
-
-                    var paymentIsSuccessful = paymentClient.PayViaStripe(
-                        purchase.getPurchaseEmail(),
-                        cardHolderName.Text,
-                        cardHolderNumber.Text,
-                        cardCVV.Text,
-                        cardExpMonth.Text,
-                        cardExpYear.Text,
-                        purchase.getPurchaseAmountDue()
-                        );
-
-                    if (paymentIsSuccessful)
+                    if (button.BackgroundColor == Color.FromHex("#FF8500"))
                     {
-                        var coupond = purchase.getPurchaseCoupoID();
-                        purchase.setPurchaseCoupoID(coupond + couponsUIDs);
-                        purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
-                        purchase.setPurchaseChargeID(paymentClient.getTransactionID());
-                        _ = paymentClient.SendPurchaseToDatabase(purchase);
-                        order.Clear();
-                        await WriteFavorites(GetFavoritesList(), purchase.getPurchaseCustomerUID());
-                        UserDialogs.Instance.HideLoading();
-                        Application.Current.MainPage = new HistoryPage();
-                    }
-                    else
-                    {
-                        if (messageList != null)
+                        UserDialogs.Instance.ShowLoading("Your payment is processing...");
+                        button.BackgroundColor = Color.FromHex("#2B6D74");
+                        FinalizePurchase(purchase, selectedDeliveryDate);
+                        purchase.setPurchasePaymentType("STRIPE");
+
+                        string mode = Payments.getMode(purchase.getPurchaseDeliveryInstructions(), "STRIPE");
+                        paymentClient = new Payments(mode);
+
+                        var paymentIsSuccessful = paymentClient.PayViaStripe(
+                            purchase.getPurchaseEmail(),
+                            cardHolderName.Text,
+                            cardHolderNumber.Text,
+                            cardCVV.Text,
+                            cardExpMonth.Text,
+                            cardExpYear.Text,
+                            purchase.getPurchaseAmountDue()
+                            );
+
+                        if (paymentIsSuccessful)
                         {
-                            if (messageList.ContainsKey("701-000011"))
+                            var coupond = purchase.getPurchaseCoupoID();
+                            purchase.setPurchaseCoupoID(coupond + couponsUIDs);
+                            purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
+                            purchase.setPurchaseChargeID(paymentClient.getTransactionID());
+                            _ = paymentClient.SendPurchaseToDatabase(purchase);
+                            order.Clear();
+                            await WriteFavorites(GetFavoritesList(), purchase.getPurchaseCustomerUID());
+                            UserDialogs.Instance.HideLoading();
+                            Application.Current.MainPage = new HistoryPage();
+                        }
+                        else
+                        {
+                            if (messageList != null)
                             {
-                                UserDialogs.Instance.HideLoading();
-                                await DisplayAlert(messageList["701-000011"].title, messageList["701-000011"].message, messageList["701-000011"].responses);
+                                if (messageList.ContainsKey("701-000011"))
+                                {
+                                    UserDialogs.Instance.HideLoading();
+                                    await DisplayAlert(messageList["701-000011"].title, messageList["701-000011"].message, messageList["701-000011"].responses);
+                                }
+                                else
+                                {
+                                    UserDialogs.Instance.HideLoading();
+                                    await DisplayAlert("Oops", "Payment was not sucessful", "OK");
+                                }
                             }
                             else
                             {
                                 UserDialogs.Instance.HideLoading();
                                 await DisplayAlert("Oops", "Payment was not sucessful", "OK");
                             }
+
                         }
-                        else
-                        {
-                            UserDialogs.Instance.HideLoading();
-                            await DisplayAlert("Oops", "Payment was not sucessful", "OK");
-                        }
-                        
+                    }
+                    else
+                    {
+                        button.BackgroundColor = Color.FromHex("#FF8500");
                     }
                 }
                 else
                 {
-                    button.BackgroundColor = Color.FromHex("#FF8500");
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000006"))
+                        {
+                            await DisplayAlert(messageList["701-000006"].title, messageList["701-000006"].message, messageList["701-000006"].responses);
+                        }
+                        else
+                        {
+                            await DisplayAlert("Oops", "You seem to forgot to fill in all entries. Please fill in all entries to continue", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await DisplayAlert("Oops", "You seem to forgot to fill in all entries. Please fill in all entries to continue", "OK");
+                    }
                 }
             }catch(Exception errorCompletePaymentWithStripe)
             {
                 var client = new Diagnostic();
                 client.parseException(errorCompletePaymentWithStripe.ToString(), user);
             }
+
         }
 
         async void CheckoutViaPayPal(System.Object sender, System.EventArgs e)
@@ -1421,6 +1443,10 @@ namespace ServingFresh.Views
                 var coupond = purchase.getPurchaseCoupoID();
                 purchase.setPurchaseCoupoID(coupond + couponsUIDs);
                 await Application.Current.MainPage.Navigation.PushModalAsync(new PayPalPage(), true);
+            }
+            else
+            {
+                await DisplayAlert("Oops", "Please accept the terms and conditions", "OK");
             }
         }
 

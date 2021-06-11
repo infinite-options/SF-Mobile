@@ -5,6 +5,7 @@ using Xamarin.Forms;
 using static ServingFresh.Views.PrincipalPage;
 using static ServingFresh.App;
 using System.Diagnostics;
+using Acr.UserDialogs;
 
 namespace ServingFresh.Views
 {
@@ -22,6 +23,7 @@ namespace ServingFresh.Views
         {
             try
             {
+                UserDialogs.Instance.ShowLoading("We are checking if we deliver to your location...");
                 var client1 = new SignUp();
                 if (client1.ValidateSignUpInfo(firstName, lastName, signUpPhone, signUpAddress1Entry, signUpCityEntry, signUpStateEntry, signUpZipcodeEntry))
                 {
@@ -53,15 +55,18 @@ namespace ServingFresh.Views
                                     user.setUserLatitude(location.Latitude.ToString());
                                     user.setUserLongitude(location.Longitude.ToString());
                                     user.setUserType("GUEST");
-                                    var action = await DisplayActionSheet("Hooray!\n\nLooks like we deliver to your address. Click the button below to see the variety of fresh organic fruits and vegetables we offer.", "Cancel", null, new[] { "Explore Local Produce", "Sign Up" });
+                                    UserDialogs.Instance.HideLoading();
+                                    var action = await DisplayActionSheet("Hooray!\n\nLooks like we deliver to your address. Click the button below to see the variety of fresh organic fruits and vegetables we offer.", "Cancel", null, new[] { "Explore Local Produce", "Complete Sign Up" });
                                     if (action != "Cancel")
                                     {
                                         if (action == "Explore Local Produce")
                                         {
+                                            UserDialogs.Instance.HideLoading();
                                             Application.Current.MainPage = new SelectionPage();
                                         }
-                                        else if (action == "Sign Up")
+                                        else if (action == "Complete Sign Up")
                                         {
+                                            UserDialogs.Instance.HideLoading();
                                             await Application.Current.MainPage.Navigation.PopModalAsync();
                                             await Application.Current.MainPage.Navigation.PushModalAsync(new SignUpPage(), true);
                                         }
@@ -70,6 +75,7 @@ namespace ServingFresh.Views
                                 else
                                 {
                                     // Need a cancel button on UI
+                                    UserDialogs.Instance.HideLoading();
                                     var emailAddress = await DisplayPromptAsync("Still Growing...", "Sorry, it looks like we don’t deliver to your neighborhood yet. Enter your email address, and we will let you know as soon as we come to your area.", "OK", "Cancel");
                                     return;
                                 }
@@ -80,18 +86,21 @@ namespace ServingFresh.Views
                                 {
                                     if (messageList.ContainsKey("701-000001"))
                                     {
+                                        UserDialogs.Instance.HideLoading();
                                         await DisplayAlert(messageList["701-000001"].title, messageList["701-000001"].message, messageList["701-000001"].responses);
                                     }
                                     else
                                     {
+                                        UserDialogs.Instance.HideLoading();
                                         await DisplayAlert("We were not able to find your location in our system.", "Try again", "OK");
                                     }
                                 }
                                 else
                                 {
+                                    UserDialogs.Instance.HideLoading();
                                     await DisplayAlert("We were not able to find your location in our system.", "Try again", "OK");
                                 }
-                                
+                                UserDialogs.Instance.HideLoading();
                                 return;
                             }
 
@@ -102,20 +111,27 @@ namespace ServingFresh.Views
                             {
                                 if (messageList.ContainsKey("701-000002"))
                                 {
+                                    UserDialogs.Instance.HideLoading();
                                     await DisplayAlert(messageList["701-000002"].title, messageList["701-000002"].message, messageList["701-000002"].responses);
                                 }
                                 else
                                 {
+                                    UserDialogs.Instance.HideLoading();
                                     await DisplayAlert("Oops", "Please enter your address unit number", "OK");
                                 }
                             }
                             else
                             {
+                                UserDialogs.Instance.HideLoading();
                                 await DisplayAlert("Oops", "Please enter your address unit number", "OK");
                             }
-                            
+                            UserDialogs.Instance.HideLoading();
                             return;
                         }
+                    }
+                    else
+                    {
+                        Debug.WriteLine("addressStatus: " + "null");
                     }
                 }
                 else
@@ -124,22 +140,28 @@ namespace ServingFresh.Views
                     {
                         if (messageList.ContainsKey("701-000003"))
                         {
+                            UserDialogs.Instance.HideLoading();
                             await DisplayAlert(messageList["701-000003"].title, messageList["701-000003"].message, messageList["701-000003"].responses);
                         }
                         else
                         {
+                            UserDialogs.Instance.HideLoading();
                             await DisplayAlert("Oops", "Please enter all the required information. Thanks!", "OK");
                         }
                     }
                     else
                     {
+                        UserDialogs.Instance.HideLoading();
                         await DisplayAlert("Oops", "Please enter all the required information. Thanks!", "OK");
                     }
-
+                    UserDialogs.Instance.HideLoading();
                     return;
                 }
-            }catch(Exception errorContinueWithSignUp)
+                UserDialogs.Instance.HideLoading();
+            }
+            catch(Exception errorContinueWithSignUp)
             {
+                UserDialogs.Instance.HideLoading();
                 var client = new Diagnostic();
                 client.parseException(errorContinueWithSignUp.ToString(), user);
             }
@@ -175,7 +197,6 @@ namespace ServingFresh.Views
             if (!String.IsNullOrEmpty(signUpAddress1Entry.Text)) {
                 addr.addressEntryFocused(SignUpAddressList, signUpAddressFrame);
             }
-
         }
 
         void signUpAddress1Entry_Unfocused(System.Object sender, EventArgs eventArgs)

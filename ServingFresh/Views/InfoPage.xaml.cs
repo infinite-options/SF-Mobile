@@ -11,7 +11,6 @@ namespace ServingFresh.Views
         public InfoPage()
         {
             InitializeComponent();
-            SelectionPage.SetMenu(guestMenuSection, customerMenuSection, historyLabel, profileLabel);
             SetAppVersion(versionNumber, buildNumber);
             SetCartLabel(CartTotal);
         }

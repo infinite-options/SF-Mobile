@@ -157,8 +157,7 @@ namespace ServingFresh.Views
 
         public async void LoadHistory()
         {
-            //string userId = user.getUserID();
-            string userId = "100-000057";
+            string userId = user.getUserID();
             var client = new HttpClient();
             var response = await client.GetAsync(Constant.GetHistoryUrl + userId);
             Debug.WriteLine("HISTORY: " + Constant.GetHistoryUrl + userId);

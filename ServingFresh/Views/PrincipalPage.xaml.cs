@@ -163,6 +163,25 @@ namespace ServingFresh.Views
                                 return;
                             }
                         }
+                        else
+                        {
+                            if (messageList != null)
+                            {
+                                if (messageList.ContainsKey("701-000111"))
+                                {
+                                    string message = messageList["701-000111"].message.Replace("\\n", Environment.NewLine);
+                                    await Application.Current.MainPage.DisplayAlert(messageList["701-000111"].title, message, messageList["701-000109"].responses);
+                                }
+                                else
+                                {
+                                    await Application.Current.MainPage.DisplayAlert("Oops", "We can't deliver to this address.  Please enter another address to continue.", "OK");
+                                }
+                            }
+                            else
+                            {
+                                await Application.Current.MainPage.DisplayAlert("Oops", "We can't deliver to this address.  Please enter another address to continue.", "OK");
+                            }
+                        }
                     }
                 }
                 else
@@ -567,6 +586,26 @@ namespace ServingFresh.Views
         void NavigateToGiftCardPage(System.Object sender, System.EventArgs e)
         {
             FindLocalProduceBaseOnLocation(sender, e);
+        }
+
+        static public async void SignUpAlert()
+        {
+            if (messageList != null)
+            {
+                if (messageList.ContainsKey("701-000109"))
+                {
+                    string message = messageList["701-000109"].message.Replace("\\n", Environment.NewLine);
+                    await Application.Current.MainPage.DisplayAlert(messageList["701-000109"].title, message, messageList["701-000109"].responses);
+                }
+                else
+                {
+                    await Application.Current.MainPage.DisplayAlert("Oops", "It looks like there is already an account using this email.\nJust Login to continue.", "OK");
+                }
+            }
+            else
+            {
+                await Application.Current.MainPage.DisplayAlert("Oops", "It looks like there is already an account using this email.\nJust Login to continue.", "OK");
+            }
         }
     }
 }

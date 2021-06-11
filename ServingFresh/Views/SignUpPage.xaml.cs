@@ -149,7 +149,7 @@ namespace ServingFresh.Views
                                         user.setUserID(profile.result[0].customer_uid);
                                         var content = signUpClient.UpdateDirectUser(user, newUserPassword1.Text);
                                         var signUpStatus = await SignUp.SignUpNewUser(content);
-
+                                        
                                         if (signUpStatus)
                                         {
                                             user.setUserPlatform("DIRECT");
@@ -194,23 +194,12 @@ namespace ServingFresh.Views
                                         }
                                         else
                                         {
-                                            if (messageList != null)
-                                            {
-                                                if (messageList.ContainsKey("701-000103"))
-                                                {
-                                                    await DisplayAlert(messageList["701-000103"].title, messageList["701-000103"].message, messageList["701-000103"].responses);
-                                                }
-                                                else
-                                                {
-                                                    await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
-                                                }
-                                            }
-                                            else
-                                            {
-                                                await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
-                                            }
-                                           
+                                            SignUpAlert();
                                         }
+                                    }
+                                    else
+                                    {
+                                        SignUpAlert();
                                     }
                                 }
                             }
@@ -267,22 +256,7 @@ namespace ServingFresh.Views
                                 }
                                 else if (signUpStatus != "" && signUpStatus == "USER ALREADY EXIST")
                                 {
-                                    if (messageList != null)
-                                    {
-                                        if (messageList.ContainsKey("701-000105"))
-                                        {
-                                            await DisplayAlert(messageList["701-000105"].title, messageList["701-000105"].message, messageList["701-000105"].responses);
-                                        }
-                                        else
-                                        {
-                                            await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
-                                    }
-                                    
+                                    SignUpAlert();
                                 }
                             }
                         }
@@ -442,23 +416,13 @@ namespace ServingFresh.Views
                                 }
                                 else
                                 {
-                                    if (messageList != null)
-                                    {
-                                        if (messageList.ContainsKey("701-000109"))
-                                        {
-                                            await DisplayAlert(messageList["701-000109"].title, messageList["701-000109"].message, messageList["701-000109"].responses);
-                                        }
-                                        else
-                                        {
-                                            await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
-                                    }
-                                    
+                                    SignUpAlert();
+
                                 }
+                            }
+                            else
+                            {
+                                SignUpAlert();
                             }
                         }
                         else
@@ -496,22 +460,8 @@ namespace ServingFresh.Views
                             }
                             else if (signUpStatus != "" && signUpStatus == "USER ALREADY EXIST")
                             {
-                                if (messageList != null)
-                                {
-                                    if (messageList.ContainsKey("701-000110"))
-                                    {
-                                        await DisplayAlert(messageList["701-000110"].title, messageList["701-000110"].message, messageList["701-000110"].responses);
-                                    }
-                                    else
-                                    {
-                                        await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
-                                    }
-                                }
-                                else
-                                {
-                                    await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
-                                }
-                                
+                                SignUpAlert();
+
                             }
                         }
                     }
@@ -551,21 +501,7 @@ namespace ServingFresh.Views
                         }
                         else if (signUpStatus != "" && signUpStatus == "USER ALREADY EXIST")
                         {
-                            if (messageList != null)
-                            {
-                                if (messageList.ContainsKey("701-000111"))
-                                {
-                                    await DisplayAlert(messageList["701-000111"].title, messageList["701-000111"].message, messageList["701-000111"].responses);
-                                }
-                                else
-                                {
-                                    await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
-                                }
-                            }
-                            else
-                            {
-                                await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
-                            }
+                            SignUpAlert();
                         }
                     }
                 }
@@ -638,22 +574,12 @@ namespace ServingFresh.Views
                                 }
                                 else
                                 {
-                                    if (messageList != null)
-                                    {
-                                        if (messageList.ContainsKey("701-000112"))
-                                        {
-                                            await DisplayAlert(messageList["701-000112"].title, messageList["701-000112"].message, messageList["701-000112"].responses);
-                                        }
-                                        else
-                                        {
-                                            await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
-                                    }
+                                    SignUpAlert();
                                 }
+                            }
+                            else
+                            {
+                                SignUpAlert();
                             }
                         }
                         else
@@ -691,21 +617,7 @@ namespace ServingFresh.Views
                             }
                             else if (signUpStatus != "" && signUpStatus == "USER ALREADY EXIST")
                             {
-                                if (messageList != null)
-                                {
-                                    if (messageList.ContainsKey("701-000113"))
-                                    {
-                                        await DisplayAlert(messageList["701-000113"].title, messageList["701-000113"].message, messageList["701-000113"].responses);
-                                    }
-                                    else
-                                    {
-                                        await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
-                                    }
-                                }
-                                else
-                                {
-                                    await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
-                                }
+                                SignUpAlert();
                             }
                         }
                     }
@@ -744,21 +656,7 @@ namespace ServingFresh.Views
                         }
                         else if (signUpStatus != "" && signUpStatus == "USER ALREADY EXIST")
                         {
-                            if (messageList != null)
-                            {
-                                if (messageList.ContainsKey("701-000114"))
-                                {
-                                    await DisplayAlert(messageList["701-000114"].title, messageList["701-000114"].message, messageList["701-000114"].responses);
-                                }
-                                else
-                                {
-                                    await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
-                                }
-                            }
-                            else
-                            {
-                                await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
-                            }
+                            SignUpAlert();
                         }
                     }
 
@@ -783,9 +681,13 @@ namespace ServingFresh.Views
         public event EventHandler SignIn;
         void appleLogInButton_Clicked(System.Object sender, System.EventArgs e)
         {
-            if (Device.RuntimePlatform != Device.Android)
+            if (Device.RuntimePlatform == Device.iOS)
             {
                 OnAppleSignInRequest();
+            }
+            else
+            {
+                // hide apple button?
             }
         }
 
@@ -855,21 +757,7 @@ namespace ServingFresh.Views
                     }
                     else if (signUpStatus != "" && signUpStatus == "USER ALREADY EXIST")
                     {
-                        if (messageList != null)
-                        {
-                            if (messageList.ContainsKey("701-000116"))
-                            {
-                                await DisplayAlert(messageList["701-000116"].title, messageList["701-000116"].message, messageList["701-000116"].responses);
-                            }
-                            else
-                            {
-                                await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
-                            }
-                        }
-                        else
-                        {
-                            await DisplayAlert("Oops", "This email already exist in our system. Please use another email", "OK");
-                        }
+                        SignUpAlert();
                     }
 
                     //var client = new HttpClient();
