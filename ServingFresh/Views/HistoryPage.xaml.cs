@@ -10,10 +10,11 @@ using Xamarin.Forms;
 using static ServingFresh.Views.SelectionPage;
 using static ServingFresh.Views.PrincipalPage;
 using ServingFresh.Models;
+using static ServingFresh.App;
 
 namespace ServingFresh.Views
 {
-    public partial class HistoryPage : ContentPage
+    public partial class HistoryPage : ContentPage 
     {
 
         public class HistoryObject
@@ -128,7 +129,7 @@ namespace ServingFresh.Views
         public HistoryPage()
         {
             InitializeComponent();
-            SelectionPage.SetMenu(guestMenuSection, customerMenuSection, historyLabel, profileLabel);
+
             historyList = new ObservableCollection<HistoryDisplayObject>();
             CartTotal.Text = CheckoutPage.total_qty.ToString();
             LoadHistory();
@@ -136,12 +137,28 @@ namespace ServingFresh.Views
 
         public async void ShowSuccessfullPayment()
         {
-            await DisplayAlert("Congratulations", "Payment was successful. We appreciate your business", "OK");
+            if (messageList != null)
+            {
+                if (messageList.ContainsKey("701-000048"))
+                {
+                    await DisplayAlert(messageList["701-000048"].title, messageList["701-000048"].message, messageList["701-000048"].responses);
+                }
+                else
+                {
+                    await DisplayAlert("Congratulations", "Payment was successful. We appreciate your business", "OK");
+                }
+            }
+            else
+            {
+                await DisplayAlert("Congratulations", "Payment was successful. We appreciate your business", "OK");
+            }
+           
         }
 
         public async void LoadHistory()
         {
-            string userId = user.getUserID();
+            //string userId = user.getUserID();
+            string userId = "100-000057";
             var client = new HttpClient();
             var response = await client.GetAsync(Constant.GetHistoryUrl + userId);
             Debug.WriteLine("HISTORY: " + Constant.GetHistoryUrl + userId);
@@ -251,7 +268,6 @@ namespace ServingFresh.Views
                 {
                     var client1 = new Diagnostic();
                     client1.parseException(errorLoadHistory.ToString(), user);
-
                 }
             }
             HistoryList.ItemsSource = historyList;

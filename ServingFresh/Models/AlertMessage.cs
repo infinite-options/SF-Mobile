@@ -11,7 +11,9 @@ namespace ServingFresh.Models
     public class MessageResult
     {
         public string alert_uid { get; set; }
-        public string alert_message { get; set; }
+        public string title { get; set; }
+        public string message { get; set; }
+        public string responses { get; set; }
     }
 
     public class Message
@@ -28,20 +30,25 @@ namespace ServingFresh.Models
 
         }
 
-        public async Task<IList<MessageResult>> GetMessageList()
+        public async Task<Dictionary<string, MessageResult>> GetMessageList()
         {
-            IList<MessageResult> result = null;
+            Dictionary<string, MessageResult> result = null;
             var client = new HttpClient();
             var endpointCall = await client.GetAsync(Constant.AlertMessage);
             if (endpointCall.IsSuccessStatusCode)
             {
                 var content = await endpointCall.Content.ReadAsStringAsync();
                 var data = JsonConvert.DeserializeObject<Message>(content);
-                foreach (MessageResult key in data.result)
+
+                result = new Dictionary<string, MessageResult>();
+
+                foreach (MessageResult message in data.result)
                 {
-                    Debug.WriteLine(key.alert_message);
+                    if (!result.ContainsKey(message.alert_uid))
+                    {
+                        result.Add(message.alert_uid, message);
+                    }
                 }
-                result = data.result;
             }
             return result;
         }

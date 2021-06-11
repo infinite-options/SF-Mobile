@@ -6,7 +6,7 @@ using static ServingFresh.Views.CheckoutPage;
 using Xamarin.Forms;
 using ServingFresh.Models;
 using System.Collections.ObjectModel;
-
+using static ServingFresh.App;
 namespace ServingFresh.Views
 {
     public class GiftCard
@@ -151,7 +151,22 @@ namespace ServingFresh.Views
                 }
                 else
                 {
-                    await DisplayAlert("Oops","The value you enter is invalid.","OK");
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000046"))
+                        {
+                            await DisplayAlert(messageList["701-000046"].title, messageList["701-000046"].message, messageList["701-000046"].responses);
+                        }
+                        else
+                        {
+                            await DisplayAlert("Oops", "The value you enter is invalid.", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await DisplayAlert("Oops", "The value you enter is invalid.", "OK");
+                    }
+                    
                 }
             }
         }
@@ -224,7 +239,22 @@ namespace ServingFresh.Views
             }
             else
             {
-                await DisplayAlert("Oops", "Payment was not sucessful", "OK");
+                if (messageList != null)
+                {
+                    if (messageList.ContainsKey("701-000047"))
+                    {
+                        await DisplayAlert(messageList["701-000047"].title, messageList["701-000047"].message, messageList["701-000047"].responses);
+                    }
+                    else
+                    {
+                        await DisplayAlert("Oops", "Payment was not sucessful", "OK");
+                    }
+                }
+                else
+                {
+                    await DisplayAlert("Oops", "Payment was not sucessful", "OK");
+                }
+                
             }
         }
     }

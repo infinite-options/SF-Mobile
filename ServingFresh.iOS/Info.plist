@@ -42,7 +42,7 @@
 		</dict>
 	</array>
 	<key>CFBundleShortVersionString</key>
-	<string>1.6.3</string>
+	<string>1.6.4</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.servingfresh</string>
 	<key>UIStatusBarStyle</key>
@@ -60,8 +60,8 @@
 	<key>UIUserInterfaceStyle</key>
 	<string>Light</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>s</string>
+	<string>Turning on location services allows us to display fresh local produce near your current location. </string>
 	<key>CFBundleVersion</key>
-	<string>70</string>
+	<string>73</string>
 </dict>
 </plist>

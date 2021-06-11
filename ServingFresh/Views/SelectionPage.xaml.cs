@@ -426,7 +426,22 @@ namespace ServingFresh.Views
                                             }
                                             else
                                             {
-                                                await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
+                                                if (messageList != null)
+                                                {
+                                                    if (messageList.ContainsKey("701-000097"))
+                                                    {
+                                                        await DisplayAlert(messageList["701-000097"].title, messageList["701-000097"].message, messageList["701-000097"].responses);
+                                                    }
+                                                    else
+                                                    {
+                                                        await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
+                                                }
+                                                
                                             }
                                         }
                                         test.Hide();
@@ -435,13 +450,43 @@ namespace ServingFresh.Views
                                     else
                                     {
                                         test.Hide();
-                                        await DisplayAlert("Alert!", "Our internal system was not able to retrieve your user information. We are working to solve this issue.", "OK");
+                                        if (messageList != null)
+                                        {
+                                            if (messageList.ContainsKey("701-000098"))
+                                            {
+                                                await DisplayAlert(messageList["701-000098"].title, messageList["701-000098"].message, messageList["701-000098"].responses);
+                                            }
+                                            else
+                                            {
+                                                await DisplayAlert("Alert!", "Our internal system was not able to retrieve your user information. We are working to solve this issue.", "OK");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            await DisplayAlert("Alert!", "Our internal system was not able to retrieve your user information. We are working to solve this issue.", "OK");
+                                        }
+                                        
                                     }
                                 }
                                 else
                                 {
                                     test.Hide();
-                                    await DisplayAlert("Oops", "We are facing some problems with our internal system. We weren't able to update your credentials", "OK");
+                                    if (messageList != null)
+                                    {
+                                        if (messageList.ContainsKey("701-000099"))
+                                        {
+                                            await DisplayAlert(messageList["701-000099"].title, messageList["701-000099"].message, messageList["701-000099"].responses);
+                                        }
+                                        else
+                                        {
+                                            await DisplayAlert("Oops", "We are facing some problems with our internal system. We weren't able to update your credentials", "OK");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        await DisplayAlert("Oops", "We are facing some problems with our internal system. We weren't able to update your credentials", "OK");
+                                    }
+                                   
                                 }
                                 test.Hide();
                             }
@@ -478,16 +523,37 @@ namespace ServingFresh.Views
             {
                 var isLatest = await CrossLatestVersion.Current.IsUsingLatestVersion();
 
+                Debug.WriteLine("IsUsingLaterstVersion: " + isLatest);
+
                 if (!isLatest)
                 {
-                    await DisplayAlert("Serving Fresh\nhas gotten even better!", "Please visit the App Store to get the latest version.", "OK");
-                    //await CrossLatestVersion.Current.OpenAppInStore();
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000100"))
+                        {
+                            Debug.WriteLine("TITLE: " + messageList["701-000100"].title);
+                            // \\n, @
+                           
+                            string title = messageList["701-000100"].title.Replace("\\n", Environment.NewLine);
+                            string message = messageList["701-000100"].message.Replace("\\n", Environment.NewLine);
+                            await DisplayAlert(title, message, messageList["701-000100"].responses);
+                        }
+                        else
+                        {
+                            await DisplayAlert("Serving Fresh\nhas gotten even better!", "Please visit the App Store to get the latest version.", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await DisplayAlert("Serving Fresh\nhas gotten even better!", "Please visit the App Store to get the latest version.", "OK");
+                    }
+                    
+                    await CrossLatestVersion.Current.OpenAppInStore();
                 }
             }
             catch (Exception issueVersionChecking)
             {
                 string str = issueVersionChecking.Message;
-
             }
         }
 
@@ -819,7 +885,22 @@ namespace ServingFresh.Views
                     }
                     else
                     {
-                        await DisplayAlert("Oops", "We don't have a business that can delivery to your location at the moment", "OK");
+                        if (messageList != null)
+                        {
+                            if (messageList.ContainsKey("701-000101"))
+                            {
+                                await DisplayAlert(messageList["701-000101"].title, messageList["701-000101"].message, messageList["701-000101"].responses);
+                            }
+                            else
+                            {
+                                await DisplayAlert("Oops", "We don't have a business that can delivery to your location at the moment", "OK");
+                            }
+                        }
+                        else
+                        {
+                            await DisplayAlert("Oops", "We don't have a business that can delivery to your location at the moment", "OK");
+                        }
+                        
                         return;
                     }
                 }

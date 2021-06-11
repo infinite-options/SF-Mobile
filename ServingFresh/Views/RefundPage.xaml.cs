@@ -10,6 +10,7 @@ using System.Text;
 using static ServingFresh.Views.SelectionPage;
 using static ServingFresh.Views.PrincipalPage;
 using ServingFresh.Models;
+using static ServingFresh.App;
 
 namespace ServingFresh.Views
 {
@@ -49,7 +50,22 @@ namespace ServingFresh.Views
             {
                 var client = new Diagnostic();
                 client.parseException(errorTakePicture.ToString(), user);
-                await DisplayAlert("Permission required", "We'll need permission to access your camara, so that you can take a photo of the damaged product.", "OK");
+                if (messageList != null)
+                {
+                    if (messageList.ContainsKey("701-000090"))
+                    {
+                        await DisplayAlert(messageList["701-000090"].title, messageList["701-000090"].message, messageList["701-000090"].responses);
+                    }
+                    else
+                    {
+                        await DisplayAlert("Permission required", "We'll need permission to access your camara, so that you can take a photo of the damaged product.", "OK");
+                    }
+                }
+                else
+                {
+                    await DisplayAlert("Permission required", "We'll need permission to access your camara, so that you can take a photo of the damaged product.", "OK");
+                }
+                
                 return;
             }
         }
@@ -71,7 +87,22 @@ namespace ServingFresh.Views
             {
                 var client = new Diagnostic();
                 client.parseException(errorChoosePicture.ToString(), user);
-                await DisplayAlert("Permission required", "We'll need permission to access your camara roll, so that you can select a photo of the damaged product.", "OK");
+                if (messageList != null)
+                {
+                    if (messageList.ContainsKey("701-000091"))
+                    {
+                        await DisplayAlert(messageList["701-000091"].title, messageList["701-000091"].message, messageList["701-000091"].responses);
+                    }
+                    else
+                    {
+                        await DisplayAlert("Permission required", "We'll need permission to access your camara roll, so that you can select a photo of the damaged product.", "OK");
+                    }
+                }
+                else
+                {
+                    await DisplayAlert("Permission required", "We'll need permission to access your camara roll, so that you can select a photo of the damaged product.", "OK");
+                }
+                
                 return;
             }
         }
@@ -80,18 +111,63 @@ namespace ServingFresh.Views
         {
             if (photoStream == null)
             {
-                await DisplayAlert("Missing photo", "Please take a photo of your damage product with the button below", "OK");
+                if (messageList != null)
+                {
+                    if (messageList.ContainsKey("701-000092"))
+                    {
+                        await DisplayAlert(messageList["701-000092"].title, messageList["701-000092"].message, messageList["701-000092"].responses);
+                    }
+                    else
+                    {
+                        await DisplayAlert("Missing photo", "Please take a photo of your damage product with the button below", "OK");
+                    }
+                }
+                else
+                {
+                    await DisplayAlert("Missing photo", "Please take a photo of your damage product with the button below", "OK");
+                }
+                
                 return;
             }
             if (refundEmail.Text == null)
             {
-                await DisplayAlert("Email can't be empty", "Please fill in your email", "OK");
+                if (messageList != null)
+                {
+                    if (messageList.ContainsKey("701-000093"))
+                    {
+                        await DisplayAlert(messageList["701-000093"].title, messageList["701-000093"].message, messageList["701-000093"].responses);
+                    }
+                    else
+                    {
+                        await DisplayAlert("Email can't be empty", "Please fill in your email", "OK");
+                    }
+                }
+                else
+                {
+                    await DisplayAlert("Email can't be empty", "Please fill in your email", "OK");
+                }
+               
                 return;
             }
 
             if (refundNote.Text == null)
             {
-                await DisplayAlert("Message can't be empty", "Please fill in the message", "OK");
+                if (messageList != null)
+                {
+                    if (messageList.ContainsKey("701-000094"))
+                    {
+                        await DisplayAlert(messageList["701-000094"].title, messageList["701-000094"].message, messageList["701-000094"].responses);
+                    }
+                    else
+                    {
+                        await DisplayAlert("Message can't be empty", "Please fill in the message", "OK");
+                    }
+                }
+                else
+                {
+                    await DisplayAlert("Message can't be empty", "Please fill in the message", "OK");
+                }
+                
                 return;
             }
             try
@@ -137,12 +213,42 @@ namespace ServingFresh.Views
                 UserDialogs.Instance.HideLoading();
                 if (response.IsSuccessStatusCode)
                 {
-                    await DisplayAlert("Request Sent!", "Give us a day or two to respond.", "OK");
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000095"))
+                        {
+                            await DisplayAlert(messageList["701-000095"].title, messageList["701-000095"].message, messageList["701-000095"].responses);
+                        }
+                        else
+                        {
+                            await DisplayAlert("Request Sent!", "Give us a day or two to respond.", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await DisplayAlert("Request Sent!", "Give us a day or two to respond.", "OK");
+                    }
+                   
                     //await Navigation.PopAsync();
                 }
                 else
                 {
-                    await DisplayAlert("Fail!", "Sorry! Something went wrong", "OK");
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000096"))
+                        {
+                            await DisplayAlert(messageList["701-000096"].title, messageList["701-000096"].message, messageList["701-000096"].responses);
+                        }
+                        else
+                        {
+                            await DisplayAlert("Fail!", "Sorry! Something went wrong", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await DisplayAlert("Fail!", "Sorry! Something went wrong", "OK");
+                    }
+                    
                     //await Navigation.PopAsync();
                 }
                 return;

@@ -10,7 +10,7 @@
                 <RowDefinition Height="94"></RowDefinition>
                 <RowDefinition Height="60"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
-                <RowDefinition x:Name="menuFrame" Height="0"></RowDefinition>
+              
             </Grid.RowDefinitions>
             <Grid Grid.Row="0" ColumnSpacing="0" BackgroundColor="#136D74">
                 <Grid.ColumnDefinitions>
@@ -198,103 +198,7 @@
                         </CollectionView>
                 </StackLayout>
             </Frame>
-            <Frame Grid.Row="3" BackgroundColor="#136D74" CornerRadius="20" Margin="0,0,0,-20">
-                <StackLayout Spacing="10">
-                    <StackLayout HorizontalOptions="Center">
-                        <Frame WidthRequest="50" HeightRequest="5" CornerRadius="2"  Padding="0" BackgroundColor="Gray" HasShadow="False"></Frame>
-                    </StackLayout>
-                    <StackLayout Orientation="Horizontal" Spacing="20">
-                        <Frame HasShadow="False" BackgroundColor="Transparent" Padding="0" HeightRequest="32" WidthRequest="32" >
-                            <Image VerticalOptions="CenterAndExpand" Source="storeIcon.png"></Image>
-                        </Frame>
-                        <Label VerticalOptions="Center" Text="Store" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
-                        <StackLayout.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="NavigateToStoreFromHistory"></TapGestureRecognizer>
-                        </StackLayout.GestureRecognizers>
-                    </StackLayout>
-                    <StackLayout Orientation="Horizontal" Spacing="20">
-                        <Frame HasShadow="False" BackgroundColor="Transparent" Padding="0" HeightRequest="32" WidthRequest="32">
-                            <Image VerticalOptions="CenterAndExpand" Source="cartMenuIcon.png"></Image>
-                        </Frame>
-                        <Label VerticalOptions="Center" Text="Cart" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
-                        <StackLayout.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="NavigateToCartFromHistory"></TapGestureRecognizer>
-                        </StackLayout.GestureRecognizers>
-                    </StackLayout>
-
-                    <StackLayout Orientation="Horizontal" Spacing="20">
-                        <Frame HasShadow="False" BackgroundColor="Transparent" Padding="0" HeightRequest="32" WidthRequest="32" >
-                            <Image VerticalOptions="CenterAndExpand" Source="historyIcon.png" Aspect="Fill"></Image>
-                        </Frame>
-                        <Label VerticalOptions="Center" x:Name="historyLabel" Text="History" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
-                        <StackLayout.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="NavigateToHistoryFromHistory"></TapGestureRecognizer>
-                        </StackLayout.GestureRecognizers>
-                    </StackLayout>
-
-                    <StackLayout Orientation="Horizontal" Spacing="20">
-                        <Frame HasShadow="False" BackgroundColor="Transparent" Padding="0" HeightRequest="32" WidthRequest="32">
-                            <Image VerticalOptions="CenterAndExpand" Source="refundIcon.png"></Image>
-                        </Frame>
-                        <Label VerticalOptions="Center" Text="Refunds" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
-                        <StackLayout.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="NavigateToRefundsFromHistory"></TapGestureRecognizer>
-                        </StackLayout.GestureRecognizers>
-                    </StackLayout>
-
-                    <StackLayout Orientation="Horizontal" Spacing="20">
-                        <Frame HasShadow="False" BackgroundColor="Transparent" Padding="0" HeightRequest="32" WidthRequest="32">
-                            <Image VerticalOptions="CenterAndExpand" Source="infoIcon.png" Scale="0.9"></Image>
-                        </Frame>
-                        <Label VerticalOptions="Center" Text="Info" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
-                        <StackLayout.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="NavigateToInfoFromHistory"></TapGestureRecognizer>
-                        </StackLayout.GestureRecognizers>
-                    </StackLayout>
-
-                    <StackLayout Orientation="Horizontal" Spacing="20">
-                        <Frame HasShadow="False" BackgroundColor="Transparent" Padding="0" HeightRequest="32" WidthRequest="32">
-                            <Image VerticalOptions="CenterAndExpand" Source="profileIcon.png" Scale="0.9"></Image>
-                        </Frame>
-                        <Label VerticalOptions="Center" x:Name="profileLabel" Text="Profile" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
-                        <StackLayout.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="NavigateToProfileFromHistory"></TapGestureRecognizer>
-                        </StackLayout.GestureRecognizers>
-                    </StackLayout>
-
-                    <StackLayout x:Name="guestMenuSection">
-                        <StackLayout Orientation="Horizontal" Spacing="20">
-                            <Frame HasShadow="False" BackgroundColor="Transparent" Padding="0"  HeightRequest="32" WidthRequest="32">
-                                <Image VerticalOptions="CenterAndExpand" Source="signIn.png"  Scale="0.9"></Image>
-                            </Frame>
-                            <Label VerticalOptions="Center" Text="Sign in" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
-                            <StackLayout.GestureRecognizers>
-                                <TapGestureRecognizer Tapped="NavigateToSignInFromHistory"></TapGestureRecognizer>
-                            </StackLayout.GestureRecognizers>
-                        </StackLayout>
-
-                        <StackLayout Orientation="Horizontal" Spacing="20">
-                            <Frame HasShadow="False" BackgroundColor="Transparent" Padding="0"  HeightRequest="32" WidthRequest="32">
-                                <Image VerticalOptions="CenterAndExpand" Source="signUpIcon.png"  Scale="0.9"></Image>
-                            </Frame>
-                            <Label VerticalOptions="Center" Text="Sign up" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
-                            <StackLayout.GestureRecognizers>
-                                <TapGestureRecognizer Tapped="NavigateToSignUpFromHistory"></TapGestureRecognizer>
-                            </StackLayout.GestureRecognizers>
-                        </StackLayout>
-                    </StackLayout>
-
-                    <StackLayout Orientation="Horizontal" Spacing="20" x:Name="customerMenuSection">
-                        <Frame HasShadow="False" BackgroundColor="Transparent" Padding="0"  HeightRequest="32" WidthRequest="32">
-                            <Image VerticalOptions="CenterAndExpand" Source="logoutIcon.png"  Scale="0.9"></Image>
-                        </Frame>
-                        <Label VerticalOptions="Center" Text="Logout" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
-                        <StackLayout.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="NavigateToMainFromHistory"></TapGestureRecognizer>
-                        </StackLayout.GestureRecognizers>
-                    </StackLayout>
-                </StackLayout>
-            </Frame>
+            
         </Grid>
     </ContentPage.Content>
 </ContentPage>

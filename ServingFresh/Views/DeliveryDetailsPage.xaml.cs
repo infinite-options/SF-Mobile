@@ -18,6 +18,7 @@ using static ServingFresh.Views.CheckoutPage;
 using static ServingFresh.Views.SelectionPage;
 using static ServingFresh.Views.PrincipalPage;
 using Application = Xamarin.Forms.Application;
+using static ServingFresh.App;
 
 
 namespace ServingFresh.Views
@@ -117,7 +118,22 @@ namespace ServingFresh.Views
                         }
                         else
                         {
-                            await DisplayAlert("Make sure you fill all entries", "", "OK");
+                            if (messageList != null)
+                            {
+                                if (messageList.ContainsKey("701-000040"))
+                                {
+                                    await DisplayAlert(messageList["701-000040"].title, messageList["701-000040"].message, messageList["701-000040"].responses);
+                                }
+                                else
+                                {
+                                    await DisplayAlert("Make sure you fill all entries", "", "OK");
+                                }
+                            }
+                            else
+                            {
+                                await DisplayAlert("Make sure you fill all entries", "", "OK");
+                            }
+                            
                         }
                     }
                 }
@@ -128,7 +144,22 @@ namespace ServingFresh.Views
                         var role = isEmailUnused.result[0].role;
                         if(role == "CUSTOMER")
                         {
-                            await DisplayAlert("Oops", "You are not a guest. We are sending you to the checkout page where you can sign in to proceed with your purchase", "OK");
+                            if (messageList != null)
+                            {
+                                if (messageList.ContainsKey("701-000041"))
+                                {
+                                    await DisplayAlert(messageList["701-000041"].title, messageList["701-000041"].message, messageList["701-000041"].responses);
+                                }
+                                else
+                                {
+                                    await DisplayAlert("Oops", "You are not a guest. We are sending you to the checkout page where you can sign in to proceed with your purchase", "OK");
+                                }
+                            }
+                            else
+                            {
+                                await DisplayAlert("Oops", "You are not a guest. We are sending you to the checkout page where you can sign in to proceed with your purchase", "OK");
+                            }
+                            
                             Application.Current.MainPage = new CheckoutPage();
                         }
                         else if (role == "GUEST")
@@ -158,7 +189,22 @@ namespace ServingFresh.Views
                             }
                             else
                             {
-                                await DisplayAlert("Make sure you fill all entries", "", "OK");
+                                if (messageList != null)
+                                {
+                                    if (messageList.ContainsKey("701-000042"))
+                                    {
+                                        await DisplayAlert(messageList["701-000042"].title, messageList["701-000042"].message, messageList["701-000042"].responses);
+                                    }
+                                    else
+                                    {
+                                        await DisplayAlert("Make sure you fill all entries", "", "OK");
+                                    }
+                                }
+                                else
+                                {
+                                    await DisplayAlert("Make sure you fill all entries", "", "OK");
+                                }
+                                
                             }
                         }
                     }
@@ -232,7 +278,22 @@ namespace ServingFresh.Views
                     }
                     else
                     {
-                        await DisplayAlert("Issue with payment via PayPal", "", "OK");
+                        if (messageList != null)
+                        {
+                            if (messageList.ContainsKey("701-000043"))
+                            {
+                                await DisplayAlert(messageList["701-000043"].title, messageList["701-000043"].message, messageList["701-000043"].responses);
+                            }
+                            else
+                            {
+                                await DisplayAlert("Issue with payment via PayPal", "", "OK");
+                            }
+                        }
+                        else
+                        {
+                            await DisplayAlert("Issue with payment via PayPal", "", "OK");
+                        }
+                        
                     }
                 }
                 else
@@ -242,7 +303,22 @@ namespace ServingFresh.Views
                         var role = isEmailUnused.result[0].role;
                         if (role == "CUSTOMER")
                         {
-                            await DisplayAlert("Oops", "You are not a guest. We are sending you to the checkout page where you can sign in to proceed with your purchase", "OK");
+                            if (messageList != null)
+                            {
+                                if (messageList.ContainsKey("701-000044"))
+                                {
+                                    await DisplayAlert(messageList["701-000044"].title, messageList["701-000044"].message, messageList["701-000044"].responses);
+                                }
+                                else
+                                {
+                                    await DisplayAlert("Oops", "You are not a guest. We are sending you to the checkout page where you can sign in to proceed with your purchase", "OK");
+                                }
+                            }
+                            else
+                            {
+                                await DisplayAlert("Oops", "You are not a guest. We are sending you to the checkout page where you can sign in to proceed with your purchase", "OK");
+                            }
+                            
                             Application.Current.MainPage = new CheckoutPage();
                         }
                         else if (role == "GUEST")
@@ -263,7 +339,22 @@ namespace ServingFresh.Views
                             }
                             else
                             {
-                                await DisplayAlert("Issue with payment via PayPal", "", "OK");
+                                if (messageList != null)
+                                {
+                                    if (messageList.ContainsKey("701-000045"))
+                                    {
+                                        await DisplayAlert(messageList["701-000045"].title, messageList["701-000045"].message, messageList["701-000045"].responses);
+                                    }
+                                    else
+                                    {
+                                        await DisplayAlert("Issue with payment via PayPal", "", "OK");
+                                    }
+                                }
+                                else
+                                {
+                                    await DisplayAlert("Issue with payment via PayPal", "", "OK");
+                                }
+                                
                             }
                         }
                     }

@@ -17,7 +17,7 @@ using System.Diagnostics;
 using ServingFresh.Models;
 using Acr.UserDialogs;
 using static ServingFresh.Views.PrincipalPage;
-
+using static ServingFresh.App;
 namespace ServingFresh.Views
 {
     public partial class LogInPage : ContentPage
@@ -103,7 +103,22 @@ namespace ServingFresh.Views
                 logInButton.IsEnabled = false;
                 if (String.IsNullOrEmpty(userEmailAddress.Text) || String.IsNullOrEmpty(userPassword.Text))
                 {
-                    await DisplayAlert("Error", "Please fill in all fields", "OK");
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000049"))
+                        {
+                            await DisplayAlert(messageList["701-000049"].title, messageList["701-000049"].message, messageList["701-000049"].responses);
+                        }
+                        else
+                        {
+                            await DisplayAlert("Error", "Please fill in all fields", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await DisplayAlert("Error", "Please fill in all fields", "OK");
+                    }
+                   
                     logInButton.IsEnabled = true;
                 }
                 else
@@ -188,7 +203,22 @@ namespace ServingFresh.Views
                                         }
                                         else
                                         {
-                                            await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
+                                            if (messageList != null)
+                                            {
+                                                if (messageList.ContainsKey("701-000050"))
+                                                {
+                                                    await DisplayAlert(messageList["701-000050"].title, messageList["701-000050"].message, messageList["701-000050"].responses);
+                                                }
+                                                else
+                                                {
+                                                    await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
+                                            }
+                                           
                                         }
                                     }
                                     if (direction == "")
@@ -209,12 +239,43 @@ namespace ServingFresh.Views
                             }
                             else
                             {
-                                await DisplayAlert("Alert!", "Our internal system was not able to retrieve your user information. We are working to solve this issue.", "OK");
+                                if (messageList != null)
+                                {
+                                    if (messageList.ContainsKey("701-000051"))
+                                    {
+                                        await DisplayAlert(messageList["701-000051"].title, messageList["701-000051"].message, messageList["701-000051"].responses);
+                                    }
+                                    else
+                                    {
+                                        await DisplayAlert("Alert!", "Our internal system was not able to retrieve your user information. We are working to solve this issue.", "OK");
+                                    }
+                                }
+                                else
+                                {
+                                    await DisplayAlert("Alert!", "Our internal system was not able to retrieve your user information. We are working to solve this issue.", "OK");
+                                }
+                                
                             }
                         }
                         else
                         {
-                            await DisplayAlert("Error", "Wrong password was entered", "OK");
+
+                            if (messageList != null)
+                            {
+                                if (messageList.ContainsKey("701-000052"))
+                                {
+                                    await DisplayAlert(messageList["701-000052"].title, messageList["701-000052"].message, messageList["701-000052"].responses);
+                                }
+                                else
+                                {
+                                    await DisplayAlert("Error", "Wrong password was entered", "OK");
+                                }
+                            }
+                            else
+                            {
+                                await DisplayAlert("Error", "Wrong password was entered", "OK");
+                            }
+                            
                             logInButton.IsEnabled = true;
                         }
                     }
@@ -279,7 +340,23 @@ namespace ServingFresh.Views
                     }
                     else if (DRSMessage.Contains(Constant.EmailNotFound))
                     {
-                        await DisplayAlert("Oops!", "Our records show that you don't have an accout. Please sign up!", "OK");
+
+                        if (messageList != null)
+                        {
+                            if (messageList.ContainsKey("701-000053"))
+                            {
+                                await DisplayAlert(messageList["701-000053"].title, messageList["701-000053"].message, messageList["701-000053"].responses);
+                            }
+                            else
+                            {
+                                await DisplayAlert("Oops!", "Our records show that you don't have an accout. Please sign up!", "OK");
+                            }
+                        }
+                        else
+                        {
+                            await DisplayAlert("Oops!", "Our records show that you don't have an accout. Please sign up!", "OK");
+                        }
+                        
                     }
                     else
                     {
@@ -447,33 +524,121 @@ namespace ServingFresh.Views
                 else if (status == "USER NEEDS TO SIGN UP")
                 {
                     UserDialogs.Instance.HideLoading();
-                    await Application.Current.MainPage.DisplayAlert("Oops", "It looks like you don't have an account with Serving Fresh. Please sign up!", "OK");
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000054"))
+                        {
+                            await DisplayAlert(messageList["701-000054"].title, messageList["701-000054"].message, messageList["701-000054"].responses);
+                        }
+                        else
+                        {
+                            await Application.Current.MainPage.DisplayAlert("Oops", "It looks like you don't have an account with Serving Fresh. Please sign up!", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await Application.Current.MainPage.DisplayAlert("Oops", "It looks like you don't have an account with Serving Fresh. Please sign up!", "OK");
+                    }
+                    
                     await Application.Current.MainPage.Navigation.PushModalAsync(new AddressPage(), true);
                 }
                 else if (status == "WRONG SOCIAL MEDIA TO SIGN IN")
                 {
                     UserDialogs.Instance.HideLoading();
-                    await Application.Current.MainPage.DisplayAlert("Oops", "Our records show that you have attempted to log in with a different social media account. Please log in through the correct social media platform. Thanks!", "OK");
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000055"))
+                        {
+                            await DisplayAlert(messageList["701-000055"].title, messageList["701-000055"].message, messageList["701-000055"].responses);
+                        }
+                        else
+                        {
+                            await Application.Current.MainPage.DisplayAlert("Oops", "Our records show that you have attempted to log in with a different social media account. Please log in through the correct social media platform. Thanks!", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await Application.Current.MainPage.DisplayAlert("Oops", "Our records show that you have attempted to log in with a different social media account. Please log in through the correct social media platform. Thanks!", "OK");
+                    }
+                   
                 }
                 else if (status == "SIGN IN DIRECTLY")
                 {
                     UserDialogs.Instance.HideLoading();
-                    await Application.Current.MainPage.DisplayAlert("Oops", "Our records show that you have attempted to log in with a social media account. Please log in through our direct log in. Thanks!", "OK");
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000056"))
+                        {
+                            await DisplayAlert(messageList["701-000056"].title, messageList["701-000056"].message, messageList["701-000056"].responses);
+                        }
+                        else
+                        {
+                            await Application.Current.MainPage.DisplayAlert("Oops", "Our records show that you have attempted to log in with a social media account. Please log in through our direct log in. Thanks!", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await Application.Current.MainPage.DisplayAlert("Oops", "Our records show that you have attempted to log in with a social media account. Please log in through our direct log in. Thanks!", "OK");
+                    }
+                   
                 }
                 else if (status == "ERROR1")
                 {
                     UserDialogs.Instance.HideLoading();
-                    await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000057"))
+                        {
+                            await DisplayAlert(messageList["701-000057"].title, messageList["701-000057"].message, messageList["701-000057"].responses);
+                        }
+                        else
+                        {
+                            await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
+                    }
+                    
                 }
                 else if (status == "ERROR2")
                 {
                     UserDialogs.Instance.HideLoading();
-                    await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000058"))
+                        {
+                            await DisplayAlert(messageList["701-000058"].title, messageList["701-000058"].message, messageList["701-000058"].responses);
+                        }
+                        else
+                        {
+                            await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
+                    }
                 }
                 else
                 {
                     UserDialogs.Instance.HideLoading();
-                    await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000059"))
+                        {
+                            await DisplayAlert(messageList["701-000059"].title, messageList["701-000059"].message, messageList["701-000059"].responses);
+                        }
+                        else
+                        {
+                            await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
+                    }
                 }
             }catch(Exception errorRedirectUserBaseOnVerification)
             {
@@ -585,7 +750,22 @@ namespace ServingFresh.Views
 
         private async void AppleError(object sender, EventArgs e)
         {
-            await DisplayAlert("Error", "We weren't able to set an account for you", "OK");
+            if (messageList != null)
+            {
+                if (messageList.ContainsKey("701-000060"))
+                {
+                    await DisplayAlert(messageList["701-000060"].title, messageList["701-000060"].message, messageList["701-000060"].responses);
+                }
+                else
+                {
+                    await DisplayAlert("Error", "We weren't able to set an account for you", "OK");
+                }
+            }
+            else
+            {
+                await DisplayAlert("Error", "We weren't able to set an account for you", "OK");
+            }
+            
         }
 
 
@@ -660,7 +840,22 @@ namespace ServingFresh.Views
                         }
                         else
                         {
-                            await Application.Current.MainPage.DisplayAlert("Ooops", "Our system is not working. We can't process your request at this moment", "OK");
+                            if (messageList != null)
+                            {
+                                if (messageList.ContainsKey("701-000061"))
+                                {
+                                    await DisplayAlert(messageList["701-000061"].title, messageList["701-000061"].message, messageList["701-000061"].responses);
+                                }
+                                else
+                                {
+                                    await Application.Current.MainPage.DisplayAlert("Ooops", "Our system is not working. We can't process your request at this moment", "OK");
+                                }
+                            }
+                            else
+                            {
+                                await Application.Current.MainPage.DisplayAlert("Ooops", "Our system is not working. We can't process your request at this moment", "OK");
+                            }
+                            
                         }
                     }
                 }
@@ -720,25 +915,99 @@ namespace ServingFresh.Views
                 {
                     if(result.Contains("\"Need to do login via social\""))
                     {
-                        await DisplayAlert("Oops", "We can't reset the password for the given email since it is associated with a media social log-in. Please log in via social media.", "");
+                        if (messageList != null)
+                        {
+                            if (messageList.ContainsKey("701-000062"))
+                            {
+                                await DisplayAlert(messageList["701-000062"].title, messageList["701-000062"].message, messageList["701-000062"].responses);
+                            }
+                            else
+                            {
+                                await DisplayAlert("Oops", "We can't reset the password for the given email since it is associated with a media social log-in. Please log in via social media.", "OK");
+                            }
+                        }
+                        else
+                        {
+                            await DisplayAlert("Oops", "We can't reset the password for the given email since it is associated with a media social log-in. Please log in via social media.", "OK");
+                        }
+                        
                     }
                     else if (result.Contains("\"message\": \"A temporary password has been sent\""))
                     {
-                        await DisplayAlert("Great!", "We have reset your password. A temporary password has been sent to your email.", "OK");
+                        if (messageList != null)
+                        {
+                            if (messageList.ContainsKey("701-000063"))
+                            {
+                                await DisplayAlert(messageList["701-000063"].title, messageList["701-000063"].message, messageList["701-000063"].responses);
+                            }
+                            else
+                            {
+                                await DisplayAlert("Great!", "We have reset your password. A temporary password has been sent to your email.", "OK");
+                            }
+                        }
+                        else
+                        {
+                            await DisplayAlert("Great!", "We have reset your password. A temporary password has been sent to your email.", "OK");
+                        }
+                        
                     }
                     else if (result.Contains("\"message\": \"No such email exists\""))
                     {
-                        await DisplayAlert("Oops", "Our records show that this email is invalid", "");
+                        if (messageList != null)
+                        {
+                            if (messageList.ContainsKey("701-000064"))
+                            {
+                                await DisplayAlert(messageList["701-000064"].title, messageList["701-000064"].message, messageList["701-000064"].responses);
+                            }
+                            else
+                            {
+                                await DisplayAlert("Oops", "Our records show that this email is invalid", "OK");
+                            }
+                        }
+                        else
+                        {
+                            await DisplayAlert("Oops", "Our records show that this email is invalid", "OK");
+                        }
+                        
                     }
                 }
                 else
                 {
-                    await DisplayAlert("Oops", "We were not able to fulfill your request. Please try again.", "OK");
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000065"))
+                        {
+                            await DisplayAlert(messageList["701-000065"].title, messageList["701-000065"].message, messageList["701-000065"].responses);
+                        }
+                        else
+                        {
+                            await DisplayAlert("Oops", "We were not able to fulfill your request. Please try again.", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await DisplayAlert("Oops", "We were not able to fulfill your request. Please try again.", "OK");
+                    }
+                    
                 }
             }
             else
             {
-                await DisplayAlert("Oops","Plese enter the email address associated with your Serving Fresh account","OK");
+                if (messageList != null)
+                {
+                    if (messageList.ContainsKey("701-000066"))
+                    {
+                        await DisplayAlert(messageList["701-000066"].title, messageList["701-000066"].message, messageList["701-000066"].responses);
+                    }
+                    else
+                    {
+                        await DisplayAlert("Oops", "Plese enter the email address associated with your Serving Fresh account", "OK");
+                    }
+                }
+                else
+                {
+                    await DisplayAlert("Oops", "Plese enter the email address associated with your Serving Fresh account", "OK");
+                }
             }
         }
     }

@@ -15,6 +15,7 @@ using Xamarin.Forms.Maps;
 using Switch = Xamarin.Forms.Switch;
 using static ServingFresh.Views.PrincipalPage;
 using static ServingFresh.Views.SelectionPage;
+using static ServingFresh.App;
 using System.Threading.Tasks;
 
 namespace ServingFresh.Views
@@ -268,28 +269,105 @@ namespace ServingFresh.Views
                                             //user.setUserZipcode(userZipcode.Text);
                                             //user.setUserLatitude(location.Latitude.ToString());
                                             //user.setUserLongitude(location.Longitude.ToString());
-                                            await DisplayAlert("We have updated your profile successfully!", "", "OK");
+                                            if (messageList != null)
+                                            {
+                                                if (messageList.ContainsKey("701-000075"))
+                                                {
+                                                    await DisplayAlert(messageList["701-000075"].title, messageList["701-000075"].message, messageList["701-000075"].responses);
+                                                }
+                                                else
+                                                {
+                                                    await DisplayAlert("We have updated your profile successfully!", "", "OK");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                await DisplayAlert("We have updated your profile successfully!", "", "OK");
+                                            }
+                                            
                                         }
                                         else
                                         {
-                                            await DisplayAlert("We were not able to update your profile", "", "OK");
+                                            if (messageList != null)
+                                            {
+                                                if (messageList.ContainsKey("701-000076"))
+                                                {
+                                                    await DisplayAlert(messageList["701-000076"].title, messageList["701-000076"].message, messageList["701-000076"].responses);
+                                                }
+                                                else
+                                                {
+                                                    await DisplayAlert("We were not able to update your profile", "", "OK");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                await DisplayAlert("We were not able to update your profile", "", "OK");
+                                            }
+                                            
                                         }
                                         return;
                                     }
                                     else
                                     {
                                         client.SetPinOnMap(map, location, userAddress.Text);
-                                        bool proceed = await DisplayAlert("Great! You have updated your address", "Since, you address is located in a different delivery area we have to reset your shoping cart", "Save changes", "Don't save changes");
+                                        bool proceed = false;
+                                        if (messageList != null)
+                                        {
+                                            if (messageList.ContainsKey("701-000077"))
+                                            {
+                                                string[] arrayResponses = messageList["701-000077"].responses.Split(',');
+                                                proceed = await DisplayAlert(messageList["701-000077"].title, messageList["701-000077"].message, 0 < arrayResponses.Length? arrayResponses[0]: "Save changes", 1 < arrayResponses.Length ? arrayResponses[1] : "Don't save changes");
+                                            }
+                                            else
+                                            {
+                                                proceed = await DisplayAlert("Great! You have updated your address", "Since, you address is located in a different delivery area we have to reset your shoping cart", "Save changes", "Don't save changes");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            proceed = await DisplayAlert("Great! You have updated your address", "Since, you address is located in a different delivery area we have to reset your shoping cart", "Save changes", "Don't save changes");
+                                        }
+                                        
                                         if (proceed)
                                         {
                                             var updateStatus = await UpdateUserProfile(user, userFirstName.Text, userLastName.Text, userPhoneNumber.Text, userAddress.Text, userUnitNumber.Text, userCity.Text, userState.Text, userZipcode.Text, location.Latitude.ToString(), location.Longitude.ToString());
                                             if (updateStatus)
                                             {
-                                                await DisplayAlert("We have updated your profile successfully!", "", "OK");
+                                                if (messageList != null)
+                                                {
+                                                    if (messageList.ContainsKey("701-000078"))
+                                                    {
+                                                        await DisplayAlert(messageList["701-000078"].title, messageList["701-000078"].message, messageList["701-000078"].responses);
+                                                    }
+                                                    else
+                                                    {
+                                                        await DisplayAlert("We have updated your profile successfully!", "", "OK");
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    await DisplayAlert("We have updated your profile successfully!", "", "OK");
+                                                }
+                                                
                                             }
                                             else
                                             {
-                                                await DisplayAlert("We were not able to update your profile", "", "OK");
+                                                if (messageList != null)
+                                                {
+                                                    if (messageList.ContainsKey("701-000079"))
+                                                    {
+                                                        await DisplayAlert(messageList["701-000079"].title, messageList["701-000079"].message, messageList["701-000079"].responses);
+                                                    }
+                                                    else
+                                                    {
+                                                        await DisplayAlert("We were not able to update your profile", "", "OK");
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    await DisplayAlert("We were not able to update your profile", "", "OK");
+                                                }
+                                               
                                             }
                                         }
                                         return;
@@ -297,38 +375,130 @@ namespace ServingFresh.Views
                                 }
                                 else
                                 {
-                                    bool proceed = await DisplayAlert("Your address is outside our supported areas", "We can still update your profile, but there will not be any available business for your account", "Save changes", "Don't save changes");
+                                    bool proceed = false;
+                                    if (messageList != null)
+                                    {
+                                        if (messageList.ContainsKey("701-000080"))
+                                        {
+                                            string[] arrayResponses = messageList["701-000080"].responses.Split(',');
+                                            proceed = await DisplayAlert(messageList["701-000080"].title, messageList["701-000080"].message, 0 < arrayResponses.Length ? arrayResponses[0] : "Save changes", 1 < arrayResponses.Length ? arrayResponses[1] : "Don't save changes");
+                                        }
+                                        else
+                                        {
+                                            proceed = await DisplayAlert("Your address is outside our supported areas", "We can still update your profile, but there will not be any available business for your account", "Save changes", "Don't save changes");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        proceed = await DisplayAlert("Your address is outside our supported areas", "We can still update your profile, but there will not be any available business for your account", "Save changes", "Don't save changes");
+                                    }
+
                                     if (proceed)
                                     {
                                         var updateStatus = await UpdateUserProfile(user, userFirstName.Text, userLastName.Text, userPhoneNumber.Text, userAddress.Text, userUnitNumber.Text, userCity.Text, userState.Text, userZipcode.Text, location.Latitude.ToString(), location.Longitude.ToString());
                                         if (updateStatus)
                                         {
-                                            await DisplayAlert("We have updated your profile successfully!", "", "OK");
+                                            if (messageList != null)
+                                            {
+                                                if (messageList.ContainsKey("701-000081"))
+                                                {
+                                                    await DisplayAlert(messageList["701-000081"].title, messageList["701-000081"].message, messageList["701-000081"].responses);
+                                                }
+                                                else
+                                                {
+                                                    await DisplayAlert("We have updated your profile successfully!", "", "OK");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                await DisplayAlert("We have updated your profile successfully!", "", "OK");
+                                            }
+                                            
                                         }
                                         else
                                         {
-                                            await DisplayAlert("We were not able to update your profile", "", "OK");
+                                            if (messageList != null)
+                                            {
+                                                if (messageList.ContainsKey("701-000082"))
+                                                {
+                                                    await DisplayAlert(messageList["701-000082"].title, messageList["701-000082"].message, messageList["701-000082"].responses);
+                                                }
+                                                else
+                                                {
+                                                    await DisplayAlert("We were not able to update your profile", "", "OK");
+                                                }
+                                            }
+                                            else
+                                            {
+                                                await DisplayAlert("We were not able to update your profile", "", "OK");
+                                            }
                                         }
                                     }
                                 }
                             }
                             else
                             {
-                                await DisplayAlert("We were not able to find your location in our system.", "Try again", "OK");
+                                if (messageList != null)
+                                {
+                                    if (messageList.ContainsKey("701-000083"))
+                                    {
+                                        await DisplayAlert(messageList["701-000083"].title, messageList["701-000083"].message, messageList["701-000083"].responses);
+                                    }
+                                    else
+                                    {
+                                        await DisplayAlert("We were not able to find your location in our system.", "Try again", "OK");
+                                    }
+                                }
+                                else
+                                {
+                                    await DisplayAlert("We were not able to find your location in our system.", "Try again", "OK");
+                                }
+                                
                                 return;
                             }
 
                         }
                         else if (addressStatus == "D")
                         {
-                            await DisplayAlert("Oops", "Please enter your address unit number", "OK");
+                            if (messageList != null)
+                            {
+                                if (messageList.ContainsKey("701-000084"))
+                                {
+                                    await DisplayAlert(messageList["701-000084"].title, messageList["701-000084"].message, messageList["701-000084"].responses);
+                                }
+                                else
+                                {
+                                    await DisplayAlert("Oops", "Please enter your address unit number", "OK");
+                                }
+                            }
+                            else
+                            {
+                                await DisplayAlert("Oops", "Please enter your address unit number", "OK");
+                            }
+                           
                             return;
                         }
                     }
                 }
                 else
                 {
-                    await DisplayAlert("Oops", "Please enter all the required information. Thanks!", "OK");
+
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000085"))
+                        {
+                            await DisplayAlert(messageList["701-000085"].title, messageList["701-000085"].message, messageList["701-000085"].responses);
+                        }
+                        else
+                        {
+                            await DisplayAlert("Oops", "Please enter all the required information. Thanks!", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await DisplayAlert("Oops", "Please enter all the required information. Thanks!", "OK");
+                    }
+                    
                     return;
                 }
             }catch(Exception errorValidateAddress)
@@ -412,16 +582,61 @@ namespace ServingFresh.Views
                     var RDSResponse = await updateClient.PostAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/update_email_password", content);
                     if (RDSResponse.IsSuccessStatusCode)
                     {
-                        await DisplayAlert("Awesome!", "Your password has been updated", "OK");
+                        if (messageList != null)
+                        {
+                            if (messageList.ContainsKey("701-000086"))
+                            {
+                                await DisplayAlert(messageList["701-000086"].title, messageList["701-000086"].message, messageList["701-000086"].responses);
+                            }
+                            else
+                            {
+                                await DisplayAlert("Awesome!", "Your password has been updated", "OK");
+                            }
+                        }
+                        else
+                        {
+                            await DisplayAlert("Awesome!", "Your password has been updated", "OK");
+                        }
+                        
                     }
                     else
                     {
-                        await DisplayAlert("Ooops", "Our system is down. We can't process this request at the moment", "OK");
+                        if (messageList != null)
+                        {
+                            if (messageList.ContainsKey("701-000087"))
+                            {
+                                await DisplayAlert(messageList["701-000087"].title, messageList["701-000087"].message, messageList["701-000087"].responses);
+                            }
+                            else
+                            {
+                                await DisplayAlert("Ooops", "Our system is down. We can't process this request at the moment", "OK");
+                            }
+                        }
+                        else
+                        {
+                            await DisplayAlert("Ooops", "Our system is down. We can't process this request at the moment", "OK");
+                        }
+                        
                     }
                 }
                 else
                 {
-                    await DisplayAlert("Ooops", "Your new passwords do not match.", "OK");
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000088"))
+                        {
+                            await DisplayAlert(messageList["701-000088"].title, messageList["701-000088"].message, messageList["701-000088"].responses);
+                        }
+                        else
+                        {
+                            await DisplayAlert("Ooops", "Your new passwords do not match.", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await DisplayAlert("Ooops", "Your new passwords do not match.", "OK");
+                    }
+                    
                 }
             }
             catch (Exception errorUpdatePassword)
@@ -460,7 +675,22 @@ namespace ServingFresh.Views
                 }
                 else
                 {
-                    await DisplayAlert("Ooops", "Our system is down. We can't process this request at the moment", "OK");
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000089"))
+                        {
+                            await DisplayAlert(messageList["701-000089"].title, messageList["701-000089"].message, messageList["701-000089"].responses);
+                        }
+                        else
+                        {
+                            await DisplayAlert("Ooops", "Our system is down. We can't process this request at the moment", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await DisplayAlert("Ooops", "Our system is down. We can't process this request at the moment", "OK");
+                    }
+                   
                 }
                 
  

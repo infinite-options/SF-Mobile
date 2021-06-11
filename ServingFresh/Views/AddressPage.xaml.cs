@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using ServingFresh.Models;
 using Xamarin.Forms;
 using static ServingFresh.Views.PrincipalPage;
+using static ServingFresh.App;
+using System.Diagnostics;
+
 namespace ServingFresh.Views
 {
     public partial class AddressPage : ContentPage
@@ -67,27 +70,72 @@ namespace ServingFresh.Views
                                 else
                                 {
                                     // Need a cancel button on UI
-                                    var emailAddress = await DisplayPromptAsync("Still Growing...", "Sorry, it looks like we don’t deliver to your neighborhood yet. Enter your email address and we will let you know as soon as we come to your neighborhood.", "OK", "Cancel");
+                                    var emailAddress = await DisplayPromptAsync("Still Growing...", "Sorry, it looks like we don’t deliver to your neighborhood yet. Enter your email address, and we will let you know as soon as we come to your area.", "OK", "Cancel");
                                     return;
                                 }
                             }
                             else
                             {
-                                await DisplayAlert("We were not able to find your location in our system.", "Try again", "OK");
+                                if (messageList != null)
+                                {
+                                    if (messageList.ContainsKey("701-000001"))
+                                    {
+                                        await DisplayAlert(messageList["701-000001"].title, messageList["701-000001"].message, messageList["701-000001"].responses);
+                                    }
+                                    else
+                                    {
+                                        await DisplayAlert("We were not able to find your location in our system.", "Try again", "OK");
+                                    }
+                                }
+                                else
+                                {
+                                    await DisplayAlert("We were not able to find your location in our system.", "Try again", "OK");
+                                }
+                                
                                 return;
                             }
 
                         }
                         else if (addressStatus == "D")
                         {
-                            await DisplayAlert("Oops", "Please enter your address unit number", "OK");
+                            if (messageList != null)
+                            {
+                                if (messageList.ContainsKey("701-000002"))
+                                {
+                                    await DisplayAlert(messageList["701-000002"].title, messageList["701-000002"].message, messageList["701-000002"].responses);
+                                }
+                                else
+                                {
+                                    await DisplayAlert("Oops", "Please enter your address unit number", "OK");
+                                }
+                            }
+                            else
+                            {
+                                await DisplayAlert("Oops", "Please enter your address unit number", "OK");
+                            }
+                            
                             return;
                         }
                     }
                 }
                 else
                 {
-                    await DisplayAlert("Oops", "Please enter all the required information. Thanks!", "OK");
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000003"))
+                        {
+                            await DisplayAlert(messageList["701-000003"].title, messageList["701-000003"].message, messageList["701-000003"].responses);
+                        }
+                        else
+                        {
+                            await DisplayAlert("Oops", "Please enter all the required information. Thanks!", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await DisplayAlert("Oops", "Please enter all the required information. Thanks!", "OK");
+                    }
+
                     return;
                 }
             }catch(Exception errorContinueWithSignUp)

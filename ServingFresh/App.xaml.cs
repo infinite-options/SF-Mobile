@@ -18,7 +18,7 @@ namespace ServingFresh
         public const string LoggedInKey = "LoggedIn";
         public const string AppleUserIdKey = "AppleUserIdKey";
         string userId;
-        public static IList<MessageResult> messageList = null;
+        public static Dictionary<string, MessageResult> messageList = null;
         
         public App()
         {
@@ -60,7 +60,7 @@ namespace ServingFresh
                         }
                         else
                         {
-                            MainPage = new LogInPage();
+                            MainPage = new PrincipalPage();
                         }
                     }
                 }

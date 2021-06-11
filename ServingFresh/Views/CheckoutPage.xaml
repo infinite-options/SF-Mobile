@@ -330,7 +330,7 @@
                                                     <ColumnDefinition Width="100"></ColumnDefinition>
                                                 </Grid.ColumnDefinitions>
                                                 <Entry Grid.Column="0" x:Name="guestCardHolderNumber" TextColor="Black"  Keyboard="Numeric" HeightRequest="43" MaxLength="16" Placeholder="Card Number" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
-                                                <Entry Grid.Column="1" x:Name="guestCardCVV" TextColor="Black" MaxLength="3" Keyboard="Numeric" HeightRequest="43"  Placeholder="CVV" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
+                                                <Entry Grid.Column="1" x:Name="guestCardCVV" TextColor="Black" MaxLength="4" Keyboard="Numeric" HeightRequest="43"  Placeholder="CVV" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
                                             </Grid>
                                             <Grid>
                                                 <Entry Grid.Column="0" x:Name="guestCardExpMonth" TextColor="Black"  Keyboard="Numeric" HeightRequest="43"  MaxLength="2" Placeholder="Exp MM" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
@@ -367,13 +367,13 @@
                                             <ColumnDefinition Width="*"></ColumnDefinition>
                                             <ColumnDefinition Width="100"></ColumnDefinition>
                                         </Grid.ColumnDefinitions>
-                                        <Entry Grid.Column="0" x:Name="cardHolderNumber" TextColor="Black"  MaxLength="16" Placeholder="Card Number" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
-                                        <Entry Grid.Column="1" x:Name="cardCVV" TextColor="Black" Keyboard="Numeric" MaxLength="3" Placeholder="CVV" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
+                                        <Entry Grid.Column="0" x:Name="cardHolderNumber" TextColor="Black"  MaxLength="16" Keyboard="Numeric" Placeholder="Card Number" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
+                                        <Entry Grid.Column="1" x:Name="cardCVV" TextColor="Black" Keyboard="Numeric" MaxLength="4" Placeholder="CVV" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
                                     </Grid>
                                     <Grid>
                                         <Entry Grid.Column="0" x:Name="cardExpMonth" Placeholder="Exp MM" TextColor="Black" Keyboard="Numeric" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
                                         <Entry Grid.Column="1" x:Name="cardExpYear" Placeholder="Exp YY" TextColor="Black" Keyboard="Numeric" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
-                                        <Entry Grid.Column="2" x:Name="cardZip" Placeholder="ZIP" TextColor="Black" Keyboard="Numeric" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
+                                        <Entry Grid.Column="2" x:Name="cardZip" Placeholder="ZIP" MaxLength="5" TextColor="Black" Keyboard="Numeric" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
                                     </Grid>
                                     <Button Margin="0,15,0,0" HeightRequest="59" Text="Complete Payment with Stripe" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="CompletePaymentWithStripe"></Button>
                                 </StackLayout>

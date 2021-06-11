@@ -13,6 +13,7 @@ using ServingFresh.LogIn.Classes;
 using System.Net.Http;
 using ServingFresh.Config;
 using Newtonsoft.Json;
+using static ServingFresh.App;
 
 namespace ServingFresh.Views
 {
@@ -111,13 +112,43 @@ namespace ServingFresh.Views
                                     }
                                     else
                                     {
-                                        await DisplayAlert("Oops", "You address is outside our delivery areas", "OK");
+                                        if (messageList != null)
+                                        {
+                                            if (messageList.ContainsKey("701-000073"))
+                                            {
+                                                await DisplayAlert(messageList["701-000073"].title, messageList["701-000073"].message, messageList["701-000073"].responses);
+                                            }
+                                            else
+                                            {
+                                                await DisplayAlert("Oops", "You address is outside our delivery areas", "OK");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            await DisplayAlert("Oops", "You address is outside our delivery areas", "OK");
+                                        }
+                                        
                                         return;
                                     }
                                 }
                                 else
                                 {
-                                    await DisplayAlert("We were not able to find your location in our system.", "Try again", "OK");
+                                    if (messageList != null)
+                                    {
+                                        if (messageList.ContainsKey("701-000074"))
+                                        {
+                                            await DisplayAlert(messageList["701-000074"].title, messageList["701-000074"].message, messageList["701-000074"].responses);
+                                        }
+                                        else
+                                        {
+                                            await DisplayAlert("We were not able to find your location in our system.", "Try again", "OK");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        await DisplayAlert("We were not able to find your location in our system.", "Try again", "OK");
+                                    }
+                                    
                                     return;
                                 }
 

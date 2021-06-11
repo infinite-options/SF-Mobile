@@ -6,6 +6,7 @@ using Xamarin.Forms.Maps;
 using static ServingFresh.Views.SelectionPage;
 using static ServingFresh.Views.CheckoutPage;
 using static ServingFresh.Views.PrincipalPage;
+using static ServingFresh.App;
 using ServingFresh.Models;
 using ServingFresh.LogIn.Classes;
 using Xamarin.Auth;
@@ -43,7 +44,22 @@ namespace ServingFresh.Views
 
         async void ShowAutoGenereatedCredentials(string userName, string tempPassword)
         {
-            await DisplayAlert("Thank you for your purchase!", "Remeber you can access new features like rewards, history, and more by using the following credentials: ("+ userName+ ", " + tempPassword + ") ", "OK");
+            if (messageList != null)
+            {
+                if (messageList.ContainsKey("701-000031"))
+                {
+                    await DisplayAlert(messageList["701-000031"].title, messageList["701-000031"].message+" (" + userName + ", " + tempPassword + ")", messageList["701-000031"].responses);
+                }
+                else
+                {
+                    await DisplayAlert("Thank you for your purchase!", "Remeber you can access new features like rewards, history, and more by using the following credentials: (" + userName + ", " + tempPassword + ") ", "OK");
+                }
+            }
+            else
+            {
+                await DisplayAlert("Thank you for your purchase!", "Remeber you can access new features like rewards, history, and more by using the following credentials: (" + userName + ", " + tempPassword + ") ", "OK");
+            }
+            
         }
 
         void ReturnToStore(System.Object sender, System.EventArgs e)
@@ -149,18 +165,63 @@ namespace ServingFresh.Views
                     if (signUpStatus)
                     {
                         UserDialogs.Instance.HideLoading();
-                        await DisplayAlert("Great!", "We have created your account! Congratulations", "OK");
+                        if (messageList != null)
+                        {
+                            if (messageList.ContainsKey("701-000032"))
+                            {
+                                await DisplayAlert(messageList["701-000032"].title, messageList["701-000032"].message, messageList["701-000032"].responses);
+                            }
+                            else
+                            {
+                                await DisplayAlert("Great!", "We have created your account! Congratulations", "OK");
+                            }
+                        }
+                        else
+                        {
+                            await DisplayAlert("Great!", "We have created your account! Congratulations", "OK");
+                        }
+                        
                         Application.Current.MainPage = new SelectionPage();
                     }
                     else
                     {
                         UserDialogs.Instance.HideLoading();
-                        await DisplayAlert("Oops", "We were not able to sign you up. Try again.", "OK");
+                        if (messageList != null)
+                        {
+                            if (messageList.ContainsKey("701-000033"))
+                            {
+                                await DisplayAlert(messageList["701-000033"].title, messageList["701-000033"].message, messageList["701-000033"].responses);
+                            }
+                            else
+                            {
+                                await DisplayAlert("Oops", "We were not able to sign you up. Try again.", "OK");
+                            }
+                        }
+                        else
+                        {
+                            await DisplayAlert("Oops", "We were not able to sign you up. Try again.", "OK");
+                        }
+                        
                     }
                 }
                 else
                 {
-                    await DisplayAlert("Oops", "Please check that your password is the same in both entries", "OK");
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000034"))
+                        {
+                            await DisplayAlert(messageList["701-000034"].title, messageList["701-000034"].message, messageList["701-000034"].responses);
+                        }
+                        else
+                        {
+                            await DisplayAlert("Oops", "Please check that your password is the same in both entries", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await DisplayAlert("Oops", "Please check that your password is the same in both entries", "OK");
+                    }
+                    
                     return;
                 }
             }catch(Exception errorSignUpUser)
@@ -215,13 +276,43 @@ namespace ServingFresh.Views
 
                     if (signUpStatus)
                     {
-                        await DisplayAlert("Great!", "We have created your account! Congratulations", "OK");
+                        if (messageList != null)
+                        {
+                            if (messageList.ContainsKey("701-000035"))
+                            {
+                                await DisplayAlert(messageList["701-000035"].title, messageList["701-000035"].message, messageList["701-000035"].responses);
+                            }
+                            else
+                            {
+                                await DisplayAlert("Great!", "We have created your account! Congratulations", "OK");
+                            }
+                        }
+                        else
+                        {
+                            await DisplayAlert("Great!", "We have created your account! Congratulations", "OK");
+                        }
+                        
                         user.setUserType("CUSTOMER");
                         Application.Current.MainPage = new SelectionPage();
                     }
                     else
                     {
-                        await DisplayAlert("Oops", "We were not able to sign you up. Try again.", "OK");
+                        if (messageList != null)
+                        {
+                            if (messageList.ContainsKey("701-000036"))
+                            {
+                                await DisplayAlert(messageList["701-000036"].title, messageList["701-000036"].message, messageList["701-000036"].responses);
+                            }
+                            else
+                            {
+                                await DisplayAlert("Oops", "We were not able to sign you up. Try again.", "OK");
+                            }
+                        }
+                        else
+                        {
+                            await DisplayAlert("Oops", "We were not able to sign you up. Try again.", "OK");
+                        }
+                        
                     }
                 }
                 catch (Exception errorFacebookAuthetication)
@@ -257,13 +348,43 @@ namespace ServingFresh.Views
 
                     if (signUpStatus)
                     {
-                        await DisplayAlert("Great!", "We have created your account! Congratulations", "OK");
+                        if (messageList != null)
+                        {
+                            if (messageList.ContainsKey("701-000037"))
+                            {
+                                await DisplayAlert(messageList["701-000037"].title, messageList["701-000037"].message, messageList["701-000037"].responses);
+                            }
+                            else
+                            {
+                                await DisplayAlert("Great!", "We have created your account! Congratulations", "OK");
+                            }
+                        }
+                        else
+                        {
+                            await DisplayAlert("Great!", "We have created your account! Congratulations", "OK");
+                        }
+                        
                         user.setUserType("CUSTOMER");
                         Application.Current.MainPage = new SelectionPage();
                     }
                     else
                     {
-                        await DisplayAlert("Oops", "We were not able to sign you up. Try again.", "OK");
+                        if (messageList != null)
+                        {
+                            if (messageList.ContainsKey("701-000038"))
+                            {
+                                await DisplayAlert(messageList["701-000038"].title, messageList["701-000038"].message, messageList["701-000038"].responses);
+                            }
+                            else
+                            {
+                                await DisplayAlert("Oops", "We were not able to sign you up. Try again.", "OK");
+                            }
+                        }
+                        else
+                        {
+                            await DisplayAlert("Oops", "We were not able to sign you up. Try again.", "OK");
+                        }
+                       
                     }
                 }
                 catch (Exception errorGoogleAuthetication)
@@ -276,7 +397,22 @@ namespace ServingFresh.Views
 
         private async void Authenticator_Error(object sender, Xamarin.Auth.AuthenticatorErrorEventArgs e)
         {
-            await DisplayAlert("An error occur when authenticating", "Please try again", "OK");
+            if (messageList != null)
+            {
+                if (messageList.ContainsKey("701-000039"))
+                {
+                    await DisplayAlert(messageList["701-000039"].title, messageList["701-000039"].message, messageList["701-000039"].responses);
+                }
+                else
+                {
+                    await DisplayAlert("An error occur when authenticating", "Please try again", "OK");
+                }
+            }
+            else
+            {
+                await DisplayAlert("An error occur when authenticating", "Please try again", "OK");
+            }
+            
         }
 
         void NavigateToHistory(System.Object sender, System.EventArgs e)

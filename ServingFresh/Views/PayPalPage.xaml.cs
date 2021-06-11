@@ -6,6 +6,7 @@ using Xamarin.Forms;
 using static ServingFresh.Views.CheckoutPage;
 using static ServingFresh.Views.SelectionPage;
 using static ServingFresh.Views.PrincipalPage;
+using static ServingFresh.App;
 namespace ServingFresh.Views
 {
     public partial class PayPalPage : ContentPage
@@ -66,7 +67,22 @@ namespace ServingFresh.Views
                             }
                             else
                             {
-                                await DisplayAlert("Issue with payment via PayPal", "", "OK");
+                                if (messageList != null)
+                                {
+                                    if (messageList.ContainsKey("701-000069"))
+                                    {
+                                        await DisplayAlert(messageList["701-000069"].title, messageList["701-000069"].message, messageList["701-000069"].responses);
+                                    }
+                                    else
+                                    {
+                                        await DisplayAlert("Issue with payment via PayPal", "", "OK");
+                                    }
+                                }
+                                else
+                                {
+                                    await DisplayAlert("Issue with payment via PayPal", "", "OK");
+                                }
+                               
                             }
                         }
                         else
@@ -76,7 +92,22 @@ namespace ServingFresh.Views
                                 var role = isEmailUnused.result[0].role;
                                 if (role == "CUSTOMER")
                                 {
-                                    await DisplayAlert("Oops", "You are not a guest. We are sending you to the checkout page where you can sign in to proceed with your purchase", "OK");
+                                    if (messageList != null)
+                                    {
+                                        if (messageList.ContainsKey("701-000070"))
+                                        {
+                                            await DisplayAlert(messageList["701-000070"].title, messageList["701-000070"].message, messageList["701-000070"].responses);
+                                        }
+                                        else
+                                        {
+                                            await DisplayAlert("Oops", "You are not a guest. We are sending you to the checkout page where you can sign in to proceed with your purchase", "OK");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        await DisplayAlert("Oops", "You are not a guest. We are sending you to the checkout page where you can sign in to proceed with your purchase", "OK");
+                                    }
+                                    
                                     await Application.Current.MainPage.Navigation.PopModalAsync();
                                     await Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(94, "1"), true);
                                 }
@@ -98,7 +129,22 @@ namespace ServingFresh.Views
                                     }
                                     else
                                     {
-                                        await DisplayAlert("Issue with payment via PayPal", "", "OK");
+                                        if (messageList != null)
+                                        {
+                                            if (messageList.ContainsKey("701-000071"))
+                                            {
+                                                await DisplayAlert(messageList["701-000071"].title, messageList["701-000071"].message, messageList["701-000071"].responses);
+                                            }
+                                            else
+                                            {
+                                                await DisplayAlert("Issue with payment via PayPal", "", "OK");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            await DisplayAlert("Issue with payment via PayPal", "", "OK");
+                                        }
+                                        
                                     }
                                 }
                             }
@@ -118,7 +164,21 @@ namespace ServingFresh.Views
                         }
                         else
                         {
-                            await DisplayAlert("Issue with payment via PayPal", "", "OK");
+                            if (messageList != null)
+                            {
+                                if (messageList.ContainsKey("701-000072"))
+                                {
+                                    await DisplayAlert(messageList["701-000072"].title, messageList["701-000072"].message, messageList["701-000072"].responses);
+                                }
+                                else
+                                {
+                                    await DisplayAlert("Issue with payment via PayPal", "", "OK");
+                                }
+                            }
+                            else
+                            {
+                                await DisplayAlert("Issue with payment via PayPal", "", "OK");
+                            }
                         }
                     }
                 }

@@ -41,7 +41,7 @@ namespace ServingFresh.Models
             //if ((string)Application.Current.Properties["platform"] != "GUEST")
             //    sendExc.customer_uid = (string)Application.Current.Properties["platform"];
             //else sendExc.customer_uid = "GUEST";
-            sendExc.customer_uid = user.getUserPlatform();
+            sendExc.customer_uid = user.getUserID();
             sendExc.caught_output = ex;
             sendExc.types = ex.ToString().Substring(0, ex.ToString().IndexOf("at") - 1).Trim();
             sendExc.functions = exFunc;

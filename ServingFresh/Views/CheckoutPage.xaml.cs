@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Acr.UserDialogs;
 using static ServingFresh.Views.SelectionPage;
 using static ServingFresh.Views.PrincipalPage;
+using static ServingFresh.App;
 using Xamarin.Auth;
 using ServingFresh.LogIn.Classes;
 
@@ -292,6 +293,7 @@ namespace ServingFresh.Views
                     Debug.WriteLine("Fees from Zone: " + zone);
 
                     var RDSResponse = await client.GetAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/get_Fee_Tax/" + zone + "," + day);
+                    Debug.WriteLine("URL: " + "https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/get_Fee_Tax/" + zone + "," + day);
                     var content = await RDSResponse.Content.ReadAsStringAsync();
                     Debug.WriteLine("ZONES RESPONSE: " + content);
                     if (RDSResponse.IsSuccessStatusCode)
@@ -708,8 +710,6 @@ namespace ServingFresh.Views
         {
             try
             {
-
-
                 string dateTime = DateTime.Parse(selectedDeliveryDate.delivery_date).ToString("yyyy-MM-dd");
                 string t = selectedDeliveryDate.delivery_time;
                 Debug.WriteLine("DELIVERY DATE: " + dateTime);
@@ -743,12 +743,14 @@ namespace ServingFresh.Views
                 purchase.setPurchaseDriveTip(driver_tips.ToString("N2"));
                 purchase.setPurchaseTaxes(GetTaxes().ToString("N2"));
                 purchase.setPurchaseDeliveryInstructions(deliveryInstructions.Text);
+
             }catch(Exception errorFinalizePurchase)
             {
                 var client = new Diagnostic();
                 client.parseException(errorFinalizePurchase.ToString(), user);
             }
         }
+
 
 
         // ====================================================================
@@ -767,6 +769,15 @@ namespace ServingFresh.Views
                     itemToUpdate.item_quantity = item.qty;
                     order[item.name] = itemToUpdate;
                 }
+                if (appliedCoupon != null)
+                {
+                    updateTotals(appliedCoupon.discount, appliedCoupon.shipping);
+                }
+                else
+                {
+                    updateTotals(0, 0);
+                }
+
                 GetNewDefaltCoupon();
             }
         }
@@ -786,6 +797,15 @@ namespace ServingFresh.Views
                     itemToUpdate.item_quantity = item.qty;
                     order[item.name] = itemToUpdate;
                 }
+                if (appliedCoupon != null)
+                {
+                    updateTotals(appliedCoupon.discount, appliedCoupon.shipping);
+                }
+                else
+                {
+                    updateTotals(0, 0);
+                }
+
                 GetNewDefaltCoupon();
             }
         }
@@ -978,9 +998,22 @@ namespace ServingFresh.Views
             }
             else
             {
-                await DisplayAlert("Please verify your address!","It looks like we were not able to validate your address. Make sure that your delivery address shows in the map","OK");
+                if (messageList != null)
+                {
+                    if (messageList.ContainsKey("701-000004"))
+                    {
+                        await DisplayAlert(messageList["701-000004"].title, messageList["701-000004"].message, messageList["701-000004"].responses);
+                    }
+                    else
+                    {
+                        await DisplayAlert("Please verify your address!", "It looks like we were not able to validate your address. Make sure that your delivery address shows in the map", "OK");
+                    }
+                }
+                else
+                {
+                    await DisplayAlert("Please verify your address!", "It looks like we were not able to validate your address. Make sure that your delivery address shows in the map", "OK");
+                }
             }
-            
         }
 
         async void GuestCheckoutWithStripe(System.Object sender, System.EventArgs e)
@@ -1017,8 +1050,26 @@ namespace ServingFresh.Views
                 }
                 else
                 {
-                    await DisplayAlert("Oops", "You seem to forgot to fill in all entries. Please fill in all entries to continue", "OK");
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000005"))
+                        {
+                            await DisplayAlert(messageList["701-000005"].title, messageList["701-000005"].message, messageList["701-000005"].responses);
+                        }
+                        else
+                        {
+                            await DisplayAlert("Oops", "You seem to forgot to fill in all entries. Please fill in all entries to continue", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await DisplayAlert("Oops", "You seem to forgot to fill in all entries. Please fill in all entries to continue", "OK");
+                    }
                 }
+            }
+            else
+            {
+                await DisplayAlert("Oops", "Please accept the terms and conditions", "OK");
             }
         }
 
@@ -1050,7 +1101,21 @@ namespace ServingFresh.Views
                 }
                 else
                 {
-                    await DisplayAlert("Oops", "You seem to forgot to fill in all entries. Please fill in all entries to continue", "OK");
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000006"))
+                        {
+                            await DisplayAlert(messageList["701-000006"].title, messageList["701-000006"].message, messageList["701-000006"].responses);
+                        }
+                        else
+                        {
+                            await DisplayAlert("Oops", "You seem to forgot to fill in all entries. Please fill in all entries to continue", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await DisplayAlert("Oops", "You seem to forgot to fill in all entries. Please fill in all entries to continue", "OK");
+                    }
                 }
             }
         }
@@ -1107,7 +1172,22 @@ namespace ServingFresh.Views
                                 else
                                 {
                                     UserDialogs.Instance.HideLoading();
-                                    await DisplayAlert("Oop", "It seems that your card is invalid. Try again", "OK");
+
+                                    if (messageList != null)
+                                    {
+                                        if (messageList.ContainsKey("701-000007"))
+                                        {
+                                            await DisplayAlert(messageList["701-000007"].title, messageList["701-000007"].message, messageList["701-000007"].responses);
+                                        }
+                                        else
+                                        {
+                                            await DisplayAlert("Oop", "It seems that your card is invalid. Try again", "OK");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        await DisplayAlert("Oop", "It seems that your card is invalid. Try again", "OK");
+                                    }
                                 }
                             }
                         }
@@ -1119,7 +1199,23 @@ namespace ServingFresh.Views
                                 if (role == "CUSTOMER")
                                 {
                                     UserDialogs.Instance.HideLoading();
-                                    await DisplayAlert("Great!", "It looks like you already have an account. Please log in to find out if you have any additional discounts", "OK");
+
+                                    if (messageList != null)
+                                    {
+                                        if (messageList.ContainsKey("701-000008"))
+                                        {
+                                            await DisplayAlert(messageList["701-000008"].title, messageList["701-000008"].message, messageList["701-000008"].responses);
+                                        }
+                                        else
+                                        {
+                                            await DisplayAlert("Great!", "It looks like you already have an account. Please log in to find out if you have any additional discounts", "OK");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        await DisplayAlert("Great!", "It looks like you already have an account. Please log in to find out if you have any additional discounts", "OK");
+                                    }
+                                   
                                     await Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(94, "1"), true);
                                 }
                                 else if (role == "GUEST")
@@ -1153,7 +1249,21 @@ namespace ServingFresh.Views
                                     else
                                     {
                                         UserDialogs.Instance.HideLoading();
-                                        await DisplayAlert("Oop", "It seems that your card is invalid. Try again", "OK");
+                                        if (messageList != null)
+                                        {
+                                            if (messageList.ContainsKey("701-000009"))
+                                            {
+                                                await DisplayAlert(messageList["701-000009"].title, messageList["701-000009"].message, messageList["701-000009"].responses);
+                                            }
+                                            else
+                                            {
+                                                await DisplayAlert("Oops", "It seems that your card is invalid. Try again", "OK");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            await DisplayAlert("Oops", "It seems that your card is invalid. Try again", "OK");
+                                        }
                                     }
                                 }
                             }
@@ -1167,7 +1277,21 @@ namespace ServingFresh.Views
                 }
                 else
                 {
-                    await DisplayAlert("Oops", "You seem to forgot to fill in all entries. Please fill in all entries to continue", "OK");
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000010"))
+                        {
+                            await DisplayAlert(messageList["701-000010"].title, messageList["701-000010"].message, messageList["701-000010"].responses);
+                        }
+                        else
+                        {
+                            await DisplayAlert("Oops", "You seem to forgot to fill in all entries. Please fill in all entries to continue", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await DisplayAlert("Oops", "You seem to forgot to fill in all entries. Please fill in all entries to continue", "OK");
+                    }
                 }
             }catch(Exception errorGuestCompletePaymentWithStripe)
             {
@@ -1176,7 +1300,7 @@ namespace ServingFresh.Views
             }
         }
 
-        void CheckoutViaStripe(System.Object sender, System.EventArgs e)
+        async void CheckoutViaStripe(System.Object sender, System.EventArgs e)
         {
             if (customerAreTermAccepted.IsChecked)
             {
@@ -1195,8 +1319,12 @@ namespace ServingFresh.Views
                     //}
                     customerStripeInformationView.IsVisible = true;
 
-
-
+                    var y = scrollView.ScrollY + 120;
+                    y = y + 60;
+                    await scrollView.ScrollToAsync(0, y, true);
+                    button.BorderColor = Color.FromHex("#2F787F");
+                    guestStripeView.IsVisible = true;
+  
                 }
                 else
                 {
@@ -1204,6 +1332,10 @@ namespace ServingFresh.Views
                     //customerStripeInformationView.HeightRequest = 0;
                     customerStripeInformationView.IsVisible = false;
                 }
+            }
+            else
+            {
+                await DisplayAlert("Oops", "Please accept the terms and conditions", "OK");
             }
         }
 
@@ -1216,7 +1348,7 @@ namespace ServingFresh.Views
                 if (button.BackgroundColor == Color.FromHex("#FF8500"))
                 {
                     button.BackgroundColor = Color.FromHex("#2B6D74");
-
+                    UserDialogs.Instance.ShowLoading("Your payment is processing...");
                     FinalizePurchase(purchase, selectedDeliveryDate);
                     purchase.setPurchasePaymentType("STRIPE");
 
@@ -1242,11 +1374,30 @@ namespace ServingFresh.Views
                         _ = paymentClient.SendPurchaseToDatabase(purchase);
                         order.Clear();
                         await WriteFavorites(GetFavoritesList(), purchase.getPurchaseCustomerUID());
+                        UserDialogs.Instance.HideLoading();
                         Application.Current.MainPage = new HistoryPage();
                     }
                     else
                     {
-                        await DisplayAlert("Oops", "Payment was not sucessful", "OK");
+                        if (messageList != null)
+                        {
+                            if (messageList.ContainsKey("701-000011"))
+                            {
+                                UserDialogs.Instance.HideLoading();
+                                await DisplayAlert(messageList["701-000011"].title, messageList["701-000011"].message, messageList["701-000011"].responses);
+                            }
+                            else
+                            {
+                                UserDialogs.Instance.HideLoading();
+                                await DisplayAlert("Oops", "Payment was not sucessful", "OK");
+                            }
+                        }
+                        else
+                        {
+                            UserDialogs.Instance.HideLoading();
+                            await DisplayAlert("Oops", "Payment was not sucessful", "OK");
+                        }
+                        
                     }
                 }
                 else
@@ -1418,13 +1569,43 @@ namespace ServingFresh.Views
                         }
                         else
                         {
-                            await DisplayAlert("Oops", "You address is outside our delivery areas", "OK");
+                            if (messageList != null)
+                            {
+                                if (messageList.ContainsKey("701-000012"))
+                                {
+                                    await DisplayAlert(messageList["701-000012"].title, messageList["701-000012"].message, messageList["701-000012"].responses);
+                                }
+                                else
+                                {
+                                    await DisplayAlert("Oops", "You address is outside our delivery areas", "OK");
+                                }
+                            }
+                            else
+                            {
+                                await DisplayAlert("Oops", "You address is outside our delivery areas", "OK");
+                            }
+                            
                             return;
                         }
                     }
                     else
                     {
-                        await DisplayAlert("We were not able to find your location in our system.", "Try again", "OK");
+                        if (messageList != null)
+                        {
+                            if (messageList.ContainsKey("701-000013"))
+                            {
+                                await DisplayAlert(messageList["701-000013"].title, messageList["701-000013"].message, messageList["701-000013"].responses);
+                            }
+                            else
+                            {
+                                await DisplayAlert("We were not able to find your location in our system.", "Try again", "OK");
+                            }
+                        }
+                        else
+                        {
+                            await DisplayAlert("We were not able to find your location in our system.", "Try again", "OK");
+                        }
+                        
                         return;
                     }
 
@@ -1468,13 +1649,43 @@ namespace ServingFresh.Views
                                     }
                                     else
                                     {
-                                        await DisplayAlert("Oops", "You address is outside our delivery areas", "OK");
+                                        if (messageList != null)
+                                        {
+                                            if (messageList.ContainsKey("701-000014"))
+                                            {
+                                                await DisplayAlert(messageList["701-000014"].title, messageList["701-000014"].message, messageList["701-000014"].responses);
+                                            }
+                                            else
+                                            {
+                                                await DisplayAlert("Oops", "You address is outside our delivery areas", "OK");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            await DisplayAlert("Oops", "You address is outside our delivery areas", "OK");
+                                        }
+                                        
                                         return;
                                     }
                                 }
                                 else
                                 {
-                                    await DisplayAlert("We were not able to find your location in our system.", "Try again", "OK");
+                                    if (messageList != null)
+                                    {
+                                        if (messageList.ContainsKey("701-000015"))
+                                        {
+                                            await DisplayAlert(messageList["701-000015"].title, messageList["701-000015"].message, messageList["701-000015"].responses);
+                                        }
+                                        else
+                                        {
+                                            await DisplayAlert("We were not able to find your location in our system.", "Try again", "OK");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        await DisplayAlert("We were not able to find your location in our system.", "Try again", "OK");
+                                    }
+                                    
                                     return;
                                 }
 
@@ -1496,7 +1707,22 @@ namespace ServingFresh.Views
             }
             else
             {
-                await DisplayAlert("Oops", "This address was not confirm by USPS. Try a different address", "OK");
+                if (messageList != null)
+                {
+                    if (messageList.ContainsKey("701-000016"))
+                    {
+                        await DisplayAlert(messageList["701-000016"].title, messageList["701-000016"].message, messageList["701-000016"].responses);
+                    }
+                    else
+                    {
+                        await DisplayAlert("Oops", "This address was not confirm by USPS. Try a different address", "OK");
+                    }
+                }
+                else
+                {
+                    await DisplayAlert("Oops", "This address was not confirm by USPS. Try a different address", "OK");
+                }
+                
             }
             
         }
@@ -1525,7 +1751,22 @@ namespace ServingFresh.Views
                         if (isAddressInZones != "INSIDE CURRENT ZONE" && isAddressInZones != "")
                         {
                             // We can continue with payments since we can deliver to this location
-                            await DisplayAlert("Great!", "We are able to deliver to your location! Proceed to payments", "OK");
+                            
+                            if (messageList != null)
+                            {
+                                if (messageList.ContainsKey("701-000017"))
+                                {
+                                    await DisplayAlert(messageList["701-000017"].title, messageList["701-000017"].message, messageList["701-000017"].responses);
+                                }
+                                else
+                                {
+                                    await DisplayAlert("Great!", "We are able to deliver to your location! Proceed to payments", "OK");
+                                }
+                            }
+                            else
+                            {
+                                await DisplayAlert("Great!", "We are able to deliver to your location! Proceed to payments", "OK");
+                            }
                             client.SetPinOnMap(map, location, addressToValidate.Address);
                             purchase.setPurchaseAddress(addressToValidate.Street);
                             purchase.setPurchaseUnit(addressToValidate.Unit == null?"": addressToValidate.Unit);
@@ -1538,17 +1779,61 @@ namespace ServingFresh.Views
                         else if (isAddressInZones != "INSIDE DIFFERENT ZONE" && isAddressInZones != "")
                         {
                             // We have to reset cart or send user to store
-                            await DisplayAlert("Great!", "We are able to deliver to your location! However, your new entered address is outside the initial given address.", "OK");
+                            if (messageList != null)
+                            {
+                                if (messageList.ContainsKey("701-000018"))
+                                {
+                                    await DisplayAlert(messageList["701-000018"].title, messageList["701-000018"].message, messageList["701-000018"].responses);
+                                }
+                                else
+                                {
+                                    await DisplayAlert("Great!", "We are able to deliver to your location! However, your new entered address is outside the initial given address.", "OK");
+                                }
+                            }
+                            else
+                            {
+                                await DisplayAlert("Great!", "We are able to deliver to your location! However, your new entered address is outside the initial given address.", "OK");
+                            }
+                            
                         }
                         else if (isAddressInZones != "OUTSIDE ZONE RANGE" && isAddressInZones != "")
                         {
                             // User is outside zones
-                            await DisplayAlert("Sorry", "Unfortunately, we can't deliver to this location.", "OK");
+                            if (messageList != null)
+                            {
+                                if (messageList.ContainsKey("701-000019"))
+                                {
+                                    await DisplayAlert(messageList["701-000019"].title, messageList["701-000019"].message, messageList["701-000019"].responses);
+                                }
+                                else
+                                {
+                                    await DisplayAlert("Sorry", "Unfortunately, we can't deliver to this location.", "OK");
+                                }
+                            }
+                            else
+                            {
+                                await DisplayAlert("Sorry", "Unfortunately, we can't deliver to this location.", "OK");
+                            }
+                            
                         }
                     }
                     else
                     {
-                        await DisplayAlert("Is your address missing a unit number?", "Please check your address and add unit number if missing", "OK");
+                        if (messageList != null)
+                        {
+                            if (messageList.ContainsKey("701-000020"))
+                            {
+                                await DisplayAlert(messageList["701-000020"].title, messageList["701-000020"].message, messageList["701-000020"].responses);
+                            }
+                            else
+                            {
+                                await DisplayAlert("Is your address missing a unit number?", "Please check your address and add unit number if missing", "OK");
+                            }
+                        }
+                        else
+                        {
+                            await DisplayAlert("Is your address missing a unit number?", "Please check your address and add unit number if missing", "OK");
+                        }
                     }
                 }
             }
@@ -1631,7 +1916,22 @@ namespace ServingFresh.Views
                                 var updateStatus = await client.UpdateProfile(profile);
                                 if (updateStatus)
                                 {
-                                    await DisplayAlert("Great!", "We have updated your address successfully", "OK");
+                                    if (messageList != null)
+                                    {
+                                        if (messageList.ContainsKey("701-000021"))
+                                        {
+                                            await DisplayAlert(messageList["701-000021"].title, messageList["701-000021"].message, messageList["701-000021"].responses);
+                                        }
+                                        else
+                                        {
+                                            await DisplayAlert("Great!", "We have updated your address successfully", "OK");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        await DisplayAlert("Great!", "We have updated your address successfully", "OK");
+                                    }
+                                    
 
                                     user.setUserAddress(addressToValidate.Street);
                                     user.setUserUnit(addressToValidate.Unit == null ? "" : addressToValidate.Unit);
@@ -1643,7 +1943,22 @@ namespace ServingFresh.Views
                                 }
                                 else
                                 {
-                                    await DisplayAlert("Oops", "We were not able to update your address successfully", "OK");
+                                    if (messageList != null)
+                                    {
+                                        if (messageList.ContainsKey("701-000022"))
+                                        {
+                                            await DisplayAlert(messageList["701-000022"].title, messageList["701-000022"].message, messageList["701-000022"].responses);
+                                        }
+                                        else
+                                        {
+                                            await DisplayAlert("Oops", "We were not able to update your address successfully", "OK");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        await DisplayAlert("Oops", "We were not able to update your address successfully", "OK");
+                                    }
+                                   
                                 }
                                 // make the update
 
@@ -1651,12 +1966,42 @@ namespace ServingFresh.Views
                         }
                         else
                         {
-                            await DisplayAlert("Oops", "The address you entered was not validated. Please try again", "OK");
+                            if (messageList != null)
+                            {
+                                if (messageList.ContainsKey("701-000023"))
+                                {
+                                    await DisplayAlert(messageList["701-000023"].title, messageList["701-000023"].message, messageList["701-000023"].responses);
+                                }
+                                else
+                                {
+                                    await DisplayAlert("Oops", "The address you entered was not validated. Please try again", "OK");
+                                }
+                            }
+                            else
+                            {
+                                await DisplayAlert("Oops", "The address you entered was not validated. Please try again", "OK");
+                            }
+                            
                         }
                     }
                     else
                     {
-                        await DisplayAlert("Oops", "We faced some issues updating your address. Please try again", "OK");
+                        if (messageList != null)
+                        {
+                            if (messageList.ContainsKey("701-000024"))
+                            {
+                                await DisplayAlert(messageList["701-000024"].title, messageList["701-000024"].message, messageList["701-000024"].responses);
+                            }
+                            else
+                            {
+                                await DisplayAlert("Oops", "We faced some issues updating your address. Please try again", "OK");
+                            }
+                        }
+                        else
+                        {
+                            await DisplayAlert("Oops", "We faced some issues updating your address. Please try again", "OK");
+                        }
+                        
                     }
                 }
 
@@ -1707,7 +2052,21 @@ namespace ServingFresh.Views
                                 //await DisplayAlert("Great!", "We have verified your code! We are just checking if you meet the threshold to apply for an additional discount.", "OK");
                                 if (GetSubTotal() >= ambassadorResponse.sub.threshold)
                                 {
-                                    await DisplayAlert("Great!", "Your purchase meets the threshold to apply an additional discount", "OK");
+                                    if (messageList != null)
+                                    {
+                                        if (messageList.ContainsKey("701-000025"))
+                                        {
+                                            await DisplayAlert(messageList["701-000025"].title, messageList["701-000025"].message, messageList["701-000025"].responses);
+                                        }
+                                        else
+                                        {
+                                            await DisplayAlert("Great!", "Your purchase meets the threshold to apply an additional discount", "OK");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        await DisplayAlert("Great!", "Your purchase meets the threshold to apply an additional discount", "OK");
+                                    }
 
                                     if (total <= ambassadorResponse.sub.discount_amount)
                                     {
@@ -1741,7 +2100,22 @@ namespace ServingFresh.Views
                                 }
                                 else
                                 {
-                                    await DisplayAlert("Oops!", "Your purchase is under the threshold to have an additional discount. You can save this code for another purchase or increase your subtotal by $" + (GetSubTotal() - ambassadorResponse.sub.threshold), "OK");
+                                    if (messageList != null)
+                                    {
+                                        if (messageList.ContainsKey("701-000026"))
+                                        {
+                                            await DisplayAlert(messageList["701-000026"].title, messageList["701-000026"].message + (GetSubTotal() - ambassadorResponse.sub.threshold), messageList["701-000026"].responses);
+                                        }
+                                        else
+                                        {
+                                            await DisplayAlert("Oops!", "Your purchase is under the threshold to have an additional discount. You can save this code for another purchase or increase your subtotal by $" + (GetSubTotal() - ambassadorResponse.sub.threshold), "OK");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        await DisplayAlert("Oops!", "Your purchase is under the threshold to have an additional discount. You can save this code for another purchase or increase your subtotal by $" + (GetSubTotal() - ambassadorResponse.sub.threshold), "OK");
+                                    }
+                                    
                                 }
                             }
                         }
@@ -1830,7 +2204,22 @@ namespace ServingFresh.Views
                                     if (role == "CUSTOMER")
                                     {
                                         UserDialogs.Instance.HideLoading();
-                                        await DisplayAlert("Great!", "It looks like you already have an account. Please log in to find out if you have any additional discounts", "OK");
+                                        if (messageList != null)
+                                        {
+                                            if (messageList.ContainsKey("701-000027"))
+                                            {
+                                                await DisplayAlert(messageList["701-000027"].title, messageList["701-000027"].message, messageList["701-000027"].responses);
+                                            }
+                                            else
+                                            {
+                                                await DisplayAlert("Great!", "It looks like you already have an account. Please log in to find out if you have any additional discounts", "OK");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            await DisplayAlert("Great!", "It looks like you already have an account. Please log in to find out if you have any additional discounts", "OK");
+                                        }
+                                        
                                         await Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(94, "1"), true);
                                     }
                                     else if (role == "GUEST")
@@ -1874,7 +2263,22 @@ namespace ServingFresh.Views
                     }
                     else
                     {
-                        await DisplayAlert("Oops", "You seem to forgot to fill in all entries. Please fill in all entries to continue", "OK");
+                        if (messageList != null)
+                        {
+                            if (messageList.ContainsKey("701-000028"))
+                            {
+                                await DisplayAlert(messageList["701-000028"].title, messageList["701-000028"].message, messageList["701-000028"].responses);
+                            }
+                            else
+                            {
+                                await DisplayAlert("Oops", "You seem to forgot to fill in all entries. Please fill in all entries to continue", "OK");
+                            }
+                        }
+                        else
+                        {
+                            await DisplayAlert("Oops", "You seem to forgot to fill in all entries. Please fill in all entries to continue", "OK");
+                        }
+                        
                     }
                 }
                 else
@@ -1925,17 +2329,42 @@ namespace ServingFresh.Views
                     var createAmbassadorStatus = await client.CreateAmbassadorFromCode(action.ToLower());
                     if (createAmbassadorStatus)
                     {
-                        await DisplayAlert("Congratulations!", "You are now an ambassador! Share this email: "+ action + "with your friends and get $10 on your next two orders", "OK");
+                        if (messageList != null)
+                        {
+                            if (messageList.ContainsKey("701-000029"))
+                            {
+                                await DisplayAlert(messageList["701-000029"].title, messageList["701-000029"].message + action + "with your friends and get $10 on your next two orders", messageList["701-000029"].responses);
+                            }
+                            else
+                            {
+                                await DisplayAlert("Congratulations!", "You are now an ambassador! Share this email: " + action + "with your friends and get $10 on your next two orders", "OK");
+                            }
+                        }
+                        else
+                        {
+                            await DisplayAlert("Congratulations!", "You are now an ambassador! Share this email: " + action + "with your friends and get $10 on your next two orders", "OK");
+                        }
+                       
                     }
                     else
                     {
-                        await DisplayAlert("Oops", "Something went wrong. Please try again", "OK");
+                        if (messageList != null)
+                        {
+                            if (messageList.ContainsKey("701-000030"))
+                            {
+                                await DisplayAlert(messageList["701-000030"].title, messageList["701-000030"].message, messageList["701-000030"].responses);
+                            }
+                            else
+                            {
+                                await DisplayAlert("Oops", "Something went wrong. Please try again", "OK");
+                            }
+                        }
+                        else
+                        {
+                            await DisplayAlert("Oops", "Something went wrong. Please try again", "OK");
+                        }
+                       
                     }
-
-                }
-                else if (action == "Sign Up")
-                {
-                    
                 }
             }
         }
