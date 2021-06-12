@@ -43,7 +43,8 @@ namespace ServingFresh.Models
              );
 
             // This endpoint needs to change
-            var url = "http://production.shippingapis.com/ShippingAPI.dll?API=Verify&XML=" + requestDoc;
+            //var url = "http://production.shippingapis.com/ShippingAPI.dll?API=Verify&XML=" + requestDoc;
+            var url = Constant.USPSShipping + requestDoc;
             var client = new WebClient();
             var response = client.DownloadString(url);
             var xdoc = XDocument.Parse(response.ToString());
@@ -87,7 +88,7 @@ namespace ServingFresh.Models
              );
 
             // This endpoint needs to change
-            var url = "http://production.shippingapis.com/ShippingAPI.dll?API=Verify&XML=" + requestDoc;
+            var url = Constant.USPSShipping + requestDoc;
             var client = new WebClient();
             var response = client.DownloadString(url);
             var xdoc = XDocument.Parse(response.ToString());

@@ -23,11 +23,14 @@ namespace ServingFresh.Views
 
         async void CheckoutWithPayPal(System.Object sender, System.EventArgs e)
         {
-            
-            string mode = Payments.getMode(purchase.getPurchaseDeliveryInstructions(), "PAYPAL");
-            paymentClient = new Payments(mode);
-            webView.Source = await paymentClient.PayViaPayPal(purchase.getPurchaseAmountDue());
-            webView.Navigated += WebViewPage_Navigated;
+            paymentClient = new Payments();
+            string mode = await paymentClient.getMode(purchase.getPurchaseDeliveryInstructions(), "PAYPAL");
+            if(mode == "LIVE" || mode == "TEST")
+            {
+                paymentClient = new Payments(mode);
+                webView.Source = await paymentClient.PayViaPayPal(purchase.getPurchaseAmountDue());
+                webView.Navigated += WebViewPage_Navigated;
+            }
         }
 
         void ImageButton_Clicked(System.Object sender, System.EventArgs e)

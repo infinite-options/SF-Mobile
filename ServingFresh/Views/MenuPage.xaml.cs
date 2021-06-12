@@ -129,7 +129,7 @@ namespace ServingFresh.Views
 
         void NavigateToGiftCardStore(System.Object sender, System.EventArgs e)
         {
-            Application.Current.MainPage = new GiftCardPage();
+            Application.Current.MainPage = new SelectionPage();
         }
     }
 }

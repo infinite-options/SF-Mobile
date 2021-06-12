@@ -11,6 +11,7 @@ using PayPalHttp;
 using ServingFresh.Config;
 using Stripe;
 using static ServingFresh.Views.CheckoutPage;
+using static ServingFresh.Views.PrincipalPage;
 
 namespace ServingFresh.Models
 {
@@ -18,6 +19,11 @@ namespace ServingFresh.Models
     {
         private static string mode;
         private string transactionID;
+
+        public Payments()
+        {
+
+        }
 
         public Payments(string mode)
         {
@@ -82,55 +88,70 @@ namespace ServingFresh.Models
         }
 
 
-        public static string getMode(string mode, string paymentType)
+        public async Task<string> getMode(string mode, string paymentType)
         {
             string result = "";
+            string url = "";
             var credentials = new Credentials();
 
             if (paymentType == "STRIPE")
             {
                 if (mode == "SFTEST")
                 {
-                    credentials.key = Constant.TestSK;
-                    result = "TEST";
+                    credentials.key = Constant.TestPK;
                 }
                 else
                 {
                     credentials.key = Constant.LivePK;
-                    result = "LIVE";
                 }
+                url = Constant.StripeMode;
             }
             else if (paymentType == "PAYPAL")
             {
                 if (mode == "SFTEST")
                 {
-                    credentials.key = Constant.TestSecret;
-                    result = "TEST";
+                    credentials.key = Constant.TestClientId;
                 }
                 else
                 {
-                    credentials.key = Constant.LiveSecret;
+                    credentials.key = Constant.LiveClientId;
+                }
+                url = Constant.PayPalMode;
+            }
+            try
+            {
+                var client = new System.Net.Http.HttpClient();
+                var serializeObject = JsonConvert.SerializeObject(credentials);
+                Debug.WriteLine("INPUT:" + serializeObject);
+                var content = new StringContent(serializeObject, Encoding.UTF8, "application/json");
+                var endpointCall = await client.PostAsync(url, content);
+
+                var r = await endpointCall.Content.ReadAsStringAsync();
+                Debug.WriteLine("PAYMENT MODE:" + r);
+
+                if (endpointCall.IsSuccessStatusCode)
+                {
+                    var endpointContent = await endpointCall.Content.ReadAsStringAsync();
+                    if (endpointContent.Contains("Test"))
+                    {
+                        result = "TEST";
+                    }
+                    else if (endpointContent.Contains("Live"))
+                    {
+                        result = "LIVE";
+                    }
+                }
+                else
+                {
                     result = "LIVE";
                 }
             }
-            //var client = new System.Net.Http.HttpClient();
-            //var serializeObject = JsonConvert.SerializeObject(credentials);
-            //var content = new StringContent(serializeObject, Encoding.UTF8, "application/json");
-            //var endpointCall = await client.PostAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/Paypal_Payment_key_checker", content);
-
-
-            //if (endpointCall.IsSuccessStatusCode)
-            //{
-            //    var endpointContent = await endpointCall.Content.ReadAsStringAsync();
-            //    if (endpointContent.Contains("Test"))
-            //    {
-            //        result = "TEST";
-            //    }
-            //    else if (endpointContent.Contains("Live"))
-            //    {
-            //        result = "LIVE";
-            //    }
-            //}
+            catch(Exception errorPaymentsEndpoint)
+            {
+                var client2 = new Diagnostic();
+                client2.parseException(errorPaymentsEndpoint.ToString(), user);
+                result = "LIVE";
+            }
 
             return result;
         }
@@ -198,11 +219,13 @@ namespace ServingFresh.Models
             string apiKey = "";
             if (mode == "TEST")
             {
+                Debug.WriteLine("STRIPE TEST ENVIROMENT");
                 apiKey = Constant.TestSK;
             }
             else
             {
-                apiKey = Constant.LivePK;
+                Debug.WriteLine("STRIPE LIVE ENVIROMENT");
+                apiKey = Constant.LiveSK;
             }
             return apiKey;
         }
