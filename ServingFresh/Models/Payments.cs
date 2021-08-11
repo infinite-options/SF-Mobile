@@ -19,6 +19,7 @@ namespace ServingFresh.Models
     {
         private static string mode;
         private string transactionID;
+        private string last4;
 
         public Payments()
         {
@@ -34,6 +35,11 @@ namespace ServingFresh.Models
         public string getTransactionID()
         {
             return transactionID;
+        }
+
+        public string getLastFour()
+        {
+            return last4;
         }
 
         public async Task<string> PayViaPayPal(string amount)
@@ -297,11 +303,177 @@ namespace ServingFresh.Models
                 {
                     return false;
                 }
-            }catch(Exception changeMode)
+            }
+            catch(Exception changeMode)
             {
                 Debug.WriteLine("USING PAYMENTS IN WRONG MODE: " + changeMode.Message);
                 return false;
             }
+        }
+
+        public async Task<bool> PayViaStripeCard(string userID, string businessCode, string cardNumber, string cardCVV, string ExpMonth, string ExpYear, string amount)
+        {
+           
+            try
+            {
+                StripeConfiguration.ApiKey = ReturnStripeApikey(mode);
+
+                var options = new PaymentMethodCreateOptions
+                {
+                    Type = "card",
+                    Card = new PaymentMethodCardOptions
+                    {
+                        Number = cardNumber.Trim(),
+                        ExpMonth = Convert.ToInt64(ExpMonth),
+                        ExpYear = Convert.ToInt64(ExpYear),
+                        Cvc = cardCVV.Trim(),
+                    },
+
+                };
+
+                Debug.WriteLine("reached after options");
+                var payMethodService = new PaymentMethodService();
+                var tempPayMethod = payMethodService.Create(options);
+                var method = tempPayMethod;
+
+                var credentials = await ProcessPaymentIntent(userID,businessCode,amount);
+                if (credentials != null)
+                {
+
+                    //Debug.WriteLine("CREDENTIALS: " + credentials);
+                    Debug.WriteLine("CLIENT SECRET: " + credentials.secrent);
+                    Debug.WriteLine("PAYMENT INTENT: " + credentials.intent);
+                    Debug.WriteLine("API KEY: " + GetStripeClient(mode));
+                    var paymentIntentService = new PaymentIntentService(new StripeClient(GetStripeClient(mode)));
+                    //Debug.WriteLine("reached after paymentIntentService");
+                    // PaymentMethod = method.Id,
+                    var paymentConfirmOptions = new PaymentIntentConfirmOptions
+                    {
+                        ClientSecret = credentials.secrent,
+                        Expand = new List<string> { "payment_method" },
+                        PaymentMethod = method.Id,
+                        UseStripeSdk = true,
+                        ReturnUrl = "payments-example://stripe-redirect",
+                        SetupFutureUsage = "off_session",
+                        
+                    };
+                    
+                    var result = await paymentIntentService.ConfirmAsync(credentials.intent, paymentConfirmOptions);
+                    
+                    switch (result.NextAction?.Type)
+                    {
+                        case null:
+                            Debug.WriteLine("Success", "Your purchase was successful!");
+                            //transactionID = credentials.intent;
+                            try
+                            {
+                                transactionID = credentials.intent;
+                                last4 = result.PaymentMethod.Card.Last4;
+                                Debug.WriteLine("transactionID: " + transactionID);
+                                Debug.WriteLine("LAST 4: " + last4);
+                                return true;
+                            }
+                            catch
+                            {
+                                return false;
+                            }
+                            
+                        //break; // All good
+
+                        case "stripe_3ds2_fingerprint":
+                        default:
+                            return false;
+                            //throw new NotImplementedException($"Not implemented: Can't handle {result.NextAction.Type}");
+                    }
+
+                }
+                else
+                {
+                    return false;
+                }                
+            }
+            catch (Exception changeMode)
+            {
+                Debug.WriteLine("USING PAYMENTS IN WRONG MODE: " + changeMode.Message);
+                return false;
+            }
+        }
+
+        public string GetStripeClient(string mode)
+        {
+            if(mode == "TEST")
+            {
+                return Constant.TestPK;
+            }
+            else
+            {
+                return Constant.LivePK;
+            }
+        }
+
+        public async Task<IntentSecret> ProcessPaymentIntent(string userID, string businessCode, string amount)
+        {
+            IntentSecret result = null;
+            var paymentIntent = new StripePaymentIntent()
+            {
+                currency = "uds",
+                customer_uid = userID,
+                business_code = businessCode,
+                payment_summary = new PaymentSummary() { total = amount }
+            };
+
+            var paymentIntentStr = JsonConvert.SerializeObject(paymentIntent);
+            var content = new StringContent(paymentIntentStr, Encoding.UTF8, "application/json");
+            var client = new System.Net.Http.HttpClient();
+            var endpointResponse = await client.PostAsync(Constant.CreatePaymentIntent, content);
+
+            Debug.WriteLine("JSON TO SEND VIA PURCHASE ENDPOINT: " + paymentIntentStr);
+            Debug.WriteLine("PURCHASE WAS WRITTEN TO DATABASE: " + endpointResponse.IsSuccessStatusCode);
+            if (endpointResponse.IsSuccessStatusCode)
+            {
+                var data = await endpointResponse.Content.ReadAsStringAsync();
+                string clientSecret = data.Substring(1);
+                clientSecret = clientSecret.Substring(0, clientSecret.IndexOf("\""));
+                string payIntent = data.Substring(1, data.IndexOf("secret") - 2);
+
+                Debug.WriteLine("clientSecret: " + clientSecret);
+                Debug.WriteLine("payIntent: " + payIntent);
+
+                result = new IntentSecret()
+                {
+                    intent = payIntent,
+                    secrent = clientSecret,
+                };
+            }
+            return result;
+        }
+
+        public async Task<string> ProcessPaymentIntentOffSession(string userID, string businessCode, string amount)
+        {
+            string result = "";
+            var paymentIntent = new StripePaymentIntent()
+            {
+                currency = "uds",
+                customer_uid = userID,
+                business_code = businessCode,
+                payment_summary = new PaymentSummary() { total = amount }
+            };
+
+            var paymentIntentStr = JsonConvert.SerializeObject(paymentIntent);
+            var content = new StringContent(paymentIntentStr, Encoding.UTF8, "application/json");
+            var client = new System.Net.Http.HttpClient();
+            var endpointResponse = await client.PostAsync(Constant.CreatePaymentIntentOffSession, content);
+
+            Debug.WriteLine("JSON: " + paymentIntentStr);
+            Debug.WriteLine("ENDPOINT RESPONSE: " + endpointResponse.IsSuccessStatusCode);
+            if (endpointResponse.IsSuccessStatusCode)
+            {
+                string data = await endpointResponse.Content.ReadAsStringAsync();
+                data = data.Replace('"', ' ').Trim();
+                Debug.WriteLine("DATA: " + data);
+                result = data;
+            }
+            return result;
         }
 
         public int RemoveDecimalFromTotalAmount(string amount)
@@ -326,8 +498,8 @@ namespace ServingFresh.Models
             var client = new System.Net.Http.HttpClient();
             var Response = await client.PostAsync(Constant.PurchaseUrl, purchaseMessage);
 
-            Debug.WriteLine("JSON TO SEND VIA PURCHASE ENDPOINT: " + purchaseString);
-            Debug.WriteLine("PURCHASE WAS WRITTEN TO DATABASE: " + Response.IsSuccessStatusCode);
+            Debug.WriteLine("JSON : " + purchaseString);
+            Debug.WriteLine("RESPONSE: " + Response.IsSuccessStatusCode);
             if (Response.IsSuccessStatusCode)
             {
                 return true;

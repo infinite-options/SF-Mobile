@@ -156,6 +156,7 @@ namespace ServingFresh.Models
         public object exp_date { get; set; }
         public string business_delivery_hours { get; set; }
         public string taxable { get; set; }
+        public string item_info { get; set; }
     }
 
     public class ItemPurchased

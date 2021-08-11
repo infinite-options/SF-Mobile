@@ -108,6 +108,7 @@ namespace ServingFresh.Views
 
             string account = JsonConvert.SerializeObject(user);
             Application.Current.Properties[Constant.Autheticatior] = account;
+            Application.Current.Properties[Constant.Card] = "";
             Application.Current.SavePropertiesAsync();
         }
 

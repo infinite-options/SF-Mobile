@@ -293,11 +293,11 @@
                                 </Grid>
                                 <StackLayout Margin="0,15,0,0" x:Name="guestPaymentsView">
                                     <StackLayout Padding="20,0,20,0">
-                                        <Button WidthRequest="264" HeightRequest="36" HorizontalOptions="Center"  Text="Proceed as guest" BorderWidth="4" BorderColor="#FF8500" Clicked="ProceedAsGuest"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold"></Button>
+                                        <Button WidthRequest="264" HeightRequest="36" HorizontalOptions="Center"  Text="Proceed as guest" BorderWidth="2" BorderColor="#FF8500" Clicked="ProceedAsGuest"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold"></Button>
                                         <Label Text="Already have an account?" TextColor="#2B6D74" FontSize="14" HorizontalTextAlignment="Center"></Label>
-                                        <Button WidthRequest="264" HeightRequest="36" HorizontalOptions="Center"  Text="Login"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="ShowLogInModal"></Button>
+                                        <Button WidthRequest="264" HeightRequest="36" HorizontalOptions="Center" BorderColor="#FF8500" BorderWidth="2" Text="Login"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="ShowLogInModal"></Button>
                                         <Label Text="Save time and create an account" FontSize="14" TextColor="#2B6D74" HorizontalTextAlignment="Center"></Label>
-                                        <Button WidthRequest="264" HeightRequest="36" HorizontalOptions="Center"  Text="Sign up"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="ShowSignUpModal"></Button>
+                                        <Button WidthRequest="264" HeightRequest="36" HorizontalOptions="Center" BorderColor="#FF8500" BorderWidth="2" Text="Sign up"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="ShowSignUpModal"></Button>
                                     </StackLayout>
                                     <StackLayout Margin="0,25,0,0"  IsVisible="false" x:Name="guestRequiredInfoView">
                                         <Entry x:Name="firstName" TextColor="Black"  HeightRequest="43" WidthRequest="372" HorizontalOptions="Center" Placeholder="First name (so we can address you)" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
@@ -318,8 +318,8 @@
                                             </StackLayout>
                                             
                                         </StackLayout>
-                                        <Button Text="Checkout with Stripe" BorderWidth="4" BorderColor="#FF8500" HeightRequest="36" WidthRequest="264" HorizontalOptions="Center" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="GuestCheckoutWithStripe"></Button>
-                                        <Button Text="Checkout with PayPal" HeightRequest="36" WidthRequest="264" HorizontalOptions="Center"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="GuestCompletePaymentWithPayPal"></Button>
+                                        <Button Text="Checkout with Stripe" BorderWidth="2" BorderColor="#FF8500" HeightRequest="36" WidthRequest="264" HorizontalOptions="Center" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="GuestCheckoutWithStripe"></Button>
+                                        <Button Text="Checkout with PayPal" BorderWidth="2" HeightRequest="36" BorderColor="#FF8500" WidthRequest="264" HorizontalOptions="Center"  TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="GuestCompletePaymentWithPayPal"></Button>
                                     </StackLayout>
                                    
                                     <StackLayout x:Name="guestStripeView" Spacing="10" IsVisible="false">                             
@@ -337,7 +337,7 @@
                                                 <Entry Grid.Column="1" x:Name="guestCardExpYear" TextColor="Black"  Keyboard="Numeric" HeightRequest="43"  MaxLength="2" Placeholder="Exp YY" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
                                                 <Entry Grid.Column="2" x:Name="guestCardZipcode" TextColor="Black"  Keyboard="Numeric" HeightRequest="43"  MaxLength="5" Placeholder="ZIP" PlaceholderColor="Gray" FontSize="13" FontAttributes="Bold"></Entry>
                                             </Grid>
-                                        <Button Margin="0,25,0,0" WidthRequest="264" HorizontalOptions="Center" HeightRequest="36" Text="Complete Payment with Stripe" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="GuestCompletePaymentWithStripe"></Button>
+                                        <Button Margin="0,25,0,0" WidthRequest="264" HorizontalOptions="Center" HeightRequest="36" Text="Complete Payment with Stripe" TextColor="White" BorderColor="#FF8500" BorderWidth="1.5" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="GuestCompletePaymentWithStripe"></Button>
                                     </StackLayout>
                                 </StackLayout>
                                 <StackLayout Margin="0,25,0,25" Spacing="15" x:Name="freeCheckoutView" IsVisible="false">
@@ -356,8 +356,8 @@
                                         </StackLayout>
                                     </StackLayout>
                                     <StackLayout Padding="20,0,20,0" Spacing="15">
-                                        <Button Text="Checkout with Stripe" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="CheckoutViaStripe"></Button>
-                                        <Button Text="Checkout with PayPal" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="CheckoutViaPayPal"></Button>
+                                        <Button Text="Checkout with Stripe" TextColor="White" BorderColor="#FF8500" BorderWidth="2" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="CheckoutViaStripe"></Button>
+                                        <Button Text="Checkout with PayPal" TextColor="White" BorderColor="#FF8500" BorderWidth="2" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="CheckoutViaPayPal"></Button>
                                     </StackLayout>
                                 </StackLayout>
                                 <StackLayout Margin="0,30,0,0" x:Name="customerStripeInformationView" IsVisible="false">
@@ -371,11 +371,11 @@
                                         <Entry Grid.Column="1" x:Name="cardCVV" TextColor="Black" Keyboard="Numeric" MaxLength="4" Placeholder="CVV" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
                                     </Grid>
                                     <Grid>
-                                        <Entry Grid.Column="0" x:Name="cardExpMonth" Placeholder="Exp MM" TextColor="Black" Keyboard="Numeric" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
-                                        <Entry Grid.Column="1" x:Name="cardExpYear" Placeholder="Exp YY" TextColor="Black" Keyboard="Numeric" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
+                                        <Entry Grid.Column="0" x:Name="cardExpMonth" Placeholder="Exp MM" MaxLength="2" TextColor="Black" Keyboard="Numeric" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
+                                        <Entry Grid.Column="1" x:Name="cardExpYear" Placeholder="Exp YY" MaxLength="2" TextColor="Black" Keyboard="Numeric" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
                                         <Entry Grid.Column="2" x:Name="cardZip" Placeholder="ZIP" MaxLength="5" TextColor="Black" Keyboard="Numeric" PlaceholderColor="Gray" FontSize="16" FontAttributes="Bold"></Entry>
                                     </Grid>
-                                    <Button Margin="0,15,0,0" HeightRequest="59" Text="Complete Payment with Stripe" TextColor="White" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="CompletePaymentWithStripe"></Button>
+                                    <Button Margin="0,15,0,0" HeightRequest="59" Text="Complete Payment with Stripe" TextColor="White" BorderColor="#FF8500" BorderWidth="1.5" BackgroundColor="#FF8500" FontSize="14" FontAttributes="Bold" Clicked="CompletePaymentWithStripe"></Button>
                                 </StackLayout>
                              </StackLayout>
                         </ScrollView>

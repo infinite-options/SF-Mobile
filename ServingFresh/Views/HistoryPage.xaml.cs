@@ -123,7 +123,6 @@ namespace ServingFresh.Views
             public string ambassador_code { get; set; }
         }
                    
-
         public ObservableCollection<HistoryDisplayObject> historyList;
 
         public HistoryPage()
@@ -139,9 +138,9 @@ namespace ServingFresh.Views
         {
             if (messageList != null)
             {
-                if (messageList.ContainsKey("701-000048"))
+                if (messageList.ContainsKey("701-000031"))
                 {
-                    await DisplayAlert(messageList["701-000048"].title, messageList["701-000048"].message, messageList["701-000048"].responses);
+                    await DisplayAlert(messageList["701-000031"].title, messageList["701-000031"].message, messageList["701-000031"].responses);
                 }
                 else
                 {

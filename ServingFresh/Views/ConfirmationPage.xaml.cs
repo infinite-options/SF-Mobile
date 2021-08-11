@@ -46,9 +46,9 @@ namespace ServingFresh.Views
         {
             if (messageList != null)
             {
-                if (messageList.ContainsKey("701-000031"))
+                if (messageList.ContainsKey("701-000024"))
                 {
-                    await DisplayAlert(messageList["701-000031"].title, messageList["701-000031"].message+" (" + userName + ", " + tempPassword + ")", messageList["701-000031"].responses);
+                    await DisplayAlert(messageList["701-000024"].title, messageList["701-000024"].message+" (" + userName + ", " + tempPassword + ")", messageList["701-000024"].responses);
                 }
                 else
                 {
@@ -167,9 +167,9 @@ namespace ServingFresh.Views
                         UserDialogs.Instance.HideLoading();
                         if (messageList != null)
                         {
-                            if (messageList.ContainsKey("701-000032"))
+                            if (messageList.ContainsKey("701-000025"))
                             {
-                                await DisplayAlert(messageList["701-000032"].title, messageList["701-000032"].message, messageList["701-000032"].responses);
+                                await DisplayAlert(messageList["701-000025"].title, messageList["701-000025"].message, messageList["701-000025"].responses);
                             }
                             else
                             {
@@ -188,9 +188,9 @@ namespace ServingFresh.Views
                         UserDialogs.Instance.HideLoading();
                         if (messageList != null)
                         {
-                            if (messageList.ContainsKey("701-000033"))
+                            if (messageList.ContainsKey("701-000026"))
                             {
-                                await DisplayAlert(messageList["701-000033"].title, messageList["701-000033"].message, messageList["701-000033"].responses);
+                                await DisplayAlert(messageList["701-000026"].title, messageList["701-000026"].message, messageList["701-000026"].responses);
                             }
                             else
                             {
@@ -208,9 +208,9 @@ namespace ServingFresh.Views
                 {
                     if (messageList != null)
                     {
-                        if (messageList.ContainsKey("701-000034"))
+                        if (messageList.ContainsKey("701-000027"))
                         {
-                            await DisplayAlert(messageList["701-000034"].title, messageList["701-000034"].message, messageList["701-000034"].responses);
+                            await DisplayAlert(messageList["701-000027"].title, messageList["701-000027"].message, messageList["701-000027"].responses);
                         }
                         else
                         {
@@ -278,9 +278,9 @@ namespace ServingFresh.Views
                     {
                         if (messageList != null)
                         {
-                            if (messageList.ContainsKey("701-000035"))
+                            if (messageList.ContainsKey("701-000025"))
                             {
-                                await DisplayAlert(messageList["701-000035"].title, messageList["701-000035"].message, messageList["701-000035"].responses);
+                                await DisplayAlert(messageList["701-000025"].title, messageList["701-000025"].message, messageList["701-000025"].responses);
                             }
                             else
                             {
@@ -299,9 +299,9 @@ namespace ServingFresh.Views
                     {
                         if (messageList != null)
                         {
-                            if (messageList.ContainsKey("701-000036"))
+                            if (messageList.ContainsKey("701-000026"))
                             {
-                                await DisplayAlert(messageList["701-000036"].title, messageList["701-000036"].message, messageList["701-000036"].responses);
+                                await DisplayAlert(messageList["701-000026"].title, messageList["701-000026"].message, messageList["701-000026"].responses);
                             }
                             else
                             {
@@ -350,9 +350,9 @@ namespace ServingFresh.Views
                     {
                         if (messageList != null)
                         {
-                            if (messageList.ContainsKey("701-000037"))
+                            if (messageList.ContainsKey("701-000025"))
                             {
-                                await DisplayAlert(messageList["701-000037"].title, messageList["701-000037"].message, messageList["701-000037"].responses);
+                                await DisplayAlert(messageList["701-000025"].title, messageList["701-000025"].message, messageList["701-000025"].responses);
                             }
                             else
                             {
@@ -371,9 +371,9 @@ namespace ServingFresh.Views
                     {
                         if (messageList != null)
                         {
-                            if (messageList.ContainsKey("701-000038"))
+                            if (messageList.ContainsKey("701-000026"))
                             {
-                                await DisplayAlert(messageList["701-000038"].title, messageList["701-000038"].message, messageList["701-000038"].responses);
+                                await DisplayAlert(messageList["701-000026"].title, messageList["701-000026"].message, messageList["701-000026"].responses);
                             }
                             else
                             {
@@ -399,9 +399,9 @@ namespace ServingFresh.Views
         {
             if (messageList != null)
             {
-                if (messageList.ContainsKey("701-000039"))
+                if (messageList.ContainsKey("701-000028"))
                 {
-                    await DisplayAlert(messageList["701-000039"].title, messageList["701-000039"].message, messageList["701-000039"].responses);
+                    await DisplayAlert(messageList["701-000028"].title, messageList["701-000028"].message, messageList["701-000028"].responses);
                 }
                 else
                 {

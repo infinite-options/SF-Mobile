@@ -22,6 +22,7 @@ namespace ServingFresh.Models
         public IList<AppInfo> result { get; set; }
         public string sql { get; set; }
     }
+
     public class AppVersion
     {
 
@@ -71,7 +72,14 @@ namespace ServingFresh.Models
                 var data = JsonConvert.DeserializeObject<Version>(content);
                 if(data.result.Count != 0)
                 {
-                    result = data.result[0].version;
+                    foreach(AppInfo app in data.result)
+                    {
+                        if(app.program == "Serving Fresh")
+                        {
+                            result = app.version;
+                            break;
+                        }
+                    }
                 }
                 else
                 {

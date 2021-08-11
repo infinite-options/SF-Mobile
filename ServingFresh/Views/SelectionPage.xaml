@@ -130,7 +130,7 @@
                         <DataTemplate>
                             <Frame Padding="0,0,15,0" WidthRequest="160" HasShadow="False" BackgroundColor="Transparent">
                                 <StackLayout Spacing="0">
-                                    <Frame HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding itemOpacity}">
+                                    <Frame IsVisible="{Binding frontView}" HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding itemOpacity}">
                                         <RelativeLayout>
                                             <Frame
                                                 BackgroundColor="Transparent"
@@ -160,9 +160,48 @@
                                                     </Frame>
                                                 </StackLayout>
                                                 <StackLayout Grid.Column="1"></StackLayout>
-                                                <StackLayout Grid.Column="2" IsVisible="false">
+                                                <StackLayout Grid.Column="2" IsVisible="true">
                                                     <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
-                                                        <Image Source="informationIcon.png"></Image>
+                                                        <ImageButton Source="informationIcon.png" Clicked="ShowItemInfoHorizontal" CommandParameter="{Binding .}"></ImageButton>
+                                                    </Frame>
+                                                </StackLayout>
+                                            </Grid>
+                                        </RelativeLayout>
+                                    </Frame>
+                                    <Frame IsVisible="{Binding backView}" HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="1">
+                                        <RelativeLayout>
+                                            <Frame
+                                                BackgroundColor="Transparent"
+                                                HasShadow="False"
+                                                HeightRequest="120"
+                                                Padding="0"
+                                                CornerRadius="10"
+                                                IsClippedToBounds="True"
+                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                                <StackLayout HorizontalOptions="CenterAndExpand">
+                                                    <Label Margin="0,30,0,0" HorizontalTextAlignment="Center" Text="{Binding itemBackViewInfo}" FontSize="11" TextColor="#2B6D74" ></Label>
+                                                </StackLayout>
+                                            </Frame>
+                                            <Grid
+                                                ColumnSpacing="0"
+                                                HeightRequest="120"
+                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="40"></ColumnDefinition>
+                                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                                    <ColumnDefinition Width="40"></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <StackLayout Grid.Column="0">
+                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
+                                                        <StackLayout HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center">
+                                                            <ImageButton Margin="0,-2,0,0" Source="{Binding itemFavoriteImage}" BackgroundColor="Transparent" Clicked="FavoriteClick"  CommandParameter="{Binding .}"></ImageButton>
+                                                        </StackLayout>
+                                                    </Frame>
+                                                </StackLayout>
+                                                <StackLayout Grid.Column="1"></StackLayout>
+                                                <StackLayout Grid.Column="2" IsVisible="true">
+                                                    <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
+                                                        <ImageButton Source="informationIcon.png" Clicked="ShowItemInfoHorizontal" CommandParameter="{Binding .}"></ImageButton>
                                                     </Frame>
                                                 </StackLayout>
                                             </Grid>
@@ -223,7 +262,7 @@
                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                     </Grid.ColumnDefinitions>
                                 <StackLayout Margin="20,0,7,0" Grid.Column="0" Spacing="0" >
-                                    <Frame HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding opacityLeft}">
+                                    <Frame IsVisible="{Binding frontViewLeft}" HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding opacityLeft}">
                                         <RelativeLayout>
                                             <Frame
                                                 BackgroundColor="Transparent"
@@ -253,9 +292,50 @@
                                                     </Frame>
                                                 </StackLayout>
                                                 <StackLayout Grid.Column="1" ></StackLayout>
-                                                <StackLayout Grid.Column="2" IsVisible="false">
+                                                <StackLayout Grid.Column="2" IsVisible="true">
                                                     <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
-                                                        <Image Source="informationIcon.png"></Image>
+                                                        <ImageButton Source="informationIcon.png"  Clicked="ShowItemInfoVerticalLeft" CommandParameter="{Binding .}"></ImageButton>
+                                                    </Frame>
+                                                </StackLayout>
+                                            </Grid>
+                                         
+                                        </RelativeLayout>
+                                    </Frame>
+                                    <Frame IsVisible="{Binding backViewLeft}" HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding opacityLeft}">
+                                        <RelativeLayout>
+                                            <Frame
+                                                BackgroundColor="Transparent"
+                                                HasShadow="False"
+                                                HeightRequest="120"
+                                                Padding="0"
+                                                CornerRadius="10"
+                                                IsClippedToBounds="True"
+                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                                <StackLayout HorizontalOptions="CenterAndExpand">
+                                                    <Label Margin="0,30,0,0" HorizontalTextAlignment="Center" Text="{Binding itemBackViewInfoLeft}" FontSize="11" TextColor="#2B6D74" ></Label>
+                                                </StackLayout>
+                                            </Frame>
+
+                                            <Grid
+                                                ColumnSpacing="0"
+                                                HeightRequest="120"
+                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="40"></ColumnDefinition>
+                                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                                    <ColumnDefinition Width="40"></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <StackLayout Grid.Column="0">
+                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
+                                                        <StackLayout HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center">
+                                                            <ImageButton Margin="0,-2,0,0" Source="{Binding favoriteIconLeft}" BackgroundColor="Transparent" Clicked="AddFavoriteLeftItemOnVerticalView"  CommandParameter="{Binding .}"></ImageButton>
+                                                        </StackLayout>
+                                                    </Frame>
+                                                </StackLayout>
+                                                <StackLayout Grid.Column="1" ></StackLayout>
+                                                <StackLayout Grid.Column="2" IsVisible="true">
+                                                    <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
+                                                        <ImageButton Source="informationIcon.png"  Clicked="ShowItemInfoVerticalLeft" CommandParameter="{Binding .}"></ImageButton>
                                                     </Frame>
                                                 </StackLayout>
                                             </Grid>
@@ -304,7 +384,7 @@
                                     <Label Margin="0,-110,0,0" IsVisible="{Binding isItemLeftUnavailable}" Text="Not available on this day" TextColor="Black" FontSize="11" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
                                 </StackLayout>
                                 <StackLayout Margin="7,0,20,0" Grid.Column="1" Spacing="0">
-                                    <Frame HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding opacityRight}">
+                                    <Frame IsVisible="{Binding frontViewRight}" HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding opacityRight}">
                                         <RelativeLayout>
                                             <Frame
                                                 BackgroundColor="Transparent"
@@ -333,9 +413,48 @@
                                                     </Frame>
                                                 </StackLayout>
                                                 <StackLayout Grid.Column="1"></StackLayout>
-                                                <StackLayout Grid.Column="2" IsVisible="false">
+                                                <StackLayout Grid.Column="2" IsVisible="true">
                                                     <Frame Margin="7,3,3,0"  WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
-                                                        <Image Source="informationIcon.png"></Image>
+                                                        <ImageButton Source="informationIcon.png" Clicked="ShowItemInfoVerticalRight" CommandParameter="{Binding .}"></ImageButton>
+                                                    </Frame>
+                                                </StackLayout>
+                                            </Grid>
+                                        </RelativeLayout>
+                                    </Frame>
+                                    <Frame IsVisible="{Binding backViewRight}" HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding opacityRight}">
+                                        <RelativeLayout>
+                                            <Frame
+                                                BackgroundColor="Transparent"
+                                                HasShadow="False"
+                                                HeightRequest="120"
+                                                Padding="0"
+                                                CornerRadius="10"
+                                                IsClippedToBounds="True"
+                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                                <StackLayout HorizontalOptions="CenterAndExpand">
+                                                    <Label Margin="0,30,0,0" HorizontalTextAlignment="Center" Text="{Binding itemBackViewInfoRight}" FontSize="11" TextColor="#2B6D74" ></Label>
+                                                </StackLayout>
+                                            </Frame>
+                                            <Grid
+                                                ColumnSpacing="0"
+                                                HeightRequest="120"
+                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="40"></ColumnDefinition>
+                                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                                    <ColumnDefinition Width="40"></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <StackLayout Grid.Column="0">
+                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
+                                                        <StackLayout HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center">
+                                                            <ImageButton Margin="0,-2,0,0" Source="{Binding favoriteIconRight}" BackgroundColor="Transparent" Clicked="AddFavoriteRighttemOnVerticalView" CommandParameter="{Binding .}"></ImageButton>
+                                                        </StackLayout>
+                                                    </Frame>
+                                                </StackLayout>
+                                                <StackLayout Grid.Column="1"></StackLayout>
+                                                <StackLayout Grid.Column="2" IsVisible="true">
+                                                    <Frame Margin="7,3,3,0"  WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
+                                                        <ImageButton Source="informationIcon.png" Clicked="ShowItemInfoVerticalRight" CommandParameter="{Binding .}"></ImageButton>
                                                     </Frame>
                                                 </StackLayout>
                                             </Grid>
@@ -407,7 +526,7 @@
                         <DataTemplate>
                             <Frame Padding="0,0,15,0" WidthRequest="160" HasShadow="False" BackgroundColor="Transparent">
                                 <StackLayout Spacing="0">
-                                    <Frame HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding itemOpacity}">
+                                    <Frame IsVisible="{Binding frontView}" HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding itemOpacity}">
                                         <RelativeLayout>
                                             <Frame
                                                 BackgroundColor="Transparent"
@@ -437,9 +556,48 @@
                                                     </Frame>
                                                 </StackLayout>
                                                 <StackLayout Grid.Column="1"></StackLayout>
-                                                <StackLayout Grid.Column="2" IsVisible="false">
+                                                <StackLayout Grid.Column="2" IsVisible="true">
                                                     <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
-                                                        <Image Source="informationIcon.png"></Image>
+                                                        <ImageButton Source="informationIcon.png" Clicked="ShowItemInfoHorizontal" CommandParameter="{Binding .}"></ImageButton>
+                                                    </Frame>
+                                                </StackLayout>
+                                            </Grid>
+                                        </RelativeLayout>
+                                    </Frame>
+                                    <Frame IsVisible="{Binding backView}" HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="1">
+                                        <RelativeLayout>
+                                            <Frame
+                                                BackgroundColor="Transparent"
+                                                HasShadow="False"
+                                                HeightRequest="120"
+                                                Padding="0"
+                                                CornerRadius="10"
+                                                IsClippedToBounds="True"
+                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                                <StackLayout HorizontalOptions="CenterAndExpand">
+                                                    <Label Margin="0,30,0,0" HorizontalTextAlignment="Center" Text="{Binding itemBackViewInfo}" FontSize="11" TextColor="#2B6D74" ></Label>
+                                                </StackLayout>
+                                            </Frame>
+                                            <Grid
+                                                ColumnSpacing="0"
+                                                HeightRequest="120"
+                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="40"></ColumnDefinition>
+                                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                                    <ColumnDefinition Width="40"></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <StackLayout Grid.Column="0">
+                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
+                                                        <StackLayout HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center">
+                                                            <ImageButton Margin="0,-2,0,0" Source="{Binding itemFavoriteImage}" BackgroundColor="Transparent" Clicked="FavoriteClick"  CommandParameter="{Binding .}"></ImageButton>
+                                                        </StackLayout>
+                                                    </Frame>
+                                                </StackLayout>
+                                                <StackLayout Grid.Column="1"></StackLayout>
+                                                <StackLayout Grid.Column="2" IsVisible="true">
+                                                    <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
+                                                        <ImageButton Source="informationIcon.png" Clicked="ShowItemInfoHorizontal" CommandParameter="{Binding .}"></ImageButton>
                                                     </Frame>
                                                 </StackLayout>
                                             </Grid>
@@ -500,7 +658,7 @@
                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                     </Grid.ColumnDefinitions>
                                 <StackLayout Margin="20,0,7,0" Grid.Column="0" Spacing="0" >
-                                    <Frame HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding opacityLeft}">
+                                    <Frame IsVisible="{Binding frontViewLeft}"  HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding opacityLeft}">
                                         <RelativeLayout>
                                             <Frame
                                                 BackgroundColor="Transparent"
@@ -530,9 +688,50 @@
                                                     </Frame>
                                                 </StackLayout>
                                                 <StackLayout Grid.Column="1" ></StackLayout>
-                                                <StackLayout Grid.Column="2" IsVisible="false">
+                                                <StackLayout Grid.Column="2" IsVisible="true">
                                                     <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
-                                                        <Image Source="informationIcon.png"></Image>
+                                                        <ImageButton Source="informationIcon.png"  Clicked="ShowItemInfoVerticalLeft" CommandParameter="{Binding .}"></ImageButton>
+                                                    </Frame>
+                                                </StackLayout>
+                                            </Grid>
+                                         
+                                        </RelativeLayout>
+                                    </Frame>
+                                    <Frame IsVisible="{Binding backViewLeft}" HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding opacityLeft}">
+                                        <RelativeLayout>
+                                            <Frame
+                                                BackgroundColor="Transparent"
+                                                HasShadow="False"
+                                                HeightRequest="120"
+                                                Padding="0"
+                                                CornerRadius="10"
+                                                IsClippedToBounds="True"
+                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                                <StackLayout HorizontalOptions="CenterAndExpand">
+                                                    <Label Margin="0,30,0,0" HorizontalTextAlignment="Center" Text="{Binding itemBackViewInfoLeft}" FontSize="11" TextColor="#2B6D74" ></Label>
+                                                </StackLayout>
+                                            </Frame>
+
+                                            <Grid
+                                                ColumnSpacing="0"
+                                                HeightRequest="120"
+                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="40"></ColumnDefinition>
+                                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                                    <ColumnDefinition Width="40"></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <StackLayout Grid.Column="0">
+                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
+                                                        <StackLayout HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center">
+                                                            <ImageButton Margin="0,-2,0,0" Source="{Binding favoriteIconLeft}" BackgroundColor="Transparent" Clicked="AddFavoriteLeftItemOnVerticalView"  CommandParameter="{Binding .}"></ImageButton>
+                                                        </StackLayout>
+                                                    </Frame>
+                                                </StackLayout>
+                                                <StackLayout Grid.Column="1" ></StackLayout>
+                                                <StackLayout Grid.Column="2" IsVisible="true">
+                                                    <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
+                                                        <ImageButton Source="informationIcon.png"  Clicked="ShowItemInfoVerticalLeft" CommandParameter="{Binding .}"></ImageButton>
                                                     </Frame>
                                                 </StackLayout>
                                             </Grid>
@@ -581,7 +780,7 @@
                                     <Label Margin="0,-110,0,0" IsVisible="{Binding isItemLeftUnavailable}" Text="Not available on this day" TextColor="Black" FontSize="11" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
                                 </StackLayout>
                                 <StackLayout Margin="7,0,20,0" Grid.Column="1" Spacing="0">
-                                    <Frame HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding opacityRight}">
+                                    <Frame IsVisible="{Binding frontViewRight}" HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding opacityRight}">
                                         <RelativeLayout>
                                             <Frame
                                                 BackgroundColor="Transparent"
@@ -610,9 +809,48 @@
                                                     </Frame>
                                                 </StackLayout>
                                                 <StackLayout Grid.Column="1"></StackLayout>
-                                                <StackLayout Grid.Column="2" IsVisible="false">
+                                                <StackLayout Grid.Column="2" IsVisible="true">
                                                     <Frame Margin="7,3,3,0"  WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
-                                                        <Image Source="informationIcon.png"></Image>
+                                                        <ImageButton Source="informationIcon.png" Clicked="ShowItemInfoVerticalRight" CommandParameter="{Binding .}"></ImageButton>
+                                                    </Frame>
+                                                </StackLayout>
+                                            </Grid>
+                                        </RelativeLayout>
+                                    </Frame>
+                                    <Frame IsVisible="{Binding backViewRight}" HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding opacityRight}">
+                                        <RelativeLayout>
+                                            <Frame
+                                                BackgroundColor="Transparent"
+                                                HasShadow="False"
+                                                HeightRequest="120"
+                                                Padding="0"
+                                                CornerRadius="10"
+                                                IsClippedToBounds="True"
+                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                                <StackLayout HorizontalOptions="CenterAndExpand">
+                                                    <Label Margin="0,30,0,0" HorizontalTextAlignment="Center" Text="{Binding itemBackViewInfoRight}" FontSize="11" TextColor="#2B6D74" ></Label>
+                                                </StackLayout>
+                                            </Frame>
+                                            <Grid
+                                                ColumnSpacing="0"
+                                                HeightRequest="120"
+                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="40"></ColumnDefinition>
+                                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                                    <ColumnDefinition Width="40"></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <StackLayout Grid.Column="0">
+                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
+                                                        <StackLayout HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center">
+                                                            <ImageButton Margin="0,-2,0,0" Source="{Binding favoriteIconRight}" BackgroundColor="Transparent" Clicked="AddFavoriteRighttemOnVerticalView" CommandParameter="{Binding .}"></ImageButton>
+                                                        </StackLayout>
+                                                    </Frame>
+                                                </StackLayout>
+                                                <StackLayout Grid.Column="1"></StackLayout>
+                                                <StackLayout Grid.Column="2" IsVisible="true">
+                                                    <Frame Margin="7,3,3,0"  WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
+                                                        <ImageButton Source="informationIcon.png" Clicked="ShowItemInfoVerticalRight" CommandParameter="{Binding .}"></ImageButton>
                                                     </Frame>
                                                 </StackLayout>
                                             </Grid>
@@ -684,7 +922,7 @@
                         <DataTemplate>
                             <Frame Padding="0,0,15,0" WidthRequest="160" HasShadow="False" BackgroundColor="Transparent">
                                 <StackLayout Spacing="0">
-                                    <Frame HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding itemOpacity}">
+                                    <Frame IsVisible="{Binding frontView}" HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding itemOpacity}">
                                         <RelativeLayout>
                                             <Frame
                                                 BackgroundColor="Transparent"
@@ -714,9 +952,48 @@
                                                     </Frame>
                                                 </StackLayout>
                                                 <StackLayout Grid.Column="1"></StackLayout>
-                                                <StackLayout Grid.Column="2" IsVisible="false">
+                                                <StackLayout Grid.Column="2" IsVisible="true">
                                                     <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
-                                                        <Image Source="informationIcon.png"></Image>
+                                                        <ImageButton Source="informationIcon.png" Clicked="ShowItemInfoHorizontal" CommandParameter="{Binding .}"></ImageButton>
+                                                    </Frame>
+                                                </StackLayout>
+                                            </Grid>
+                                        </RelativeLayout>
+                                    </Frame>
+                                    <Frame IsVisible="{Binding backView}" HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="1">
+                                        <RelativeLayout>
+                                            <Frame
+                                                BackgroundColor="Transparent"
+                                                HasShadow="False"
+                                                HeightRequest="120"
+                                                Padding="0"
+                                                CornerRadius="10"
+                                                IsClippedToBounds="True"
+                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                                <StackLayout HorizontalOptions="CenterAndExpand">
+                                                    <Label Margin="0,30,0,0" HorizontalTextAlignment="Center" Text="{Binding itemBackViewInfo}" FontSize="11" TextColor="#2B6D74" ></Label>
+                                                </StackLayout>
+                                            </Frame>
+                                            <Grid
+                                                ColumnSpacing="0"
+                                                HeightRequest="120"
+                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="40"></ColumnDefinition>
+                                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                                    <ColumnDefinition Width="40"></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <StackLayout Grid.Column="0">
+                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
+                                                        <StackLayout HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center">
+                                                            <ImageButton Margin="0,-2,0,0" Source="{Binding itemFavoriteImage}" BackgroundColor="Transparent" Clicked="FavoriteClick"  CommandParameter="{Binding .}"></ImageButton>
+                                                        </StackLayout>
+                                                    </Frame>
+                                                </StackLayout>
+                                                <StackLayout Grid.Column="1"></StackLayout>
+                                                <StackLayout Grid.Column="2" IsVisible="true">
+                                                    <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
+                                                        <ImageButton Source="informationIcon.png" Clicked="ShowItemInfoHorizontal" CommandParameter="{Binding .}"></ImageButton>
                                                     </Frame>
                                                 </StackLayout>
                                             </Grid>
@@ -777,7 +1054,7 @@
                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                     </Grid.ColumnDefinitions>
                                 <StackLayout Margin="20,0,7,0" Grid.Column="0" Spacing="0" >
-                                    <Frame HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding opacityLeft}">
+                                    <Frame IsVisible="{Binding frontViewLeft}" HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding opacityLeft}">
                                         <RelativeLayout>
                                             <Frame
                                                 BackgroundColor="Transparent"
@@ -807,9 +1084,50 @@
                                                     </Frame>
                                                 </StackLayout>
                                                 <StackLayout Grid.Column="1" ></StackLayout>
-                                                <StackLayout Grid.Column="2" IsVisible="false">
+                                                <StackLayout Grid.Column="2" IsVisible="true">
                                                     <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
-                                                        <Image Source="informationIcon.png"></Image>
+                                                        <ImageButton Source="informationIcon.png"  Clicked="ShowItemInfoVerticalLeft" CommandParameter="{Binding .}"></ImageButton>
+                                                    </Frame>
+                                                </StackLayout>
+                                            </Grid>
+                                         
+                                        </RelativeLayout>
+                                    </Frame>
+                                    <Frame IsVisible="{Binding backViewLeft}" HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding opacityLeft}">
+                                        <RelativeLayout>
+                                            <Frame
+                                                BackgroundColor="Transparent"
+                                                HasShadow="False"
+                                                HeightRequest="120"
+                                                Padding="0"
+                                                CornerRadius="10"
+                                                IsClippedToBounds="True"
+                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                                <StackLayout HorizontalOptions="CenterAndExpand">
+                                                    <Label Margin="0,30,0,0" HorizontalTextAlignment="Center" Text="{Binding itemBackViewInfoLeft}" FontSize="11" TextColor="#2B6D74" ></Label>
+                                                </StackLayout>
+                                            </Frame>
+
+                                            <Grid
+                                                ColumnSpacing="0"
+                                                HeightRequest="120"
+                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="40"></ColumnDefinition>
+                                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                                    <ColumnDefinition Width="40"></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <StackLayout Grid.Column="0">
+                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
+                                                        <StackLayout HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center">
+                                                            <ImageButton Margin="0,-2,0,0" Source="{Binding favoriteIconLeft}" BackgroundColor="Transparent" Clicked="AddFavoriteLeftItemOnVerticalView"  CommandParameter="{Binding .}"></ImageButton>
+                                                        </StackLayout>
+                                                    </Frame>
+                                                </StackLayout>
+                                                <StackLayout Grid.Column="1" ></StackLayout>
+                                                <StackLayout Grid.Column="2" IsVisible="true">
+                                                    <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
+                                                        <ImageButton Source="informationIcon.png"  Clicked="ShowItemInfoVerticalLeft" CommandParameter="{Binding .}"></ImageButton>
                                                     </Frame>
                                                 </StackLayout>
                                             </Grid>
@@ -858,7 +1176,7 @@
                                     <Label Margin="0,-110,0,0" IsVisible="{Binding isItemLeftUnavailable}" Text="Not available on this day" TextColor="Black" FontSize="11" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
                                 </StackLayout>
                                 <StackLayout Margin="7,0,20,0" Grid.Column="1" Spacing="0">
-                                    <Frame HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding opacityRight}">
+                                    <Frame IsVisible="{Binding frontViewRight}" HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding opacityRight}">
                                         <RelativeLayout>
                                             <Frame
                                                 BackgroundColor="Transparent"
@@ -887,9 +1205,48 @@
                                                     </Frame>
                                                 </StackLayout>
                                                 <StackLayout Grid.Column="1"></StackLayout>
-                                                <StackLayout Grid.Column="2" IsVisible="false">
+                                                <StackLayout Grid.Column="2" IsVisible="true">
                                                     <Frame Margin="7,3,3,0"  WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
-                                                        <Image Source="informationIcon.png"></Image>
+                                                        <ImageButton Source="informationIcon.png" Clicked="ShowItemInfoVerticalRight" CommandParameter="{Binding .}"></ImageButton>
+                                                    </Frame>
+                                                </StackLayout>
+                                            </Grid>
+                                        </RelativeLayout>
+                                    </Frame>
+                                    <Frame IsVisible="{Binding backViewRight}" HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding opacityRight}">
+                                        <RelativeLayout>
+                                            <Frame
+                                                BackgroundColor="Transparent"
+                                                HasShadow="False"
+                                                HeightRequest="120"
+                                                Padding="0"
+                                                CornerRadius="10"
+                                                IsClippedToBounds="True"
+                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                                <StackLayout HorizontalOptions="CenterAndExpand">
+                                                    <Label Margin="0,30,0,0" HorizontalTextAlignment="Center" Text="{Binding itemBackViewInfoRight}" FontSize="11" TextColor="#2B6D74" ></Label>
+                                                </StackLayout>
+                                            </Frame>
+                                            <Grid
+                                                ColumnSpacing="0"
+                                                HeightRequest="120"
+                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="40"></ColumnDefinition>
+                                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                                    <ColumnDefinition Width="40"></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <StackLayout Grid.Column="0">
+                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
+                                                        <StackLayout HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center">
+                                                            <ImageButton Margin="0,-2,0,0" Source="{Binding favoriteIconRight}" BackgroundColor="Transparent" Clicked="AddFavoriteRighttemOnVerticalView" CommandParameter="{Binding .}"></ImageButton>
+                                                        </StackLayout>
+                                                    </Frame>
+                                                </StackLayout>
+                                                <StackLayout Grid.Column="1"></StackLayout>
+                                                <StackLayout Grid.Column="2" IsVisible="true">
+                                                    <Frame Margin="7,3,3,0"  WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
+                                                        <ImageButton Source="informationIcon.png" Clicked="ShowItemInfoVerticalRight" CommandParameter="{Binding .}"></ImageButton>
                                                     </Frame>
                                                 </StackLayout>
                                             </Grid>
@@ -961,7 +1318,7 @@
                         <DataTemplate>
                             <Frame Padding="0,0,15,0" WidthRequest="160" HasShadow="False" BackgroundColor="Transparent">
                                 <StackLayout Spacing="0">
-                                    <Frame HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding itemOpacity}">
+                                    <Frame IsVisible="{Binding frontView}" HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding itemOpacity}">
                                         <RelativeLayout>
                                             <Frame
                                                 BackgroundColor="Transparent"
@@ -991,15 +1348,54 @@
                                                     </Frame>
                                                 </StackLayout>
                                                 <StackLayout Grid.Column="1"></StackLayout>
-                                                <StackLayout Grid.Column="2" IsVisible="false">
-                                                    <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
-                                                        <Image Source="informationIcon.png"></Image>
+                                                <StackLayout Grid.Column="2" IsVisible="true">
+                                                    <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
+                                                        <ImageButton Source="informationIcon.png" Clicked="ShowItemInfoHorizontal" CommandParameter="{Binding .}"></ImageButton>
                                                     </Frame>
                                                 </StackLayout>
                                             </Grid>
                                         </RelativeLayout>
                                     </Frame>
-                                   <Frame HasShadow="false" Padding="5" HeightRequest="40" CornerRadius="10"  IsEnabled="{Binding isItemEnable}" BackgroundColor="{Binding itemBackgroundColor}" Opacity="{Binding itemOpacity}">
+                                    <Frame IsVisible="{Binding backView}" HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="1">
+                                        <RelativeLayout>
+                                            <Frame
+                                                BackgroundColor="Transparent"
+                                                HasShadow="False"
+                                                HeightRequest="120"
+                                                Padding="0"
+                                                CornerRadius="10"
+                                                IsClippedToBounds="True"
+                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                                <StackLayout HorizontalOptions="CenterAndExpand">
+                                                    <Label Margin="0,30,0,0" HorizontalTextAlignment="Center" Text="{Binding itemBackViewInfo}" FontSize="11" TextColor="#2B6D74" ></Label>
+                                                </StackLayout>
+                                            </Frame>
+                                            <Grid
+                                                ColumnSpacing="0"
+                                                HeightRequest="120"
+                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="40"></ColumnDefinition>
+                                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                                    <ColumnDefinition Width="40"></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <StackLayout Grid.Column="0">
+                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
+                                                        <StackLayout HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center">
+                                                            <ImageButton Margin="0,-2,0,0" Source="{Binding itemFavoriteImage}" BackgroundColor="Transparent" Clicked="FavoriteClick"  CommandParameter="{Binding .}"></ImageButton>
+                                                        </StackLayout>
+                                                    </Frame>
+                                                </StackLayout>
+                                                <StackLayout Grid.Column="1"></StackLayout>
+                                                <StackLayout Grid.Column="2" IsVisible="true">
+                                                    <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
+                                                        <ImageButton Source="informationIcon.png" Clicked="ShowItemInfoHorizontal" CommandParameter="{Binding .}"></ImageButton>
+                                                    </Frame>
+                                                </StackLayout>
+                                            </Grid>
+                                        </RelativeLayout>
+                                    </Frame>
+                                    <Frame HasShadow="false" Padding="5" HeightRequest="40" CornerRadius="10"  IsEnabled="{Binding isItemEnable}" BackgroundColor="{Binding itemBackgroundColor}" Opacity="{Binding itemOpacity}">
                                         <Grid>
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="*"></RowDefinition>
@@ -1054,7 +1450,7 @@
                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                     </Grid.ColumnDefinitions>
                                 <StackLayout Margin="20,0,7,0" Grid.Column="0" Spacing="0" >
-                                    <Frame HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding opacityLeft}">
+                                    <Frame IsVisible="{Binding frontViewLeft}" HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding opacityLeft}">
                                         <RelativeLayout>
                                             <Frame
                                                 BackgroundColor="Transparent"
@@ -1084,9 +1480,50 @@
                                                     </Frame>
                                                 </StackLayout>
                                                 <StackLayout Grid.Column="1" ></StackLayout>
-                                                <StackLayout Grid.Column="2" IsVisible="false">
-                                                    <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
-                                                        <Image Source="informationIcon.png"></Image>
+                                                <StackLayout Grid.Column="2" IsVisible="true">
+                                                    <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
+                                                        <ImageButton Source="informationIcon.png"  Clicked="ShowItemInfoVerticalLeft" CommandParameter="{Binding .}"></ImageButton>
+                                                    </Frame>
+                                                </StackLayout>
+                                            </Grid>
+                                         
+                                        </RelativeLayout>
+                                    </Frame>
+                                    <Frame IsVisible="{Binding backViewLeft}" HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding opacityLeft}">
+                                        <RelativeLayout>
+                                            <Frame
+                                                BackgroundColor="Transparent"
+                                                HasShadow="False"
+                                                HeightRequest="120"
+                                                Padding="0"
+                                                CornerRadius="10"
+                                                IsClippedToBounds="True"
+                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                                <StackLayout HorizontalOptions="CenterAndExpand">
+                                                    <Label Margin="0,30,0,0" HorizontalTextAlignment="Center" Text="{Binding itemBackViewInfoLeft}" FontSize="11" TextColor="#2B6D74" ></Label>
+                                                </StackLayout>
+                                            </Frame>
+
+                                            <Grid
+                                                ColumnSpacing="0"
+                                                HeightRequest="120"
+                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="40"></ColumnDefinition>
+                                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                                    <ColumnDefinition Width="40"></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <StackLayout Grid.Column="0">
+                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
+                                                        <StackLayout HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center">
+                                                            <ImageButton Margin="0,-2,0,0" Source="{Binding favoriteIconLeft}" BackgroundColor="Transparent" Clicked="AddFavoriteLeftItemOnVerticalView"  CommandParameter="{Binding .}"></ImageButton>
+                                                        </StackLayout>
+                                                    </Frame>
+                                                </StackLayout>
+                                                <StackLayout Grid.Column="1" ></StackLayout>
+                                                <StackLayout Grid.Column="2" IsVisible="true">
+                                                    <Frame Margin="7,3,3,0" WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
+                                                        <ImageButton Source="informationIcon.png"  Clicked="ShowItemInfoVerticalLeft" CommandParameter="{Binding .}"></ImageButton>
                                                     </Frame>
                                                 </StackLayout>
                                             </Grid>
@@ -1135,7 +1572,7 @@
                                     <Label Margin="0,-110,0,0" IsVisible="{Binding isItemLeftUnavailable}" Text="Not available on this day" TextColor="Black" FontSize="11" FontAttributes="Bold" HorizontalTextAlignment="Center"></Label>
                                 </StackLayout>
                                 <StackLayout Margin="7,0,20,0" Grid.Column="1" Spacing="0">
-                                    <Frame HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding opacityRight}">
+                                    <Frame IsVisible="{Binding frontViewRight}" HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding opacityRight}">
                                         <RelativeLayout>
                                             <Frame
                                                 BackgroundColor="Transparent"
@@ -1164,9 +1601,48 @@
                                                     </Frame>
                                                 </StackLayout>
                                                 <StackLayout Grid.Column="1"></StackLayout>
-                                                <StackLayout Grid.Column="2" IsVisible="false">
-                                                    <Frame Margin="7,3,3,0"  WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="13" Padding="0" HasShadow="False">
-                                                        <Image Source="informationIcon.png"></Image>
+                                                <StackLayout Grid.Column="2" IsVisible="true">
+                                                    <Frame Margin="7,3,3,0"  WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
+                                                        <ImageButton Source="informationIcon.png" Clicked="ShowItemInfoVerticalRight" CommandParameter="{Binding .}"></ImageButton>
+                                                    </Frame>
+                                                </StackLayout>
+                                            </Grid>
+                                        </RelativeLayout>
+                                    </Frame>
+                                    <Frame IsVisible="{Binding backViewRight}" HeightRequest="120" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding opacityRight}">
+                                        <RelativeLayout>
+                                            <Frame
+                                                BackgroundColor="Transparent"
+                                                HasShadow="False"
+                                                HeightRequest="120"
+                                                Padding="0"
+                                                CornerRadius="10"
+                                                IsClippedToBounds="True"
+                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                                <StackLayout HorizontalOptions="CenterAndExpand">
+                                                    <Label Margin="0,30,0,0" HorizontalTextAlignment="Center" Text="{Binding itemBackViewInfoRight}" FontSize="11" TextColor="#2B6D74" ></Label>
+                                                </StackLayout>
+                                            </Frame>
+                                            <Grid
+                                                ColumnSpacing="0"
+                                                HeightRequest="120"
+                                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="40"></ColumnDefinition>
+                                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                                    <ColumnDefinition Width="40"></ColumnDefinition>
+                                                </Grid.ColumnDefinitions>
+                                                <StackLayout Grid.Column="0">
+                                                    <Frame Margin="3,3,7,0" WidthRequest="31" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
+                                                        <StackLayout HeightRequest="16" WidthRequest="16" HorizontalOptions="Center" VerticalOptions="Center">
+                                                            <ImageButton Margin="0,-2,0,0" Source="{Binding favoriteIconRight}" BackgroundColor="Transparent" Clicked="AddFavoriteRighttemOnVerticalView" CommandParameter="{Binding .}"></ImageButton>
+                                                        </StackLayout>
+                                                    </Frame>
+                                                </StackLayout>
+                                                <StackLayout Grid.Column="1"></StackLayout>
+                                                <StackLayout Grid.Column="2" IsVisible="true">
+                                                    <Frame Margin="7,3,3,0"  WidthRequest="31" IsClippedToBounds="True" HeightRequest="26" CornerRadius="7" Padding="0" HasShadow="False">
+                                                        <ImageButton Source="informationIcon.png" Clicked="ShowItemInfoVerticalRight" CommandParameter="{Binding .}"></ImageButton>
                                                     </Frame>
                                                 </StackLayout>
                                             </Grid>

@@ -10,7 +10,6 @@
                 <RowDefinition Height="94"></RowDefinition>
                 <RowDefinition Height="60"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
-              
             </Grid.RowDefinitions>
             <Grid Grid.Row="0" ColumnSpacing="0" BackgroundColor="#136D74">
                 <Grid.ColumnDefinitions>
@@ -69,145 +68,144 @@
                     </StackLayout.GestureRecognizers>
                 </StackLayout>
             </Grid>
-            <Frame Grid.Row="2" HasShadow="False">
-                <StackLayout>
-                    <CollectionView x:Name="HistoryList" Footer="">
-                            <CollectionView.ItemTemplate>
-                                <DataTemplate>
-                                    <StackLayout>
-                                        <StackLayout >
-                                            <FlexLayout JustifyContent="SpaceBetween">
-                                                <Label Text="{Binding purchase_status}" StyleClass="h2, primary" VerticalTextAlignment="Center"/>
-                                                <Button Margin="0,0,10,0" IsVisible="false" Text="Rate Order" HeightRequest="31" StyleClass="btn, primary"/>
-                                            </FlexLayout>
-                                            <Label Text="{Binding delivery_date}" TextColor="Black" FontSize="16"/>
-                                            <Label Text="{Binding purchase_id}" TextColor="Black" FontSize="16"/>
+            <Frame Grid.Row="2" HasShadow="False" Padding="10,0,10,0">
+               
+                <CollectionView x:Name="HistoryList">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <StackLayout>
+                                    <StackLayout >
+                                        <FlexLayout JustifyContent="SpaceBetween">
+                                            <Label Text="{Binding purchase_status}" StyleClass="h2, primary" VerticalTextAlignment="Center"/>
+                                            <Button Margin="0,0,10,0" IsVisible="false" Text="Rate Order" HeightRequest="31" StyleClass="btn, primary"/>
+                                        </FlexLayout>
+                                        <Label Text="{Binding delivery_date}" TextColor="Black" FontSize="16"/>
+                                        <Label Text="{Binding purchase_id}" TextColor="Black" FontSize="16"/>
 
-                                            <!--<Label Text="{Binding delivery_date}" StyleClass="black"/>
-                                            <Label Text="{Binding purchase_date}" StyleClass="black"/>
-                                            <Label Text="{Binding purchase_id}" StyleClass="black"/>
-                                            <Label Text="{Binding coupon_id}" StyleClass="black"/>-->
-                                        </StackLayout>
-                                        <BoxView StyleClass="spacer"/>
-                                        <CollectionView ItemsSource="{Binding items}" HorizontalOptions="Center" HeightRequest="{Binding itemsHeight}" IsEnabled="false">
-                                            <CollectionView.ItemTemplate>
-                                                <DataTemplate>
-                                                    <StackLayout>
-                                                    <Grid ColumnSpacing="0">
+                                        <!--<Label Text="{Binding delivery_date}" StyleClass="black"/>
+                                        <Label Text="{Binding purchase_date}" StyleClass="black"/>
+                                        <Label Text="{Binding purchase_id}" StyleClass="black"/>
+                                        <Label Text="{Binding coupon_id}" StyleClass="black"/>-->
+                                    </StackLayout>
+                                    <BoxView StyleClass="spacer"/>
+                                    <CollectionView ItemsSource="{Binding items}" HorizontalOptions="Center" HeightRequest="{Binding itemsHeight}" IsEnabled="false">
+                                        <CollectionView.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackLayout>
+                                                <Grid ColumnSpacing="0">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="40"></RowDefinition>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="31"></ColumnDefinition>
+                                                        <ColumnDefinition Width="*" ></ColumnDefinition>
+                                                        <ColumnDefinition Width="50"></ColumnDefinition>
+                                                        <ColumnDefinition Width="70"></ColumnDefinition>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackLayout Grid.Column="0" Margin="0,2,0,0" VerticalOptions="Center">
+                                                        <Frame  Padding="0" HeightRequest="31" HasShadow="False" IsClippedToBounds="True">
+                                                            <Image Source="{Binding img}" Aspect="Fill"></Image>
+                                                        </Frame>
+                                                    </StackLayout>
+                                                    <StackLayout Grid.Column="1" VerticalOptions="Center" Padding="10,0,10,0">
+                                                        <Label Text="{Binding name}" TextDecorations="{Binding decorationType}" MaxLines="1" LineBreakMode="TailTruncation" TextColor="Black" FontSize="14"></Label>
+                                                        <Label Text="{Binding namePriceUnit}" TextDecorations="{Binding decorationType}" MaxLines="1" LineBreakMode="TailTruncation" TextColor="Black" FontSize="14"></Label>
+                                                    </StackLayout>
+                                                    <StackLayout Grid.Column="2" Orientation="Horizontal" VerticalOptions="Center" HorizontalOptions="Center" IsEnabled="{Binding isItemAvailable}" IsVisible="{Binding isItemAvailable}">
+                                                        <Label Text="{Binding qty}" MaxLines="1"  HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontSize="18" FontAttributes="Bold" TextColor="Black"></Label>
+                                                    </StackLayout>
+                                                    <StackLayout Grid.Column="3" VerticalOptions="Center" Margin="0,0,2,0">
+                                                        <Label Text="{Binding total_price}" TextDecorations="{Binding decorationType}" HorizontalTextAlignment="End" TextColor="Black" FontSize="14"></Label>
+                                                    </StackLayout>
+
+                                                </Grid>
+                                                    <BoxView HeightRequest="1" Color="LightGray"></BoxView>
+                                                </StackLayout>
+                                                <!--<StackLayout>
+                                                    <Grid Padding="15,0,15,0">
                                                         <Grid.RowDefinitions>
-                                                            <RowDefinition Height="40"></RowDefinition>
+                                                            <RowDefinition Height="50"></RowDefinition>
                                                         </Grid.RowDefinitions>
                                                         <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="31"></ColumnDefinition>
-                                                            <ColumnDefinition Width="*" ></ColumnDefinition>
                                                             <ColumnDefinition Width="50"></ColumnDefinition>
-                                                            <ColumnDefinition Width="70"></ColumnDefinition>
+                                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                                            <ColumnDefinition Width="25"></ColumnDefinition>
+                                                            <ColumnDefinition Width="50"></ColumnDefinition>
                                                         </Grid.ColumnDefinitions>
-                                                        <StackLayout Grid.Column="0" Margin="0,2,0,0" VerticalOptions="Center">
-                                                            <Frame  Padding="0" HeightRequest="31" HasShadow="False" IsClippedToBounds="True">
-                                                                <Image Source="{Binding img}" Aspect="Fill"></Image>
-                                                            </Frame>
-                                                        </StackLayout>
-                                                        <StackLayout Grid.Column="1" VerticalOptions="Center" Padding="10,0,10,0">
-                                                            <Label Text="{Binding name}" TextDecorations="{Binding decorationType}" MaxLines="1" LineBreakMode="TailTruncation" TextColor="Black" FontSize="14"></Label>
-                                                            <Label Text="{Binding namePriceUnit}" TextDecorations="{Binding decorationType}" MaxLines="1" LineBreakMode="TailTruncation" TextColor="Black" FontSize="14"></Label>
-                                                        </StackLayout>
-                                                        <StackLayout Grid.Column="2" Orientation="Horizontal" VerticalOptions="Center" HorizontalOptions="Center" IsEnabled="{Binding isItemAvailable}" IsVisible="{Binding isItemAvailable}">
-                                                            <Label Text="{Binding qty}" MaxLines="1"  HorizontalTextAlignment="Center" VerticalTextAlignment="Center" FontSize="18" FontAttributes="Bold" TextColor="Black"></Label>
-                                                        </StackLayout>
-                                                        <StackLayout Grid.Column="3" VerticalOptions="Center" Margin="0,0,2,0">
-                                                            <Label Text="{Binding total_price}" TextDecorations="{Binding decorationType}" HorizontalTextAlignment="End" TextColor="Black" FontSize="14"></Label>
-                                                        </StackLayout>
 
+
+                                                        <Image Grid.Row="0" Grid.Column="0" Source="{Binding img}"></Image>
+                                                        <Label Grid.Row="0" Grid.Column="1"  Text="{Binding namePriceUnit}" StyleClass="p, black"/>
+                                                        <Label Grid.Row="0" Grid.Column="2"  Text="{Binding qty}" StyleClass="p"/>
+                                                        <Label Grid.Row="0" Grid.Column="3" Text="{Binding total_price}" HorizontalTextAlignment="End" StyleClass="p, black"/>
                                                     </Grid>
-                                                        <BoxView HeightRequest="1" Color="LightGray"></BoxView>
-                                                    </StackLayout>
-                                                    <!--<StackLayout>
-                                                        <Grid Padding="15,0,15,0">
-                                                            <Grid.RowDefinitions>
-                                                                <RowDefinition Height="50"></RowDefinition>
-                                                            </Grid.RowDefinitions>
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="50"></ColumnDefinition>
-                                                                <ColumnDefinition Width="*"></ColumnDefinition>
-                                                                <ColumnDefinition Width="25"></ColumnDefinition>
-                                                                <ColumnDefinition Width="50"></ColumnDefinition>
-                                                            </Grid.ColumnDefinitions>
-
-
-                                                            <Image Grid.Row="0" Grid.Column="0" Source="{Binding img}"></Image>
-                                                            <Label Grid.Row="0" Grid.Column="1"  Text="{Binding namePriceUnit}" StyleClass="p, black"/>
-                                                            <Label Grid.Row="0" Grid.Column="2"  Text="{Binding qty}" StyleClass="p"/>
-                                                            <Label Grid.Row="0" Grid.Column="3" Text="{Binding total_price}" HorizontalTextAlignment="End" StyleClass="p, black"/>
-                                                        </Grid>
-                                                        <BoxView StyleClass="spacer"/>
-                                                    </StackLayout>-->
-                                                </DataTemplate>
-                                            </CollectionView.ItemTemplate>
-                                        </CollectionView>
-                                        <FlexLayout  JustifyContent="SpaceBetween">
-                                            <Label Text="Subtotal" TextColor="Black" FontSize="20" FontAttributes="Bold"/>
-                                            <Label Text="{Binding subtotal}" TextColor="Black" FontSize="20" FontAttributes="Bold"/>
-                                        </FlexLayout>
-                                        <BoxView HeightRequest="1" Color="LightGray"></BoxView>
-                                        <Grid>
-                                        <Label Grid.Column="0" Text="Coupon applied" TextColor="#136D74" FontSize="14"></Label>
-                                            <StackLayout Grid.Column="1" Orientation="Horizontal" HorizontalOptions="End" VerticalOptions="Center">
-                                                <Label Text="-" TextColor="Black" FontSize="14"></Label>
-                                                <Label Text="{Binding promo_applied}" TextColor="Black" FontSize="14"></Label>
-                                            </StackLayout>
-                                        </Grid>
-                                        <!--<BoxView HeightRequest="1" Color="LightGray"></BoxView>-->
-                                        <!--<FlexLayout  Margin="0,-10,0,0" JustifyContent="SpaceBetween" HeightRequest="30">
-                                            <Label Text="Coupon applied" TextColor="#136D74" VerticalTextAlignment="End" FontSize="14"/>
-                                            <Label Text="{Binding promo_applied}" VerticalTextAlignment="End"  TextColor="Black" FontSize="14"/>
-                                        </FlexLayout>-->
-                                        <BoxView HeightRequest="1" Color="LightGray"></BoxView>
-                                        <FlexLayout   JustifyContent="SpaceBetween">
-                                            <Label Text="Delivery Fee" TextColor="Black" FontSize="14"/>
-                                            <Label Text="{Binding delivery_fee}" TextColor="Black" FontSize="14"/>
-                                        </FlexLayout>
-                                        <BoxView HeightRequest="1" Color="LightGray"></BoxView>
-                                        <FlexLayout  JustifyContent="SpaceBetween">
-                                            <Label Text="Service Fee" TextColor="Black" FontSize="14"/>
-                                            <Label Text="{Binding service_fee}" TextColor="Black" FontSize="14"/>
-                                        </FlexLayout>
-                                        <BoxView HeightRequest="1" Color="LightGray"></BoxView>
-                                        <FlexLayout  JustifyContent="SpaceBetween">
-                                            <Label Text="Driver Tip" TextColor="Black" FontSize="14"/>
-                                            <Label Text="{Binding driver_tip}" TextColor="Black" FontSize="14"/>
-                                        </FlexLayout>
-                                        <BoxView HeightRequest="1" Color="LightGray"></BoxView>
-                                        <FlexLayout   JustifyContent="SpaceBetween">
-                                            <Label Text="Taxes" TextColor="Black" FontSize="14"/>
-                                            <Label Text="{Binding taxes}" TextColor="Black" FontSize="14"/>
-                                        </FlexLayout>
-                                        <BoxView HeightRequest="1" Color="LightGray"></BoxView>
-                                        
-                                        <FlexLayout  JustifyContent="SpaceBetween">
-                                            <Label Text="Ambassador Code" TextColor="Black" FontSize="14"/>
-                                            <Label Text="{Binding ambassador_code}" TextColor="Black" FontSize="14"/>
-                                        </FlexLayout>
-                                        <BoxView HeightRequest="1" Color="LightGray"></BoxView>
-                                        <FlexLayout   JustifyContent="SpaceBetween">
-                                            <Label Text="Total" TextColor="Black" FontSize="20" FontAttributes="Bold"/>
-                                            <Label Text="{Binding total}" TextColor="Black" FontSize="20" FontAttributes="Bold"/>
-                                        </FlexLayout>
-                                        
-                                        <!--<Grid Padding="15">
-                                            <Button Grid.Column="0" Text="View Receipt" StyleClass="btn, primary" Margin="20,0" Clicked="Button_Clicked" IsVisible="False" IsEnabled="False"/>
-                                            <Button Grid.Column="1" Text="Get Help" StyleClass="btn, primary" Margin="20,0" Clicked="Button_Clicked" IsVisible="False" IsEnabled="False"/>
-                                        </Grid>-->
-                                        <StackLayout HeightRequest="50" >
-                                            <BoxView VerticalOptions="CenterAndExpand" HeightRequest="1" Color="#2B6D74"></BoxView>
+                                                    <BoxView StyleClass="spacer"/>
+                                                </StackLayout>-->
+                                            </DataTemplate>
+                                        </CollectionView.ItemTemplate>
+                                    </CollectionView>
+                                    <FlexLayout  JustifyContent="SpaceBetween">
+                                        <Label Text="Subtotal" TextColor="Black" FontSize="20" FontAttributes="Bold"/>
+                                        <Label Text="{Binding subtotal}" TextColor="Black" FontSize="20" FontAttributes="Bold"/>
+                                    </FlexLayout>
+                                    <BoxView HeightRequest="1" Color="LightGray"></BoxView>
+                                    <Grid>
+                                    <Label Grid.Column="0" Text="Coupon applied" TextColor="#136D74" FontSize="14"></Label>
+                                        <StackLayout Grid.Column="1" Orientation="Horizontal" HorizontalOptions="End" VerticalOptions="Center">
+                                            <Label Text="-" TextColor="Black" FontSize="14"></Label>
+                                            <Label Text="{Binding promo_applied}" TextColor="Black" FontSize="14"></Label>
                                         </StackLayout>
+                                    </Grid>
+                                    <!--<BoxView HeightRequest="1" Color="LightGray"></BoxView>-->
+                                    <!--<FlexLayout  Margin="0,-10,0,0" JustifyContent="SpaceBetween" HeightRequest="30">
+                                        <Label Text="Coupon applied" TextColor="#136D74" VerticalTextAlignment="End" FontSize="14"/>
+                                        <Label Text="{Binding promo_applied}" VerticalTextAlignment="End"  TextColor="Black" FontSize="14"/>
+                                    </FlexLayout>-->
+                                    <BoxView HeightRequest="1" Color="LightGray"></BoxView>
+                                    <FlexLayout   JustifyContent="SpaceBetween">
+                                        <Label Text="Delivery Fee" TextColor="Black" FontSize="14"/>
+                                        <Label Text="{Binding delivery_fee}" TextColor="Black" FontSize="14"/>
+                                    </FlexLayout>
+                                    <BoxView HeightRequest="1" Color="LightGray"></BoxView>
+                                    <FlexLayout  JustifyContent="SpaceBetween">
+                                        <Label Text="Service Fee" TextColor="Black" FontSize="14"/>
+                                        <Label Text="{Binding service_fee}" TextColor="Black" FontSize="14"/>
+                                    </FlexLayout>
+                                    <BoxView HeightRequest="1" Color="LightGray"></BoxView>
+                                    <FlexLayout  JustifyContent="SpaceBetween">
+                                        <Label Text="Driver Tip" TextColor="Black" FontSize="14"/>
+                                        <Label Text="{Binding driver_tip}" TextColor="Black" FontSize="14"/>
+                                    </FlexLayout>
+                                    <BoxView HeightRequest="1" Color="LightGray"></BoxView>
+                                    <FlexLayout   JustifyContent="SpaceBetween">
+                                        <Label Text="Taxes" TextColor="Black" FontSize="14"/>
+                                        <Label Text="{Binding taxes}" TextColor="Black" FontSize="14"/>
+                                    </FlexLayout>
+                                    <BoxView HeightRequest="1" Color="LightGray"></BoxView>
+                                        
+                                    <FlexLayout  JustifyContent="SpaceBetween">
+                                        <Label Text="Ambassador Code" TextColor="Black" FontSize="14"/>
+                                        <Label Text="{Binding ambassador_code}" TextColor="Black" FontSize="14"/>
+                                    </FlexLayout>
+                                    <BoxView HeightRequest="1" Color="LightGray"></BoxView>
+                                    <FlexLayout   JustifyContent="SpaceBetween">
+                                        <Label Text="Total" TextColor="Black" FontSize="20" FontAttributes="Bold"/>
+                                        <Label Text="{Binding total}" TextColor="Black" FontSize="20" FontAttributes="Bold"/>
+                                    </FlexLayout>
+                                        
+                                    <!--<Grid Padding="15">
+                                        <Button Grid.Column="0" Text="View Receipt" StyleClass="btn, primary" Margin="20,0" Clicked="Button_Clicked" IsVisible="False" IsEnabled="False"/>
+                                        <Button Grid.Column="1" Text="Get Help" StyleClass="btn, primary" Margin="20,0" Clicked="Button_Clicked" IsVisible="False" IsEnabled="False"/>
+                                    </Grid>-->
+                                    <StackLayout HeightRequest="50" >
+                                        <BoxView VerticalOptions="CenterAndExpand" HeightRequest="1" Color="#2B6D74"></BoxView>
                                     </StackLayout>
-                                </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
-                </StackLayout>
+                                </StackLayout>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+               
             </Frame>
-            
         </Grid>
     </ContentPage.Content>
 </ContentPage>

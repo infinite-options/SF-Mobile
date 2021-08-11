@@ -18,6 +18,15 @@ namespace ServingFresh.Models
         public string itemPriceLeft { get; set; }
         public string itemPriceLeftUnit { get; set; }
         public string itemLeftUnit { get; set; }
+
+        public string itemBackViewInfoLeft { get; set; }
+        public bool frontViewLeft { get; set; }
+        public bool backViewLeft { get; set; }
+
+        public string itemBackViewInfoRight { get; set; }
+        public bool frontViewRight { get; set; }
+        public bool backViewRight { get; set; }
+
         public bool isItemLeftVisiable { get; set; }
         public bool isItemLeftEnable { get; set; }
         // Additional
@@ -163,6 +172,48 @@ namespace ServingFresh.Models
                 PropertyChanged(this, new PropertyChangedEventArgs("quantityRight"));
             }
         }
+
+        public bool updateFrontViewLeft
+        {
+            get { return frontViewLeft; }
+            set
+            {
+                frontViewLeft = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("frontViewLeft"));
+            }
+        }
+
+        public bool updateBackViewLeft
+        {
+            get { return backViewLeft; }
+            set
+            {
+                backViewLeft = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("backViewLeft"));
+            }
+        }
+
+        public bool updateFrontViewRight
+        {
+            get { return frontViewRight; }
+            set
+            {
+                frontViewRight = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("frontViewRight"));
+            }
+        }
+
+        public bool updateBackViewRight
+        {
+            get { return backViewRight; }
+            set
+            {
+                backViewRight = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("backViewRight"));
+            }
+        }
+
+
     }
 
     public class SingleItem : INotifyPropertyChanged
@@ -181,6 +232,9 @@ namespace ServingFresh.Models
         public string itemDescription { get; set; }
         public string itemTaxable { get; set; }
         public string itemType { get; set; }
+        public string itemBackViewInfo { get; set; }
+        public bool frontView { get; set; }
+        public bool backView { get; set; }
 
         // Integer Properties
         public int itemQuantity { get; set; }
@@ -252,6 +306,26 @@ namespace ServingFresh.Models
             {
                 itemBackgroundColor = value;
                 PropertyChanged(this, new PropertyChangedEventArgs("itemBackgroundColor"));
+            }
+        }
+
+        public bool updateFrontView
+        {
+            get { return frontView; }
+            set
+            {
+                frontView = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("frontView"));
+            }
+        }
+
+        public bool updateBackView
+        {
+            get { return backView; }
+            set
+            {
+                backView = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("backView"));
             }
         }
     }

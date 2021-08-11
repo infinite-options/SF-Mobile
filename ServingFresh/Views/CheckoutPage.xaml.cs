@@ -137,13 +137,12 @@ namespace ServingFresh.Views
         public CheckoutPage()
         {
             InitializeComponent();
-
+            SetTips("$2");
 
             if (selectedDeliveryDate != null && order.Count != 0)
             {
                 expectedDelivery.Text = selectedDeliveryDate.deliveryTimeStamp.ToString("dddd, MMM dd, yyyy, ") + " between " + selectedDeliveryDate.delivery_time;
-                GetFees(selectedDeliveryDate.delivery_dayofweek, zone);
-                GetAvailiableCoupons(user);
+                
                 if (user.getUserType() == "GUEST")
                 {
                     InitializeMap();
@@ -226,13 +225,10 @@ namespace ServingFresh.Views
 
                 CartItems.ItemsSource = cartItems;
                 CartItems.HeightRequest = 50 * cartItems.Count;
-                SetTips("$2");
-                updateTotals(0, 0);
+                
             }
             else
             {
-                SetTips("$2");
-                GetAvailiableCoupons(user);
                 customerPaymentsView.HeightRequest = 0;
                 customerStripeInformationView.HeightRequest = 0;
                 customerDeliveryAddressView.HeightRequest = 0;
@@ -240,6 +236,27 @@ namespace ServingFresh.Views
                 guestPaymentsView.HeightRequest = 0;
                 expectedDelivery.Text = "";
                 
+            }
+            SetTotals();
+        }
+
+        public async void SetTotals()
+        {
+            if (selectedDeliveryDate != null && order.Count != 0)
+            {
+                var result = await GetFees(selectedDeliveryDate.delivery_dayofweek, zone);
+                if (result)
+                {
+                    GetAvailiableCoupons(user);
+                }
+                else
+                {
+                    GetAvailiableCoupons(user);
+                }
+            }
+            else
+            {
+                GetAvailiableCoupons(user);
             }
         }
 
@@ -283,8 +300,9 @@ namespace ServingFresh.Views
             map.Pins.Clear();
         }
 
-        public async void GetFees(string day, string zone)
+        public async Task<bool> GetFees(string day, string zone)
         {
+            bool r = false;
             try
             {
                 var client = new System.Net.Http.HttpClient();
@@ -311,7 +329,12 @@ namespace ServingFresh.Views
 
                         ServiceFee.Text = "$" + service_fee.ToString("N2");
                         DeliveryFee.Text = "$" + delivery_fee.ToString("N2");
+                        r = true;
 
+                    }
+                    else
+                    {
+                        r = false;
                     }
 
                     //Debug.WriteLine("Delivery Fee: " + delivery_fee);
@@ -320,7 +343,7 @@ namespace ServingFresh.Views
                     //ServiceFee.Text = "$" + service_fee.ToString("N2");
                     //DeliveryFee.Text = "$" + delivery_fee.ToString("N2");
                     // GetAvailiableCoupons();
-                    SetTips("$2");
+
                     //updateTotals(0, 0);
                 }
             }
@@ -329,12 +352,14 @@ namespace ServingFresh.Views
                 var client = new Diagnostic();
                 client.parseException(errorGetFees.ToString(), user);
             }
+            return r;
         }
 
         public async void GetAvailiableCoupons(Models.User user)
         {
             try
             {
+                UserDialogs.Instance.ShowLoading("We are searching for the best coupons available for you!");
                 var client = new System.Net.Http.HttpClient();
                 var email = user.getUserEmail();
                 var RDSResponse = new HttpResponseMessage();
@@ -465,10 +490,11 @@ namespace ServingFresh.Views
                         }
                     }
                     coupon_list.ItemsSource = availableCoupons;
-
+                    UserDialogs.Instance.HideLoading();
                 }
             }catch(Exception errorGetAvailableCoupons)
             {
+                UserDialogs.Instance.HideLoading();
                 var client = new Diagnostic();
                 client.parseException(errorGetAvailableCoupons.ToString(), user);
             }
@@ -557,8 +583,14 @@ namespace ServingFresh.Views
             if(appliedCoupon != null)
             {
                 id = appliedCoupon.couponId;
+                updateTotals(appliedCoupon.discount, appliedCoupon.shipping);
+            }
+            else
+            {
+                updateTotals(0, 0);
             }
             return id;
+
         }
 
         public void updateTotals(double discount, double discount_delivery_fee)
@@ -582,8 +614,8 @@ namespace ServingFresh.Views
             subtotal = subtotal - ambassadorDiscount;
             this.discount = discount;
             Discount.Text = "$" + this.discount.ToString("N2");
-            
-            if((delivery_fee - discount_delivery_fee <= 0))
+            ServiceFee.Text = "$" + service_fee.ToString("N2");
+            if ((delivery_fee - discount_delivery_fee <= 0))
             {
                 DeliveryFee.Text = "$" + (0.00).ToString("N2");
                 delivery_fee_db = 0.0;
@@ -716,18 +748,21 @@ namespace ServingFresh.Views
             {
                 if (i.isItemAvailable)
                 {
-                    purchasedOrder.Add(new PurchasedItem
+                    if (i.qty != 0)
                     {
-                        img = i.img,
-                        qty = i.qty,
-                        name = i.name,
-                        unit = i.unit,
-                        price = i.price,
-                        item_uid = i.item_uid,
-                        itm_business_uid = i.business_uid,
-                        description = i.description,
-                        business_price = i.business_price,
-                    });
+                        purchasedOrder.Add(new PurchasedItem
+                        {
+                            img = i.img,
+                            qty = i.qty,
+                            name = i.name,
+                            unit = i.unit,
+                            price = i.price,
+                            item_uid = i.item_uid,
+                            itm_business_uid = i.business_uid,
+                            description = i.description,
+                            business_price = i.business_price,
+                        });
+                    }
                 }
             }
             return purchasedOrder;
@@ -737,6 +772,8 @@ namespace ServingFresh.Views
         {
             try
             {
+                
+
                 string dateTime = DateTime.Parse(selectedDeliveryDate.delivery_date).ToString("yyyy-MM-dd");
                 string t = selectedDeliveryDate.delivery_time;
                 Debug.WriteLine("DELIVERY DATE: " + dateTime);
@@ -1116,23 +1153,20 @@ namespace ServingFresh.Views
                     purchase.setPurchaseCoupoID(coupond + couponsUIDs);
                     var button = (Button)sender;
 
-                    if (button.BackgroundColor == Color.FromHex("#FF8500"))
+                    if (button.BorderColor == Color.FromHex("#FF8500"))
                     {
-                        button.BackgroundColor = Color.FromHex("#2B6D74");
+                        button.BorderColor = Color.FromHex("#2B6D74");
                         await Application.Current.MainPage.Navigation.PushModalAsync(new PayPalPage(), true);
-                    }
-                    else
-                    {
-                        button.BackgroundColor = Color.FromHex("#FF8500");
+                        button.BorderColor = Color.FromHex("#FF8500");
                     }
                 }
                 else
                 {
                     if (messageList != null)
                     {
-                        if (messageList.ContainsKey("701-000006"))
+                        if (messageList.ContainsKey("701-000005"))
                         {
-                            await DisplayAlert(messageList["701-000006"].title, messageList["701-000006"].message, messageList["701-000006"].responses);
+                            await DisplayAlert(messageList["701-000005"].title, messageList["701-000005"].message, messageList["701-000005"].responses);
                         }
                         else
                         {
@@ -1160,9 +1194,9 @@ namespace ServingFresh.Views
                 {
                     var button = (Button)sender;
 
-                    if (button.BackgroundColor == Color.FromHex("#FF8500"))
+                    if (button.BorderColor == Color.FromHex("#FF8500"))
                     {
-                        button.BackgroundColor = Color.FromHex("#2B6D74");
+                        button.BorderColor = Color.FromHex("#2B6D74");
                         purchase.setPurchasePaymentType("STRIPE");
                         UserDialogs.Instance.ShowLoading("Your payment is processing...");
                         var paymentClient = new Payments();
@@ -1179,15 +1213,26 @@ namespace ServingFresh.Views
                                 {
                                     user.setUserID(userID);
                                     purchase.setPurchaseCustomerUID(userID);
-                                    var paymentIsSuccessful = paymentClient.PayViaStripe(
-                                        purchase.getPurchaseEmail(),
-                                        guestCardHolderName.Text,
-                                        guestCardHolderNumber.Text,
-                                        guestCardCVV.Text,
-                                        guestCardExpMonth.Text,
-                                        guestCardExpYear.Text,
-                                        purchase.getPurchaseAmountDue()
-                                        );
+
+                                    var paymentIsSuccessful = await paymentClient.PayViaStripeCard(
+                                       purchase.getPurchaseCustomerUID(),
+                                       purchase.getPurchaseDeliveryInstructions(),
+                                       guestCardHolderNumber.Text,
+                                       guestCardCVV.Text,
+                                       guestCardExpMonth.Text,
+                                       guestCardExpYear.Text,
+                                       purchase.getPurchaseAmountDue()
+                                       );
+
+                                    //var paymentIsSuccessful = paymentClient.PayViaStripe(
+                                    //    purchase.getPurchaseEmail(),
+                                    //    guestCardHolderName.Text,
+                                    //    guestCardHolderNumber.Text,
+                                    //    guestCardCVV.Text,
+                                    //    guestCardExpMonth.Text,
+                                    //    guestCardExpYear.Text,
+                                    //    purchase.getPurchaseAmountDue()
+                                    //    );
 
                                     await WriteFavorites(GetFavoritesList(), userID);
 
@@ -1209,9 +1254,9 @@ namespace ServingFresh.Views
 
                                         if (messageList != null)
                                         {
-                                            if (messageList.ContainsKey("701-000007"))
+                                            if (messageList.ContainsKey("701-000006"))
                                             {
-                                                await DisplayAlert(messageList["701-000007"].title, messageList["701-000007"].message, messageList["701-000007"].responses);
+                                                await DisplayAlert(messageList["701-000006"].title, messageList["701-000006"].message, messageList["701-000006"].responses);
                                             }
                                             else
                                             {
@@ -1236,9 +1281,9 @@ namespace ServingFresh.Views
 
                                         if (messageList != null)
                                         {
-                                            if (messageList.ContainsKey("701-000008"))
+                                            if (messageList.ContainsKey("701-000007"))
                                             {
-                                                await DisplayAlert(messageList["701-000008"].title, messageList["701-000008"].message, messageList["701-000008"].responses);
+                                                await DisplayAlert(messageList["701-000007"].title, messageList["701-000007"].message, messageList["701-000007"].responses);
                                             }
                                             else
                                             {
@@ -1258,15 +1303,26 @@ namespace ServingFresh.Views
                                         user.setUserID(isEmailUnused.result[0].customer_uid);
                                         purchase.setPurchaseCustomerUID(user.getUserID());
                                         user.setUserFromProfile(isEmailUnused);
-                                        var paymentIsSuccessful = paymentClient.PayViaStripe(
-                                            purchase.getPurchaseEmail(),
-                                            guestCardHolderName.Text,
-                                            guestCardHolderNumber.Text,
-                                            guestCardCVV.Text,
-                                            guestCardExpMonth.Text,
-                                            guestCardExpYear.Text,
-                                            purchase.getPurchaseAmountDue()
-                                            );
+
+                                        var paymentIsSuccessful = await paymentClient.PayViaStripeCard(
+                                          purchase.getPurchaseCustomerUID(),
+                                          purchase.getPurchaseDeliveryInstructions(),
+                                          guestCardHolderNumber.Text,
+                                          guestCardCVV.Text,
+                                          guestCardExpMonth.Text,
+                                          guestCardExpYear.Text,
+                                          purchase.getPurchaseAmountDue()
+                                          );
+
+                                        //var paymentIsSuccessful = paymentClient.PayViaStripe(
+                                        //    purchase.getPurchaseEmail(),
+                                        //    guestCardHolderName.Text,
+                                        //    guestCardHolderNumber.Text,
+                                        //    guestCardCVV.Text,
+                                        //    guestCardExpMonth.Text,
+                                        //    guestCardExpYear.Text,
+                                        //    purchase.getPurchaseAmountDue()
+                                        //    );
 
                                         await WriteFavorites(GetFavoritesList(), user.getUserID());
                                         if (paymentIsSuccessful)
@@ -1285,9 +1341,9 @@ namespace ServingFresh.Views
                                             UserDialogs.Instance.HideLoading();
                                             if (messageList != null)
                                             {
-                                                if (messageList.ContainsKey("701-000009"))
+                                                if (messageList.ContainsKey("701-000007"))
                                                 {
-                                                    await DisplayAlert(messageList["701-000009"].title, messageList["701-000009"].message, messageList["701-000009"].responses);
+                                                    await DisplayAlert(messageList["701-000007"].title, messageList["701-000007"].message, messageList["701-000007"].responses);
                                                 }
                                                 else
                                                 {
@@ -1303,20 +1359,16 @@ namespace ServingFresh.Views
                                 }
                             }
                         }
-
-                    }
-                    else
-                    {
-                        button.BackgroundColor = Color.FromHex("#FF8500");
+                        button.BorderColor = Color.FromHex("#FF8500");
                     }
                 }
                 else
                 {
                     if (messageList != null)
                     {
-                        if (messageList.ContainsKey("701-000010"))
+                        if (messageList.ContainsKey("701-000005"))
                         {
-                            await DisplayAlert(messageList["701-000010"].title, messageList["701-000010"].message, messageList["701-000010"].responses);
+                            await DisplayAlert(messageList["701-000005"].title, messageList["701-000005"].message, messageList["701-000005"].responses);
                         }
                         else
                         {
@@ -1341,22 +1393,69 @@ namespace ServingFresh.Views
             {
                 var button = (Button)sender;
 
-                if (button.BackgroundColor == Color.FromHex("#FF8500"))
+                if (button.BorderColor == Color.FromHex("#FF8500"))
                 {
-                    button.BackgroundColor = Color.FromHex("#2B6D74");
-                    
-                    customerStripeInformationView.IsVisible = true;
+                    button.BorderColor = Color.FromHex("#2B6D74");
+
+                    if (Application.Current.Properties.ContainsKey(Constant.Card))
+                    {
+                        string content = (string)Application.Current.Properties[Constant.Card];
+                        if (content != "")
+                        {
+                            var details = JsonConvert.DeserializeObject<PaymentDetails>(content);
+                            bool option = await DisplayAlert("Great!", "You have an existing card on file that ends with " + details.last4 +"."+ "\n Would you like to use this card to pay for your purchase?", "Use this card", "Enter a new card");
+                            if (option)
+                            {
+                                FinalizePurchase(purchase, selectedDeliveryDate);
+                                purchase.setPurchasePaymentType("STRIPE");
+                                var paymentClient = new Payments();
+                                string chargeID = await paymentClient.ProcessPaymentIntentOffSession(purchase.getPurchaseCustomerUID(), purchase.getPurchaseDeliveryInstructions(), purchase.getPurchaseAmountDue());
+                                if (chargeID != "")
+                                {
+                                    Debug.WriteLine(chargeID);
+                                    UserDialogs.Instance.ShowLoading("Your payment is processing...");
+                                    var coupond = purchase.getPurchaseCoupoID();
+                                    purchase.setPurchaseCoupoID(coupond + couponsUIDs);
+                                    purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
+                                    purchase.setPurchaseChargeID(chargeID);
+                                    purchase.setCardNum(details.last4);
+                                    SaveLastFour(purchase.getPurchaseCustomerUID(), purchase.getPurchaseCardNum());
+                                    _ = paymentClient.SendPurchaseToDatabase(purchase);
+                                    order.Clear();
+                                    await WriteFavorites(GetFavoritesList(), purchase.getPurchaseCustomerUID());
+                                    UserDialogs.Instance.HideLoading();
+                                    Application.Current.MainPage = new HistoryPage();
+                                }
+                                else
+                                {
+                                    customerStripeInformationView.IsVisible = true;
+                                }
+                            }
+                            else
+                            {
+                                customerStripeInformationView.IsVisible = true;
+                            }
+                        }
+                        else
+                        {
+                            customerStripeInformationView.IsVisible = true;
+                        }
+                    }
+                    else
+                    {
+                        customerStripeInformationView.IsVisible = true;
+                    }
+
 
                     var y = scrollView.ScrollY + 120;
                     y = y + 60;
                     await scrollView.ScrollToAsync(0, y, true);
-                    button.BorderColor = Color.FromHex("#2F787F");
-                    guestStripeView.IsVisible = true;
+                    //guestStripeView.IsVisible = true;
   
                 }
                 else
                 {
-                    button.BackgroundColor = Color.FromHex("#FF8500");
+                    button.BorderColor = Color.FromHex("#FF8500");
                     //customerStripeInformationView.HeightRequest = 0;
                     customerStripeInformationView.IsVisible = false;
                 }
@@ -1377,10 +1476,10 @@ namespace ServingFresh.Views
                 {
                     var button = (Button)sender;
 
-                    if (button.BackgroundColor == Color.FromHex("#FF8500"))
+                    if (button.BorderColor == Color.FromHex("#FF8500"))
                     {
                         UserDialogs.Instance.ShowLoading("Your payment is processing...");
-                        button.BackgroundColor = Color.FromHex("#2B6D74");
+                        button.BorderColor = Color.FromHex("#2B6D74");
                         FinalizePurchase(purchase, selectedDeliveryDate);
                         purchase.setPurchasePaymentType("STRIPE");
                         var paymentClient = new Payments();
@@ -1389,9 +1488,9 @@ namespace ServingFresh.Views
                         {
                             paymentClient = new Payments(mode);
 
-                            var paymentIsSuccessful = paymentClient.PayViaStripe(
-                                purchase.getPurchaseEmail(),
-                                cardHolderName.Text,
+                            var paymentIsSuccessful = await paymentClient.PayViaStripeCard(
+                                purchase.getPurchaseCustomerUID(),
+                                purchase.getPurchaseDeliveryInstructions(),
                                 cardHolderNumber.Text,
                                 cardCVV.Text,
                                 cardExpMonth.Text,
@@ -1399,12 +1498,24 @@ namespace ServingFresh.Views
                                 purchase.getPurchaseAmountDue()
                                 );
 
+                            //var paymentIsSuccessful = paymentClient.PayViaStripe(
+                            //    purchase.getPurchaseEmail(),
+                            //    cardHolderName.Text,
+                            //    cardHolderNumber.Text,
+                            //    cardCVV.Text,
+                            //    cardExpMonth.Text,
+                            //    cardExpYear.Text,
+                            //    purchase.getPurchaseAmountDue()
+                            //    );
+
                             if (paymentIsSuccessful)
                             {
                                 var coupond = purchase.getPurchaseCoupoID();
                                 purchase.setPurchaseCoupoID(coupond + couponsUIDs);
                                 purchase.setPurchaseBusinessUID(SignUp.GetDeviceInformation() + SignUp.GetAppVersion());
                                 purchase.setPurchaseChargeID(paymentClient.getTransactionID());
+                                purchase.setCardNum(paymentClient.getLastFour());
+                                SaveLastFour(purchase.getPurchaseCustomerUID(), purchase.getPurchaseCardNum());
                                 _ = paymentClient.SendPurchaseToDatabase(purchase);
                                 order.Clear();
                                 await WriteFavorites(GetFavoritesList(), purchase.getPurchaseCustomerUID());
@@ -1415,10 +1526,10 @@ namespace ServingFresh.Views
                             {
                                 if (messageList != null)
                                 {
-                                    if (messageList.ContainsKey("701-000011"))
+                                    if (messageList.ContainsKey("701-000008"))
                                     {
                                         UserDialogs.Instance.HideLoading();
-                                        await DisplayAlert(messageList["701-000011"].title, messageList["701-000011"].message, messageList["701-000011"].responses);
+                                        await DisplayAlert(messageList["701-000008"].title, messageList["701-000008"].message, messageList["701-000008"].responses);
                                     }
                                     else
                                     {
@@ -1437,16 +1548,16 @@ namespace ServingFresh.Views
                     }
                     else
                     {
-                        button.BackgroundColor = Color.FromHex("#FF8500");
+                        button.BorderColor = Color.FromHex("#FF8500");
                     }
                 }
                 else
                 {
                     if (messageList != null)
                     {
-                        if (messageList.ContainsKey("701-000006"))
+                        if (messageList.ContainsKey("701-000005"))
                         {
-                            await DisplayAlert(messageList["701-000006"].title, messageList["701-000006"].message, messageList["701-000006"].responses);
+                            await DisplayAlert(messageList["701-000005"].title, messageList["701-000005"].message, messageList["701-000005"].responses);
                         }
                         else
                         {
@@ -1471,16 +1582,32 @@ namespace ServingFresh.Views
             //TERMS AND CONDITIONS: http://localhost:3000/terms-and-conditions
             if (customerAreTermAccepted.IsChecked)
             {
+                var button = (Button)sender;
+                button.BorderColor = Color.FromHex("#2B6D74");
                 FinalizePurchase(purchase, selectedDeliveryDate);
                 purchase.setPurchasePaymentType("PAYPAL");
                 var coupond = purchase.getPurchaseCoupoID();
                 purchase.setPurchaseCoupoID(coupond + couponsUIDs);
                 await Application.Current.MainPage.Navigation.PushModalAsync(new PayPalPage(), true);
+                button.BorderColor = Color.FromHex("#FF8500");
             }
             else
             {
                 await DisplayAlert("Oops", "Please accept the terms and conditions", "OK");
             }
+        }
+
+        void SaveLastFour(string id, string last4)
+        {
+            var details = new PaymentDetails
+            {
+                id = id,
+                last4 = last4,
+            };
+
+            var paymentDetailsStr = JsonConvert.SerializeObject(details);
+            Application.Current.Properties[Constant.Card] = paymentDetailsStr;
+            Application.Current.SavePropertiesAsync();
         }
 
         public static async Task<bool> WriteFavorites(List<string> favorites, string userID)
@@ -1630,9 +1757,9 @@ namespace ServingFresh.Views
                         {
                             if (messageList != null)
                             {
-                                if (messageList.ContainsKey("701-000012"))
+                                if (messageList.ContainsKey("701-000009"))
                                 {
-                                    await DisplayAlert(messageList["701-000012"].title, messageList["701-000012"].message, messageList["701-000012"].responses);
+                                    await DisplayAlert(messageList["701-000009"].title, messageList["701-000009"].message, messageList["701-000009"].responses);
                                 }
                                 else
                                 {
@@ -1651,9 +1778,9 @@ namespace ServingFresh.Views
                     {
                         if (messageList != null)
                         {
-                            if (messageList.ContainsKey("701-000013"))
+                            if (messageList.ContainsKey("701-000010"))
                             {
-                                await DisplayAlert(messageList["701-000013"].title, messageList["701-000013"].message, messageList["701-000013"].responses);
+                                await DisplayAlert(messageList["701-000010"].title, messageList["701-000010"].message, messageList["701-000010"].responses);
                             }
                             else
                             {
@@ -1710,9 +1837,9 @@ namespace ServingFresh.Views
                                     {
                                         if (messageList != null)
                                         {
-                                            if (messageList.ContainsKey("701-000014"))
+                                            if (messageList.ContainsKey("701-000009"))
                                             {
-                                                await DisplayAlert(messageList["701-000014"].title, messageList["701-000014"].message, messageList["701-000014"].responses);
+                                                await DisplayAlert(messageList["701-000009"].title, messageList["701-000009"].message, messageList["701-000009"].responses);
                                             }
                                             else
                                             {
@@ -1731,9 +1858,9 @@ namespace ServingFresh.Views
                                 {
                                     if (messageList != null)
                                     {
-                                        if (messageList.ContainsKey("701-000015"))
+                                        if (messageList.ContainsKey("701-000010"))
                                         {
-                                            await DisplayAlert(messageList["701-000015"].title, messageList["701-000015"].message, messageList["701-000015"].responses);
+                                            await DisplayAlert(messageList["701-000010"].title, messageList["701-000010"].message, messageList["701-000010"].responses);
                                         }
                                         else
                                         {
@@ -1768,9 +1895,9 @@ namespace ServingFresh.Views
             {
                 if (messageList != null)
                 {
-                    if (messageList.ContainsKey("701-000016"))
+                    if (messageList.ContainsKey("701-000011"))
                     {
-                        await DisplayAlert(messageList["701-000016"].title, messageList["701-000016"].message, messageList["701-000016"].responses);
+                        await DisplayAlert(messageList["701-000011"].title, messageList["701-000011"].message, messageList["701-000011"].responses);
                     }
                     else
                     {
@@ -1813,9 +1940,9 @@ namespace ServingFresh.Views
                             
                             if (messageList != null)
                             {
-                                if (messageList.ContainsKey("701-000017"))
+                                if (messageList.ContainsKey("701-000012"))
                                 {
-                                    await DisplayAlert(messageList["701-000017"].title, messageList["701-000017"].message, messageList["701-000017"].responses);
+                                    await DisplayAlert(messageList["701-000012"].title, messageList["701-000012"].message, messageList["701-000012"].responses);
                                 }
                                 else
                                 {
@@ -1840,9 +1967,9 @@ namespace ServingFresh.Views
                             // We have to reset cart or send user to store
                             if (messageList != null)
                             {
-                                if (messageList.ContainsKey("701-000018"))
+                                if (messageList.ContainsKey("701-000013"))
                                 {
-                                    await DisplayAlert(messageList["701-000018"].title, messageList["701-000018"].message, messageList["701-000018"].responses);
+                                    await DisplayAlert(messageList["701-000013"].title, messageList["701-000013"].message, messageList["701-000013"].responses);
                                 }
                                 else
                                 {
@@ -1860,9 +1987,9 @@ namespace ServingFresh.Views
                             // User is outside zones
                             if (messageList != null)
                             {
-                                if (messageList.ContainsKey("701-000019"))
+                                if (messageList.ContainsKey("701-000014"))
                                 {
-                                    await DisplayAlert(messageList["701-000019"].title, messageList["701-000019"].message, messageList["701-000019"].responses);
+                                    await DisplayAlert(messageList["701-000014"].title, messageList["701-000014"].message, messageList["701-000014"].responses);
                                 }
                                 else
                                 {
@@ -1880,9 +2007,9 @@ namespace ServingFresh.Views
                     {
                         if (messageList != null)
                         {
-                            if (messageList.ContainsKey("701-000020"))
+                            if (messageList.ContainsKey("701-000015"))
                             {
-                                await DisplayAlert(messageList["701-000020"].title, messageList["701-000020"].message, messageList["701-000020"].responses);
+                                await DisplayAlert(messageList["701-000015"].title, messageList["701-000015"].message, messageList["701-000015"].responses);
                             }
                             else
                             {
@@ -1900,12 +2027,18 @@ namespace ServingFresh.Views
 
         void ShowLogInModal(System.Object sender, System.EventArgs e)
         {
+            var button = (Button)sender;
+            button.BorderColor = Color.FromHex("#2B6D74");
             Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(94, "1"), true);
+            button.BorderColor = Color.FromHex("#FF8500");
         }
 
         void ShowSignUpModal(System.Object sender, System.EventArgs e)
         {
+            var button = (Button)sender;
+            button.BorderColor = Color.FromHex("#2B6D74");
             Application.Current.MainPage.Navigation.PushModalAsync(new SignUpPage(94), true);
+            button.BorderColor = Color.FromHex("#FF8500");
         }
 
         void NavigateToInfoFromCheckout(System.Object sender, System.EventArgs e)
@@ -1977,9 +2110,9 @@ namespace ServingFresh.Views
                                 {
                                     if (messageList != null)
                                     {
-                                        if (messageList.ContainsKey("701-000021"))
+                                        if (messageList.ContainsKey("701-000016"))
                                         {
-                                            await DisplayAlert(messageList["701-000021"].title, messageList["701-000021"].message, messageList["701-000021"].responses);
+                                            await DisplayAlert(messageList["701-000016"].title, messageList["701-000016"].message, messageList["701-000016"].responses);
                                         }
                                         else
                                         {
@@ -2004,9 +2137,9 @@ namespace ServingFresh.Views
                                 {
                                     if (messageList != null)
                                     {
-                                        if (messageList.ContainsKey("701-000022"))
+                                        if (messageList.ContainsKey("701-000017"))
                                         {
-                                            await DisplayAlert(messageList["701-000022"].title, messageList["701-000022"].message, messageList["701-000022"].responses);
+                                            await DisplayAlert(messageList["701-000017"].title, messageList["701-000017"].message, messageList["701-000017"].responses);
                                         }
                                         else
                                         {
@@ -2027,9 +2160,9 @@ namespace ServingFresh.Views
                         {
                             if (messageList != null)
                             {
-                                if (messageList.ContainsKey("701-000023"))
+                                if (messageList.ContainsKey("701-000018"))
                                 {
-                                    await DisplayAlert(messageList["701-000023"].title, messageList["701-000023"].message, messageList["701-000023"].responses);
+                                    await DisplayAlert(messageList["701-000018"].title, messageList["701-000018"].message, messageList["701-000018"].responses);
                                 }
                                 else
                                 {
@@ -2047,9 +2180,9 @@ namespace ServingFresh.Views
                     {
                         if (messageList != null)
                         {
-                            if (messageList.ContainsKey("701-000024"))
+                            if (messageList.ContainsKey("701-000019"))
                             {
-                                await DisplayAlert(messageList["701-000024"].title, messageList["701-000024"].message, messageList["701-000024"].responses);
+                                await DisplayAlert(messageList["701-000019"].title, messageList["701-000019"].message, messageList["701-000019"].responses);
                             }
                             else
                             {
@@ -2113,9 +2246,9 @@ namespace ServingFresh.Views
                                 {
                                     if (messageList != null)
                                     {
-                                        if (messageList.ContainsKey("701-000025"))
+                                        if (messageList.ContainsKey("701-000020"))
                                         {
-                                            await DisplayAlert(messageList["701-000025"].title, messageList["701-000025"].message, messageList["701-000025"].responses);
+                                            await DisplayAlert(messageList["701-000020"].title, messageList["701-000020"].message, messageList["701-000020"].responses);
                                         }
                                         else
                                         {
@@ -2161,9 +2294,9 @@ namespace ServingFresh.Views
                                 {
                                     if (messageList != null)
                                     {
-                                        if (messageList.ContainsKey("701-000026"))
+                                        if (messageList.ContainsKey("701-000021"))
                                         {
-                                            await DisplayAlert(messageList["701-000026"].title, messageList["701-000026"].message + (GetSubTotal() - ambassadorResponse.sub.threshold), messageList["701-000026"].responses);
+                                            await DisplayAlert(messageList["701-000021"].title, messageList["701-000021"].message + (GetSubTotal() - ambassadorResponse.sub.threshold), messageList["701-000021"].responses);
                                         }
                                         else
                                         {
@@ -2265,9 +2398,9 @@ namespace ServingFresh.Views
                                         UserDialogs.Instance.HideLoading();
                                         if (messageList != null)
                                         {
-                                            if (messageList.ContainsKey("701-000027"))
+                                            if (messageList.ContainsKey("701-000008"))
                                             {
-                                                await DisplayAlert(messageList["701-000027"].title, messageList["701-000027"].message, messageList["701-000027"].responses);
+                                                await DisplayAlert(messageList["701-000008"].title, messageList["701-000008"].message, messageList["701-000008"].responses);
                                             }
                                             else
                                             {
@@ -2324,9 +2457,9 @@ namespace ServingFresh.Views
                     {
                         if (messageList != null)
                         {
-                            if (messageList.ContainsKey("701-000028"))
+                            if (messageList.ContainsKey("701-000005"))
                             {
-                                await DisplayAlert(messageList["701-000028"].title, messageList["701-000028"].message, messageList["701-000028"].responses);
+                                await DisplayAlert(messageList["701-000005"].title, messageList["701-000005"].message, messageList["701-000005"].responses);
                             }
                             else
                             {
@@ -2390,9 +2523,9 @@ namespace ServingFresh.Views
                     {
                         if (messageList != null)
                         {
-                            if (messageList.ContainsKey("701-000029"))
+                            if (messageList.ContainsKey("701-000022"))
                             {
-                                await DisplayAlert(messageList["701-000029"].title, messageList["701-000029"].message + action + "with your friends and get $10 on your next two orders", messageList["701-000029"].responses);
+                                await DisplayAlert(messageList["701-000022"].title, messageList["701-000022"].message + action + "with your friends and get $10 on your next two orders", messageList["701-000022"].responses);
                             }
                             else
                             {
@@ -2409,9 +2542,9 @@ namespace ServingFresh.Views
                     {
                         if (messageList != null)
                         {
-                            if (messageList.ContainsKey("701-000030"))
+                            if (messageList.ContainsKey("701-000023"))
                             {
-                                await DisplayAlert(messageList["701-000030"].title, messageList["701-000030"].message, messageList["701-000030"].responses);
+                                await DisplayAlert(messageList["701-000023"].title, messageList["701-000023"].message, messageList["701-000023"].responses);
                             }
                             else
                             {

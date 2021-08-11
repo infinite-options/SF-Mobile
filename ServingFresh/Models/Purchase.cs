@@ -83,6 +83,11 @@ namespace ServingFresh.Models
             ambassador_code = "0.00";
         }
 
+        public string getPurchaseCardNum()
+        {
+            return cc_num;
+        }
+
         public string getPurchaseCustomerUID()
         {
             return pur_customer_uid;
@@ -441,6 +446,11 @@ namespace ServingFresh.Models
         public void setAmbassadorCode(string ambassador_code)
         {
             this.ambassador_code = ambassador_code;
+        }
+
+        public void setCardNum(string cc_num)
+        {
+            this.cc_num = cc_num;
         }
 
         public void printPurchase()

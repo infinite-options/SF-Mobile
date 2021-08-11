@@ -430,9 +430,9 @@ namespace ServingFresh.Views
                                             {
                                                 if (messageList != null)
                                                 {
-                                                    if (messageList.ContainsKey("701-000097"))
+                                                    if (messageList.ContainsKey("701-000033"))
                                                     {
-                                                        await DisplayAlert(messageList["701-000097"].title, messageList["701-000097"].message, messageList["701-000097"].responses);
+                                                        await DisplayAlert(messageList["701-000033"].title, messageList["701-000033"].message, messageList["701-000033"].responses);
                                                     }
                                                     else
                                                     {
@@ -454,9 +454,9 @@ namespace ServingFresh.Views
                                         test.Hide();
                                         if (messageList != null)
                                         {
-                                            if (messageList.ContainsKey("701-000098"))
+                                            if (messageList.ContainsKey("701-000034"))
                                             {
-                                                await DisplayAlert(messageList["701-000098"].title, messageList["701-000098"].message, messageList["701-000098"].responses);
+                                                await DisplayAlert(messageList["701-000034"].title, messageList["701-000034"].message, messageList["701-000034"].responses);
                                             }
                                             else
                                             {
@@ -475,9 +475,9 @@ namespace ServingFresh.Views
                                     test.Hide();
                                     if (messageList != null)
                                     {
-                                        if (messageList.ContainsKey("701-000099"))
+                                        if (messageList.ContainsKey("701-000062"))
                                         {
-                                            await DisplayAlert(messageList["701-000099"].title, messageList["701-000099"].message, messageList["701-000099"].responses);
+                                            await DisplayAlert(messageList["701-000062"].title, messageList["701-000062"].message, messageList["701-000062"].responses);
                                         }
                                         else
                                         {
@@ -531,14 +531,14 @@ namespace ServingFresh.Views
                 //{
                 //    if (messageList != null)
                 //    {
-                //        if (messageList.ContainsKey("701-000100"))
+                //        if (messageList.ContainsKey("701-000063"))
                 //        {
-                //            Debug.WriteLine("TITLE: " + messageList["701-000100"].title);
+                //            Debug.WriteLine("TITLE: " + messageList["701-000063"].title);
                 //            // \\n, @
 
-                //            string title = messageList["701-000100"].title.Replace("\\n", Environment.NewLine);
-                //            string message = messageList["701-000100"].message.Replace("\\n", Environment.NewLine);
-                //            await DisplayAlert(title, message, messageList["701-000100"].responses);
+                //            string title = messageList["701-000063"].title.Replace("\\n", Environment.NewLine);
+                //            string message = messageList["701-000063"].message.Replace("\\n", Environment.NewLine);
+                //            await DisplayAlert(title, message, messageList["701-000063"].responses);
                 //        }
                 //        else
                 //        {
@@ -552,7 +552,7 @@ namespace ServingFresh.Views
 
                 //    await CrossLatestVersion.Current.OpenAppInStore();
                 //}
-                
+
 
                 var client = new AppVersion();
                 string versionStr = DependencyService.Get<IAppVersionAndBuild>().GetVersionNumber();
@@ -563,14 +563,14 @@ namespace ServingFresh.Views
                 {
                     if (messageList != null)
                     {
-                        if (messageList.ContainsKey("701-000100"))
+                        if (messageList.ContainsKey("701-000063"))
                         {
-                            Debug.WriteLine("TITLE: " + messageList["701-000100"].title);
+                            Debug.WriteLine("TITLE: " + messageList["701-000063"].title);
                             // \\n, @
 
-                            string title = messageList["701-000100"].title.Replace("\\n", Environment.NewLine);
-                            string message = messageList["701-000100"].message.Replace("\\n", Environment.NewLine);
-                            await DisplayAlert(title, message, messageList["701-000100"].responses);
+                            string title = messageList["701-000063"].title.Replace("\\n", Environment.NewLine);
+                            string message = messageList["701-000063"].message.Replace("\\n", Environment.NewLine);
+                            await DisplayAlert(title, message, messageList["701-000063"].responses);
                         }
                         else
                         {
@@ -920,9 +920,9 @@ namespace ServingFresh.Views
                     {
                         if (messageList != null)
                         {
-                            if (messageList.ContainsKey("701-000101"))
+                            if (messageList.ContainsKey("701-000064"))
                             {
-                                await DisplayAlert(messageList["701-000101"].title, messageList["701-000101"].message, messageList["701-000101"].responses);
+                                await DisplayAlert(messageList["701-000064"].title, messageList["701-000064"].message, messageList["701-000064"].responses);
                             }
                             else
                             {
@@ -1016,6 +1016,9 @@ namespace ServingFresh.Views
                             favoriteIconLeft = "unselectedHeartIcon.png",
                             opacityLeft = 0,
                             isItemLeftUnavailable = false,
+                            itemBackViewInfoLeft = "",
+                            frontViewLeft = true,
+                            backViewLeft = false,
 
                             imageSourceRight = "",
                             quantityRight = 0,
@@ -1034,6 +1037,9 @@ namespace ServingFresh.Views
                             favoriteIconRight = "unselectedHeartIcon.png",
                             opacityRight = 0,
                             isItemRightUnavailable = false,
+                            itemBackViewInfoRight = "",
+                            frontViewRight = true,
+                            backViewRight = false,
                         });
                     }
                     if (isAmountItemsEven(n))
@@ -1063,6 +1069,9 @@ namespace ServingFresh.Views
                                 favoriteIconLeft = listOfItems[j].itemFavoriteImage,
                                 opacityLeft = listOfItems[j].itemOpacity,
                                 isItemLeftUnavailable = listOfItems[j].isItemUnavailable,
+                                itemBackViewInfoLeft = listOfItems[j].itemBackViewInfo,
+                                frontViewLeft = true,
+                                backViewLeft = false,
 
                                 imageSourceRight = listOfItems[j + 1].itemImage,
                                 item_uidRight = listOfItems[j + 1].itemUID,
@@ -1083,6 +1092,9 @@ namespace ServingFresh.Views
                                 favoriteIconRight = listOfItems[j + 1].itemFavoriteImage,
                                 opacityRight = listOfItems[j + 1].itemOpacity,
                                 isItemRightUnavailable = listOfItems[j + 1].isItemUnavailable,
+                                itemBackViewInfoRight = listOfItems[j + 1].itemBackViewInfo,
+                                frontViewRight = true,
+                                backViewRight = false,
                             }); ;
                             j = j + 2;
                         }
@@ -1114,6 +1126,9 @@ namespace ServingFresh.Views
                                 favoriteIconLeft = listOfItems[j].itemFavoriteImage,
                                 opacityLeft = listOfItems[j].itemOpacity,
                                 isItemLeftUnavailable = listOfItems[j].isItemUnavailable,
+                                itemBackViewInfoLeft = listOfItems[j].itemBackViewInfo,
+                                frontViewLeft = true,
+                                backViewLeft = false,
 
                                 imageSourceRight = listOfItems[j + 1].itemImage,
                                 item_uidRight = listOfItems[j + 1].itemUID,
@@ -1134,6 +1149,9 @@ namespace ServingFresh.Views
                                 favoriteIconRight = listOfItems[j + 1].itemFavoriteImage,
                                 opacityRight = listOfItems[j + 1].itemOpacity,
                                 isItemRightUnavailable = listOfItems[j + 1].isItemUnavailable,
+                                itemBackViewInfoRight = listOfItems[j + 1].itemBackViewInfo,
+                                frontViewRight = true,
+                                backViewRight = false,
                             });
                             j = j + 2;
                         }
@@ -1160,6 +1178,9 @@ namespace ServingFresh.Views
                             favoriteIconLeft = listOfItems[j].itemFavoriteImage,
                             opacityLeft = listOfItems[j].itemOpacity,
                             isItemLeftUnavailable = listOfItems[j].isItemUnavailable,
+                            itemBackViewInfoLeft = listOfItems[j].itemBackViewInfo,
+                            frontViewLeft = true,
+                            backViewLeft = false,
 
                             imageSourceRight = "",
                             quantityRight = 0,
@@ -1173,6 +1194,9 @@ namespace ServingFresh.Views
                             favoriteIconRight = "unselectedHeartIcon.png",
                             opacityRight = 0,
                             isItemRightUnavailable = false,
+                            itemBackViewInfoRight = "",
+                            frontViewRight = true,
+                            backViewRight = false,
                         });
                     }
                 }
@@ -1335,6 +1359,9 @@ namespace ServingFresh.Views
                     isItemVisiable = true,
                     isItemEnable = true,
                     isItemUnavailable = false,
+                    itemBackViewInfo = produce.item_info,
+                    frontView = true,
+                    backView = false,
                 };
 
                 if (produce.item_type == type)
@@ -2493,6 +2520,73 @@ namespace ServingFresh.Views
         void NavigateToMainFromSelection(System.Object sender, System.EventArgs e)
         {
             NavigateToMain(sender, e);
+        }
+
+        void ShowItemInfoHorizontal(System.Object sender, System.EventArgs e)
+        {
+            var selectedImage = (ImageButton)sender;
+            var pickedElement = (SingleItem)selectedImage.CommandParameter;
+
+            Debug.WriteLine("INFO BUTTON WAS CLICKED");
+            Debug.WriteLine("INFO: " + pickedElement.itemBackViewInfo);
+            if(pickedElement.isItemUnavailable == false)
+            {
+                if (pickedElement.frontView == true)
+                {
+                    pickedElement.updateFrontView = false;
+                    pickedElement.updateBackView = true;
+                }
+                else
+                {
+                    pickedElement.updateBackView = false;
+                    pickedElement.updateFrontView = true;
+                }
+            }
+        }
+
+        void ShowItemInfoVerticalLeft(System.Object sender, System.EventArgs e)
+        {
+            var selectedImage = (ImageButton)sender;
+            var pickedElement = (ItemsModel)selectedImage.CommandParameter;
+
+            Debug.WriteLine("INFO BUTTON WAS CLICKED");
+            Debug.WriteLine("INFO: " + pickedElement.itemBackViewInfoLeft);
+            if (pickedElement.isItemLeftUnavailable == false)
+            {
+                if (pickedElement.frontViewLeft == true)
+                {
+                    pickedElement.updateFrontViewLeft = false;
+                    pickedElement.updateBackViewLeft = true;
+                }
+                else
+                {
+                    pickedElement.updateBackViewLeft = false;
+                    pickedElement.updateFrontViewLeft = true;
+                }
+            }
+        }
+
+        void ShowItemInfoVerticalRight(System.Object sender, System.EventArgs e)
+        {
+            var selectedImage = (ImageButton)sender;
+            var pickedElement = (ItemsModel)selectedImage.CommandParameter;
+
+            Debug.WriteLine("INFO BUTTON WAS CLICKED");
+            Debug.WriteLine("INFO: " + pickedElement.itemBackViewInfoRight);
+
+            if (pickedElement.isItemRightUnavailable == false)
+            {
+                if (pickedElement.frontViewRight == true)
+                {
+                    pickedElement.updateFrontViewRight = false;
+                    pickedElement.updateBackViewRight = true;
+                }
+                else
+                {
+                    pickedElement.updateBackViewRight = false;
+                    pickedElement.updateFrontViewRight = true;
+                }
+            }
         }
     }
 }
