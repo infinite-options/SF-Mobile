@@ -228,7 +228,7 @@ namespace ServingFresh.Views
             InitializeComponent();
             GetBusinesses();
             _ = SetFavoritesList();
-            _ = CheckVersion();
+            //_ = CheckVersion();
         }
 
         public static void SetMenu(StackLayout guest, StackLayout customer, Label history, Label profile)
@@ -1495,6 +1495,11 @@ namespace ServingFresh.Views
                         {
                             i.updateItemBackgroundColor = Color.FromHex("#ffce99");
                             i.updateItemQuantity = order[i.itemName].item_quantity;
+
+                            order[i.itemName].business_price = i.itemBusinessPrice;
+                            order[i.itemName].description = i.itemDescription;
+                            order[i.itemName].isItemAvailable = i.isItemUnavailable;
+                            order[i.itemName].taxable = i.itemTaxable;
                         }
                         else
                         {
@@ -1706,7 +1711,7 @@ namespace ServingFresh.Views
 
         private Dictionary<string, ItemPurchased> purchase = new Dictionary<string, ItemPurchased>();
 
-        void CheckOutClickBusinessPage(System.Object sender, System.EventArgs e)
+        public void CheckOutClickBusinessPage(System.Object sender, System.EventArgs e)
         {
             var itemKeyToRemove = new List<string>();
             foreach (string item in order.Keys)

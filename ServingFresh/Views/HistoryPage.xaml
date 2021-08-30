@@ -75,12 +75,23 @@
                             <DataTemplate>
                                 <StackLayout>
                                     <StackLayout >
-                                        <FlexLayout JustifyContent="SpaceBetween">
-                                            <Label Text="{Binding purchase_status}" StyleClass="h2, primary" VerticalTextAlignment="Center"/>
-                                            <Button Margin="0,0,10,0" IsVisible="false" Text="Rate Order" HeightRequest="31" StyleClass="btn, primary"/>
-                                        </FlexLayout>
-                                        <Label Text="{Binding delivery_date}" TextColor="Black" FontSize="16"/>
-                                        <Label Text="{Binding purchase_id}" TextColor="Black" FontSize="16"/>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition></ColumnDefinition>
+                                                <ColumnDefinition Width="125"></ColumnDefinition>
+                                            </Grid.ColumnDefinitions>
+                                            <StackLayout Grid.Column="0">
+                                                <Label Text="{Binding purchase_status}" StyleClass="h2, primary" VerticalTextAlignment="Center"/>
+                                                <Label Text="{Binding delivery_date}" TextColor="Black" FontSize="16"/>
+                                                <Label Text="{Binding purchase_id}" TextColor="Black" FontSize="16"/>
+                                            </StackLayout>
+                                            <StackLayout Grid.Column="1">
+                                                <StackLayout HorizontalOptions="End">
+                                                    <Button Padding="10" IsVisible="false" Text="Rate Order" TextColor="#136D74" HeightRequest="31" CornerRadius="5" FontSize="14" BackgroundColor="#E0E6E6"/>
+                                                    <Button Padding="10" IsVisible="true" Text="EZ Reorder" TextColor="White" HeightRequest="31" CornerRadius="5" FontSize="14" BackgroundColor="#FF8500" Clicked="Reorder" CommandParameter="{Binding .}"/>
+                                                </StackLayout>
+                                            </StackLayout>
+                                        </Grid>
 
                                         <!--<Label Text="{Binding delivery_date}" StyleClass="black"/>
                                         <Label Text="{Binding purchase_date}" StyleClass="black"/>

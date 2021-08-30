@@ -336,7 +336,7 @@ namespace ServingFresh.Models
                 var tempPayMethod = payMethodService.Create(options);
                 var method = tempPayMethod;
 
-                var credentials = await ProcessPaymentIntent(userID,businessCode,amount);
+                var credentials = await ProcessPaymentIntent(userID, businessCode, amount);
                 if (credentials != null)
                 {
 
@@ -344,7 +344,10 @@ namespace ServingFresh.Models
                     Debug.WriteLine("CLIENT SECRET: " + credentials.secrent);
                     Debug.WriteLine("PAYMENT INTENT: " + credentials.intent);
                     Debug.WriteLine("API KEY: " + GetStripeClient(mode));
+                    //Debug.WriteLine("API KEY: " + ReturnStripeApikey(mode));
+
                     var paymentIntentService = new PaymentIntentService(new StripeClient(GetStripeClient(mode)));
+                    //var paymentIntentService = new PaymentIntentService(new StripeClient(ReturnStripeApikey(mode)));
                     //Debug.WriteLine("reached after paymentIntentService");
                     // PaymentMethod = method.Id,
                     var paymentConfirmOptions = new PaymentIntentConfirmOptions
@@ -359,7 +362,7 @@ namespace ServingFresh.Models
                     };
                     
                     var result = await paymentIntentService.ConfirmAsync(credentials.intent, paymentConfirmOptions);
-                    
+
                     switch (result.NextAction?.Type)
                     {
                         case null:
@@ -394,7 +397,7 @@ namespace ServingFresh.Models
             }
             catch (Exception changeMode)
             {
-                Debug.WriteLine("USING PAYMENTS IN WRONG MODE: " + changeMode.Message);
+                Debug.WriteLine("Error: " + changeMode.Message);
                 return false;
             }
         }
@@ -414,11 +417,12 @@ namespace ServingFresh.Models
         public async Task<IntentSecret> ProcessPaymentIntent(string userID, string businessCode, string amount)
         {
             IntentSecret result = null;
+
             var paymentIntent = new StripePaymentIntent()
             {
                 currency = "uds",
                 customer_uid = userID,
-                business_code = businessCode,
+                business_code = SetBusinessCode(businessCode),
                 payment_summary = new PaymentSummary() { total = amount }
             };
 
@@ -445,6 +449,22 @@ namespace ServingFresh.Models
                     secrent = clientSecret,
                 };
             }
+            return result;
+        }
+
+        public string SetBusinessCode(string code)
+        {
+            string result = "";
+
+            if(code == "SFTEST")
+            {
+                result = "SFTEST";
+            }
+            else
+            {
+                result = "SF";
+            }
+
             return result;
         }
 

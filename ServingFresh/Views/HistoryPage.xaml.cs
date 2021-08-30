@@ -329,5 +329,84 @@ namespace ServingFresh.Views
         {
             NavigateToHistory(sender, e);
         }
+
+        async void Reorder(System.Object sender, System.EventArgs e)
+        {
+            try
+            {
+                var button = (Button)sender;
+                var purchase = (HistoryDisplayObject)button.CommandParameter;
+
+                Debug.WriteLine("ORDER ID: " + purchase.purchase_id);
+                Debug.WriteLine("ORDER ID: " + purchase.items);
+                foreach (HistoryItemObject item in purchase.items)
+                {
+                    if (order.ContainsKey(item.name))
+                    {
+                        var itemToUpdate = order[item.name];
+                        itemToUpdate.item_quantity += Int16.Parse(item.qty);
+                        order[item.name] = itemToUpdate;
+                    }
+                    else
+                    {
+                        //(Double.Parse(qty) * Double.Parse(price)).ToString("N2")
+                        var itemToAdd = new ItemPurchased();
+                        itemToAdd.pur_business_uid = item.itm_business_uid;
+                        itemToAdd.item_uid = item.item_uid;
+                        itemToAdd.item_name = item.name;
+                        itemToAdd.item_quantity = Int16.Parse(item.qty);
+                        itemToAdd.item_price = Double.Parse(item.price);
+                        itemToAdd.img = item.img;
+                        itemToAdd.unit = item.unit;
+                        itemToAdd.description = "";
+                        itemToAdd.business_price = 0.0;
+                        itemToAdd.taxable = "FALSE";
+                        itemToAdd.isItemAvailable = false;
+                        order.Add(item.name, itemToAdd);
+                    }
+                }
+
+                if (messageList != null)
+                {
+                    if (messageList.ContainsKey("701-000070"))
+                    {
+                        await DisplayAlert(messageList["701-000070"].title, messageList["701-000070"].message, messageList["701-000070"].responses);
+                    }
+                    else
+                    {
+                        await DisplayAlert("EZ Reorder", "Great! We’ve added everything that is in season to your cart.", "Continue");
+                    }
+                }
+                else
+                {
+                    await DisplayAlert("EZ Reorder", "Great! We’ve added everything that is in season to your cart.", "Continue");
+                }
+
+
+                var client = new SelectionPage();
+
+                client.CheckOutClickBusinessPage(new System.Object(), new System.EventArgs());
+            }
+            catch (Exception errorReordering)
+            {
+                if (messageList != null)
+                {
+                    if (messageList.ContainsKey("701-000071"))
+                    {
+                        await DisplayAlert(messageList["701-000071"].title, messageList["701-000071"].message, messageList["701-000071"].responses);
+                    }
+                    else
+                    {
+                        await DisplayAlert("Oops", "Not able to add order to your cart. Please try again.", "OK");
+                    }
+                }
+                else
+                {
+                    await DisplayAlert("Oops", "Not able to add order to your cart. Please try again.", "OK");
+                }
+                var client = new Diagnostic();
+                client.parseException(errorReordering.ToString(), user);
+            }
+        }
     }
 }

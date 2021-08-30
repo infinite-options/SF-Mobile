@@ -95,6 +95,7 @@ namespace ServingFresh.Views
         public double delivery_fee = 5.0;
         public double service_fee = 1.5;
         public double taxes = 0;
+        public double taxRate = 0;
         public double total = 0;
         public double driver_tips;
         public static int total_qty = 0;
@@ -323,12 +324,14 @@ namespace ServingFresh.Views
                         //Constant.tax_rate = data.result.tax_rate;
                         delivery_fee = data.result.delivery_fee;
                         service_fee = data.result.service_fee;
+                        taxRate = data.result.tax_rate;
 
                         Debug.WriteLine("Delivery Fee: " + delivery_fee);
                         Debug.WriteLine("Service Fee: " + service_fee);
 
                         ServiceFee.Text = "$" + service_fee.ToString("N2");
                         DeliveryFee.Text = "$" + delivery_fee.ToString("N2");
+                        
                         r = true;
 
                     }
@@ -600,7 +603,7 @@ namespace ServingFresh.Views
             total_qty = 0;
             var tips = 0.0;
             delivery_fee = GetDeliveryFee();
-            taxes = GetTaxes();
+
             service_fee = GetServiceFee();
             foreach (ItemObject item in cartItems)
             {
@@ -627,18 +630,20 @@ namespace ServingFresh.Views
             }
 
 
-            var cartTax = 0.0;
+            taxes = 0;
+
             foreach (ItemObject item in cartItems)
             {
-                var tax = 0.0;
                 if(item.taxable == "TRUE")
                 {
-                    tax = (item.qty * item.price) * GetTaxes() / 100;
-                    cartTax += tax;
+                    if(item.qty != 0)
+                    {
+                        var tax = Math.Round(item.price * (taxRate / 100), 2) * item.qty;
+                        taxes += tax;
+                    }
                 }
             }
 
-            taxes = cartTax;
             Taxes.Text = "$" + taxes.ToString("N2");
 
             if (DriverTip.Text == null)
@@ -1729,7 +1734,7 @@ namespace ServingFresh.Views
                 if (addressStatus == "Y" || addressStatus == "S")
                 {
 
-                    var location = await client.ConvertAddressToGeoCoordiantes(AddressEntry.Text, newUserUnitNumber.Text, newUserState.Text);
+                    var location = await client.ConvertAddressToGeoCoordiantes(AddressEntry.Text, newUserCity.Text, newUserState.Text);
                     if (location != null)
                     {
                         var isAddressInZones = await client.getZoneFromLocation(location.Latitude.ToString(), location.Longitude.ToString());
@@ -1810,7 +1815,7 @@ namespace ServingFresh.Views
                             if (addressStatus == "Y" || addressStatus == "S")
                             {
 
-                                var location = await client.ConvertAddressToGeoCoordiantes(AddressEntry.Text, newUserUnitNumber.Text, newUserState.Text);
+                                var location = await client.ConvertAddressToGeoCoordiantes(AddressEntry.Text, newUserCity.Text, newUserState.Text);
                                 if (location != null)
                                 {
                                     var isAddressInZones = await client.getZoneFromLocation(location.Latitude.ToString(), location.Longitude.ToString());
