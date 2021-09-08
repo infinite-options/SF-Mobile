@@ -42,9 +42,9 @@ namespace ServingFresh.Models
             return result;
         }
 
-        public async Task<bool> CreateAmbassadorFromCode(string code)
+        public async Task<string> CreateAmbassadorFromCode(string code)
         {
-            bool result = false;
+            string result = "";
 
             var client = new HttpClient();
             var ambassador = new CreateAmbassador();
@@ -56,14 +56,17 @@ namespace ServingFresh.Models
             var endpointCall = await client.PostAsync(Constant.CreateAmbassador, content);
 
             Debug.WriteLine("JSON TO BE SEND: " + serializedObject);
-            //Debug.WriteLine("RESPONSE1: " + endpointCall.IsSuccessStatusCode);
-            //Debug.WriteLine("RESPONSE2: " + endpointCall.Content.ReadAsStringAsync());
+
             if (endpointCall.IsSuccessStatusCode)
             {
                 var endpointContentString = await endpointCall.Content.ReadAsStringAsync();
                 if(endpointContentString.Contains("SF Ambassdaor created"))
                 {
-                    result = true;
+                    result = "SF Ambassdaor created";
+                }
+                else if (endpointContentString.Contains("Customer already an Ambassador"))
+                {
+                    result = "Customer already an Ambassador";
                 }
             }
 

@@ -75,7 +75,7 @@
                         </Frame>
                         <Label VerticalOptions="Center" Text="Become an Ambassador" TextColor="White" FontSize="20" FontAttributes="Bold"></Label>
                         <StackLayout.GestureRecognizers>
-                            <TapGestureRecognizer></TapGestureRecognizer>
+                            <TapGestureRecognizer Tapped="NavigateToBecomeAmbassador" ></TapGestureRecognizer>
                         </StackLayout.GestureRecognizers>
                     </StackLayout>
 

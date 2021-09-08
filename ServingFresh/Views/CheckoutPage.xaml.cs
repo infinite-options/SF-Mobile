@@ -2499,7 +2499,7 @@ namespace ServingFresh.Views
             }
         }
 
-        async void AmbassadorShowInformation(System.Object sender, System.EventArgs e)
+        public async void AmbassadorShowInformation(System.Object sender, System.EventArgs e)
         {
             if(user.getUserType() == "GUEST")
             {
@@ -2516,32 +2516,36 @@ namespace ServingFresh.Views
             }
             else if(user.getUserType() == "CUSTOMER")
             {
-                
-                string action = await DisplayPromptAsync("Love Serving Fresh?", "\n\nBecome an Ambassador\n\nGive 20, Get 20\n\nRefer a friend and both you and your friend get $10 off on your next two orders.", "OK","Cancel",null,-1,Keyboard.Email,null);
-                if (!String.IsNullOrEmpty(action))
+                var email = user.email;
+                bool action = await DisplayAlert("Love Serving Fresh?", "\n\nBecome an Ambassador\n\nGive 10, Get 10\n\nRefer a friend and both you and your friend get $10 off your next order. \n\nClick OK to become an ambassador and have your friend enter your email as the ambassador code when they checkout.", "OK","Cancel");
+                if (action)
                 {
                     // Make input an ambassador...
 
                     var client = new Ambassador();
-                    var createAmbassadorStatus = await client.CreateAmbassadorFromCode(action.ToLower());
-                    if (createAmbassadorStatus)
+                    var createAmbassadorStatus = await client.CreateAmbassadorFromCode(email.ToLower());
+                    if (createAmbassadorStatus == "SF Ambassdaor created")
                     {
                         if (messageList != null)
                         {
                             if (messageList.ContainsKey("701-000022"))
                             {
-                                await DisplayAlert(messageList["701-000022"].title, messageList["701-000022"].message + action + "with your friends and get $10 on your next two orders", messageList["701-000022"].responses);
+                                await DisplayAlert(messageList["701-000022"].title, messageList["701-000022"].message + email + " with your friends and save $10 on your next order.", messageList["701-000022"].responses);
                             }
                             else
                             {
-                                await DisplayAlert("Congratulations!", "You are now an ambassador! Share this email: " + action + "with your friends and get $10 on your next two orders", "OK");
+                                await DisplayAlert("Congratulations!", "You are now an ambassador! Share this email: " + email + " with your friends and save $10 on your next order.", "OK");
                             }
                         }
                         else
                         {
-                            await DisplayAlert("Congratulations!", "You are now an ambassador! Share this email: " + action + "with your friends and get $10 on your next two orders", "OK");
+                            await DisplayAlert("Congratulations!", "You are now an ambassador! Share this email: " + email + " with your friends and save $10 on your next order.", "OK");
                         }
                        
+                    }
+                    else if (createAmbassadorStatus == "Customer already an Ambassador")
+                    {
+                        await DisplayAlert("Oops", "You are already an ambassador.", "OK");
                     }
                     else
                     {
@@ -2553,14 +2557,13 @@ namespace ServingFresh.Views
                             }
                             else
                             {
-                                await DisplayAlert("Oops", "Something went wrong. Please try again", "OK");
+                                await DisplayAlert("Oops", "Something went wrong. Please try again.", "OK");
                             }
                         }
                         else
                         {
-                            await DisplayAlert("Oops", "Something went wrong. Please try again", "OK");
+                            await DisplayAlert("Oops", "Something went wrong. Please try again.", "OK");
                         }
-                       
                     }
                 }
             }

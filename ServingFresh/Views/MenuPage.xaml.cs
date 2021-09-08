@@ -132,5 +132,14 @@ namespace ServingFresh.Views
         {
             Application.Current.MainPage = new SelectionPage();
         }
+
+        void NavigateToBecomeAmbassador(System.Object sender, System.EventArgs e)
+        {
+            var checkoutPageClient = new CheckoutPage();
+
+            checkoutPageClient.AmbassadorShowInformation(new object(), new EventArgs());
+
+            Application.Current.MainPage = checkoutPageClient;
+        }
     }
 }

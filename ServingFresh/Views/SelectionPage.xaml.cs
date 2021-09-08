@@ -228,7 +228,7 @@ namespace ServingFresh.Views
             InitializeComponent();
             GetBusinesses();
             _ = SetFavoritesList();
-            //_ = CheckVersion();
+            _ = CheckVersion();
         }
 
         public static void SetMenu(StackLayout guest, StackLayout customer, Label history, Label profile)

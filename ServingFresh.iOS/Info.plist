@@ -37,7 +37,7 @@
 			<string>Google Auth</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.97916302968-f22boafqno1dicq4a0eolpr6qj8hkvbm</string>
+				<string>com.googleusercontent.apps.478982641106-f00qc0qmstldd8h2cuvs5ur6uskqak6i</string>
 			</array>
 		</dict>
 	</array>
@@ -60,8 +60,8 @@
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Turning on location services allows us to display fresh local produce near your current location. </string>
 	<key>CFBundleVersion</key>
-	<string>85</string>
+	<string>87</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.7.1</string>
+	<string>1.7.2</string>
 </dict>
 </plist>
