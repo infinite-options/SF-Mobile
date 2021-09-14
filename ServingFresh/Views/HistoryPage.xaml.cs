@@ -86,6 +86,8 @@ namespace ServingFresh.Views
             public string price { get; set; }
             public string item_uid { get; set; }
             public string itm_business_uid { get; set; }
+            public string description { get; set; }
+            public string business_price { get; set; }
 
             public string namePriceUnit
             {
@@ -358,8 +360,8 @@ namespace ServingFresh.Views
                         itemToAdd.item_price = Double.Parse(item.price);
                         itemToAdd.img = item.img;
                         itemToAdd.unit = item.unit;
-                        itemToAdd.description = "";
-                        itemToAdd.business_price = 0.0;
+                        itemToAdd.description = item.description;
+                        itemToAdd.business_price = Double.Parse(item.business_price);
                         itemToAdd.taxable = "FALSE";
                         itemToAdd.isItemAvailable = false;
                         order.Add(item.name, itemToAdd);

@@ -2482,6 +2482,7 @@ namespace ServingFresh.Views
                 {
                     FinalizePurchase(purchase, selectedDeliveryDate);
                     purchase.setPurchasePaymentType("SFGiftCard");
+                    UserDialogs.Instance.ShowLoading("Your payment is processing...");
                     paymentClient = new Payments("SFTEST");
                     var coupond = purchase.getPurchaseCoupoID();
                     purchase.setPurchaseCoupoID(coupond + couponsUIDs);
@@ -2490,6 +2491,7 @@ namespace ServingFresh.Views
                     _ = paymentClient.SendPurchaseToDatabase(purchase);
                     order.Clear();
                     await WriteFavorites(GetFavoritesList(), purchase.getPurchaseCustomerUID());
+                    UserDialogs.Instance.HideLoading();
                     Application.Current.MainPage = new HistoryPage();
                 }
             }catch(Exception errorPurchaseBalanceIsZero)

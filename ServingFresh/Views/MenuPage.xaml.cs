@@ -76,7 +76,8 @@ namespace ServingFresh.Views
         public static void NavigateToSignUp(System.Object sender, System.EventArgs e)
         {
             Application.Current.MainPage.Navigation.PopModalAsync();
-            Application.Current.MainPage.Navigation.PushModalAsync(new SignUpPage(94), true);
+            //Application.Current.MainPage.Navigation.PushModalAsync(new SignUpPage(94), true);
+            Application.Current.MainPage.Navigation.PushModalAsync(new AddressPage(), true);
         }
 
         public static void NavigateToMain(System.Object sender, System.EventArgs e)

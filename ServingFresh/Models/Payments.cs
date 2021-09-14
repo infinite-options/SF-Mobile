@@ -475,7 +475,7 @@ namespace ServingFresh.Models
             {
                 currency = "uds",
                 customer_uid = userID,
-                business_code = businessCode,
+                business_code = SetBusinessCode(businessCode),
                 payment_summary = new PaymentSummary() { total = amount }
             };
 
@@ -513,18 +513,27 @@ namespace ServingFresh.Models
 
         public async Task<bool> SendPurchaseToDatabase(Purchase purchase)
         {
-            var purchaseString = JsonConvert.SerializeObject(purchase);
-            var purchaseMessage = new StringContent(purchaseString, Encoding.UTF8, "application/json");
-            var client = new System.Net.Http.HttpClient();
-            var Response = await client.PostAsync(Constant.PurchaseUrl, purchaseMessage);
-
-            Debug.WriteLine("JSON : " + purchaseString);
-            Debug.WriteLine("RESPONSE: " + Response.IsSuccessStatusCode);
-            if (Response.IsSuccessStatusCode)
+            try
             {
-                return true;
+                var purchaseString = JsonConvert.SerializeObject(purchase);
+                var purchaseMessage = new StringContent(purchaseString, Encoding.UTF8, "application/json");
+                var client = new System.Net.Http.HttpClient();
+                var Response = await client.PostAsync(Constant.PurchaseUrl, purchaseMessage);
+
+                Debug.WriteLine("JSON : " + purchaseString);
+                Debug.WriteLine("RESPONSE: " + Response.IsSuccessStatusCode);
+                if (Response.IsSuccessStatusCode)
+                {
+                    return true;
+                }
+                return false;
             }
-            return false;
+            catch (Exception issueSendingPurchase)
+            {
+                var client2 = new Diagnostic();
+                client2.parseException(issueSendingPurchase.ToString(), user);
+                return false;
+            }
         }
     }
 }

@@ -1292,25 +1292,25 @@ namespace ServingFresh.Views
                         {
                             vegetablesList = SetItemList(listOfItems, type);
                             //vegetablesListView.IsVisible = true;
-                            category1.Text = type;
+                            category1.Text = SetCathegory(type);
                         }
                         else if (j == 1)
                         {
                             fruitsList = SetItemList(listOfItems, type);
                             //fruitsListView.IsVisible = true;
-                            category2.Text = type;
+                            category2.Text = SetCathegory(type);
                         }
                         else if (j == 2)
                         {
                             othersList = SetItemList(listOfItems, type);
                             //othersListView.IsVisible = true;
-                            category3.Text = type;
+                            category3.Text = SetCathegory(type);
                         }
                         else if (j == 3)
                         {
                             dessertsList = SetItemList(listOfItems, type);
                             //dessertsListView.IsVisible = true;
-                            category4.Text = type;
+                            category4.Text = SetCathegory(type);
                         }
                         j++;
                     }
@@ -1326,6 +1326,28 @@ namespace ServingFresh.Views
             {
                 var client = new Diagnostic();
                 client.parseException(errorGetDataForSigleList.ToString(), user);
+            }
+        }
+
+        string SetCathegory(string type)
+        {
+            string category = "";
+            try
+            {
+                if (type != "")
+                {
+                    if (type.Length >= 1)
+                    {
+                        var tempType = type;
+                        var upperChar = tempType[0].ToString().ToUpper().ToCharArray();
+                        category += tempType.Replace(tempType[0], upperChar[0]) + "s";
+                    }
+                }
+                return category;
+            }
+            catch
+            {
+                return type;
             }
         }
 
@@ -2382,7 +2404,7 @@ namespace ServingFresh.Views
             var stacklayout = (StackLayout)sender;
             var label = (Label)stacklayout.Children[0];
             var image = (Image)stacklayout.Children[1];
-
+            
             if (stacklayout.ClassId == "vegetablesView")
             {
                 SwitchLayoutViews(vegetablesList, vegetablesListView, itemList, label, image, "vegetables");
@@ -2399,12 +2421,14 @@ namespace ServingFresh.Views
             {
                 SwitchLayoutViews(dessertsList, dessertsListView, dessertsVerticalView, label, image, "desserts");
             }
+            
         }
 
         void SwitchLayoutViews(ObservableCollection<SingleItem> source, CollectionView horizontalView, ListView verticalView, Label viewLabel, Image viewIcon, string category)
         {
             if (viewIcon.Source.ToString() == "File: triangleIconFilled.png")
             {
+                UserDialogs.Instance.ShowLoading("Loading...");
                 viewLabel.Text = "Switch to scroll view";
                 viewIcon.Rotation = 180;
                 viewIcon.Source = "triangleIconEmpty.png";
@@ -2414,6 +2438,7 @@ namespace ServingFresh.Views
                 var rowHeight = source.Count;
                 if (rowHeight % 2 != 0) { rowHeight++; }
                 verticalView.HeightRequest = 190 * rowHeight / 2;
+                UserDialogs.Instance.HideLoading();
             }
             else
             {
