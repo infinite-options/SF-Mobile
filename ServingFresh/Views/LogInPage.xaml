@@ -17,7 +17,7 @@
            
            
             <StackLayout>
-                <ImageButton x:Name="appleLogInButton" BackgroundColor="Transparent" Clicked="AppleLogInClick" Command = "{Binding SignInWithAppleCommand}" Source="continueWithApple.png" HeightRequest="48"></ImageButton>
+                <ImageButton x:Name="appleLogInButton" BackgroundColor="Transparent" Clicked="AppleLogInClick" Command = "{Binding SignInWithAppleCommand}" Source="continueWithApple2.png" HeightRequest="48"></ImageButton>
                 <ImageButton Clicked="FacebookLogInClick" BackgroundColor="Transparent" Source="continueWithFacebook.png" HeightRequest="48"></ImageButton>
                 <ImageButton Clicked="GoogleLogInClick" BackgroundColor="Transparent" Source="continueWithGoogle.png" HeightRequest="48"></ImageButton>
                 <!--<Grid>

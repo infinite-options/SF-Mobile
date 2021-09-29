@@ -422,7 +422,7 @@ namespace ServingFresh.Models
             {
                 currency = "uds",
                 customer_uid = userID,
-                business_code = SetBusinessCode(businessCode),
+                business_code = SetBusinessCode(businessCode.Trim()),
                 payment_summary = new PaymentSummary() { total = amount }
             };
 

@@ -241,7 +241,7 @@
                                                         </Button>-->
                                                         <ImageButton Source="plusIcon" BackgroundColor="Transparent" Clicked="AddItem" CommandParameter="{Binding .}"></ImageButton>
                                                     </StackLayout>
-                                                    <Label Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceWithUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
+                                                    <Label Margin="-3,0,0,0" Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceWithUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
                                                 </Grid>
                                             </Grid>
                                         </Grid>
@@ -376,7 +376,7 @@
                                                         </Button>-->
                                                         <ImageButton Source="plusIcon" BackgroundColor="Transparent" Clicked="AddItemLeft" CommandParameter="{Binding .}"></ImageButton>
                                                     </StackLayout>
-                                                    <Label Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceLeftUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
+                                                    <Label Margin="-3,0,0,0" Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceLeftUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
                                                 </Grid>
                                             </Grid>
                                         </Grid>
@@ -494,7 +494,7 @@
                                                         </Button>-->
                                                         <ImageButton Source="plusIcon" BackgroundColor="Transparent" Clicked="AddItemRight" CommandParameter="{Binding .}"></ImageButton>
                                                     </StackLayout>
-                                                    <Label Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceRightUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
+                                                    <Label Margin="-3,0,0,0" Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceRightUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
                                                 </Grid>
                                             </Grid>
                                         </Grid>
@@ -637,7 +637,7 @@
                                                         </Button>-->
                                                         <ImageButton Source="plusIcon" BackgroundColor="Transparent" Clicked="AddItem" CommandParameter="{Binding .}"></ImageButton>
                                                     </StackLayout>
-                                                    <Label Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceWithUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
+                                                    <Label Margin="-3,0,0,0" Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceWithUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
                                                 </Grid>
                                             </Grid>
                                         </Grid>
@@ -772,7 +772,7 @@
                                                         </Button>-->
                                                         <ImageButton Source="plusIcon" BackgroundColor="Transparent" Clicked="AddItemLeft" CommandParameter="{Binding .}"></ImageButton>
                                                     </StackLayout>
-                                                    <Label Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceLeftUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
+                                                    <Label Margin="-3,0,0,0" Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceLeftUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
                                                 </Grid>
                                             </Grid>
                                         </Grid>
@@ -890,7 +890,7 @@
                                                         </Button>-->
                                                         <ImageButton Source="plusIcon" BackgroundColor="Transparent" Clicked="AddItemRight" CommandParameter="{Binding .}"></ImageButton>
                                                     </StackLayout>
-                                                    <Label Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceRightUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
+                                                    <Label Margin="-3,0,0,0" Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceRightUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
                                                 </Grid>
                                             </Grid>
                                         </Grid>
@@ -1033,7 +1033,7 @@
                                                         </Button>-->
                                                         <ImageButton Source="plusIcon" BackgroundColor="Transparent" Clicked="AddItem" CommandParameter="{Binding .}"></ImageButton>
                                                     </StackLayout>
-                                                    <Label Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceWithUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
+                                                    <Label Margin="-3,0,0,0" Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceWithUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
                                                 </Grid>
                                             </Grid>
                                         </Grid>
@@ -1168,7 +1168,7 @@
                                                         </Button>-->
                                                         <ImageButton Source="plusIcon" BackgroundColor="Transparent" Clicked="AddItemLeft" CommandParameter="{Binding .}"></ImageButton>
                                                     </StackLayout>
-                                                    <Label Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceLeftUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
+                                                    <Label Margin="-3,0,0,0" Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceLeftUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
                                                 </Grid>
                                             </Grid>
                                         </Grid>
@@ -1286,7 +1286,7 @@
                                                         </Button>-->
                                                         <ImageButton Source="plusIcon" BackgroundColor="Transparent" Clicked="AddItemRight" CommandParameter="{Binding .}"></ImageButton>
                                                     </StackLayout>
-                                                    <Label Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceRightUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
+                                                    <Label Margin="-3,0,0,0" Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceRightUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
                                                 </Grid>
                                             </Grid>
                                         </Grid>
@@ -1429,7 +1429,7 @@
                                                         </Button>-->
                                                         <ImageButton Source="plusIcon" BackgroundColor="Transparent" Clicked="AddItem" CommandParameter="{Binding .}"></ImageButton>
                                                     </StackLayout>
-                                                    <Label Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceWithUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
+                                                    <Label Margin="-3,0,0,0" Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceWithUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
                                                 </Grid>
                                             </Grid>
                                         </Grid>
@@ -1564,7 +1564,7 @@
                                                         </Button>-->
                                                         <ImageButton Source="plusIcon" BackgroundColor="Transparent" Clicked="AddItemLeft" CommandParameter="{Binding .}"></ImageButton>
                                                     </StackLayout>
-                                                    <Label Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceLeftUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
+                                                    <Label Margin="-3,0,0,0" Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceLeftUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
                                                 </Grid>
                                             </Grid>
                                         </Grid>
@@ -1682,7 +1682,7 @@
                                                         </Button>-->
                                                         <ImageButton Source="plusIcon" BackgroundColor="Transparent" Clicked="AddItemRight" CommandParameter="{Binding .}"></ImageButton>
                                                     </StackLayout>
-                                                    <Label Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceRightUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
+                                                    <Label Margin="-3,0,0,0" Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPriceRightUnit}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
                                                 </Grid>
                                             </Grid>
                                         </Grid>

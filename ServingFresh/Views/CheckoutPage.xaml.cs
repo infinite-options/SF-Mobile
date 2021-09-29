@@ -811,7 +811,7 @@ namespace ServingFresh.Views
                 purchase.setPurchaseDeliveryFee(delivery_fee_db.ToString("N2"));
                 purchase.setPurchaseDriveTip(driver_tips.ToString("N2"));
                 purchase.setPurchaseTaxes(GetTaxes().ToString("N2"));
-                purchase.setPurchaseDeliveryInstructions(deliveryInstructions.Text == null || deliveryInstructions.Text == "" ? "" : deliveryInstructions.Text);
+                purchase.setPurchaseDeliveryInstructions(deliveryInstructions.Text == null || deliveryInstructions.Text.Trim() == "" ? "" : deliveryInstructions.Text.Trim());
 
             }catch(Exception errorFinalizePurchase)
             {

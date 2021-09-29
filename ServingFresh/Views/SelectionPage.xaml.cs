@@ -523,37 +523,6 @@ namespace ServingFresh.Views
         {
             try
             {
-                //var isLatest = await CrossLatestVersion.Current.IsUsingLatestVersion();
-
-                //Debug.WriteLine("IsUsingLaterstVersion: " + isLatest);
-
-                //if (!isLatest)
-                //{
-                //    if (messageList != null)
-                //    {
-                //        if (messageList.ContainsKey("701-000063"))
-                //        {
-                //            Debug.WriteLine("TITLE: " + messageList["701-000063"].title);
-                //            // \\n, @
-
-                //            string title = messageList["701-000063"].title.Replace("\\n", Environment.NewLine);
-                //            string message = messageList["701-000063"].message.Replace("\\n", Environment.NewLine);
-                //            await DisplayAlert(title, message, messageList["701-000063"].responses);
-                //        }
-                //        else
-                //        {
-                //            await DisplayAlert("Serving Fresh\nhas gotten even better!", "Please visit the App Store to get the latest version.", "OK");
-                //        }
-                //    }
-                //    else
-                //    {
-                //        await DisplayAlert("Serving Fresh\nhas gotten even better!", "Please visit the App Store to get the latest version.", "OK");
-                //    }
-
-                //    await CrossLatestVersion.Current.OpenAppInStore();
-                //}
-
-
                 var client = new AppVersion();
                 string versionStr = DependencyService.Get<IAppVersionAndBuild>().GetVersionNumber();
                 var result = await client.isRunningLatestVersion(versionStr);

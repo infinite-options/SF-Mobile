@@ -93,7 +93,7 @@
                                 </StackLayout>
                                 <StackLayout HorizontalOptions="Center">
                                     <StackLayout Margin="0,0,0,20">
-                                        <ImageButton x:Name="appleLogInButton" Source="continueWithApple.png" HeightRequest="52"></ImageButton>
+                                        <ImageButton x:Name="appleLogInButton" Source="continueWithApple2.png" HeightRequest="52"></ImageButton>
                                         <ImageButton Source="continueWithFacebook.png" Clicked="ContinuteWithFacebook" HeightRequest="52"></ImageButton>
                                         <ImageButton Source="continueWithGoogle.png" Clicked="ContinueWithGoogle" HeightRequest="53"></ImageButton>
                                     </StackLayout>

@@ -33,7 +33,7 @@
                             <Button CornerRadius="13" HorizontalOptions="Center" WidthRequest="241" HeightRequest="52" Padding="27,0,0,0" Text="Sign up with Google" TextColor="White" FontSize="16" BackgroundColor="#5C83F0"></Button>
                             <Image Margin="55,0,0,0" Source="googleWhiteIcon.png" HorizontalOptions="Start"></Image>
                         </Grid>-->
-                        <ImageButton x:Name="appleLogInButton" BackgroundColor="Transparent" Clicked="appleLogInButton_Clicked" Command = "{Binding SignInWithAppleCommand}" Source="continueWithApple.png" HeightRequest="52"></ImageButton>
+                        <ImageButton x:Name="appleLogInButton" BackgroundColor="Transparent" Clicked="appleLogInButton_Clicked" Command = "{Binding SignInWithAppleCommand}" Source="continueWithApple2.png" HeightRequest="52"></ImageButton>
                         <ImageButton Source="continueWithFacebook.png" BackgroundColor="Transparent" Clicked="ContinueWithFacebook" HeightRequest="52"></ImageButton>
                         <ImageButton Source="continueWithGoogle.png" BackgroundColor="Transparent" Clicked="ContinueWithGoogle" HeightRequest="53"></ImageButton>
                     </StackLayout>
