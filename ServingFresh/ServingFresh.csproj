@@ -37,5 +37,9 @@
     <Folder Include="Effects\" />
     <Folder Include="Notifications\" />
     <Folder Include="Models\Interfaces\" />
+    <Folder Include="ViewModels\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="ViewModels\" />
   </ItemGroup>
 </Project>

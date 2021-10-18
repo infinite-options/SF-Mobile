@@ -60,8 +60,12 @@
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Turning on location services allows us to display fresh local produce near your current location. </string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.7.3</string>
+	<string>1.7.4</string>
 	<key>CFBundleVersion</key>
-	<string>92</string>
+	<string>94</string>
+	<key>Custom Property</key>
+	<string></string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

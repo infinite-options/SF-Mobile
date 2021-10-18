@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    BackgroundColor="#AB000000"
+    x:Class="ServingFresh.Views.RatingMessagePage">
+    <ContentPage.Content>
+        <StackLayout BackgroundColor="#E0E6E6" VerticalOptions="CenterAndExpand" Margin="10">
+            <StackLayout Spacing="20" x:Name="UIPoorRating" IsVisible="false" Padding="20,50,20,50">
+                <Label HorizontalOptions="Center" Text="Rating Submitted" FontSize="20" TextColor="#136D74" FontAttributes="Bold" TextDecorations="Underline"></Label>
+                <Label HorizontalTextAlignment="Center" Text="Thank you for your feedback.&#10; We appreciate you supporting&#10;local farmers" FontSize="14" TextColor="Black"></Label>
+                <Button Text="Back to History" Clicked="Button_Clicked" TextColor="White" FontAttributes="Bold" BackgroundColor="#FF8500"></Button>
+            </StackLayout>
+            <StackLayout Spacing="20" x:Name="UIGreatRating" IsVisible="false">
+                <ImageButton HorizontalOptions="End" Clicked="CloseRatingModal" Margin="0,5,5,0" HeightRequest="30" Source="greenCloseIcon"></ImageButton>
+                <Label HorizontalOptions="Center" Text="Rating Submitted" FontSize="20" TextColor="#136D74" FontAttributes="Bold" TextDecorations="Underline"></Label>
+                <Label HorizontalTextAlignment="Center" Text="Thank you for your feedback.&#10; Please leave us a review on:" FontSize="14" TextColor="Black"></Label>
+                <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand" Margin="0,0,0,50">
+                    <ImageButton HeightRequest="50" Source="facebookReviewIcon" IsVisible="false"  Clicked="SendUserToReviewLinks"></ImageButton>
+                    <ImageButton HeightRequest="50" Source="googleReviewIcon" Clicked="SendUserToReviewLinks"></ImageButton>
+                </StackLayout>
+            </StackLayout>
+        </StackLayout>
+
+    </ContentPage.Content>
+</ContentPage>

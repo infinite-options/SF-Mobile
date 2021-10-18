@@ -11,122 +11,15 @@ using static ServingFresh.Views.SelectionPage;
 using static ServingFresh.Views.PrincipalPage;
 using ServingFresh.Models;
 using static ServingFresh.App;
+using System.ComponentModel;
 
 namespace ServingFresh.Views
 {
     public partial class HistoryPage : ContentPage 
-    {
-
-        public class HistoryObject
-        {
-            public string purchase_uid { get; set; }
-            public string purchase_date { get; set; }
-            public string purchase_id { get; set; }
-            public string purchase_status { get; set; }
-            public string pur_customer_uid { get; set; }
-            public string pur_business_uid { get; set; }
-            public string items { get; set; }
-            public string order_instructions { get; set; }
-            public string delivery_instructions { get; set; }
-            public string order_type { get; set; }
-            public string delivery_first_name { get; set; }
-            public string delivery_last_name { get; set; }
-            public string delivery_phone_num { get; set; }
-            public string delivery_email { get; set; }
-            public string delivery_address { get; set; }
-            public string delivery_unit { get; set; }
-            public string delivery_city { get; set; }
-            public string delivery_state { get; set; }
-            public string delivery_zip { get; set; }
-            public string delivery_latitude { get; set; }
-            public string delivery_longitude { get; set; }
-            public string purchase_notes { get; set; }
-            public string delivery_status { get; set; }
-            public int feedback_rating { get; set; }
-            public object feedback_notes { get; set; }
-            public string payment_uid { get; set; }
-            public string payment_id { get; set; }
-            public string pay_purchase_uid { get; set; }
-            public string pay_purchase_id { get; set; }
-            public string payment_time_stamp { get; set; }
-            public string start_delivery_date { get; set; }
-            public string pay_coupon_id { get; set; }
-            public double amount_due { get; set; }
-            public double amount_discount { get; set; }
-            public double subtotal { get; set; }
-            public double service_fee { get; set; }
-            public double delivery_fee { get; set; }
-            public double driver_tip { get; set; }
-            public double taxes { get; set; }
-            public double amount_paid { get; set; }
-            public string info_is_Addon { get; set; }
-            public string cc_num { get; set; }
-            public string cc_exp_date { get; set; }
-            public string cc_cvv { get; set; }
-            public string cc_zip { get; set; }
-            public string charge_id { get; set; }
-            public string payment_type { get; set; }
-            public double ambassador_code { get; set; }
-        }
-
-        public class HistoryResponse
-        {
-            public string message { get; set; }
-            public int code { get; set; }
-            public IList<HistoryObject> result { get; set; }
-            public string sql { get; set; }
-        }
-
-        public class HistoryItemObject
-        {
-            public string img { get; set; }
-            public string unit { get; set; }
-            public string qty { get; set; }
-            public string name { get; set; }
-            public string price { get; set; }
-            public string item_uid { get; set; }
-            public string itm_business_uid { get; set; }
-            public string description { get; set; }
-            public string business_price { get; set; }
-
-            public string namePriceUnit
-            {
-                get
-                {
-                    return "(" + unit  +")";
-                }
-            }
-
-            public string total_price
-            {
-                get
-                {
-                    return "$" + (Double.Parse(qty) * Double.Parse(price)).ToString("N2");
-                }
-            }
-        }
-
-        public class HistoryDisplayObject
-        {
-            public ObservableCollection<HistoryItemObject> items { get; set; }
-            public string delivery_date { get; set; }
-            public int itemsHeight { get; set; }
-            public string purchase_status { get; set; }
-            public string purchase_id { get; set; }
-            public string purchase_date { get; set; }
-            public string subtotal { get; set; }
-            public string promo_applied { get; set; }
-            public string delivery_fee { get; set; }
-            public string service_fee { get; set; }
-            public string driver_tip { get; set; }
-            public string taxes { get; set; }
-            public string total { get; set; }
-            public string coupon_id { get; set; }
-            public string ambassador_code { get; set; }
-        }
-                   
+    {   // Class attributes
         public ObservableCollection<HistoryDisplayObject> historyList;
 
+        // Constructor
         public HistoryPage()
         {
             InitializeComponent();
@@ -136,34 +29,14 @@ namespace ServingFresh.Views
             LoadHistory();
         }
 
-        public async void ShowSuccessfullPayment()
+        // This function calls the history endpoint to process its data and display it in the history page
+        async void LoadHistory()
         {
-            if (messageList != null)
-            {
-                if (messageList.ContainsKey("701-000031"))
-                {
-                    await DisplayAlert(messageList["701-000031"].title, messageList["701-000031"].message, messageList["701-000031"].responses);
-                }
-                else
-                {
-                    await DisplayAlert("Congratulations", "Payment was successful. We appreciate your business", "OK");
-                }
-            }
-            else
-            {
-                await DisplayAlert("Congratulations", "Payment was successful. We appreciate your business", "OK");
-            }
-           
-        }
-
-        public async void LoadHistory()
-        {
-            string userId = user.getUserID();
+            var userId = user.getUserID();
             var client = new HttpClient();
             var response = await client.GetAsync(Constant.GetHistoryUrl + userId);
-            Debug.WriteLine("HISTORY: " + Constant.GetHistoryUrl + userId);
-            string result = await response.Content.ReadAsStringAsync();
-            Debug.WriteLine(result);
+            var result = await response.Content.ReadAsStringAsync();
+
             if (response.IsSuccessStatusCode)
             {
                 try
@@ -183,6 +56,7 @@ namespace ServingFresh.Views
                         var ambassador_code = 0.0;
                         var deliveryStatus = "";
                         var couponApplied = "None";
+
                         if (ho.subtotal != null)
                         {
                             subtotal = ho.subtotal;
@@ -252,6 +126,7 @@ namespace ServingFresh.Views
                             purchase_date = "Purchase Date: " + localPurchaseDate,
                             coupon_id = "Coupon ID: " + couponApplied,
                             purchase_id = "Order #" + ho.purchase_uid,
+                            original_purchase_id = ho.purchase_uid,
                             purchase_status = "Order " + deliveryStatus,
                             subtotal = "$" + subtotal.ToString("N2"),
                             promo_applied = "$" + promo_applied.ToString("N2"),
@@ -261,77 +136,82 @@ namespace ServingFresh.Views
                             taxes = "$" + taxes.ToString("N2"),
                             total = "$" + total.ToString("N2"),
                             ambassador_code = "$" + ambassador_code.ToString("N2"),
+                            isRateOrderButtonAvailable = EvaluateRatingState(ho.feedback_rating),
+                            isRateIconAvailable = !EvaluateRatingState(ho.feedback_rating),
+                            ratingSourceIcon = SetIcon(ho.feedback_rating),
+
                         });
+
                     }
                 }
                 catch (Exception errorLoadHistory)
                 {
                     var client1 = new Diagnostic();
                     client1.parseException(errorLoadHistory.ToString(), user);
+                    historyMessage.IsVisible = true;
+                    historyMessage.Text = "Unfortunately, there was an error retrieving your history. Please check again later.";
                 }
             }
-            HistoryList.ItemsSource = historyList;
+
+            if (historyList.Count != 0)
+            {
+                HistoryList.ItemsSource = historyList;
+                HistoryList.IsVisible = true;
+            }
+            else
+            {
+                historyMessage.Text = "You have no history at the moment.";
+                historyMessage.IsVisible = true;
+            }
         }
 
-        void ShowMenuFromHistory(System.Object sender, System.EventArgs e)
+        // This function evalutes the state of the rating button based on the rating value
+        bool EvaluateRatingState(int ratingValue)
         {
-            Application.Current.MainPage.Navigation.PushModalAsync(new MenuPage(), true);
-            //var height = new GridLength(0);
-            //if (menuFrame.Height.Equals(height))
-            //{
-            //    menuFrame.Height = this.Height - 180;
-            //}
-            //else
-            //{
-            //    menuFrame.Height = 0;
-            //}
+            bool result = false;
+            if(ratingValue == -1)
+            {
+                result = true;
+            }
+            return result;
         }
 
-        void NavigateToCartFromHistory(System.Object sender, System.EventArgs e)
+        // This function return star icon based on the rating value
+        string SetIcon(int ratingValue)
         {
-            NavigateToCart(sender,e);
+            string result = "";
+
+            if(ratingValue == 0)
+            {
+                result = "emptyStar";
+            }
+            else if (ratingValue == 1)
+            {
+                result = "filledStar";
+            }
+            else if (ratingValue == 2)
+            {
+                result = "twoStarRating";
+            }
+            else if (ratingValue == 3)
+            {
+                result = "threeStarRating";
+            }
+            else if (ratingValue == 4)
+            {
+                result = "fourStarRating";
+            }
+            else if (ratingValue == 5)
+            {
+                result = "fiveStarRating";
+            }
+
+            return result;
         }
 
-        void NavigateToRefundsFromHistory(System.Object sender, System.EventArgs e)
-        {
-            NavigateToRefunds(sender, e);
-        }
+        // NAVIGATION EVENT HANDLERS ___________________________________________
 
-        void NavigateToStoreFromHistory(System.Object sender, System.EventArgs e)
-        {
-            NavigateToStore(sender, e);
-        }
-
-        void NavigateToInfoFromHistory(System.Object sender, System.EventArgs e)
-        {
-            NavigateToInfo(sender, e);
-        }
-
-        void NavigateToProfileFromHistory(System.Object sender, System.EventArgs e)
-        {
-            NavigateToProfile(sender, e);
-        }
-
-        void NavigateToSignInFromHistory(System.Object sender, System.EventArgs e)
-        {
-            NavigateToSignIn(sender, e);
-        }
-
-        void NavigateToSignUpFromHistory(System.Object sender, System.EventArgs e)
-        {
-            NavigateToSignUp(sender, e);
-        }
-
-        void NavigateToMainFromHistory(System.Object sender, System.EventArgs e)
-        {
-            NavigateToMain(sender, e);
-        }
-
-        void NavigateToHistoryFromHistory(System.Object sender, System.EventArgs e)
-        {
-            NavigateToHistory(sender, e);
-        }
-
+        //This function process a HistoryItemObject and creates a new order from previoud purchase items.
         async void Reorder(System.Object sender, System.EventArgs e)
         {
             try
@@ -351,7 +231,6 @@ namespace ServingFresh.Views
                     }
                     else
                     {
-                        //(Double.Parse(qty) * Double.Parse(price)).ToString("N2")
                         var itemToAdd = new ItemPurchased();
                         itemToAdd.pur_business_uid = item.itm_business_uid;
                         itemToAdd.item_uid = item.item_uid;
@@ -410,5 +289,44 @@ namespace ServingFresh.Views
                 client.parseException(errorReordering.ToString(), user);
             }
         }
+
+        // This function navigates to from history page to rate order page (modally)
+        void RateOrderButton(System.Object sender, System.EventArgs e)
+        {
+            if (sender.ToString() == "Xamarin.Forms.Button")
+            {
+                var button = (Button)sender;
+                var objectSelected = (HistoryDisplayObject)button.CommandParameter;
+
+                Navigation.PushModalAsync(new RateOrderPage(objectSelected), true);
+            }
+            else
+            {
+                var button = (ImageButton)sender;
+                var objectSelected = (HistoryDisplayObject)button.CommandParameter;
+
+                Navigation.PushModalAsync(new RateOrderPage(objectSelected), true);
+            }
+        }
+
+        // This function is call when user wants to open and see app menu
+        void ShowMenuFromHistory(System.Object sender, System.EventArgs e)
+        {
+            Application.Current.MainPage.Navigation.PushModalAsync(new MenuPage(), true);
+        }
+
+        // This function navigates from the history page to the checkout page
+        void NavigateToCartFromHistory(System.Object sender, System.EventArgs e)
+        {
+            NavigateToCart(sender,e);
+        }
+
+        // This function navigates from history page to the refunds page
+        void NavigateToRefundsFromHistory(System.Object sender, System.EventArgs e)
+        {
+            NavigateToRefunds(sender, e);
+        }
+
+        // NAVIGATION EVENT HANDLERS ___________________________________________
     }
 }

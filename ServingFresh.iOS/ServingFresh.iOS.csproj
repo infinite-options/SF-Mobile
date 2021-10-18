@@ -71,7 +71,7 @@
     <MtouchArch>ARM64</MtouchArch>
     <CodesignKey>Apple Distribution: Infinite Options, LLC (8V66NC2T37)</CodesignKey>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-    <CodesignProvision>Serving Fresh</CodesignProvision>
+    <CodesignProvision>Serving Fresh (Distribution)</CodesignProvision>
     <MtouchLink>SdkOnly</MtouchLink>
   </PropertyGroup>
   <ItemGroup>
@@ -236,6 +236,15 @@
     <BundleResource Include="Resources\plusIcon.png" />
     <BundleResource Include="Resources\giftCardA.png" />
     <BundleResource Include="Resources\continueWithApple2.png" />
+    <BundleResource Include="Resources\emptyStar.png" />
+    <BundleResource Include="Resources\filledStar.png" />
+    <BundleResource Include="Resources\facebookReviewIcon.png" />
+    <BundleResource Include="Resources\googleReviewIcon.png" />
+    <BundleResource Include="Resources\greenCloseIcon.png" />
+    <BundleResource Include="Resources\fiveStarRating.png" />
+    <BundleResource Include="Resources\fourStarRating.png" />
+    <BundleResource Include="Resources\threeStarRating.png" />
+    <BundleResource Include="Resources\twoStarRating.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="AppleSignIn\" />
