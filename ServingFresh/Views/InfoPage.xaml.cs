@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
+using ServingFresh.Config;
 using ServingFresh.Models.Interfaces;
+using Xamarin.Essentials;
 using Xamarin.Forms;
 using static ServingFresh.Views.SelectionPage;
 namespace ServingFresh.Views
@@ -46,6 +49,19 @@ namespace ServingFresh.Views
         void NavigateToCartFromInfo(System.Object sender, System.EventArgs e)
         {
             NavigateToCart(sender, e);
+        }
+
+        async void GoToPrivacyPolicy(System.Object sender, System.EventArgs e)
+        {
+
+            try
+            {
+                await Browser.OpenAsync(Constant.PrivacyPolicy, BrowserLaunchMode.SystemPreferred);
+            }
+            catch
+            {
+                // An unexpected error occured. No browser may be installed on the device.
+            }
         }
     }
 }

@@ -69,9 +69,9 @@
                     </StackLayout.GestureRecognizers>
                 </StackLayout>-->
             </Grid>
-            <StackLayout Grid.Row="2" Padding="17,30,17,0" >
+            <StackLayout Grid.Row="2" >
                 <ScrollView>
-                    <StackLayout>
+                    <StackLayout Padding="20,20,20,0">
                         <StackLayout Spacing="20">
                     <Label Text="For questions / enquiries regarding the app or your orders, please get in touch with us via any of the following:" FontSize="22" TextColor="Black"></Label>
                     <StackLayout>
@@ -89,12 +89,18 @@
                         <Label Text="Grocery basket by Martin LEBRETON from the Noun Project" FontSize="18" TextColor="#FF8500"></Label>
                         <Label Text="Farmer with seedling by Gan Khoon Lay from the Noun Project" FontSize="18" TextColor="#FF8500"></Label>
                     </StackLayout>
-                    
-                </StackLayout>
-                        <StackLayout VerticalOptions="EndAndExpand">
-                    <Label HorizontalOptions="Center" x:Name="versionNumber" TextColor="Black" FontSize="Small" FontAttributes="Bold"></Label>
-                    <Label HorizontalOptions="Center" x:Name="buildNumber" TextColor="Black" FontSize="Small" FontAttributes="Bold"></Label>
-                </StackLayout>
+                    <StackLayout>
+                        <Label Text="Privacy Policy" TextColor="Black" FontSize="22">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="GoToPrivacyPolicy"></TapGestureRecognizer>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </StackLayout>
+                    </StackLayout>
+                            <StackLayout VerticalOptions="EndAndExpand">
+                        <Label HorizontalOptions="Center" x:Name="versionNumber" TextColor="Black" FontSize="Small" FontAttributes="Bold"></Label>
+                        <Label HorizontalOptions="Center" x:Name="buildNumber" TextColor="Black" FontSize="Small" FontAttributes="Bold"></Label>
+                    </StackLayout>
                     </StackLayout>
                 </ScrollView>
             </StackLayout>
