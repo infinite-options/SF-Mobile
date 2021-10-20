@@ -84,14 +84,16 @@ namespace ServingFresh.Views
                 }
                 else
                 {
-                    if(surveySource[objectSelected.ratingStarListIndex].ratingStarList[objectSelected.position].ratingStar == "filledStar")
+
+                    if (surveySource[objectSelected.ratingStarListIndex].ratingStarList[objectSelected.position].ratingStar == "filledStar")
                     {
-                        for (int i = 0; i <= objectSelected.position; i++)
+                        for (int i = 1; i <= objectSelected.position; i++)
                         {
                             surveySource[objectSelected.ratingStarListIndex].ratingStarList[i].updateRatingStar = "emptyStar";
                         }
-                        surveySource[objectSelected.ratingStarListIndex].rateValue = 0;
+                        surveySource[objectSelected.ratingStarListIndex].rateValue = 1;
                     }
+
                 }
             }
         }
@@ -136,42 +138,49 @@ namespace ServingFresh.Views
                 ratingArray.Add(q.rateValue);
             }
 
-            ratingObject.purchase_uid = historyObjectLocal.original_purchase_id;
-            ratingObject.comment = commentsView.Text == null ? "" : commentsView.Text;
+            if(ratingArray[0]> 0)
+            { 
+                ratingObject.purchase_uid = historyObjectLocal.original_purchase_id;
+                ratingObject.comment = commentsView.Text == null ? "" : commentsView.Text;
 
-            var serializeArray = JsonConvert.SerializeObject(ratingArray);
+                var serializeArray = JsonConvert.SerializeObject(ratingArray);
 
-            ratingObject.rating = serializeArray;
+                ratingObject.rating = serializeArray;
 
-            var serializeContent = JsonConvert.SerializeObject(ratingObject);
-            var contentString = new StringContent(serializeContent, Encoding.UTF8, "application/json");
+                var serializeContent = JsonConvert.SerializeObject(ratingObject);
+                var contentString = new StringContent(serializeContent, Encoding.UTF8, "application/json");
 
-            var client = new HttpClient();
-            var endpointCall = await client.PostAsync(Constant.RateOrder, contentString);
+                var client = new HttpClient();
+                var endpointCall = await client.PostAsync(Constant.RateOrder, contentString);
 
 
-            if (endpointCall.IsSuccessStatusCode)
-            {
-                historyObjectLocal.updateIsRateOrderButtonAvaiable = false;
-                historyObjectLocal.updateIsRateIconAvailable = true;
-                historyObjectLocal.updateRatingSourceIcon = SetIcon(ratingArray[0]);
-
-                if (ratingArray[0] >= 4)
+                if (endpointCall.IsSuccessStatusCode)
                 {
-                    // display different UI
-                    await Navigation.PushModalAsync(new RatingMessagePage(true)); ;
+                    historyObjectLocal.updateIsRateOrderButtonAvaiable = false;
+                    historyObjectLocal.updateIsRateIconAvailable = true;
+                    historyObjectLocal.updateRatingSourceIcon = SetIcon(ratingArray[0]);
+
+                    if (ratingArray[0] >= 4)
+                    {
+                        // display different UI
+                        await Navigation.PushModalAsync(new RatingMessagePage(true)); ;
+                    }
+                    else
+                    {
+                        // display different UI
+                        await Navigation.PushModalAsync(new RatingMessagePage(false));
+                    }
+
                 }
                 else
                 {
-                    // display different UI
-                    await Navigation.PushModalAsync(new RatingMessagePage(false));
+                    await DisplayAlert("Oops", "We are not able to process your request at the moment. Please, try again later.", "OK");
+                    await Navigation.PopModalAsync();
                 }
-
             }
             else
             {
-                await DisplayAlert("Oops", "We are not able to process your request at the moment. Please, try again later.", "OK");
-                await Navigation.PopModalAsync();
+                await DisplayAlert("Oops", "Please rate your overall experience or click X to exit.", "OK");
             }
 
         }
