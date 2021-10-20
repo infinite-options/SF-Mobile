@@ -32,23 +32,31 @@ namespace ServingFresh.Models
 
         public async Task<Dictionary<string, MessageResult>> GetMessageList()
         {
+            
             Dictionary<string, MessageResult> result = null;
-            var client = new HttpClient();
-            var endpointCall = await client.GetAsync(Constant.AlertMessage);
-            if (endpointCall.IsSuccessStatusCode)
+            try
             {
-                var content = await endpointCall.Content.ReadAsStringAsync();
-                var data = JsonConvert.DeserializeObject<Message>(content);
-
-                result = new Dictionary<string, MessageResult>();
-
-                foreach (MessageResult message in data.result)
+                var client = new HttpClient();
+                var endpointCall = await client.GetAsync(Constant.AlertMessage);
+                if (endpointCall.IsSuccessStatusCode)
                 {
-                    if (!result.ContainsKey(message.alert_uid))
+                    var content = await endpointCall.Content.ReadAsStringAsync();
+                    var data = JsonConvert.DeserializeObject<Message>(content);
+
+                    result = new Dictionary<string, MessageResult>();
+
+                    foreach (MessageResult message in data.result)
                     {
-                        result.Add(message.alert_uid, message);
+                        if (!result.ContainsKey(message.alert_uid))
+                        {
+                            result.Add(message.alert_uid, message);
+                        }
                     }
                 }
+            }
+            catch
+            {
+
             }
             return result;
         }

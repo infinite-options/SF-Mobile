@@ -186,7 +186,7 @@ namespace ServingFresh.Views
             }
             else if (ratingValue == 1)
             {
-                result = "filledStar";
+                result = "oneStarRating";
             }
             else if (ratingValue == 2)
             {

@@ -17,7 +17,7 @@
                 <Label HorizontalTextAlignment="Center" Text="Thank you for your feedback.&#10; Please leave us a review on:" FontSize="14" TextColor="Black"></Label>
                 <StackLayout Orientation="Horizontal" HorizontalOptions="CenterAndExpand" Margin="0,0,0,50">
                     <ImageButton HeightRequest="50" Source="facebookReviewIcon" IsVisible="false"  Clicked="SendUserToReviewLinks"></ImageButton>
-                    <ImageButton HeightRequest="50" Source="googleReviewIcon" Clicked="SendUserToReviewLinks"></ImageButton>
+                    <ImageButton HeightRequest="50" Source="googleReviewIcon" BackgroundColor="Transparent"  Clicked="SendUserToReviewLinks"></ImageButton>
                 </StackLayout>
             </StackLayout>
         </StackLayout>

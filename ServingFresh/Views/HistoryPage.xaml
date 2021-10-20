@@ -89,9 +89,9 @@
                                             </StackLayout>
                                             <StackLayout Grid.Column="1">
                                                 <StackLayout HorizontalOptions="End" WidthRequest="100">
-                                                    <Button Padding="10" IsVisible="true" Text="EZ Reorder" TextColor="White" HeightRequest="31" CornerRadius="5" FontSize="14" BackgroundColor="#FF8500" Clicked="Reorder" CommandParameter="{Binding .}"/>
-                                                    <Button Padding="10" IsVisible="{Binding isRateOrderButtonAvailable}" Text="Rate Order" Clicked="RateOrderButton" CommandParameter="{Binding .}" TextColor="#136D74" HeightRequest="31" CornerRadius="5" FontSize="14" BackgroundColor="#E0E6E6"/>
-                                                    <ImageButton Padding="10" HeightRequest="31" WidthRequest="100" IsVisible="{Binding isRateIconAvailable}" Source="{Binding ratingSourceIcon}" Scale="1.5" Clicked="RateOrderButton" CommandParameter="{Binding .}"/>
+                                                    <Button Padding="10" IsVisible="true" Text="EZ Reorder" TextColor="White" HeightRequest="40" CornerRadius="5" FontSize="14" BackgroundColor="#FF8500" Clicked="Reorder" CommandParameter="{Binding .}"/>
+                                                    <Button Padding="10" IsVisible="{Binding isRateOrderButtonAvailable}" Text="Rate Order" Clicked="RateOrderButton" CommandParameter="{Binding .}" TextColor="#136D74" HeightRequest="40" CornerRadius="5" FontSize="14" BackgroundColor="#E0E6E6"/>
+                                                    <ImageButton Padding="10" BackgroundColor="Transparent" HeightRequest="31" WidthRequest="100" IsVisible="{Binding isRateIconAvailable}" Source="{Binding ratingSourceIcon}" Scale="1.5" Clicked="RateOrderButton" CommandParameter="{Binding .}"/>
                                                 </StackLayout>
                                             </StackLayout>
                                         </Grid>

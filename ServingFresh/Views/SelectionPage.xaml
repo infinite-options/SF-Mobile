@@ -113,7 +113,7 @@
                     <StackLayout Spacing="0">
                  <FlexLayout JustifyContent="SpaceBetween" >
                      <Label Margin="20,10,0,10" x:Name="category1" Text="" TextColor="#136D74" FontAttributes="Bold" FontSize="16"></Label>
-                     <StackLayout Margin="0,10,20,10" Orientation="Horizontal" ClassId="vegetablesView" >
+                     <StackLayout Margin="0,10,0,10"  Padding="20,0,20,0"  Orientation="Horizontal" ClassId="vegetablesView" >
                          <Label Text="See all vegetables" VerticalTextAlignment="Center" TextColor="#FF8500" FontAttributes="Bold" FontSize="10"></Label>
                          <Image HeightRequest="12" Rotation="0" Source="triangleIconFilled.png" >
                              <Image.Effects>
@@ -509,7 +509,7 @@
                 <BoxView Margin="15,0,15,0" HeightRequest="1" Color="#136D74"></BoxView>
                  <FlexLayout JustifyContent="SpaceBetween">
                      <Label Margin="20,10,0,10" x:Name="category2" Text="" TextColor="#136D74" FontAttributes="Bold" FontSize="16"></Label>
-                     <StackLayout Margin="0,10,20,10" Orientation="Horizontal" ClassId="fruitsView" >
+                     <StackLayout Margin="0,10,0,10" Padding="20,0,20,0" Orientation="Horizontal" ClassId="fruitsView" >
                          <Label Text="See all fruits" VerticalTextAlignment="Center" TextColor="#FF8500" FontAttributes="Bold" FontSize="10"></Label>
                          <Image HeightRequest="12" Rotation="0" Source="triangleIconFilled.png">
                              <Image.Effects>
@@ -905,7 +905,7 @@
                 <BoxView Margin="15,0,15,0" HeightRequest="1" Color="#136D74"></BoxView>
                  <FlexLayout JustifyContent="SpaceBetween" >
                      <Label Margin="20,10,0,10" x:Name="category3" Text="" TextColor="#136D74" FontAttributes="Bold" FontSize="16"></Label>
-                     <StackLayout Margin="0,10,20,10" Orientation="Horizontal" ClassId="othersView">
+                     <StackLayout Margin="0,10,0,10" Padding="20,0,20,0" Orientation="Horizontal" ClassId="othersView">
                          <Label Text="See all others" VerticalTextAlignment="Center" TextColor="#FF8500" FontAttributes="Bold" FontSize="10"></Label>
                          <Image HeightRequest="12" Rotation="0" Source="triangleIconFilled.png">
                              <Image.Effects>
@@ -1301,7 +1301,7 @@
                 <BoxView Margin="15,0,15,0" HeightRequest="1" Color="#136D74"></BoxView>
                  <FlexLayout JustifyContent="SpaceBetween">
                      <Label Margin="20,10,0,10" x:Name="category4" Text="" TextColor="#136D74" FontAttributes="Bold" FontSize="16"></Label>
-                     <StackLayout Margin="0,10,20,10" Orientation="Horizontal" ClassId="dessertsView">
+                     <StackLayout Margin="0,10,0,10" Padding="20,0,20,0" Orientation="Horizontal" ClassId="dessertsView">
                          <Label Text="See all desserts" VerticalTextAlignment="Center" TextColor="#FF8500" FontAttributes="Bold" FontSize="10"></Label>
                          <Image HeightRequest="12" Rotation="0" Source="triangleIconFilled.png">
                              <Image.Effects>

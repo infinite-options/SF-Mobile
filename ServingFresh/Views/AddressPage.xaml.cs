@@ -195,6 +195,8 @@ namespace ServingFresh.Views
         void signUpAddress1Entry_Focused(System.Object sender, EventArgs eventArgs)
         {
             if (!String.IsNullOrEmpty(signUpAddress1Entry.Text)) {
+                var currentScrollYPosition = addressScrollView.ScrollX;
+                addressScrollView.ScrollToAsync(0, currentScrollYPosition + 100, true);
                 addr.addressEntryFocused(SignUpAddressList, signUpAddressFrame);
             }
         }

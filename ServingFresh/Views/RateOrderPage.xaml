@@ -18,7 +18,7 @@
                                     <StackLayout BindableLayout.ItemsSource="{Binding ratingStarList}" HorizontalOptions="Center" Orientation="Horizontal">
                                         <BindableLayout.ItemTemplate>
                                             <DataTemplate>
-                                                <ImageButton HeightRequest="40" Source="{Binding ratingStar}" CommandParameter="{Binding .}" Clicked="ClickOnStar" ></ImageButton>
+                                                <ImageButton HeightRequest="40" Source="{Binding ratingStar}" BackgroundColor="Transparent"  CommandParameter="{Binding .}" Clicked="ClickOnStar" ></ImageButton>
                                             </DataTemplate>
                                         </BindableLayout.ItemTemplate>
                                     </StackLayout>

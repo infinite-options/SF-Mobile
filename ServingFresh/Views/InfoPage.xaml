@@ -90,7 +90,7 @@
                         <Label Text="Farmer with seedling by Gan Khoon Lay from the Noun Project" FontSize="18" TextColor="#FF8500"></Label>
                     </StackLayout>
                     <StackLayout>
-                        <Label Text="Privacy Policy" TextColor="Black" FontSize="22">
+                        <Label Text="Privacy Policy" HorizontalOptions="Center" TextColor="Black" FontSize="Small" FontAttributes="Bold">
                             <Label.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="GoToPrivacyPolicy"></TapGestureRecognizer>
                             </Label.GestureRecognizers>

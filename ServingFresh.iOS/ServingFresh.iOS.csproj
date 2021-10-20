@@ -223,8 +223,6 @@
     <BundleResource Include="Resources\vegetablesBackgroundImage.png" />
     <BundleResource Include="Resources\instagramIcon.png" />
     <BundleResource Include="Resources\continueWithApple.png" />
-    <BundleResource Include="Resources\continueWithFacebook.png" />
-    <BundleResource Include="Resources\continueWithGoogle.png" />
     <BundleResource Include="Resources\homeIcon.png" />
     <BundleResource Include="Resources\ambassadorIcon.png" />
     <BundleResource Include="Resources\giftCardIcon.png" />
@@ -235,14 +233,17 @@
     <BundleResource Include="Resources\minusIcon.png" />
     <BundleResource Include="Resources\plusIcon.png" />
     <BundleResource Include="Resources\giftCardA.png" />
-    <BundleResource Include="Resources\continueWithApple2.png" />
     <BundleResource Include="Resources\emptyStar.png" />
     <BundleResource Include="Resources\filledStar.png" />
     <BundleResource Include="Resources\facebookReviewIcon.png" />
     <BundleResource Include="Resources\googleReviewIcon.png" />
     <BundleResource Include="Resources\greenCloseIcon.png" />
+    <BundleResource Include="Resources\continueWithApple2.png" />
+    <BundleResource Include="Resources\continueWithFacebook.png" />
+    <BundleResource Include="Resources\continueWithGoogle.png" />
     <BundleResource Include="Resources\fiveStarRating.png" />
     <BundleResource Include="Resources\fourStarRating.png" />
+    <BundleResource Include="Resources\oneStarRating.png" />
     <BundleResource Include="Resources\threeStarRating.png" />
     <BundleResource Include="Resources\twoStarRating.png" />
   </ItemGroup>
