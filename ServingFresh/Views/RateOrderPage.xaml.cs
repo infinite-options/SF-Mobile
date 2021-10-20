@@ -47,8 +47,7 @@ namespace ServingFresh.Views
                 surveySource.Add(new RateOrderDetails(questionArray[i], i));
             }
 
-            surveyView.ItemsSource = surveySource;
-            surveyView.HeightRequest = 100 * 3;
+            BindableLayout.SetItemsSource(myStack, surveySource);
         }
 
         void ClickOnStar(System.Object sender, System.EventArgs e)
@@ -93,12 +92,10 @@ namespace ServingFresh.Views
                         }
                         surveySource[objectSelected.ratingStarListIndex].rateValue = 1;
                     }
-
                 }
             }
         }
         
-
         bool AllStarsAreEmpty(ObservableCollection<Star> list)
         {
             bool result = true;

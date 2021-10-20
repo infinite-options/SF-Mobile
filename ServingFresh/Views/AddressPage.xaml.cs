@@ -171,6 +171,8 @@ namespace ServingFresh.Views
         {
             if (!String.IsNullOrEmpty(signUpAddress1Entry.Text))
             {
+                
+
                 if (addressToValidate != null)
                 {
                     if (addressToValidate.Street != signUpAddress1Entry.Text)
@@ -195,8 +197,17 @@ namespace ServingFresh.Views
         void signUpAddress1Entry_Focused(System.Object sender, EventArgs eventArgs)
         {
             if (!String.IsNullOrEmpty(signUpAddress1Entry.Text)) {
-                var currentScrollYPosition = addressScrollView.ScrollX;
-                addressScrollView.ScrollToAsync(0, currentScrollYPosition + 100, true);
+
+                if(Device.RuntimePlatform == Device.iOS)
+                {
+                    var currentScrollYPosition = addressScrollView.ScrollX;
+                    addressScrollView.ScrollToAsync(0, currentScrollYPosition + 100, true);
+                }else if (Device.RuntimePlatform == Device.Android)
+                {
+                    var currentScrollYPosition = addressScrollView.ScrollX;
+                    addressScrollView.ScrollToAsync(0, currentScrollYPosition + 150, true);
+                }
+                
                 addr.addressEntryFocused(SignUpAddressList, signUpAddressFrame);
             }
         }

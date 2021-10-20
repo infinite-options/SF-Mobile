@@ -8,13 +8,13 @@
     <ContentPage.Content>
       <Frame x:Name="signUpFrame" Margin="0,180,0,0" BackgroundColor="WhiteSmoke">
         <StackLayout>
-            <Grid HeightRequest="60">
+            <Grid >
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="100"></ColumnDefinition>
+                    <ColumnDefinition Width="50"></ColumnDefinition>
                     <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="100"></ColumnDefinition>
+                    <ColumnDefinition Width="50"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <Label Grid.Column="1" Margin="0,0,0,0" Text="Sign Up" TextColor="#136D74" FontSize="32" FontAttributes="Bold" TextDecorations="Underline" HorizontalTextAlignment="Center" ></Label>
+                <Label Grid.Column="1" Margin="0,0,0,0" HeightRequest="140" Text="Sign Up" TextColor="#136D74" FontSize="32" FontAttributes="Bold" TextDecorations="Underline" HorizontalTextAlignment="Center" ></Label>
                 <ImageButton Grid.Column="2" Padding="0,0,2,0" HeightRequest="30" BackgroundColor="Transparent" Source="closeFrameIcon.png" HorizontalOptions="End" Clicked="CloseSignUpPage"></ImageButton>
             </Grid>
             

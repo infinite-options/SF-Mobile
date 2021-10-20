@@ -5,16 +5,16 @@
     x:Class="ServingFresh.Views.RateOrderPage"
     BackgroundColor="#AB000000">
 
-    <StackLayout Margin="0,150,0,0" BackgroundColor="WhiteSmoke" Padding="0,0,0,0">
+    <StackLayout Margin="0,100,0,0" BackgroundColor="WhiteSmoke">
         <ImageButton HorizontalOptions="End" Margin="0,5,5,0" Clicked="CloseRatingPage" HeightRequest="30" Source="greenCloseIcon"></ImageButton>
-        <ScrollView>
+        <ScrollView Padding="0,0,0,20">
             <StackLayout>
-                <CollectionView x:Name="surveyView">
-                    <CollectionView.ItemTemplate>
+                <StackLayout x:Name="myStack">
+                    <BindableLayout.ItemTemplate>
                         <DataTemplate>
-                            <StackLayout Margin="0,25,0,0">
+                             <StackLayout Margin="0,15,0,0">
                                 <StackLayout VerticalOptions="CenterAndExpand">
-                                    <Label HorizontalOptions="Center" Text="{Binding question}" TextColor="#2F787F" FontSize="18" FontAttributes="Bold"></Label>
+                                    <Label HorizontalOptions="Center" HorizontalTextAlignment="Center" Text="{Binding question}" TextColor="#2F787F" FontSize="18" FontAttributes="Bold"></Label>
                                     <StackLayout BindableLayout.ItemsSource="{Binding ratingStarList}" HorizontalOptions="Center" Orientation="Horizontal">
                                         <BindableLayout.ItemTemplate>
                                             <DataTemplate>
@@ -25,17 +25,17 @@
                                 </StackLayout>
                             </StackLayout>
                         </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-                <StackLayout>
+                    </BindableLayout.ItemTemplate>
+                </StackLayout>
+                <StackLayout Margin="0,15,0,0">
                     <StackLayout HorizontalOptions="Center">
                         <Label Text="Any other comments or feedback?" TextColor="#2F787F" FontSize="18" FontAttributes="Bold"></Label>
                     </StackLayout>
-                    <StackLayout Padding="40,0,40,0"  HeightRequest="80">
-                        <Editor x:Name="commentsView" VerticalOptions="FillAndExpand" BackgroundColor="Transparent" Placeholder="Write your additional feedback"></Editor>
-                    </StackLayout>
+                    <Frame  Margin="20,0,20,0" HeightRequest="80" Padding="0" BorderColor="LightGray" HasShadow="False">
+                        <Editor x:Name="commentsView" TextColor="Black" FontSize="14" VerticalOptions="FillAndExpand" PlaceholderColor="DarkGray" Placeholder="Write your additional feedback"></Editor>
+                    </Frame>
                 </StackLayout>
-                <Button Margin="60,0,60,0" Text="Submit Rating" Clicked="SubmitRating" TextColor="White" FontAttributes="Bold" BackgroundColor="#FF8500"></Button>
+                <Button Margin="60,10,60,0" Text="Submit Rating" Clicked="SubmitRating" TextColor="White" FontAttributes="Bold" BackgroundColor="#FF8500"></Button>
             </StackLayout>
         </ScrollView>
     </StackLayout>

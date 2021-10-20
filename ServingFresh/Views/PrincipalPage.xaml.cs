@@ -259,8 +259,6 @@ namespace ServingFresh.Views
             bool animate = false;
             scrollView.ScrollToAsync(0, 5, animate);
             Application.Current.MainPage.Navigation.PushModalAsync(new AddressPage(), true);
-            //addressRow.Height = this.Height - 200;
-            //addressFrameSignUp.Margin = new Thickness(5, -this.Height + 400, 5, 0);
         }
 
         async void OnAddressChanged(object sender, EventArgs eventArgs)

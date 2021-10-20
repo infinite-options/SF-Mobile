@@ -3,7 +3,7 @@
     <ContentPage.Content>
     <Frame x:Name="logInFrame" Margin="0,170,0,0" BackgroundColor="WhiteSmoke">
         <StackLayout>
-            <Grid HeightRequest="50" >
+            <Grid HeightRequest="55" >
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100"></ColumnDefinition>
                     <ColumnDefinition Width="*"></ColumnDefinition>
@@ -13,9 +13,7 @@
                 <ImageButton Grid.Column="2" Padding="0,0,2,0" HeightRequest="30" BackgroundColor="Transparent" Source="closeFrameIcon.png" HorizontalOptions="End" Clicked="ImageButton_Clicked"></ImageButton>
             </Grid>
         <ScrollView x:Name="scrollView" Margin="0,5,0,0">
-        <StackLayout x:Name="grids" BackgroundColor="WhiteSmoke"  HorizontalOptions="Center" >
-           
-           
+        <StackLayout x:Name="grids" BackgroundColor="WhiteSmoke"  HorizontalOptions="Center">
             <StackLayout>
                 <ImageButton x:Name="appleLogInButton" BackgroundColor="Transparent" Clicked="AppleLogInClick" Command = "{Binding SignInWithAppleCommand}" Source="continueWithApple2.png" HeightRequest="48"></ImageButton>
                 <ImageButton Clicked="FacebookLogInClick" BackgroundColor="Transparent" Source="continueWithFacebook.png" HeightRequest="48"></ImageButton>
