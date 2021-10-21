@@ -80,12 +80,10 @@
     <None Include="Entitlements.plist" />
     <None Include="Info.plist" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="AppleSignIn\AppleSignInButtonRenderer.cs" />
     <Compile Include="AppleSignIn\AppleSignInService.cs" />
     <Compile Include="Effects\TintImageEffect.cs" />
     <Compile Include="Renderers\CustomEntryRenderer.cs" />
     <Compile Include="AppleNotificationService\NotificationService.cs" />
-    <Compile Include="iOSAzureConstants.cs" />
     <Compile Include="VersionAndBuild_iOS.cs" />
   </ItemGroup>
   <ItemGroup>

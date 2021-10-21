@@ -64,8 +64,6 @@
                                         </Frame>
                                     </Grid>
                                 </Frame>
-                                <!--<Label Text="OR" TextColor="White"  FontSize="Medium" HorizontalTextAlignment="Center" FontAttributes="Bold" ></Label>
-                                <Entry Margin="70,0,70,0" x:Name="zipcodeEntry" Placeholder="Enter Zip Code" FontSize="14" PlaceholderColor="Gray"  HorizontalTextAlignment="Center"></Entry>-->
                                 <Button WidthRequest="287" HorizontalOptions="Center"  Font="14" TextColor="white" Text="Find Local Produce"  BackgroundColor="#136D74" Clicked="FindLocalProduceBaseOnLocation"></Button>
                                 <Frame Margin="0,-68,0,0" Padding="2" HorizontalOptions="CenterAndExpand" BackgroundColor="#E0EBEC" CornerRadius="0" x:Name="addressFrame" IsVisible="false">
                                     <ListView x:Name="addressList" IsVisible="false" HasUnevenRows="True" SeparatorVisibility="None" RowHeight="40" BackgroundColor="#E0EBEC" HorizontalOptions="CenterAndExpand" WidthRequest="280" HeightRequest="60" ItemSelected="addressSelected">

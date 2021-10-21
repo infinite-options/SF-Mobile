@@ -11,6 +11,7 @@ using ServingFresh.Notifications;
 using WindowsAzure.Messaging;
 using System.Diagnostics;
 using Xamarin.Essentials;
+using ServingFresh.Config;
 
 namespace ServingFresh.iOS
 {
@@ -177,7 +178,7 @@ namespace ServingFresh.iOS
                 return;
             }
 
-            Hub = new SBNotificationHub(AppConstants.ListenConnectionString, AppConstants.NotificationHubName);
+            Hub = new SBNotificationHub(Constant.ListenConnectionString, Constant.NotificationHubName);
 
             // update registration with Azure Notification Hub
             Hub.UnregisterAll(deviceToken, (error) =>
@@ -193,7 +194,7 @@ namespace ServingFresh.iOS
                 Console.WriteLine("guid:" + tag);
                 Preferences.Set("guid", tag);
                 System.Diagnostics.Debug.WriteLine("This is the GUID from RegisteredForRemoteNotifications: " + Preferences.Get("guid", string.Empty));
-                var tags = new NSSet(AppConstants.SubscriptionTags.Append(tag).ToArray());
+                var tags = new NSSet(Constant.SubscriptionTags.Append(tag).ToArray());
 
                 Preferences.Set("Token", deviceToken.ToString());
 
@@ -206,7 +207,7 @@ namespace ServingFresh.iOS
                 });
 
                 var templateExpiration = DateTime.Now.AddDays(120).ToString(System.Globalization.CultureInfo.CreateSpecificCulture("en-US"));
-                Hub.RegisterTemplate(deviceToken, "defaultTemplate", AppConstants.APNTemplateBody, templateExpiration, tags, (errorCallback) =>
+                Hub.RegisterTemplate(deviceToken, "defaultTemplate", Constant.APNTemplateBody, templateExpiration, tags, (errorCallback) =>
                 {
                     if (errorCallback != null)
                     {

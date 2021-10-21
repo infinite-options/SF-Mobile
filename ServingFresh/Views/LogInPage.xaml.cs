@@ -775,95 +775,43 @@ namespace ServingFresh.Views
             {
                 IAppleSignInService appleSignInService = DependencyService.Get<IAppleSignInService>();
                 var account = await appleSignInService.SignInAsync();
+
                 if (account != null)
                 {
                     Preferences.Set(App.LoggedInKey, true);
                     await SecureStorage.SetAsync(App.AppleUserIdKey, account.UserId);
-
-                    if (account.Token == null) { account.Token = ""; }
+                    string email = "";
                     if (account.Email != null)
                     {
-                        if (Application.Current.Properties.ContainsKey(account.UserId.ToString()))
-                        {
-                            //Application.Current.Properties[account.UserId.ToString()] = account.Email;
-                            Debug.WriteLine((string)Application.Current.Properties[account.UserId.ToString()]);
-                        }
-                        else
-                        {
-                            Application.Current.Properties[account.UserId.ToString()] = account.Email;
-                        }
+                        await SecureStorage.SetAsync(account.UserId, account.Email);
+                        Application.Current.Properties[account.UserId.ToString()] = account.Email;
                     }
-                    if (account.Email == null) { account.Email = ""; }
-                    if (account.Name == null) { account.Name = ""; }
-
-                    if (Application.Current.Properties.ContainsKey(account.UserId.ToString()))
+                    else
                     {
-                        account.Email = (string)Application.Current.Properties[account.UserId.ToString()];
-                        //Application.Current.MainPage = new SelectionPage("", "", null, account, "APPLE");
-                        //var root = (LogInPage)Application.Current.MainPage;
-                        //root.AppleLogIn("", "", null, account, "APPLE");
+                        email = await SecureStorage.GetAsync(account.UserId);
+
+                        if (email == null)
+                        {
+                            if (Application.Current.Properties.ContainsKey(account.UserId.ToString()))
+                            {
+                                email = (string)Application.Current.Properties[account.UserId.ToString()];
+                            }
+                            else
+                            {
+                                email = "";
+                            }
+                        }
+
+                        account.Email = email;
 
                         var client = new SignIn();
                         UserDialogs.Instance.ShowLoading("Retrieving your SF account...");
                         var status = await client.VerifyUserCredentials("", "", null, account, "APPLE");
                         RedirectUserBasedOnVerification(status, direction);
-                        //AppleUserProfileAsync(account.UserId, account.Token, (string)Application.Current.Properties[account.UserId.ToString()], account.Name);
-                    }
-                    else
-                    {
-                        var client = new HttpClient();
-                        var getAppleEmail = new AppleEmail();
-                        getAppleEmail.social_id = account.UserId;
 
-                        var socialLogInPostSerialized = JsonConvert.SerializeObject(getAppleEmail);
-
-                        System.Diagnostics.Debug.WriteLine(socialLogInPostSerialized);
-
-                        var postContent = new StringContent(socialLogInPostSerialized, Encoding.UTF8, "application/json");
-                        var RDSResponse = await client.PostAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/AppleEmail", postContent);
-                        var responseContent = await RDSResponse.Content.ReadAsStringAsync();
-
-                        System.Diagnostics.Debug.WriteLine(responseContent);
-                        if (RDSResponse.IsSuccessStatusCode)
-                        {
-                            var data = JsonConvert.DeserializeObject<AppleUser>(responseContent);
-                            Application.Current.Properties[account.UserId.ToString()] = data.result[0].customer_email;
-                            account.Email = (string)Application.Current.Properties[account.UserId.ToString()];
-                            //var root = (LogInPage)Application.Current.MainPage;
-                            //root.AppleLogIn("", "", null, account, "APPLE");
-                            //Application.Current.MainPage = new SelectionPage("", "", null, account, "APPLE");
-                            //AppleUserProfileAsync(account.UserId, account.Token, (string)Application.Current.Properties[account.UserId.ToString()], account.Name);
-                            var client1 = new SignIn();
-                            UserDialogs.Instance.ShowLoading("Retrieving your SF account...");
-                            var status = await client1.VerifyUserCredentials("", "", null, account, "APPLE");
-                            RedirectUserBasedOnVerification(status, direction);
-                        }
-                        else
-                        {
-                            if (messageList != null)
-                            {
-                                if (messageList.ContainsKey("701-000042"))
-                                {
-                                    await DisplayAlert(messageList["701-000042"].title, messageList["701-000042"].message, messageList["701-000042"].responses);
-                                }
-                                else
-                                {
-                                    await Application.Current.MainPage.DisplayAlert("Ooops", "Our system is not working. We can't process your request at this moment", "OK");
-                                }
-                            }
-                            else
-                            {
-                                await Application.Current.MainPage.DisplayAlert("Ooops", "Our system is not working. We can't process your request at this moment", "OK");
-                            }
-                            
-                        }
                     }
                 }
-                else
-                {
-                    //AppleError?.Invoke(this, default(EventArgs));
 
-                }
             }
             catch (Exception errorAppleSignInRequest)
             {
