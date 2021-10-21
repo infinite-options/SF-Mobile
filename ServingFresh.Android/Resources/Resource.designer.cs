@@ -27712,80 +27712,83 @@ namespace ServingFresh.Droid
 			// aapt resource value: 0x7F0700E4
 			public const int selectedVegetablesIcon = 2131165412;
 			
-			// aapt resource value: 0x7F0700E5
-			public const int servingFreshIcon = 2131165413;
-			
 			// aapt resource value: 0x7F0700E6
-			public const int SFIcon = 2131165414;
+			public const int servingFreshIcon = 2131165414;
+			
+			// aapt resource value: 0x7F0700E5
+			public const int serving_fresh_main_luncher = 2131165413;
 			
 			// aapt resource value: 0x7F0700E7
-			public const int signedAppleIcon = 2131165415;
+			public const int SFIcon = 2131165415;
 			
 			// aapt resource value: 0x7F0700E8
-			public const int signedFacebookIcon = 2131165416;
+			public const int signedAppleIcon = 2131165416;
 			
 			// aapt resource value: 0x7F0700E9
-			public const int signedGoogleIcon = 2131165417;
+			public const int signedFacebookIcon = 2131165417;
 			
 			// aapt resource value: 0x7F0700EA
-			public const int signIn = 2131165418;
+			public const int signedGoogleIcon = 2131165418;
 			
 			// aapt resource value: 0x7F0700EB
-			public const int signUpIcon = 2131165419;
+			public const int signIn = 2131165419;
 			
 			// aapt resource value: 0x7F0700EC
-			public const int signUpLeafIcon = 2131165420;
+			public const int signUpIcon = 2131165420;
 			
 			// aapt resource value: 0x7F0700ED
-			public const int store = 2131165421;
+			public const int signUpLeafIcon = 2131165421;
 			
 			// aapt resource value: 0x7F0700EE
-			public const int storeIcon = 2131165422;
+			public const int store = 2131165422;
 			
 			// aapt resource value: 0x7F0700EF
-			public const int test_custom_background = 2131165423;
+			public const int storeIcon = 2131165423;
 			
 			// aapt resource value: 0x7F0700F0
-			public const int threeStarRating = 2131165424;
+			public const int test_custom_background = 2131165424;
 			
 			// aapt resource value: 0x7F0700F1
-			public const int tooltip_frame_dark = 2131165425;
+			public const int threeStarRating = 2131165425;
 			
 			// aapt resource value: 0x7F0700F2
-			public const int tooltip_frame_light = 2131165426;
+			public const int tooltip_frame_dark = 2131165426;
 			
 			// aapt resource value: 0x7F0700F3
-			public const int triangleIconEmpty = 2131165427;
+			public const int tooltip_frame_light = 2131165427;
 			
 			// aapt resource value: 0x7F0700F4
-			public const int triangleIconFilled = 2131165428;
+			public const int triangleIconEmpty = 2131165428;
 			
 			// aapt resource value: 0x7F0700F5
-			public const int twoStarRating = 2131165429;
+			public const int triangleIconFilled = 2131165429;
 			
 			// aapt resource value: 0x7F0700F6
-			public const int unselectedDessertsIcon = 2131165430;
+			public const int twoStarRating = 2131165430;
 			
 			// aapt resource value: 0x7F0700F7
-			public const int unselectedFavoritesIcon = 2131165431;
+			public const int unselectedDessertsIcon = 2131165431;
 			
 			// aapt resource value: 0x7F0700F8
-			public const int unselectedFruitsIcon = 2131165432;
+			public const int unselectedFavoritesIcon = 2131165432;
 			
 			// aapt resource value: 0x7F0700F9
-			public const int unselectedHeartIcon = 2131165433;
+			public const int unselectedFruitsIcon = 2131165433;
 			
 			// aapt resource value: 0x7F0700FA
-			public const int unselectedOthersIcon = 2131165434;
+			public const int unselectedHeartIcon = 2131165434;
 			
 			// aapt resource value: 0x7F0700FB
-			public const int unselectedVegetablesIcon = 2131165435;
+			public const int unselectedOthersIcon = 2131165435;
 			
 			// aapt resource value: 0x7F0700FC
-			public const int vegetablesBackgroundImage = 2131165436;
+			public const int unselectedVegetablesIcon = 2131165436;
 			
 			// aapt resource value: 0x7F0700FD
-			public const int welcomeBackground = 2131165437;
+			public const int vegetablesBackgroundImage = 2131165437;
+			
+			// aapt resource value: 0x7F0700FE
+			public const int welcomeBackground = 2131165438;
 			
 			static Drawable()
 			{
