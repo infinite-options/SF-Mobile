@@ -6,67 +6,113 @@
     xmlns:maps="clr-namespace:Xamarin.Forms.Maps;assembly=Xamarin.Forms.Maps"
     x:Class="ServingFresh.Views.SocialSignUp">
     <ContentPage.Content>
-                <StackLayout Padding="0,0,0,0">
-            <Label
-                HeightRequest="136"
-                HorizontalTextAlignment="Center"
-                VerticalTextAlignment="Center"
-                Text="Sign Up"
-                TextColor="White"
-                FontSize="34"
-                FontAttributes="Bold"
-                BackgroundColor="#136D74">
-
-            </Label>
+                <StackLayout Padding="0,0,0,0" BackgroundColor="White">
+                <Grid BackgroundColor="#136D74">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="136"></RowDefinition>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="100"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Label
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    HeightRequest="50"
+                    HorizontalTextAlignment="Center"
+                    VerticalTextAlignment="Center"
+                    Text="Back"
+                    TextColor="White"
+                    FontSize="Default"
+                    FontAttributes="Bold">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"></TapGestureRecognizer>
+                    </Label.GestureRecognizers>
+                </Label>
+                <Label
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    HeightRequest="136"
+                    HorizontalTextAlignment="Center"
+                    VerticalTextAlignment="Center"
+                    Text="Sign Up"
+                    TextColor="White"
+                    FontSize="34"
+                    FontAttributes="Bold"
+                    BackgroundColor="#136D74">
+                </Label>
+            </Grid>
             <ScrollView>
                 <StackLayout
                     Margin="10,10,10,0">
                     <Entry
                         x:Name="userEmailAddress"
-                        Placeholder="Email Address">
+                        Placeholder="Email Address"
+                        Keyboard="Email"
+                        PlaceholderColor="Gray"
+                        TextColor="Black">
                     </Entry>
                     <Grid>
                         <servingfresh:CustomEntry Placeholder="Push Notification" IsReadOnly="True" Margin="7,0,0,0"></servingfresh:CustomEntry>
-                        <Switch HorizontalOptions="End" Grid.Column="1" IsToggled="True"></Switch>
+                        <Switch x:Name="localSocialNotificationButton" HorizontalOptions="End" Grid.Column="1" IsToggled="True"></Switch>
                     </Grid>
                     <Entry
                         x:Name="userFirstName"
-                        Placeholder="First name">
+                        Placeholder="First name"
+                        PlaceholderColor="Gray"
+                        TextColor="Black">
                     </Entry>
                     <Entry
                         x:Name="userLastName"
-                        Placeholder="Last name">
+                        Placeholder="Last name"
+                        PlaceholderColor="Gray"
+                        TextColor="Black">
                     </Entry>
                     <Entry
                         x:Name="userPhoneNumber"
-                        Placeholder="Phone number">
+                        Placeholder="Phone number - Enter only 10 digits"
+                        Keyboard="Numeric"
+                        MaxLength="10"
+                        PlaceholderColor="Gray"
+                        TextColor="Black">
                     </Entry>
                     <Entry
                         x:Name="userAddress"
-                        Placeholder="Street Address">
+                        Placeholder="Street Address"
+                        PlaceholderColor="Gray"
+                        TextColor="Black">
                     </Entry>
                     <Entry
                         x:Name="userUnitNumber"
-                        Placeholder="Apt number">
+                        Placeholder="Apt number"
+                        PlaceholderColor="Gray"
+                        TextColor="Black">
                     </Entry>
                     <Grid>
                         <Entry
                             x:Name="userCity"
                             Grid.Column="0"
-                            Placeholder="City">
+                            Placeholder="City"
+                            PlaceholderColor="Gray"
+                            TextColor="Black">
                         </Entry>
                         <Entry
                             x:Name="userState"
                             Grid.Column="1"
-                            Placeholder="State">
+                            Placeholder="State"
+                            PlaceholderColor="Gray"
+                            TextColor="Black">
                         </Entry>
                         <Entry
                             x:Name="userZipcode"
                             Grid.Column="2"
-                            Placeholder="Zipcode">
+                            Placeholder="Zipcode"
+                            PlaceholderColor="Gray"
+                            TextColor="Black">
                         </Entry>
                     </Grid>
-                    <Entry x:Name="userDeliveryInstructions" Placeholder="Delivery instructions"></Entry>
+                    <!--<Entry x:Name="userDeliveryInstructions" Placeholder="Delivery instructions" IsEnabled="False"></Entry>-->
                     <Frame HasShadow="False" BackgroundColor="Gray" Padding="0" HeightRequest="200">
                         <maps:Map
                             x:Name="map"
@@ -74,6 +120,7 @@
                         </maps:Map>
                     </Frame>
                     <Button
+                        x:Name="validateAddressButton"
                         Text="Validate Address"
                         TextColor="#FF8500"
                         FontAttributes="Bold"
@@ -85,7 +132,7 @@
                         Clicked="ValidateAddressClick">
 
                     </Button>
-                    <Button
+                    <!--<Button
                         Text="Sign up"
                         TextColor="White"
                         CornerRadius="5"
@@ -94,7 +141,7 @@
                         HeightRequest="40"
                         BackgroundColor="#FF8500"
                         Clicked="SignUpNewUser">
-                    </Button>
+                    </Button>-->
                 </StackLayout>
             </ScrollView>
         </StackLayout>

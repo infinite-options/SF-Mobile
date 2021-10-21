@@ -7,167 +7,204 @@
     xmlns:customentry="clr-namespace:ServingFresh.Models"
     x:Class="ServingFresh.Views.ProfilePage">
     <ContentPage.Content>
-        <Grid RowSpacing="0">
+        <Grid RowSpacing="0" BackgroundColor="White">
             <Grid.RowDefinitions>
-                <RowDefinition Height="35"></RowDefinition>
-                <RowDefinition Height="95"></RowDefinition>
-                <RowDefinition Height="1"></RowDefinition>
-                <RowDefinition Height="65"></RowDefinition>
+                <RowDefinition Height="94"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
-                <RowDefinition Height="80"></RowDefinition>
             </Grid.RowDefinitions>
-            <Label Grid.Row="0" BackgroundColor="#136D74"></Label>
-            <Grid Grid.Row="1" BackgroundColor="#136D74">
+
+            <Grid Grid.Row="0" ColumnSpacing="0" BackgroundColor="#136D74">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="70"></ColumnDefinition>
+                    <ColumnDefinition Width="100"></ColumnDefinition>
                     <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="70"></ColumnDefinition>
+                    <ColumnDefinition Width="100"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <Label
-                    Grid.Column="1"
-                    HeightRequest="136"
-                    HorizontalTextAlignment="Center"
-                    VerticalTextAlignment="Center"
-                    Text="Profile"
-                    TextColor="White"
-                    FontSize="34"
-                    FontAttributes="Bold">
-                </Label>
+                <StackLayout Grid.Column="0" Margin="0,40,0,0" Spacing="0">
+                     <ImageButton Source="menuIcon.png" Clicked="ShowMenuFromProfile" BackgroundColor="Transparent">
+                         <ImageButton.Effects>
+                            <servingfresh:TintImageEffect TintColor="White"/>
+                         </ImageButton.Effects>
+                     </ImageButton>
+                </StackLayout>
+                <StackLayout Grid.Column="1" Margin="0,40,0,0" Spacing="0" >
+                     <Label x:Name="title" HorizontalOptions="CenterAndExpand" VerticalOptions="Center" Text="Profile" FontSize="26" TextColor="#FFFFFF" FontAttributes="Bold"></Label>
+                </StackLayout>
+                <StackLayout Grid.Column="2" Margin="0,15,0,0" VerticalOptions="Center" HorizontalOptions="Center">
+                    <RelativeLayout
+                        RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}"
+                        RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}">
+                        <Image Source="CartIcon.png" HeightRequest="40">
+                            <Image.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="NavigateToCartFromProfile"></TapGestureRecognizer>
+                            </Image.GestureRecognizers>
+                             <Image.Effects>
+                                <servingfresh:TintImageEffect TintColor="White"/>
+                            </Image.Effects>
+                            <Image.Margin>
+                                <OnPlatform x:TypeArguments="Thickness">
+                                  <On Platform="iOS" Value="0,20,0,0" />
+                                  <On Platform="Android" Value="4,20,0,0" />
+                                </OnPlatform>
+                            </Image.Margin>
+                        </Image>
+                        <Frame Margin="30,20,0,0" HeightRequest="20" MinimumWidthRequest="20" CornerRadius="10" Padding="0" HasShadow="False">
+                            <Label x:Name="CartTotal" Margin="5,1,5,0" Text="   "  TextColor="#FF8500" FontSize="14" FontAttributes="Bold"></Label>
+                        </Frame>
+                    </RelativeLayout>
+                </StackLayout>
             </Grid>
-            <BoxView Grid.Row="2" HeightRequest="1" BackgroundColor="Black"></BoxView>
-            <Grid
-                Grid.Row="3"
-                ColumnSpacing="0.5"
-                BackgroundColor="Black">
-                <Button
-                    Grid.Row="0"
-                    Grid.Column="0"
-                    Text="Delivery Info"
-                    TextColor="#FF8500"
-                    FontAttributes="Bold"
-                    BackgroundColor="#136D74"
-                    CornerRadius="0">
-                </Button>
-                <Button
-                    Grid.Row="0"
-                    Grid.Column="1"
-                    Text="Rewards"
-                    TextColor="White"
-                    FontAttributes="Bold"
-                    BackgroundColor="#136D74"
-                    CornerRadius="0">
-                </Button>
-            </Grid>
-            <StackLayout Grid.Row="4">
-        <ScrollView >
-            <StackLayout
-                Margin="10,10,10,0">
-                <Entry
-                    x:Name="userEmailAddress"
-                    Placeholder="Email Address">
-                </Entry>
-                <Entry
-                    x:Name="userPassword"
-                    Placeholder="Enter Password">
-                </Entry>
-                <Entry
-                    x:Name="userConfirmPassword"
-                    Placeholder="Confirm Password">
-                </Entry>
-                <Grid>
-                    <customentry:CustomEntry Placeholder="Push Notification" IsReadOnly="True" Margin="7,0,0,0" ></customentry:CustomEntry>
-                    <Switch HorizontalOptions="End" Grid.Column="1" IsToggled="True"></Switch>
-                </Grid>
-                <Entry
-                    x:Name="userFirstName"
-                    Placeholder="First name">
-                </Entry>
-                <Entry
-                    x:Name="userLastName"
-                    Placeholder="Last name">
-                </Entry>
-                <Entry
-                    x:Name="userPhoneNumber"
-                    Placeholder="Phone number">
-                </Entry>
-                <Entry
-                    x:Name="userAddress"
-                    Placeholder="Street Address">
-                </Entry>
-                <Entry
-                    x:Name="userUnitNumber"
-                    Placeholder="Apt number">
-                </Entry>
-                <Grid>
-                    <Entry
-                        x:Name="userCity"
-                        Grid.Column="0"
-                        Placeholder="City">
-                    </Entry>
-                    <Entry
-                        x:Name="userState"
-                        Grid.Column="1"
-                        Placeholder="State">
-                    </Entry>
-                    <Entry
-                        x:Name="userZipcode"
-                        Grid.Column="2"
-                        Placeholder="Zipcode">
-                    </Entry>
-                </Grid>
-                <Frame HasShadow="False" BackgroundColor="Gray" Padding="0" HeightRequest="200">
-                    <maps:Map
-                        x:Name="map"
-                        IsVisible="true">
-                    </maps:Map>
-                </Frame>
-                <Button
-                    Text="Save Changes"
-                    TextColor="#FF8500"
-                    CornerRadius="5"
-                    BorderColor="LightGray"
-                    BorderWidth="1"
-                    HeightRequest="40"
-                    BackgroundColor="White"
-                    Clicked="SaveChangesClick">
-                </Button>
-                <Button
-                    Text="Sign Out"
-                    TextColor="#FF8500"
-                    CornerRadius="5"
-                    BorderColor="LightGray"
-                    BorderWidth="1"
-                    HeightRequest="40"
-                    BackgroundColor="White"
-                    Clicked="LogOut">
-                </Button>
+            <StackLayout Grid.Row="1">
+                <ScrollView>
+                    <StackLayout Margin="10,10,10,0">
+
+                        <StackLayout HeightRequest="135" x:Name="userInitialsCircle" IsVisible="false">
+                            <Frame Padding="0"  IsClippedToBounds="True" BackgroundColor="#FF8500" HasShadow="False" CornerRadius="67.5" HeightRequest="135" WidthRequest="135" VerticalOptions="Center" HorizontalOptions="Center">
+                                <StackLayout >
+                                    <Label x:Name="userInitials" Text="" TextColor="White" HeightRequest="135" FontSize="60" HorizontalTextAlignment="Center" VerticalTextAlignment="Center"></Label>
+                                </StackLayout>
+                            </Frame>
+                        </StackLayout>
+
+                        <StackLayout HeightRequest="135" x:Name="userImageCircle" IsVisible="false">
+                            <Frame Padding="0"  IsClippedToBounds="True" BackgroundColor="#FF8500" HasShadow="False" CornerRadius="67.5" HeightRequest="135" WidthRequest="135" VerticalOptions="Center" HorizontalOptions="Center">
+                                <StackLayout >
+                                    <Image x:Name="imageUser" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"></Image>
+                                </StackLayout>
+                            </Frame>
+                        </StackLayout>
+
+                        <StackLayout>
+                            <Entry x:Name="userFirstName" HeightRequest="39" TextColor="Black" Placeholder="First name" PlaceholderColor="Gray"></Entry>
+                            <Entry x:Name="userLastName" HeightRequest="39" Placeholder="Last name" PlaceholderColor="Gray" TextColor="Black"></Entry>
+                            <Entry x:Name="userPhoneNumber" HeightRequest="39" Placeholder="Phone number" MaxLength="10" PlaceholderColor="Gray" TextColor="Black"></Entry>
+                            <Frame BorderColor="LightGray" HeightRequest="39" HasShadow="False" Padding="0">
+                                <Label x:Name="userEmailAddress" Margin="7,0,0,0" VerticalOptions="Center" TextColor="Black" FontSize="Medium"></Label>
+                            </Frame>
+                        </StackLayout>
+
+                        <StackLayout x:Name="directUserReset" IsVisible="false" Margin="0,20,0,20">
+                            <Label Text="Reset Password" FontSize="14" TextDecorations="Underline" HorizontalOptions="Center" TextColor="#A0A0A0">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped"></TapGestureRecognizer>
+                                </Label.GestureRecognizers>
+                            </Label>
+                        </StackLayout>
+
+                        <StackLayout x:Name="socialUserSignedIcon" IsVisible="false" Margin="0,20,0,20">
+                            <Image Margin="87,0,87,0" x:Name="signedIcon"></Image>
+                        </StackLayout>
+
+                        <StackLayout x:Name="passwordCredentials" IsVisible="false" >
+                            <Entry x:Name="userPassword" HeightRequest="39" Placeholder="Enter New Password" Keyboard="Default" PlaceholderColor="Gray" TextColor="Black"></Entry>
+                            <Entry x:Name="userConfirmPassword" HeightRequest="39" Placeholder="Confirm New Password" Keyboard="Default" PlaceholderColor="Gray" TextColor="Black"></Entry>
+                            <!--<Button Text="Update Password" TextColor="#FF8500" CornerRadius="5" BorderColor="LightGray" BorderWidth="1" HeightRequest="40" BackgroundColor="White" Clicked="UpdatePasswordClick"></Button>-->
+                        </StackLayout>
+
+                        <Frame HasShadow="False" IsEnabled="false" IsClippedToBounds="true" CornerRadius="8" BackgroundColor="Gray" Padding="0" HeightRequest="104">
+                            <maps:Map
+                                x:Name="map"
+                                IsVisible="true">
+                            </maps:Map>
+                        </Frame>
+
+                        <!--<Grid>
+                            <customentry:CustomEntry Placeholder="Push Notification" PlaceholderColor="Gray" IsReadOnly="True" Margin="7,0,0,0" ></customentry:CustomEntry>
+                            <Switch x:Name="notificationButton" HorizontalOptions="End" Grid.Column="1" Toggled="Switch_Toggled"></Switch>
+                        </Grid>-->
+
+                        <StackLayout HeightRequest="132">
+                            <RelativeLayout
+                                RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
+                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                <StackLayout 
+                                    RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
+                                    RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                    <Entry x:Name="userAddress" HeightRequest="39" FontSize="16" Placeholder="Street Address" PlaceholderColor="#6D7278"  Keyboard="Text" TextColor="Black" TextChanged="signUpAddress1Entry_TextChanged" Focused="signUpAddress1Entry_Focused" Unfocused="signUpAddress1Entry_Unfocused"/>
+                                    <Entry x:Name="userUnitNumber" HeightRequest="39" Placeholder="Apt number" PlaceholderColor="Gray" TextColor="Black"></Entry>
+                                    <Grid >
+                                        <Entry
+                                            HeightRequest="39"
+                                            x:Name="userCity"
+                                            Grid.Column="0"
+                                            Placeholder="City"
+                                            PlaceholderColor="Gray"
+                                            TextColor="Black">
+                                        </Entry>
+                                        <Entry
+                                            HeightRequest="39"
+                                            x:Name="userState"
+                                            Grid.Column="1"
+                                            Placeholder="State"
+                                            PlaceholderColor="Gray"
+                                            TextColor="Black">
+                                        </Entry>
+                                        <Entry
+                                            HeightRequest="39"
+                                            x:Name="userZipcode"
+                                            Grid.Column="2"
+                                            Placeholder="Zipcode"
+                                            PlaceholderColor="Gray"
+                                            TextColor="Black">
+                                        </Entry>
+                                    </Grid>
+                                <Frame Margin="0,-90,0,0" Padding="2" HasShadow="false" BackgroundColor="#E0EBEC" CornerRadius="0" HorizontalOptions="CenterAndExpand" x:Name="signUpAddressFrame" IsVisible="false">
+                                    <ListView x:Name="SignUpAddressList" IsVisible="false" BackgroundColor="#E0EBEC"  HeightRequest="90"  ItemsSource="{Binding Addresses}" ItemSelected="SignUpAddressList_ItemSelected">
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate>
+                                                <ViewCell>
+                                                    <StackLayout HeightRequest="53" VerticalOptions="CenterAndExpand">
+                                                        <Label HeightRequest="53" VerticalTextAlignment="Center" Text="{Binding Address}" FontSize="12" TextColor="Black" LineBreakMode="WordWrap"/>
+                                                    <BoxView HeightRequest="1" Color="#136D74"></BoxView>
+                                                </StackLayout>
+                                                </ViewCell>
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
+                                </Frame>
+                            </StackLayout>
+                        </RelativeLayout>
+                        </StackLayout>
+
+                        <StackLayout Margin="0,20,0,0">
+                            <Button
+                                Text="Save Changes"
+                                TextColor="White"
+                                FontSize="14"
+                                FontAttributes="Bold"
+                                CornerRadius="5"
+                                BorderColor="LightGray"
+                                BorderWidth="1"
+                                HeightRequest="45"
+                                BackgroundColor="#FF8500"
+                                Clicked="SaveChangesClick">
+                            </Button>
+                            <Button
+                                Text="Log out"
+                                TextColor="White"
+                                FontSize="14"
+                                FontAttributes="Bold"
+                                CornerRadius="5"
+                                BorderColor="LightGray"
+                                BorderWidth="1"
+                                HeightRequest="45"
+                                BackgroundColor="#FF8500"
+                                Clicked="NavigateToMainPageFromProfile">
+                            </Button>
+                        </StackLayout>
+                        <StackLayout Margin="0,20,0,20" >
+                            <Label  FontSize="18">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="Please contact" TextColor="Black"/>
+                                        <Span Text=" support@servingfresh.me" TextColor="#F26522"/>
+                                        <Span Text=" to change your First Name, Last Name or Email Address" TextColor="Black"/>
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </StackLayout>
+                    </StackLayout>
+                </ScrollView>
             </StackLayout>
-        </ScrollView>
-            </StackLayout>
-            <Grid Grid.Row="5" BackgroundColor="WhiteSmoke">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="45"></RowDefinition>
-                    <RowDefinition Height="*"></RowDefinition>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-                <ImageButton Grid.Row="0" Grid.Column="0" BackgroundColor="Transparent" Source="CalendarI" Clicked="DeliveryDaysClick" Padding="6"></ImageButton>
-                <Label Grid.Row="1" Grid.Column="0" Text="Days" HorizontalTextAlignment="Center"></Label>
-                <ImageButton Grid.Row="0" Grid.Column="1" BackgroundColor="Transparent" Source="RefundIcon" Clicked="OrdersClick" Padding="6"></ImageButton>
-                <Label Grid.Row="1" Grid.Column="1" Text="Orders" HorizontalTextAlignment="Center"></Label>
-                <ImageButton Grid.Row="0" Grid.Column="2" BackgroundColor="Transparent" Source="InfoIcon" Clicked="InfoClick" Padding="6"></ImageButton>
-                <Label Grid.Row="1" Grid.Column="2" Text="Info" HorizontalTextAlignment="Center"></Label>
-                <ImageButton Grid.Row="0" Grid.Column="3" BackgroundColor="Transparent" Source="UserIcon" Clicked="ProfileClick" Padding="6">
-                    <ImageButton.Effects>
-                        <servingfresh:TintImageEffect TintColor="#FF8500"/>
-                    </ImageButton.Effects>
-                </ImageButton>
-                <Label Grid.Row="1" Grid.Column="3" Text="Profile" HorizontalTextAlignment="Center"></Label>
-            </Grid>
         </Grid>
     </ContentPage.Content>
 </ContentPage>

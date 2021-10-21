@@ -19,7 +19,7 @@ namespace ServingFresh.iOS.Renderers
             {
                 Control.BorderStyle = UITextBorderStyle.None;
                 //Below line is useful to give border color 
-                Control.TintColor = UIColor.White;
+                Control.TintColor = UIColor.Black;
                 Control.Layer.CornerRadius = 0;
                 Control.TextColor = UIColor.Black;
             }

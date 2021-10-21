@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Diagnostics;
+using System.Threading.Tasks;
+using ServingFresh.Config;
+using ServingFresh.Models.Interfaces;
+using Xamarin.Essentials;
 using Xamarin.Forms;
-
+using static ServingFresh.Views.SelectionPage;
 namespace ServingFresh.Views
 {
     public partial class InfoPage : ContentPage
@@ -10,26 +14,54 @@ namespace ServingFresh.Views
         public InfoPage()
         {
             InitializeComponent();
+            SetAppVersion(versionNumber, buildNumber);
+            SetCartLabel(CartTotal);
         }
 
-        void DeliveryDaysClick(System.Object sender, System.EventArgs e)
+        void SetAppVersion(Label version, Label build)
         {
-            Application.Current.MainPage = new SelectionPage();
+            string versionStr = "";
+            string buildStr = "";
+
+            versionStr = DependencyService.Get<IAppVersionAndBuild>().GetVersionNumber();
+            buildStr = DependencyService.Get<IAppVersionAndBuild>().GetBuildNumber();
+
+            version.Text = "Running App version: " + versionStr;
+            build.Text = "Running App build: " + buildStr;
         }
 
-        void OrderscClick(System.Object sender, System.EventArgs e)
+        public string GetAppVersion()
         {
-            Application.Current.MainPage = new CheckoutPage();
+            string versionStr = "";
+            string buildStr = "";
+
+            versionStr = DependencyService.Get<IAppVersionAndBuild>().GetVersionNumber();
+            buildStr = DependencyService.Get<IAppVersionAndBuild>().GetBuildNumber();
+
+            return versionStr + ", " + buildStr;
         }
 
-        void InfoClick(System.Object sender, System.EventArgs e)
+        void ShowMenuFromInfo(System.Object sender, System.EventArgs e)
         {
-            // NO ACTION NEEDED
+            Application.Current.MainPage.Navigation.PushModalAsync(new MenuPage(), true);
         }
 
-        void ProfileClick(System.Object sender, System.EventArgs e)
+        void NavigateToCartFromInfo(System.Object sender, System.EventArgs e)
         {
-            Application.Current.MainPage = new ProfilePage();
+            NavigateToCart(sender, e);
+        }
+
+        async void GoToPrivacyPolicy(System.Object sender, System.EventArgs e)
+        {
+
+            try
+            {
+                await Browser.OpenAsync(Constant.PrivacyPolicy, BrowserLaunchMode.SystemPreferred);
+            }
+            catch
+            {
+                // An unexpected error occured. No browser may be installed on the device.
+            }
         }
     }
 }

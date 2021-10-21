@@ -19,7 +19,7 @@ namespace ServingFresh.Droid
     [IntentFilter(
     new[] { Intent.ActionView },
     Categories = new[] { Intent.CategoryDefault, Intent.CategoryBrowsable },
-    DataSchemes = new[] { "com.googleusercontent.apps.97916302968-7una3voi6tjhf92jmvf87rdaeblaaf3s" },
+    DataSchemes = new[] { "com.googleusercontent.apps.478982641106-15ruq8q2clbok6vvdtt9cd5uqj4ujqem" },
     DataPath = "/oauth2redirect")]
 
     public class CustomUrlSchemeInterceptorActivity : Activity

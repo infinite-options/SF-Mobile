@@ -23,5 +23,29 @@ namespace ServingFresh.LogIn.Classes
         public string social { get; set; }
         public string password { get; set; }
         public string social_id { get; set; }
+
+        public SignUpPost()
+        {
+            email = "";
+            first_name = "";
+            last_name = "";
+            phone_number = "";
+            address = "";
+            unit = "";
+            city = "";
+            state = "";
+            zip_code = "";
+            latitude = "";
+            longitude = "";
+            referral_source = "";
+            role = "";
+            mobile_access_token = "";
+            mobile_refresh_token = "";
+            user_access_token = "";
+            user_refresh_token = "";
+            social = "";
+            password = "";
+            social_id = "";
+        }
     }
 }

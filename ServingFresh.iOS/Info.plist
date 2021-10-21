@@ -9,8 +9,6 @@
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
@@ -20,7 +18,7 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>MinimumOSVersion</key>
-	<string>8.0</string>
+	<string>13.0</string>
 	<key>CFBundleDisplayName</key>
 	<string>Serving Fresh</string>
 	<key>UILaunchStoryboardName</key>
@@ -39,19 +37,33 @@
 			<string>Google Auth</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.97916302968-f22boafqno1dicq4a0eolpr6qj8hkvbm</string>
+				<string>com.googleusercontent.apps.478982641106-f00qc0qmstldd8h2cuvs5ur6uskqak6i</string>
 			</array>
 		</dict>
 	</array>
-	<key>CFBundleShortVersionString</key>
-	<string>1.1</string>
-	<key>CFBundleVersion</key>
-	<string>6</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.servingfresh</string>
 	<key>UIStatusBarStyle</key>
 	<string>UIStatusBarStyleLightContent</string>
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/AppIcon.appiconset</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app needs access to the camera to take photos on the damaged product that you want to refund.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs access to photo so that you can select a photo of the damaged product.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app needs access to microphone.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>This app needs access to the photo gallery so that you can select a photo of the damaged product.</string>
+	<key>UIUserInterfaceStyle</key>
+	<string>Light</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Turning on location services allows us to display fresh local produce near your current location. </string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.7.7</string>
+	<key>CFBundleVersion</key>
+	<string>97</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

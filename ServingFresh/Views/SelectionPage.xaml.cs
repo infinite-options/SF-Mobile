@@ -7,31 +7,42 @@ using ServingFresh.Models;
 using System.Collections.ObjectModel;
 using System.Net.Http;
 using Newtonsoft.Json;
+using Xamarin.Essentials;
+using System.Diagnostics;
+using Plugin.LatestVersion;
+using Xamarin.Auth;
+using ServingFresh.LogIn.Apple;
+using Acr.UserDialogs;
+using ServingFresh.LogIn.Classes;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+using System.ComponentModel;
+using static ServingFresh.Views.PrincipalPage;
+using static ServingFresh.App;
+using ServingFresh.Models.Interfaces;
 
-namespace ServingFresh.Views                                                        // Zach's work
+namespace ServingFresh.Views
 {
     public partial class SelectionPage : ContentPage
     {
-
-        class BusinessCard                                                          // Class Definition.  Could have been in a different file
+        class BusinessCard
         {
             public string business_image { get; set; }
             public string business_name { get; set; }
-            public string item_type { get; set; }
             public string business_uid { get; set; }
-            public string business_type { get; set; }
+            public IDictionary<string, IList<string>> list_delivery_days { get; set; }
             public Color border_color { get; set; }
         }
 
-        BusinessCard unselectedBusiness(Business b)                                 // Creating Function of Class Buisness Card and pass in b as type Business                               
+        BusinessCard unselectedBusiness(Business b)
         {
-            return new BusinessCard()                                               // Return BusinessCard with these updated attributes 
+            return new BusinessCard()
             {
                 business_image = b.business_image,
                 business_name = b.business_name,
-                item_type = b.item_type,
-                business_uid = b.business_uid,
-                business_type = b.business_type,
+                business_uid = b.z_biz_id,
+                list_delivery_days = b.delivery_days,
                 border_color = Color.LightGray
             };
         }
@@ -42,438 +53,2539 @@ namespace ServingFresh.Views                                                    
             {
                 business_image = b.business_image,
                 business_name = b.business_name,
-                item_type = b.item_type,
-                business_uid = b.business_uid,
-                business_type = b.business_type,
+                business_uid = b.z_biz_id,
+                list_delivery_days = b.delivery_days,
                 border_color = Constants.SecondaryColor
             };
         }
 
-        // Initializing Variables
-        List<DeliveriesModel> AllDeliveries = new List<DeliveriesModel>();                                  // type (List data structure of Deliveries Model type) called AllDeliveries
-        List<Business> AllFarms = new List<Business>();                                                     // List of Businesses called AllFarms (Can't add anything to this list that is not a Business)
+        public class AcceptingSchedule
+        {
+            public IList<string> Friday { get; set; }
+            public IList<string> Monday { get; set; }
+            public IList<string> Sunday { get; set; }
+            public IList<string> Tuesday { get; set; }
+            public IList<string> Saturday { get; set; }
+            public IList<string> Thursday { get; set; }
+            public IList<string> Wednesday { get; set; }
+        }
+
+        List<DeliveriesModel> AllDeliveries = new List<DeliveriesModel>();
+        List<Business> AllFarms = new List<Business>();
         List<Business> AllFarmersMarkets = new List<Business>();
+        List<Business> OpenFarms = new List<Business>();
+
         ObservableCollection<DeliveriesModel> Deliveries = new ObservableCollection<DeliveriesModel>();
         ObservableCollection<BusinessCard> Farms = new ObservableCollection<BusinessCard>();
         ObservableCollection<BusinessCard> FarmersMarkets = new ObservableCollection<BusinessCard>();
+
         List<string> types = new List<string>();
         List<string> b_uids = new List<string>();
         string selected_market_id = "";
         string selected_farm_id = "";
 
-        public SelectionPage()                                                      // Constructor matches class name.  Constructor defines how the class is supposed to look
+        public static ScheduleInfo selectedDeliveryDate = null;
+
+        public class DeliveryInfo
         {
-            InitializeComponent();                                                  // Given by Visual Studio
-            Init();                                                                 // Function created below
-            GetBusinesses();
-            GetDays();
-            CartTotal.Text = CheckoutPage.total_qty.ToString();
+            public string delivery_day { get; set; }
+            public string delivery_time { get; set; }
         }
 
-        void Init()
+        public class Delivery
         {
-            BackgroundColor = Constants.PrimaryColor;                               //  Get this data from ...
-            delivery_list.ItemsSource = Deliveries;                                 //  delivery_list from xaml is linked to ... Get this data from ...
-            market_list.ItemsSource = FarmersMarkets;                               //  Get this data from ...
-            farm_list.ItemsSource = Farms;                                          //  Get this data from ...  Binding to get data out of a list
+            public string delivery_date { get; set; }
+            public string delivery_shortname { get; set; }
+            public string delivery_dayofweek { get; set; }
+            public string delivery_time { get; set; }
         }
 
-        void GetDays()
+        public class FavoriteResult
         {
-            AllDeliveries.Clear();                                                  // Data stored in AllDeliveries
-            var date = DateTime.Now.AddHours(7);                                    // Time horizon of 7 days
-            var monthNames = new List<string>();
-            monthNames.Add("");
-            monthNames.Add("Jan");
-            monthNames.Add("Feb");
-            monthNames.Add("Mar");
-            monthNames.Add("Apr");
-            monthNames.Add("May");
-            monthNames.Add("Jun");
-            monthNames.Add("Jul");
-            monthNames.Add("Aug");
-            monthNames.Add("Sep");
-            monthNames.Add("Oct");
-            monthNames.Add("Nov");
-            monthNames.Add("Dec");
-            for (int i = 0; i < 7; i++)
-            {
-                AllDeliveries.Add(new DeliveriesModel()                             // Delivery Model 
+            public string favorite_produce { get; set; }
+        }
+
+        public class FavoriteGet
+        {
+            public string message { get; set; }
+            public int code { get; set; }
+            public IList<FavoriteResult> result { get; set; }
+            public string sql { get; set; }
+        }
+
+        public class FavoriteItemByUser
+        {
+            public string customer_uid { get; set; }
+        }
+
+        public class ScheduleInfo : INotifyPropertyChanged
+        {
+            public event PropertyChangedEventHandler PropertyChanged = delegate { };
+            public string delivery_date { get; set; }
+            public string delivery_shortname { get; set; }
+            public string delivery_dayofweek { get; set; }
+            public string delivery_time { get; set; }
+            public List<string> business_uids { get; set; }
+            public DateTime deliveryTimeStamp { get; set; }
+            public string orderExpTime { get; set; }
+            public Xamarin.Forms.Color colorSchedule { get; set; }
+            public Xamarin.Forms.Color textColor { get; set; }
+
+            public Xamarin.Forms.Color colorScheduleUpdate {
+                set
                 {
-                    delivery_dayofweek = date.DayOfWeek.ToString(),                 
-                    delivery_shortname = date.DayOfWeek.ToString().Substring(0, 3).ToUpper(),
-                    delivery_date = monthNames[date.Month] + " " + date.Day         // Constructs the Month & Day
-                });
-                date = date.AddDays(1);
-            }
-            Deliveries.Clear();
-
-            foreach (DeliveriesModel dm in AllDeliveries) Deliveries.Add(dm);       // Puts data into Deliveries
-        }
-
-        void ResetDays()                                                            // Function that filters through which Businesses (Farms & Farmers Markets) are currently open
-        {
-            List<string> business_uids = new List<string>();
-            if (selected_farm_id != "")
-            {
-                business_uids.Add(selected_farm_id);
-            }
-            else
-            {
-                foreach (BusinessCard bc in Farms)
-                {
-                    business_uids.Add(bc.business_uid);
+                    colorSchedule = value;
+                    PropertyChanged(this, new PropertyChangedEventArgs("colorSchedule"));
                 }
             }
-            Deliveries.Clear();
-            foreach (DeliveriesModel dm in AllDeliveries)
-            {
-                if (anyBusinessesOpen(business_uids, dm.delivery_dayofweek))
-                    Deliveries.Add(dm);
-            }
-        }                                                                           
 
-        void ResetFarms()                                                            // Function that filters through which Farms are currently open
-        {
-            if (selected_farm_id != "") return;
-            Farms.Clear();
-            if (selected_market_id != "")
+            public Xamarin.Forms.Color textColorUpdate
             {
-                foreach (Business b in AllFarms)
+                set
                 {
-                    if (b.business_association != null)
+                    textColor = value;
+                    PropertyChanged(this, new PropertyChangedEventArgs("textColor"));
+                }
+            }
+        }
+
+        public class Filter : INotifyPropertyChanged
+        {
+            public event PropertyChangedEventHandler PropertyChanged = delegate { };
+            public string filterName { get; set; }
+            public string iconSource { get; set; }
+            public bool isSelected { get; set; }
+            public string type { get; set; }
+
+            public Filter(string filterName, string iconSource, string type)
+            {
+                this.filterName = filterName;
+                this.iconSource = iconSource;
+                this.type = type;
+                isSelected = false;
+            }
+
+            public string updateImage
+            {
+                set
+                {
+                    iconSource = value;
+                    PropertyChanged(this, new PropertyChangedEventArgs("iconSource"));
+                }
+            }
+
+        }
+
+        GridLength columnWidth;
+        ObservableCollection<Filter> filters;
+        List<DeliveryInfo> deliveryDays = new List<DeliveryInfo>();
+        List<string> deliveryDayList = new List<string>();
+        List<DeliveriesModel> deliveryScheduleUnfiltered = new List<DeliveriesModel>();
+        List<Delivery> deliveryScheduleFiltered = new List<Delivery>();
+        List<ScheduleInfo> schedule = new List<ScheduleInfo>();
+        List<string> businessList = new List<string>();
+        List<BusinessCard> businesses = new List<BusinessCard>();
+        List<BusinessCard> business = new List<BusinessCard>();
+        List<ScheduleInfo> copy = new List<ScheduleInfo>();
+        List<DateTime> deliverySchedule = new List<DateTime>();
+        List<ScheduleInfo> displaySchedule = new List<ScheduleInfo>();
+        ServingFreshBusiness data = new ServingFreshBusiness();
+        private string deviceId;
+        List<Items> data2 = new List<Items>();
+        public ObservableCollection<ItemsModel> datagrid = new ObservableCollection<ItemsModel>();
+
+        public static readonly Dictionary<string, ItemPurchased> order = new Dictionary<string, ItemPurchased>();
+        public static string zone = "";
+        public int totalCount = 0;
+        private double menuRowHeight = 0;
+
+        // New variables for single lists
+        ObservableCollection<SingleItem> vegetablesList = new ObservableCollection<SingleItem>();
+        List<Items> vegetableDoubleList = new List<Items>();
+        List<Items> fruitDoubleList = new List<Items>();
+        List<Items> otherDoubleList = new List<Items>();
+        List<Items> dessetDoubleList = new List<Items>();
+
+        public ObservableCollection<ItemsModel> fruitGrid = new ObservableCollection<ItemsModel>();
+        public ObservableCollection<ItemsModel> otherGrid = new ObservableCollection<ItemsModel>();
+        public ObservableCollection<ItemsModel> dessertGrid = new ObservableCollection<ItemsModel>();
+
+        ObservableCollection<SingleItem> fruitsList = new ObservableCollection<SingleItem>();
+        ObservableCollection<SingleItem> othersList = new ObservableCollection<SingleItem>();
+        ObservableCollection<SingleItem> dessertsList = new ObservableCollection<SingleItem>();
+        public static List<string> favorites = new List<string>();
+
+        public SelectionPage(string accessToken = "", string refreshToken = "", AuthenticatorCompletedEventArgs googleCredentials = null, AppleAccount appleCredentials = null, string platform = "")
+        {
+            InitializeComponent();
+            _ = VerifyUserCredentials(accessToken, refreshToken, googleCredentials, appleCredentials, platform);
+            _ = SetFavoritesList();
+            //_ = CheckVersion();
+        }
+
+        public SelectionPage()
+        {
+            InitializeComponent();
+            GetBusinesses();
+            _ = SetFavoritesList();
+            _ = CheckVersion();
+        }
+
+        public static void SetMenu(StackLayout guest, StackLayout customer, Label history, Label profile)
+        {
+            if (user.getUserType() == "GUEST")
+            {
+                customer.HeightRequest = 0;
+                SetMenuLabel(history, "History (sign in required)");
+                SetMenuLabel(profile, "Profile (sign in required)");
+            }
+            else if (user.getUserType() == "CUSTOMER")
+            {
+                guest.HeightRequest = 0;
+            }
+        }
+
+        public SelectionPage(Location current, Dictionary<string, ItemPurchased> previousOrder = null)
+        {
+            InitializeComponent();
+            GetPreviousOrder(previousOrder);
+            GetBusinesses();
+            _ = SetFavoritesList();
+        }
+
+        static async Task WaitAndApologizeAsync()
+        {
+            await Task.Delay(2000);
+        }
+
+        public async Task VerifyUserCredentials(string accessToken = "", string refreshToken = "", AuthenticatorCompletedEventArgs googleAccount = null, AppleAccount appleCredentials = null, string platform = "")
+        {
+            try
+            {
+                //var progress = UserDialogs.Instance.Loading("Loading...");
+                var client = new HttpClient();
+                var socialLogInPost = new SocialLogInPost();
+
+                var googleData = new GoogleResponse();
+                var facebookData = new FacebookResponse();
+
+                if (platform == "GOOGLE")
+                {
+                    var request = new OAuth2Request("GET", new Uri(Constant.GoogleUserInfoUrl), null, googleAccount.Account);
+                    var GoogleResponse = await request.GetResponseAsync();
+                    var googelUserData = GoogleResponse.GetResponseText();
+
+                    googleData = JsonConvert.DeserializeObject<GoogleResponse>(googelUserData);
+
+                    socialLogInPost.email = googleData.email;
+                    socialLogInPost.social_id = googleData.id;
+                }
+                else if (platform == "FACEBOOK")
+                {
+                    var facebookResponse = client.GetStringAsync(Constant.FacebookUserInfoUrl + accessToken);
+                    var facebookUserData = facebookResponse.Result;
+
+                    facebookData = JsonConvert.DeserializeObject<FacebookResponse>(facebookUserData);
+
+                    socialLogInPost.email = facebookData.email;
+                    socialLogInPost.social_id = facebookData.id;
+                }
+                else if (platform == "APPLE")
+                {
+                    socialLogInPost.email = appleCredentials.Email;
+                    socialLogInPost.social_id = appleCredentials.UserId;
+                }
+
+                socialLogInPost.password = "";
+                socialLogInPost.signup_platform = platform;
+
+                var socialLogInPostSerialized = JsonConvert.SerializeObject(socialLogInPost);
+                var postContent = new StringContent(socialLogInPostSerialized, Encoding.UTF8, "application/json");
+
+                var test = UserDialogs.Instance.Loading("Loading...");
+                var RDSResponse = await client.PostAsync(Constant.LogInUrl, postContent);
+                var responseContent = await RDSResponse.Content.ReadAsStringAsync();
+                var authetication = JsonConvert.DeserializeObject<SuccessfulSocialLogIn>(responseContent);
+                if (RDSResponse.IsSuccessStatusCode)
+                {
+                    if (responseContent != null)
                     {
-                        var association = JsonConvert.DeserializeObject<List<string>>(b.business_association);
-                        if (association.Contains(selected_market_id))
+                        if (authetication.code.ToString() == Constant.EmailNotFound)
                         {
-                            bool matchesItemType = true;
-                            foreach (string type in types)
+                            test.Hide();
+                            if (platform == "GOOGLE")
                             {
-                                if (!b.item_type.Contains(type)) matchesItemType = false;
+                                Application.Current.MainPage = new SocialSignUp(googleData.id, googleData.given_name, googleData.family_name, googleData.email, accessToken, refreshToken, "GOOGLE");
                             }
-                            if (matchesItemType) Farms.Add(unselectedBusiness(b));
+                            else if (platform == "FACEBOOK")
+                            {
+                                Application.Current.MainPage = new SocialSignUp(facebookData.id, facebookData.name, "", facebookData.email, accessToken, accessToken, "FACEBOOK");
+                            }
+                            else if (platform == "APPLE")
+                            {
+                                Application.Current.MainPage = new SocialSignUp(appleCredentials.UserId, appleCredentials.Name, "", appleCredentials.Email, appleCredentials.Token, appleCredentials.Token, "APPLE");
+                            }
+                        }
+                        if (authetication.code.ToString() == Constant.AutheticatedSuccesful)
+                        {
+                            try
+                            {
+                                var data = JsonConvert.DeserializeObject<SuccessfulSocialLogIn>(responseContent);
+                                user.setUserID(data.result[0].customer_uid);
+
+                                UpdateTokensPost updateTokesPost = new UpdateTokensPost();
+                                updateTokesPost.uid = data.result[0].customer_uid;
+                                if (platform == "GOOGLE")
+                                {
+                                    updateTokesPost.mobile_access_token = accessToken;
+                                    updateTokesPost.mobile_refresh_token = refreshToken;
+                                }
+                                else if (platform == "FACEBOOK")
+                                {
+                                    updateTokesPost.mobile_access_token = accessToken;
+                                    updateTokesPost.mobile_refresh_token = accessToken;
+                                } else if (platform == "APPLE")
+                                {
+                                    updateTokesPost.mobile_access_token = appleCredentials.Token;
+                                    updateTokesPost.mobile_refresh_token = appleCredentials.Token;
+                                }
+
+                                var updateTokesPostSerializedObject = JsonConvert.SerializeObject(updateTokesPost);
+                                var updateTokesContent = new StringContent(updateTokesPostSerializedObject, Encoding.UTF8, "application/json");
+                                var updateTokesResponse = await client.PostAsync(Constant.UpdateTokensUrl, updateTokesContent);
+                                var updateTokenResponseContent = await updateTokesResponse.Content.ReadAsStringAsync();
+
+                                if (updateTokesResponse.IsSuccessStatusCode)
+                                {
+                                    var user1 = new RequestUserInfo();
+                                    user1.uid = data.result[0].customer_uid;
+
+                                    var requestSelializedObject = JsonConvert.SerializeObject(user1);
+                                    var requestContent = new StringContent(requestSelializedObject, Encoding.UTF8, "application/json");
+
+                                    var clientRequest = await client.PostAsync(Constant.GetUserInfoUrl, requestContent);
+
+                                    if (clientRequest.IsSuccessStatusCode)
+                                    {
+                                        var userSfJSON = await clientRequest.Content.ReadAsStringAsync();
+                                        var userProfile = JsonConvert.DeserializeObject<UserInfo>(userSfJSON);
+
+                                        DateTime today = DateTime.Now;
+                                        DateTime expDate = today.AddDays(Constant.days);
+
+
+
+                                        user.setUserID(data.result[0].customer_uid);
+                                        user.setUserSessionTime(expDate);
+                                        user.setUserPlatform(platform);
+                                        user.setUserType("CUSTOMER");
+                                        user.setUserEmail(userProfile.result[0].customer_email);
+                                        user.setUserFirstName(userProfile.result[0].customer_first_name);
+                                        user.setUserLastName(userProfile.result[0].customer_last_name);
+                                        user.setUserPhoneNumber(userProfile.result[0].customer_phone_num);
+                                        user.setUserAddress(userProfile.result[0].customer_address);
+                                        user.setUserUnit(userProfile.result[0].customer_unit);
+                                        user.setUserCity(userProfile.result[0].customer_city);
+                                        user.setUserState(userProfile.result[0].customer_state);
+                                        user.setUserZipcode(userProfile.result[0].customer_zip);
+                                        user.setUserLatitude(userProfile.result[0].customer_lat);
+                                        user.setUserLongitude(userProfile.result[0].customer_long);
+
+                                        SetMenu(guestMenuSection, customerMenuSection, historyLabel, profileLabel);
+                                        GetBusinesses();
+                                        if (Device.RuntimePlatform == Device.iOS)
+                                        {
+                                            deviceId = Preferences.Get("guid", null);
+                                            if (deviceId != null) { Debug.WriteLine("This is the iOS GUID from Log in: " + deviceId); }
+                                        }
+                                        else
+                                        {
+                                            deviceId = Preferences.Get("guid", null);
+                                            if (deviceId != null) { Debug.WriteLine("This is the Android GUID from Log in " + deviceId); }
+                                        }
+
+                                        if (deviceId != null)
+                                        {
+                                            NotificationPost notificationPost = new NotificationPost();
+
+                                            notificationPost.uid = user.getUserID();
+                                            notificationPost.guid = deviceId.Substring(5);
+                                            user.setUserDeviceID(deviceId.Substring(5));
+                                            notificationPost.notification = "TRUE";
+
+                                            var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
+                                            Debug.WriteLine("Notification JSON Object to send: " + notificationSerializedObject);
+
+                                            var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
+
+                                            var clientResponse = await client.PostAsync(Constant.NotificationsUrl, notificationContent);
+
+                                            Debug.WriteLine("Status code: " + clientResponse.IsSuccessStatusCode);
+
+                                            if (clientResponse.IsSuccessStatusCode)
+                                            {
+                                                System.Diagnostics.Debug.WriteLine("We have post the guid to the database");
+                                            }
+                                            else
+                                            {
+                                                if (messageList != null)
+                                                {
+                                                    if (messageList.ContainsKey("701-000033"))
+                                                    {
+                                                        await DisplayAlert(messageList["701-000033"].title, messageList["701-000033"].message, messageList["701-000033"].responses);
+                                                    }
+                                                    else
+                                                    {
+                                                        await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
+                                                }
+                                                
+                                            }
+                                        }
+                                        test.Hide();
+                                        //Application.Current.MainPage = new SelectionPage();
+                                    }
+                                    else
+                                    {
+                                        test.Hide();
+                                        if (messageList != null)
+                                        {
+                                            if (messageList.ContainsKey("701-000034"))
+                                            {
+                                                await DisplayAlert(messageList["701-000034"].title, messageList["701-000034"].message, messageList["701-000034"].responses);
+                                            }
+                                            else
+                                            {
+                                                await DisplayAlert("Alert!", "Our internal system was not able to retrieve your user information. We are working to solve this issue.", "OK");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            await DisplayAlert("Alert!", "Our internal system was not able to retrieve your user information. We are working to solve this issue.", "OK");
+                                        }
+                                        
+                                    }
+                                }
+                                else
+                                {
+                                    test.Hide();
+                                    if (messageList != null)
+                                    {
+                                        if (messageList.ContainsKey("701-000062"))
+                                        {
+                                            await DisplayAlert(messageList["701-000062"].title, messageList["701-000062"].message, messageList["701-000062"].responses);
+                                        }
+                                        else
+                                        {
+                                            await DisplayAlert("Oops", "We are facing some problems with our internal system. We weren't able to update your credentials", "OK");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        await DisplayAlert("Oops", "We are facing some problems with our internal system. We weren't able to update your credentials", "OK");
+                                    }
+                                   
+                                }
+                                test.Hide();
+                            }
+                            catch (Exception second)
+                            {
+                                Debug.WriteLine(second.Message);
+                            }
+                        }
+                        if (authetication.code.ToString() == Constant.ErrorPlatform)
+                        {
+                            var RDSCode = JsonConvert.DeserializeObject<RDSLogInMessage>(responseContent);
+                            test.Hide();
+                            Application.Current.MainPage = new LogInPage();
+                        }
+
+                        if (authetication.code.ToString() == Constant.ErrorUserDirectLogIn)
+                        {
+                            test.Hide();
+                            Application.Current.MainPage = new LogInPage();
                         }
                     }
                 }
+                test.Hide();
             }
-            else
+            catch (Exception first)
             {
-                foreach (Business b in AllFarms)
+                Debug.WriteLine(first.Message);
+            }
+        }
+
+        public async Task CheckVersion()
+        {
+            try
+            {
+                var client = new AppVersion();
+                string versionStr = DependencyService.Get<IAppVersionAndBuild>().GetVersionNumber();
+                var result = await client.isRunningLatestVersion(versionStr);
+                Debug.WriteLine("isRunningLatestVersion: " + result);
+
+                if(result == "FALSE")
                 {
-                    bool matchesItemType = true;
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000063"))
+                        {
+                            Debug.WriteLine("TITLE: " + messageList["701-000063"].title);
+                            // \\n, @
+
+                            string title = messageList["701-000063"].title.Replace("\\n", Environment.NewLine);
+                            string message = messageList["701-000063"].message.Replace("\\n", Environment.NewLine);
+                            await DisplayAlert(title, message, messageList["701-000063"].responses);
+                        }
+                        else
+                        {
+                            await DisplayAlert("Serving Fresh\nhas gotten even better!", "Please visit the App Store to get the latest version.", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await DisplayAlert("Serving Fresh\nhas gotten even better!", "Please visit the App Store to get the latest version.", "OK");
+                    }
+                    await CrossLatestVersion.Current.OpenAppInStore();
+                }
+            }
+            catch (Exception issueVersionChecking)
+            {
+                string str = issueVersionChecking.Message;
+            }
+        }
+
+        void GetPreviousOrder(Dictionary<string, ItemPurchased> previousOrder = null)
+        {
+            //if(previousOrder != null)
+            //{
+            //    order = previousOrder;
+            //}
+        }
+
+        public async void GetBusinesses()
+        {
+            try
+            {
+                var userLat = user.getUserLatitude();
+                var userLong = user.getUserLongitude();
+
+                Debug.WriteLine("INPUT 1: " + userLat);
+                Debug.WriteLine("INPUT 2: " + userLong);
+
+                //if (userLat == "0" && userLong == "0"){ userLong = "-121.8866517"; userLat = "37.2270928";}
+
+                var client = new HttpClient();
+                var response = await client.GetAsync(Constant.ProduceByLocation + userLong + "," + userLat);
+                var result = await response.Content.ReadAsStringAsync();
+
+                Debug.WriteLine("URL: " + Constant.ProduceByLocation + userLong + "," + userLat);
+
+                Debug.WriteLine("CALL TO ENDPOINT SUCCESSFULL?: " + response.IsSuccessStatusCode);
+                Debug.WriteLine("JSON RETURNED: " + result);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    data = JsonConvert.DeserializeObject<ServingFreshBusiness>(result);
+
+                    var currentDate = DateTime.Now;
+                    var tempDateTable = GetTable(currentDate);
+
+                    foreach (Business a in data.business_details)
+                    {
+                        var acceptingDate = LastAcceptingOrdersDate(tempDateTable, a.z_accepting_day, a.z_accepting_time);
+                        var deliveryDate = new DateTime();
+                        //Debug.WriteLine("CURRENT DATE: " + currentDate);
+                        //Debug.WriteLine("LAST ACCEPTING DATE: " + acceptingDate);
+
+                        if (currentDate < acceptingDate)
+                        {
+                            //Debug.WriteLine("ONTIME");
+
+                            deliveryDate = bussinesDeliveryDate(a.z_delivery_day, a.z_delivery_time);
+                            if (deliveryDate < acceptingDate)
+                            {
+                                deliveryDate = deliveryDate.AddDays(7);
+                            }
+                            if (!deliverySchedule.Contains(deliveryDate))
+                            {
+                                var element = new ScheduleInfo();
+
+                                element.business_uids = new List<string>();
+                                element.business_uids.Add(a.z_biz_id);
+                                element.delivery_date = deliveryDate.ToString("MMM dd");
+                                element.delivery_dayofweek = deliveryDate.DayOfWeek.ToString();
+                                element.delivery_shortname = deliveryDate.DayOfWeek.ToString().Substring(0, 3).ToUpper();
+                                element.delivery_time = a.z_delivery_time;
+                                element.deliveryTimeStamp = deliveryDate;
+                                element.orderExpTime = "Order by " + acceptingDate.ToString("dddd") + ", " + acceptingDate.ToString("htt").ToLower();
+
+                                //Debug.WriteLine("element.delivery_date: " + element.delivery_date);
+                                //Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
+                                //Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
+                                //Debug.WriteLine("element.delivery_time: " + element.delivery_time);
+                                //Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
+                                //Debug.WriteLine("business_uids list: ");
+
+                                //foreach(string ID in element.business_uids)
+                                //{
+                                //    Debug.WriteLine(ID);
+                                //}
+
+                                deliverySchedule.Add(deliveryDate);
+                                displaySchedule.Add(element);
+                            }
+                            else
+                            {
+                                foreach (ScheduleInfo element in displaySchedule)
+                                {
+                                    if (element.deliveryTimeStamp == deliveryDate)
+                                    {
+                                        var e = element;
+
+                                        e.business_uids.Add(a.z_biz_id);
+                                        element.business_uids = e.business_uids;
+
+                                        //Debug.WriteLine("element.delivery_date: " + element.delivery_date);
+                                        //Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
+                                        //Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
+                                        //Debug.WriteLine("element.delivery_time: " + element.delivery_time);
+                                        //Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
+                                        //Debug.WriteLine("business_uids list: ");
+
+                                        //foreach (string ID in element.business_uids)
+                                        //{
+                                        //    Debug.WriteLine(ID);
+                                        //}
+
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            //Debug.WriteLine("NON ONTIME! -> ROLL OVER TO NEXT DELIVERY DATE");
+
+                            deliveryDate = bussinesDeliveryDate(a.z_delivery_day, a.z_delivery_time);
+
+                            if (!deliverySchedule.Contains(deliveryDate.AddDays(7)))
+                            {
+                                var nextDeliveryDate = deliveryDate.AddDays(7);
+                                var element = new ScheduleInfo();
+
+                                element.business_uids = new List<string>();
+                                element.business_uids.Add(a.z_biz_id);
+                                element.delivery_date = nextDeliveryDate.ToString("MMM dd");
+                                element.delivery_dayofweek = nextDeliveryDate.DayOfWeek.ToString();
+                                element.delivery_shortname = nextDeliveryDate.DayOfWeek.ToString().Substring(0, 3).ToUpper();
+                                element.delivery_time = a.z_delivery_time;
+                                element.deliveryTimeStamp = nextDeliveryDate;
+                                element.orderExpTime = "Order by " + acceptingDate.AddDays(7).ToString("ddd") + " " + acceptingDate.AddDays(7).ToString("htt").ToLower();
+
+                                //Debug.WriteLine("element.delivery_date: " + element.delivery_date);
+                                //Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
+                                //Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
+                                //Debug.WriteLine("element.delivery_time: " + element.delivery_time);
+                                //Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
+                                //Debug.Write("business_uids list: ");
+
+                                //foreach (string ID in element.business_uids)
+                                //{
+                                //    Debug.Write(ID + ", ");
+                                //}
+
+                                deliverySchedule.Add(nextDeliveryDate);
+                                displaySchedule.Add(element);
+                            }
+                            else
+                            {
+                                var nextDeliveryDate = deliveryDate.AddDays(7);
+
+                                foreach (ScheduleInfo element in displaySchedule)
+                                {
+                                    if (element.deliveryTimeStamp == nextDeliveryDate)
+                                    {
+                                        var e = element;
+
+                                        e.business_uids.Add(a.z_biz_id);
+                                        element.business_uids = e.business_uids;
+
+                                        //Debug.WriteLine("element.delivery_date: " + element.delivery_date);
+                                        //Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
+                                        //Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
+                                        //Debug.WriteLine("element.delivery_time: " + element.delivery_time);
+                                        //Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
+                                        //Debug.Write("business_uids list: ");
+
+                                        //foreach (string ID in element.business_uids)
+                                        //{
+                                        //    Debug.Write(ID + ", ");
+                                        //}
+
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    deliverySchedule.Sort();
+                    List<ScheduleInfo> sortedSchedule = new List<ScheduleInfo>();
+
+                    foreach (DateTime deliveryElement in deliverySchedule)
+                    {
+                        foreach (ScheduleInfo scheduleElement in displaySchedule)
+                        {
+                            if (deliveryElement == scheduleElement.deliveryTimeStamp)
+                            {
+                                sortedSchedule.Add(scheduleElement);
+                            }
+                        }
+                    }
+
+                    displaySchedule = sortedSchedule;
+
+                    if (data.business_details.Count != 0)
+                    {
+                        // Parse it
+                        zone = data.business_details[0].zone;
+
+                        deliveryDays.Clear();
+                        businessList.Clear();
+
+                        foreach (Business business in data.business_details)
+                        {
+                            DeliveryInfo element = new DeliveryInfo();
+                            element.delivery_day = business.z_delivery_day;
+                            element.delivery_time = business.z_delivery_time;
+
+                            bool addElement = false;
+
+                            if (deliveryDays.Count != 0)
+                            {
+                                foreach (DeliveryInfo i in deliveryDays)
+                                {
+                                    if (element.delivery_time == i.delivery_time && element.delivery_day == i.delivery_day)
+                                    {
+                                        addElement = true;
+                                        break;
+                                    }
+                                }
+                                if (!addElement)
+                                {
+                                    deliveryDays.Add(element);
+                                }
+                            }
+                            else
+                            {
+                                deliveryDays.Add(element);
+                            }
+
+                            if (!businessList.Contains(business.z_biz_id))
+                            {
+                                businessList.Add(business.z_biz_id);
+                            }
+                        }
+
+                        foreach (string id in businessList)
+                        {
+                            //Debug.WriteLine(id + " :");
+                            IDictionary<string, IList<string>> days = new Dictionary<string, IList<string>>();
+                            foreach (Business b in data.business_details)
+                            {
+                                if (id == b.z_biz_id)
+                                {
+                                    if (!days.ContainsKey(b.z_delivery_day.ToUpper()))
+                                    {
+                                        IList<string> times = new List<string>();
+                                        times.Add(b.z_delivery_time);
+                                        days.Add(b.z_delivery_day.ToUpper(), times);
+                                    }
+                                    else
+                                    {
+                                        List<string> times = (List<string>)days[b.z_delivery_day.ToUpper()];
+                                        times.Add(b.z_delivery_time);
+                                        days[b.z_delivery_day.ToUpper()] = times;
+                                    }
+
+                                }
+                            }
+
+                            foreach (Business i in data.business_details)
+                            {
+                                if (id == i.z_biz_id)
+                                {
+                                    i.delivery_days = days;
+                                    businesses.Add(unselectedBusiness(i));
+                                    break;
+                                }
+                            }
+                        }
+
+                        foreach (ScheduleInfo i in displaySchedule)
+                        {
+                            i.colorSchedule = Color.FromHex("#E0E6E6");
+                            i.textColor = Color.FromHex("#136D74");
+                        }
+
+                        delivery_list.ItemsSource = displaySchedule;
+
+                        if (displaySchedule.Count != 0)
+                        {
+                            if (selectedDeliveryDate == null)
+                            {
+                                selectedDeliveryDate = displaySchedule[0];
+                                displaySchedule[0].colorScheduleUpdate = Color.FromHex("#FF8500");
+                                displaySchedule[0].textColorUpdate = Color.FromHex("#FFFFFF");
+                                Debug.WriteLine("FILL SELECTED SCHEDULE WITH DEFAULT DELIVERY DATE");
+                            }
+                            else
+                            {
+                                var i = FindSelectedDeliveryDate(displaySchedule, selectedDeliveryDate);
+                                displaySchedule[i].colorScheduleUpdate = Color.FromHex("#FF8500");
+                                displaySchedule[i].textColorUpdate = Color.FromHex("#FFFFFF");
+                            }
+
+                            //displaySchedule[0].colorScheduleUpdate = Color.FromHex("#FF8500");
+                            //displaySchedule[0].textColorUpdate = Color.FromHex("#FFFFFF");
+
+                            var day = DateTime.Parse(displaySchedule[0].deliveryTimeStamp.ToString());
+
+                            title.Text = day.ToString("ddd") + ", " + displaySchedule[0].delivery_date.ToString();
+                            deliveryTime.Text = "Delivery time: " + displaySchedule[0].delivery_time;
+                            orderBy.Text = "(" + displaySchedule[0].orderExpTime + ")";
+
+                            //GetData(data.result);
+
+                            GetDataForSingleList(data.result, data.types);
+                            //GetDataForVegetables(vegetableDoubleList);
+                            //GetDataForFruits(fruitDoubleList);
+                            //GetDataForOthers(otherDoubleList);
+                            //GetDataForDesserts(dessetDoubleList);
+                            //updateItemsBackgroundColorAndQuantity(vegetablesList, selectedDeliveryDate);
+
+
+                            updateItemsBackgroundColorAndQuantity(vegetablesList, selectedDeliveryDate);
+                            updateItemsBackgroundColorAndQuantity(fruitsList, selectedDeliveryDate);
+                            updateItemsBackgroundColorAndQuantity(dessertsList, selectedDeliveryDate);
+                            updateItemsBackgroundColorAndQuantity(othersList, selectedDeliveryDate);
+
+                            SetVerticalView(vegetablesList, itemList);
+                            //updateItemsBackgroundColorAndQuantity(fruitsList, selectedDeliveryDate);
+                            SetVerticalView(fruitsList, fruitsVerticalView);
+                            //updateItemsBackgroundColorAndQuantity(dessertsList, selectedDeliveryDate);
+                            SetVerticalView(dessertsList, dessertsVerticalView);
+                            //updateItemsBackgroundColorAndQuantity(othersList, selectedDeliveryDate);
+                            SetVerticalView(othersList, othersVerticalView);
+                            UpdateNumberOfItemsInCart();
+                        }
+                    }
+                    else
+                    {
+                        if (messageList != null)
+                        {
+                            if (messageList.ContainsKey("701-000064"))
+                            {
+                                await DisplayAlert(messageList["701-000064"].title, messageList["701-000064"].message, messageList["701-000064"].responses);
+                            }
+                            else
+                            {
+                                await DisplayAlert("Oops", "We don't have a business that can delivery to your location at the moment", "OK");
+                            }
+                        }
+                        else
+                        {
+                            await DisplayAlert("Oops", "We don't have a business that can delivery to your location at the moment", "OK");
+                        }
+                        
+                        return;
+                    }
+                }
+                else
+                {
+                    //await DisplayAlert("Oops!", "Our system is down. We are working to fix this issue.", "OK");
+                    return;
+                }
+            }
+            catch (Exception errorGetBusinesses)
+            {
+                var client = new Diagnostic();
+                client.parseException(errorGetBusinesses.ToString(), user);
+            }
+        }
+
+        private int FindSelectedDeliveryDate(List<ScheduleInfo> deliveryDate, ScheduleInfo selectedDate)
+        {
+            int selectedItem = 0;
+            bool check = true;
+            for (int i = 0; i < deliveryDate.Count; i++)
+            {
+                if (deliveryDate[i].deliveryTimeStamp == selectedDate.deliveryTimeStamp
+                    && deliveryDate[i].delivery_date == selectedDate.delivery_date
+                    && deliveryDate[i].delivery_dayofweek == selectedDate.delivery_dayofweek
+                    && deliveryDate[i].delivery_shortname == selectedDate.delivery_shortname
+                    && deliveryDate[i].delivery_time == selectedDate.delivery_time
+                    && deliveryDate[i].orderExpTime == selectedDate.orderExpTime
+                    )
+                {
+
+                    foreach (string businessID in selectedDate.business_uids)
+                    {
+                        if (!deliveryDate[i].business_uids.Contains(businessID))
+                        {
+                            check = false;
+                        }
+                    }
+                    if (check)
+                    {
+                        selectedItem = i;
+                    }
+                    check = true;
+                }
+            }
+            return selectedItem;
+        }
+
+        private void SetVerticalView(IList<SingleItem> listOfItems, ListView verticalList)
+        {
+            try
+            {
+                var gridViewLayout = new ObservableCollection<ItemsModel>();
+                if (listOfItems.Count != 0 && listOfItems != null)
+                {
+                    //var gridViewLayout = new ObservableCollection<ItemsModel>();
+                    int n = listOfItems.Count;
+                    int j = 0;
+                    if (n == 0)
+                    {
+
+                        gridViewLayout.Add(new ItemsModel()
+                        {
+                            height = this.Width / 2 - 10,
+                            width = this.Width / 2 - 25,
+                            imageSourceLeft = "",
+                            quantityLeft = 0,
+                            itemNameLeft = "",
+                            itemPriceLeft = "$ " + "",
+                            itemPriceLeftUnit = "",
+                            itemLeftUnit = "",
+                            item_businessPriceLeft = 0,
+                            isItemLeftVisiable = false,
+                            isItemLeftEnable = false,
+                            quantityL = 0,
+                            item_descLeft = "",
+                            itemTaxableLeft = "",
+                            colorLeft = Color.FromHex("#FFFFFF"),
+                            itemTypeLeft = "",
+                            favoriteIconLeft = "unselectedHeartIcon.png",
+                            opacityLeft = 0,
+                            isItemLeftUnavailable = false,
+                            itemBackViewInfoLeft = "",
+                            frontViewLeft = true,
+                            backViewLeft = false,
+
+                            imageSourceRight = "",
+                            quantityRight = 0,
+                            itemNameRight = "",
+                            itemPriceRight = "$ " + "",
+                            itemPriceRightUnit = "",
+                            itemRightUnit = "",
+                            item_businessPriceRight = 0,
+                            isItemRightVisiable = false,
+                            isItemRightEnable = false,
+                            quantityR = 0,
+                            item_descRight = "",
+                            itemTaxableRight = "",
+                            colorRight = Color.FromHex("#FFFFFF"),
+                            itemTypeRight = "",
+                            favoriteIconRight = "unselectedHeartIcon.png",
+                            opacityRight = 0,
+                            isItemRightUnavailable = false,
+                            itemBackViewInfoRight = "",
+                            frontViewRight = true,
+                            backViewRight = false,
+                        });
+                    }
+                    if (isAmountItemsEven(n))
+                    {
+                        for (int i = 0; i < n / 2; i++)
+                        {
+                            gridViewLayout.Add(new ItemsModel()
+                            {
+                                height = this.Width / 2 - 10,
+                                width = this.Width / 2 - 25,
+                                imageSourceLeft = listOfItems[j].itemImage,
+                                item_uidLeft = listOfItems[j].itemUID,
+                                itm_business_uidLeft = listOfItems[j].itemBusinessUID,
+                                quantityLeft = listOfItems[j].itemQuantity,
+                                itemNameLeft = listOfItems[j].itemName,
+                                itemPriceLeft = listOfItems[j].itemPrice,
+                                itemPriceLeftUnit = listOfItems[j].itemPriceWithUnit,
+                                itemLeftUnit = listOfItems[j].itemUnit,
+                                item_businessPriceLeft = listOfItems[j].itemBusinessPrice,
+                                isItemLeftVisiable = true,
+                                isItemLeftEnable = true,
+                                quantityL = listOfItems[j].itemQuantity,
+                                item_descLeft = listOfItems[j].itemDescription,
+                                itemTaxableLeft = listOfItems[j].itemTaxable,
+                                colorLeft = listOfItems[j].itemBackgroundColor,
+                                itemTypeLeft = listOfItems[j].itemType,
+                                favoriteIconLeft = listOfItems[j].itemFavoriteImage,
+                                opacityLeft = listOfItems[j].itemOpacity,
+                                isItemLeftUnavailable = listOfItems[j].isItemUnavailable,
+                                itemBackViewInfoLeft = listOfItems[j].itemBackViewInfo,
+                                frontViewLeft = true,
+                                backViewLeft = false,
+
+                                imageSourceRight = listOfItems[j + 1].itemImage,
+                                item_uidRight = listOfItems[j + 1].itemUID,
+                                itm_business_uidRight = listOfItems[j + 1].itemBusinessUID,
+                                quantityRight = listOfItems[j + 1].itemQuantity,
+                                itemNameRight = listOfItems[j + 1].itemName,
+                                itemPriceRight = listOfItems[j + 1].itemPrice,
+                                itemPriceRightUnit = listOfItems[j + 1].itemPriceWithUnit,
+                                itemRightUnit = listOfItems[j + 1].itemUnit,
+                                item_businessPriceRight = listOfItems[j + 1].itemBusinessPrice,
+                                isItemRightVisiable = true,
+                                isItemRightEnable = true,
+                                quantityR = listOfItems[j + 1].itemQuantity,
+                                item_descRight = listOfItems[j + 1].itemDescription,
+                                itemTaxableRight = listOfItems[j + 1].itemTaxable,
+                                colorRight = listOfItems[j + 1].itemBackgroundColor,
+                                itemTypeRight = listOfItems[j + 1].itemType,
+                                favoriteIconRight = listOfItems[j + 1].itemFavoriteImage,
+                                opacityRight = listOfItems[j + 1].itemOpacity,
+                                isItemRightUnavailable = listOfItems[j + 1].isItemUnavailable,
+                                itemBackViewInfoRight = listOfItems[j + 1].itemBackViewInfo,
+                                frontViewRight = true,
+                                backViewRight = false,
+                            }); ;
+                            j = j + 2;
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < n / 2; i++)
+                        {
+                            gridViewLayout.Add(new ItemsModel()
+                            {
+                                height = this.Width / 2 - 10,
+                                width = this.Width / 2 - 25,
+                                imageSourceLeft = listOfItems[j].itemImage,
+                                item_uidLeft = listOfItems[j].itemUID,
+                                itm_business_uidLeft = listOfItems[j].itemBusinessUID,
+                                quantityLeft = listOfItems[j].itemQuantity,
+                                itemNameLeft = listOfItems[j].itemName,
+                                itemPriceLeft = listOfItems[j].itemPrice,
+                                itemPriceLeftUnit = listOfItems[j].itemPriceWithUnit,
+                                itemLeftUnit = listOfItems[j].itemUnit,
+                                item_businessPriceLeft = listOfItems[j].itemBusinessPrice,
+                                isItemLeftVisiable = true,
+                                isItemLeftEnable = true,
+                                quantityL = listOfItems[j].itemQuantity,
+                                item_descLeft = listOfItems[j].itemDescription,
+                                itemTaxableLeft = listOfItems[j].itemTaxable,
+                                colorLeft = listOfItems[j].itemBackgroundColor,
+                                itemTypeLeft = listOfItems[j].itemType,
+                                favoriteIconLeft = listOfItems[j].itemFavoriteImage,
+                                opacityLeft = listOfItems[j].itemOpacity,
+                                isItemLeftUnavailable = listOfItems[j].isItemUnavailable,
+                                itemBackViewInfoLeft = listOfItems[j].itemBackViewInfo,
+                                frontViewLeft = true,
+                                backViewLeft = false,
+
+                                imageSourceRight = listOfItems[j + 1].itemImage,
+                                item_uidRight = listOfItems[j + 1].itemUID,
+                                itm_business_uidRight = listOfItems[j + 1].itemBusinessUID,
+                                quantityRight = listOfItems[j + 1].itemQuantity,
+                                itemNameRight = listOfItems[j + 1].itemName,
+                                itemPriceRight = listOfItems[j + 1].itemPrice,
+                                itemPriceRightUnit = listOfItems[j + 1].itemPriceWithUnit,
+                                itemRightUnit = listOfItems[j + 1].itemUnit,
+                                item_businessPriceRight = listOfItems[j + 1].itemBusinessPrice,
+                                isItemRightVisiable = true,
+                                isItemRightEnable = true,
+                                quantityR = listOfItems[j + 1].itemQuantity,
+                                item_descRight = listOfItems[j + 1].itemDescription,
+                                itemTaxableRight = listOfItems[j + 1].itemTaxable,
+                                colorRight = listOfItems[j + 1].itemBackgroundColor,
+                                itemTypeRight = listOfItems[j + 1].itemType,
+                                favoriteIconRight = listOfItems[j + 1].itemFavoriteImage,
+                                opacityRight = listOfItems[j + 1].itemOpacity,
+                                isItemRightUnavailable = listOfItems[j + 1].isItemUnavailable,
+                                itemBackViewInfoRight = listOfItems[j + 1].itemBackViewInfo,
+                                frontViewRight = true,
+                                backViewRight = false,
+                            });
+                            j = j + 2;
+                        }
+                        gridViewLayout.Add(new ItemsModel()
+                        {
+                            height = this.Width / 2 - 10,
+                            width = this.Width / 2 - 25,
+                            imageSourceLeft = listOfItems[j].itemImage,
+                            item_uidLeft = listOfItems[j].itemUID,
+                            itm_business_uidLeft = listOfItems[j].itemBusinessUID,
+                            quantityLeft = listOfItems[j].itemQuantity,
+                            itemNameLeft = listOfItems[j].itemName,
+                            itemPriceLeft = listOfItems[j].itemPrice,
+                            itemPriceLeftUnit = listOfItems[j].itemPriceWithUnit,
+                            itemLeftUnit = listOfItems[j].itemUnit,
+                            item_businessPriceLeft = listOfItems[j].itemBusinessPrice,
+                            isItemLeftVisiable = true,
+                            isItemLeftEnable = true,
+                            quantityL = listOfItems[j].itemQuantity,
+                            item_descLeft = listOfItems[j].itemDescription,
+                            itemTaxableLeft = listOfItems[j].itemTaxable,
+                            colorLeft = listOfItems[j].itemBackgroundColor,
+                            itemTypeLeft = listOfItems[j].itemType,
+                            favoriteIconLeft = listOfItems[j].itemFavoriteImage,
+                            opacityLeft = listOfItems[j].itemOpacity,
+                            isItemLeftUnavailable = listOfItems[j].isItemUnavailable,
+                            itemBackViewInfoLeft = listOfItems[j].itemBackViewInfo,
+                            frontViewLeft = true,
+                            backViewLeft = false,
+
+                            imageSourceRight = "",
+                            quantityRight = 0,
+                            itemNameRight = "",
+                            itemPriceRight = "$ " + "",
+                            isItemRightVisiable = false,
+                            isItemRightEnable = false,
+                            quantityR = 0,
+                            colorRight = Color.FromHex("#FFFFFF"),
+                            itemTypeRight = "",
+                            favoriteIconRight = "unselectedHeartIcon.png",
+                            opacityRight = 0,
+                            isItemRightUnavailable = false,
+                            itemBackViewInfoRight = "",
+                            frontViewRight = true,
+                            backViewRight = false,
+                        });
+                    }
+                }
+
+                verticalList.ItemsSource = gridViewLayout;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+        }
+
+        private void GetDataForSingleList(IList<Items> listOfItems, IList<string> types)
+        {
+            try
+            {
+                if (listOfItems.Count != 0 && listOfItems != null)
+                {
+                    List<Items> listUniqueItems = new List<Items>();
+                    Dictionary<string, Items> uniqueItems = new Dictionary<string, Items>();
+                    foreach (Items a in listOfItems)
+                    {
+                        string key = a.item_name + a.item_desc + a.item_price;
+                        if (!uniqueItems.ContainsKey(key))
+                        {
+                            uniqueItems.Add(key, a);
+                        }
+                        else
+                        {
+                            var savedItem = uniqueItems[key];
+
+                            if (savedItem.item_price != a.item_price)
+                            {
+                                if (savedItem.business_price != Math.Min(savedItem.business_price, a.business_price))
+                                {
+                                    savedItem = a;
+                                }
+                            }
+                            else
+                            {
+                                List<DateTime> creationDates = new List<DateTime>();
+                                Debug.WriteLine("NAME {0}, {1}", savedItem.item_name, a.item_name);
+                                Debug.WriteLine("SAVED ITEM UID {0}, SAVED TIME STAMP {1}", savedItem.item_uid, savedItem.created_at);
+                                Debug.WriteLine("NEW ITEM UID {0}, NEW TIME STAMP {1}", a.item_uid, a.created_at);
+
+                                creationDates.Add(DateTime.Parse(savedItem.created_at));
+                                creationDates.Add(DateTime.Parse(a.created_at));
+                                creationDates.Sort();
+
+                                if (creationDates[0] != creationDates[1])
+                                {
+                                    Debug.WriteLine("CREATED FIRST {0}, STRING DATETIME INDEX 0 {1}", creationDates[0], creationDates[0].ToString("yyyy-MM-dd HH:mm:ss"));
+
+                                    if (savedItem.created_at != creationDates[0].ToString("yyyy-MM-dd HH:mm:ss"))
+                                    {
+                                        savedItem = a;
+                                    }
+                                }
+                                else
+                                {
+                                    var itemsIdsList = new List<long>();
+                                    var savedItemId = savedItem.item_uid.Replace('-', '0');
+                                    var newItemId = a.item_uid.Replace('-', '0');
+
+                                    itemsIdsList.Add(long.Parse(savedItemId));
+                                    itemsIdsList.Add(long.Parse(newItemId));
+                                    itemsIdsList.Sort();
+
+                                    if (savedItemId != itemsIdsList[0].ToString())
+                                    {
+                                        //savedItem.item_uid = a.item_uid;
+                                        savedItem = a;
+                                    }
+                                }
+                                Debug.WriteLine("SELECTED ITEM UID: " + savedItem.item_uid);
+                                uniqueItems[key] = savedItem;
+                            }
+                        }
+                    }
+
+                    foreach (string key in uniqueItems.Keys)
+                    {
+                        listUniqueItems.Add(uniqueItems[key]);
+                    }
+
+                    listOfItems = listUniqueItems;
+
+                    vegetablesList.Clear();
+                    int j = 0;
                     foreach (string type in types)
                     {
-                        if (!b.item_type.Contains(type)) matchesItemType = false;
+                        if(j == 0)
+                        {
+                            vegetablesList = SetItemList(listOfItems, type);
+                            //vegetablesListView.IsVisible = true;
+                            category1.Text = SetCathegory(type);
+                        }
+                        else if (j == 1)
+                        {
+                            fruitsList = SetItemList(listOfItems, type);
+                            //fruitsListView.IsVisible = true;
+                            category2.Text = SetCathegory(type);
+                        }
+                        else if (j == 2)
+                        {
+                            othersList = SetItemList(listOfItems, type);
+                            //othersListView.IsVisible = true;
+                            category3.Text = SetCathegory(type);
+                        }
+                        else if (j == 3)
+                        {
+                            dessertsList = SetItemList(listOfItems, type);
+                            //dessertsListView.IsVisible = true;
+                            category4.Text = SetCathegory(type);
+                        }
+                        j++;
                     }
-                    if (matchesItemType) Farms.Add(unselectedBusiness(b));
+                }
+
+                vegetablesListView.ItemsSource = vegetablesList;
+                fruitsListView.ItemsSource = fruitsList;
+                othersListView.ItemsSource = othersList;
+                dessertsListView.ItemsSource = dessertsList;
+
+            }
+            catch (Exception errorGetDataForSigleList)
+            {
+                var client = new Diagnostic();
+                client.parseException(errorGetDataForSigleList.ToString(), user);
+            }
+        }
+
+        string SetCathegory(string type)
+        {
+            string category = "";
+            try
+            {
+                if (type != "")
+                {
+                    if (type.Length >= 1)
+                    {
+                        var tempType = type;
+                        var upperChar = tempType[0].ToString().ToUpper().ToCharArray();
+                        category += tempType.Replace(tempType[0], upperChar[0]) + "s";
+                    }
+                }
+                return category;
+            }
+            catch
+            {
+                return type;
+            }
+        }
+
+        public ObservableCollection<SingleItem> SetItemList(IList<Items> listOfItems, string type)
+        {
+            var list = new ObservableCollection<SingleItem>();
+            foreach (Items produce in listOfItems)
+            {
+                if (produce.taxable == null || produce.taxable == "NULL")
+                {
+                    produce.taxable = "FALSE";
+                }
+
+                var itemToInsert = new SingleItem()
+                {
+                    itemType = produce.item_type,
+                    itemImage = produce.item_photo,
+                    itemFavoriteImage = "unselectedHeartIcon.png",
+                    itemUID = produce.item_uid,
+                    itemBusinessUID = produce.itm_business_uid,
+                    itemName = produce.item_name,
+                    itemPrice = "$ " + produce.item_price.ToString(),
+                    itemPriceWithUnit = "$ " + produce.item_price.ToString("N2") + " / " + (string)produce.item_unit.ToString(),
+                    itemUnit = (string)produce.item_unit.ToString(),
+                    itemDescription = produce.item_desc,
+                    itemTaxable = produce.taxable,
+                    itemQuantity = 0,
+                    itemBusinessPrice = produce.business_price,
+                    itemBackgroundColor = Color.FromHex("#FFFFFF"),
+                    itemOpacity = 1,
+                    isItemVisiable = true,
+                    isItemEnable = true,
+                    isItemUnavailable = false,
+                    itemBackViewInfo = produce.item_info,
+                    frontView = true,
+                    backView = false,
+                };
+
+                if (produce.item_type == type)
+                {
+                    list.Add(itemToInsert);
+                }
+            }
+            return list;
+        }
+
+        public bool isAmountItemsEven(int num)
+        {
+            bool result = false;
+            if (num % 2 == 0) { result = true; }
+            return result;
+        }
+
+        void SubtractItem(System.Object sender, System.EventArgs e)
+        {
+            var button = (ImageButton)sender;
+            var itemModelObject = (SingleItem)button.CommandParameter;
+            var itemSelected = new ItemPurchased();
+
+            if (itemModelObject != null)
+            {
+                if (itemModelObject.updateItemQuantity != 0)
+                {
+                    itemModelObject.updateItemQuantity -= 1;
+
+                    if (order != null)
+                    {
+                        if (order.ContainsKey(itemModelObject.itemName))
+                        {
+                            var itemToUpdate = order[itemModelObject.itemName];
+                            itemToUpdate.item_quantity = itemModelObject.updateItemQuantity;
+                            order[itemModelObject.itemName] = itemToUpdate;
+                        }
+                        else
+                        {
+                            itemSelected.pur_business_uid = itemModelObject.itemBusinessUID;
+                            itemSelected.item_uid = itemModelObject.itemUID;
+                            itemSelected.item_name = itemModelObject.itemName;
+                            itemSelected.item_quantity = itemModelObject.updateItemQuantity;
+                            itemSelected.item_price = Convert.ToDouble(itemModelObject.itemPrice.Substring(1).Trim());
+                            itemSelected.img = itemModelObject.itemImage;
+                            itemSelected.unit = itemModelObject.itemUnit;
+                            itemSelected.description = itemModelObject.itemDescription;
+                            itemSelected.business_price = itemModelObject.itemBusinessPrice;
+                            itemSelected.taxable = itemModelObject.itemTaxable;
+                            itemSelected.isItemAvailable = true;
+                            order.Add(itemModelObject.itemName, itemSelected);
+                        }
+                    }
+
+                    if (itemModelObject.updateItemQuantity == 0)
+                    {
+                        itemModelObject.updateItemBackgroundColor = Color.FromHex("#FFFFFF");
+                        order.Remove(itemModelObject.itemName);
+                    }
+                    UpdateNumberOfItemsInCart();
+                }
+                else
+                {
+                    itemModelObject.updateItemBackgroundColor = Color.FromHex("#FFFFFF");
+                    order.Remove(itemModelObject.itemName);
+                }
+            }
+
+        }
+
+        void AddItem(System.Object sender, System.EventArgs e)
+        {
+            var button = (ImageButton)sender;
+            var itemModelObject = (SingleItem)button.CommandParameter;
+            var itemSelected = new ItemPurchased();
+            if (itemModelObject != null)
+            {
+                itemModelObject.updateItemBackgroundColor = Color.FromHex("#ffce99");
+                itemModelObject.updateItemQuantity += 1;
+
+                if (order != null)
+                {
+                    if (order.ContainsKey(itemModelObject.itemName))
+                    {
+                        var itemToUpdate = order[itemModelObject.itemName];
+                        itemToUpdate.item_quantity = itemModelObject.updateItemQuantity;
+                        order[itemModelObject.itemName] = itemToUpdate;
+                    }
+                    else
+                    {
+                        itemSelected.pur_business_uid = itemModelObject.itemBusinessUID;
+                        itemSelected.item_uid = itemModelObject.itemUID;
+                        itemSelected.item_name = itemModelObject.itemName;
+                        itemSelected.item_quantity = itemModelObject.updateItemQuantity;
+                        itemSelected.item_price = Convert.ToDouble(itemModelObject.itemPrice.Substring(1).Trim());
+                        itemSelected.img = itemModelObject.itemImage;
+                        itemSelected.unit = itemModelObject.itemUnit;
+                        itemSelected.description = itemModelObject.itemDescription;
+                        itemSelected.business_price = itemModelObject.itemBusinessPrice;
+                        itemSelected.taxable = itemModelObject.itemTaxable;
+                        itemSelected.isItemAvailable = true;
+                        order.Add(itemModelObject.itemName, itemSelected);
+                    }
+                }
+                UpdateNumberOfItemsInCart();
+            }
+        }
+
+        void updateItemsBackgroundColorAndQuantity(ObservableCollection<SingleItem> sourceList, ScheduleInfo defaultSchedule)
+        {
+            foreach (SingleItem i in sourceList)
+            {
+                if (!defaultSchedule.business_uids.Contains(i.itemBusinessUID))
+                {
+                    i.updateItemOpacity = 0.5;
+                    i.updateIsItemEnable = false;
+                    i.updateIsItemUnavailable = true;
+                }
+                else
+                {
+                    i.updateItemOpacity = 1;
+                    i.updateIsItemEnable = true;
+                    i.updateIsItemUnavailable = false;
+                }
+
+                if (order != null)
+                {
+                    if (order.ContainsKey(i.itemName))
+                    {
+                        if (order[i.itemName].item_quantity != 0)
+                        {
+                            i.updateItemBackgroundColor = Color.FromHex("#ffce99");
+                            i.updateItemQuantity = order[i.itemName].item_quantity;
+
+                            order[i.itemName].business_price = i.itemBusinessPrice;
+                            order[i.itemName].description = i.itemDescription;
+                            order[i.itemName].isItemAvailable = i.isItemUnavailable;
+                            order[i.itemName].taxable = i.itemTaxable;
+                        }
+                        else
+                        {
+                            i.updateItemBackgroundColor = Color.FromHex("#FFFFFF");
+                        }
+                    }
+                }
+
+                if (favorites != null && favorites.Count != 0)
+                {
+                    if (favorites.Contains(i.itemName))
+                    {
+                        i.updateItemFavoriteImage = "selectedFavoritesIcon.png";
+                    }
                 }
             }
         }
 
-        void ResetFarmersMarkets()
+        void SubtractItemLeft(System.Object sender, System.EventArgs e)
         {
-            if (selected_market_id != "") return;
-            FarmersMarkets.Clear();
-            if (selected_farm_id != "")
+
+            var button = (ImageButton)sender;
+            var itemModelObject = (ItemsModel)button.CommandParameter;
+            ItemPurchased itemSelected = new ItemPurchased();
+            if (itemModelObject != null)
             {
-                foreach (Business b in AllFarms)
+                if (itemModelObject.quantityL != 0)
                 {
-                    if (b.business_uid == selected_farm_id)
+                    itemModelObject.quantityL -= 1;
+                    totalCount -= 1;
+                    //CartTotal.Text = totalCount.ToString();
+
+                    if (order != null)
                     {
-                        foreach (Business market in AllFarmersMarkets)
+                        if (order.ContainsKey(itemModelObject.itemNameLeft))
                         {
-                            if (b.business_association != null &&
-                                b.business_association.Contains(market.business_uid))
+                            var itemToUpdate = order[itemModelObject.itemNameLeft];
+                            itemToUpdate.item_quantity = itemModelObject.quantityL;
+                            order[itemModelObject.itemNameLeft] = itemToUpdate;
+                        }
+                        else
+                        {
+                            itemSelected.pur_business_uid = itemModelObject.itm_business_uidLeft;
+                            itemSelected.item_uid = itemModelObject.item_uidLeft;
+                            itemSelected.item_name = itemModelObject.itemNameLeft;
+                            itemSelected.item_quantity = itemModelObject.quantityL;
+                            itemSelected.item_price = Convert.ToDouble(itemModelObject.itemPriceLeft.Substring(1).Trim());
+                            itemSelected.img = itemModelObject.imageSourceLeft;
+                            itemSelected.unit = itemModelObject.itemLeftUnit;
+                            itemSelected.description = itemModelObject.item_descLeft;
+                            itemSelected.business_price = itemModelObject.item_businessPriceLeft;
+                            itemSelected.taxable = itemModelObject.itemTaxableLeft;
+                            itemSelected.isItemAvailable = true;
+                            order.Add(itemModelObject.itemNameLeft, itemSelected);
+                        }
+                    }
+
+                    if (itemModelObject.quantityL == 0)
+                    {
+                        itemModelObject.colorLeft = Color.FromHex("#FFFFFF");
+                        itemModelObject.colorLeftUpdate = Color.FromHex("#FFFFFF");
+                        order.Remove(itemModelObject.itemNameLeft);
+                    }
+                    UpdateNumberOfItemsInCart();
+                }
+                else
+                {
+                    itemModelObject.colorLeft = Color.FromHex("#FFFFFF");
+                    itemModelObject.colorLeftUpdate = Color.FromHex("#FFFFFF");
+                }
+            }
+
+        }
+
+        void AddItemLeft(System.Object sender, System.EventArgs e)
+        {
+
+            var button = (ImageButton)sender;
+            var itemModelObject = (ItemsModel)button.CommandParameter;
+            ItemPurchased itemSelected = new ItemPurchased();
+            if (itemModelObject != null)
+            {
+                itemModelObject.colorLeft = Color.FromHex("#ffce99");
+                itemModelObject.colorLeftUpdate = Color.FromHex("#ffce99");
+                itemModelObject.quantityL += 1;
+                totalCount += 1;
+                //CartTotal.Text = totalCount.ToString();
+
+                if (order != null)
+                {
+                    if (order.ContainsKey(itemModelObject.itemNameLeft))
+                    {
+                        var itemToUpdate = order[itemModelObject.itemNameLeft];
+                        itemToUpdate.item_quantity = itemModelObject.quantityL;
+                        order[itemModelObject.itemNameLeft] = itemToUpdate;
+                    }
+                    else
+                    {
+                        itemSelected.pur_business_uid = itemModelObject.itm_business_uidLeft;
+                        itemSelected.item_uid = itemModelObject.item_uidLeft;
+                        itemSelected.item_name = itemModelObject.itemNameLeft;
+                        itemSelected.item_quantity = itemModelObject.quantityL;
+                        itemSelected.item_price = Convert.ToDouble(itemModelObject.itemPriceLeft.Substring(1).Trim());
+                        itemSelected.img = itemModelObject.imageSourceLeft;
+                        itemSelected.unit = itemModelObject.itemLeftUnit;
+                        itemSelected.description = itemModelObject.item_descLeft;
+                        itemSelected.business_price = itemModelObject.item_businessPriceLeft;
+                        itemSelected.taxable = itemModelObject.itemTaxableLeft;
+                        itemSelected.isItemAvailable = true;
+                        order.Add(itemModelObject.itemNameLeft, itemSelected);
+                    }
+                }
+                UpdateNumberOfItemsInCart();
+            }
+
+        }
+
+        void SubtractItemRight(System.Object sender, System.EventArgs e)
+        {
+
+            var button = (ImageButton)sender;
+            var itemModelObject = (ItemsModel)button.CommandParameter;
+            ItemPurchased itemSelected = new ItemPurchased();
+            if (itemModelObject != null)
+            {
+                if (itemModelObject.quantityR != 0)
+                {
+                    itemModelObject.quantityR -= 1;
+                    totalCount -= 1;
+                    //CartTotal.Text = totalCount.ToString();
+
+                    if (order.ContainsKey(itemModelObject.itemNameRight))
+                    {
+                        var itemToUpdate = order[itemModelObject.itemNameRight];
+                        itemToUpdate.item_quantity = itemModelObject.quantityR;
+                        order[itemModelObject.itemNameRight] = itemToUpdate;
+                    }
+                    else
+                    {
+                        itemSelected.pur_business_uid = itemModelObject.itm_business_uidRight;
+                        itemSelected.item_uid = itemModelObject.item_uidRight;
+                        itemSelected.item_name = itemModelObject.itemNameRight;
+                        itemSelected.item_quantity = itemModelObject.quantityR;
+                        itemSelected.item_price = Convert.ToDouble(itemModelObject.itemPriceRight.Substring(1).Trim());
+                        itemSelected.img = itemModelObject.imageSourceRight;
+                        itemSelected.unit = itemModelObject.itemRightUnit;
+                        itemSelected.description = itemModelObject.item_descRight;
+                        itemSelected.business_price = itemModelObject.item_businessPriceRight;
+                        itemSelected.taxable = itemModelObject.itemTaxableRight;
+                        itemSelected.isItemAvailable = true;
+                        order.Add(itemModelObject.itemNameRight, itemSelected);
+                    }
+
+                    if (itemModelObject.quantityR == 0)
+                    {
+                        itemModelObject.colorRight = Color.FromHex("#FFFFFF");
+                        itemModelObject.colorRightUpdate = Color.FromHex("#FFFFFF");
+                        order.Remove(itemModelObject.itemNameRight);
+                    }
+                    UpdateNumberOfItemsInCart();
+                }
+                else
+                {
+                    itemModelObject.colorRight = Color.FromHex("#FFFFFF");
+                    itemModelObject.colorRightUpdate = Color.FromHex("#FFFFFF");
+                }
+            }
+
+        }
+
+        void AddItemRight(System.Object sender, System.EventArgs e)
+        {
+
+            var button = (ImageButton)sender;
+            var itemModelObject = (ItemsModel)button.CommandParameter;
+            ItemPurchased itemSelected = new ItemPurchased();
+            if (itemModelObject != null)
+            {
+                itemModelObject.colorRight = Color.FromHex("#ffce99");
+                itemModelObject.colorRightUpdate = Color.FromHex("#ffce99");
+                itemModelObject.quantityR += 1;
+                totalCount += 1;
+                //CartTotal.Text = totalCount.ToString();
+
+                if (order.ContainsKey(itemModelObject.itemNameRight))
+                {
+                    var itemToUpdate = order[itemModelObject.itemNameRight];
+                    itemToUpdate.item_quantity = itemModelObject.quantityR;
+                    order[itemModelObject.itemNameRight] = itemToUpdate;
+                }
+                else
+                {
+                    itemSelected.pur_business_uid = itemModelObject.itm_business_uidRight;
+                    itemSelected.item_uid = itemModelObject.item_uidRight;
+                    itemSelected.item_name = itemModelObject.itemNameRight;
+                    itemSelected.item_quantity = itemModelObject.quantityR;
+                    itemSelected.item_price = Convert.ToDouble(itemModelObject.itemPriceRight.Substring(1).Trim());
+                    itemSelected.img = itemModelObject.imageSourceRight;
+                    itemSelected.unit = itemModelObject.itemRightUnit;
+                    itemSelected.description = itemModelObject.item_descRight;
+                    itemSelected.business_price = itemModelObject.item_businessPriceRight;
+                    itemSelected.taxable = itemModelObject.itemTaxableRight;
+                    itemSelected.isItemAvailable = true;
+                    order.Add(itemModelObject.itemNameRight, itemSelected);
+                }
+                UpdateNumberOfItemsInCart();
+            }
+        }
+
+        private Dictionary<string, ItemPurchased> purchase = new Dictionary<string, ItemPurchased>();
+
+        public void CheckOutClickBusinessPage(System.Object sender, System.EventArgs e)
+        {
+            var itemKeyToRemove = new List<string>();
+            foreach (string item in order.Keys)
+            {
+                if(order[item].item_quantity != 0)
+                {
+                    if (!selectedDeliveryDate.business_uids.Contains(order[item].pur_business_uid))
+                    {
+                        order[item].isItemAvailable = false;
+                    }
+                    else
+                    {
+                        order[item].isItemAvailable = true;
+                    }
+                }else
+                {
+                    itemKeyToRemove.Add(item);
+                }
+            }
+
+            foreach(string key in itemKeyToRemove)
+            {
+                order.Remove(key);
+            }
+
+            Application.Current.MainPage = new CheckoutPage();
+        }
+
+        void UpdateNumberOfItemsInCart()
+        {
+            var totalItemsToDelivery = 0;
+            foreach (string item in order.Keys)
+            {
+                if (order[item].item_quantity != 0)
+                {
+                    if (selectedDeliveryDate.business_uids.Contains(order[item].pur_business_uid))
+                    {
+                        totalItemsToDelivery += order[item].item_quantity;
+                    }
+                }
+            }
+            CartTotal.Text = totalItemsToDelivery.ToString();
+        }
+
+        public List<DateTime> GetBusinessSchedule(ServingFreshBusiness data, string businessID)
+        {
+            var currentDate = DateTime.Now;
+            var tempDateTable = GetTable(currentDate);
+            var businesDeliverySchedule = new List<DateTime>();
+            var businesDisplaySchedule = new List<ScheduleInfo>();
+
+            //Debug.WriteLine("TEMP TABLE FOR LOOK UPS");
+            //foreach (DateTime t in tempDateTable)
+            //{
+            //    Debug.WriteLine(t);
+            //}
+
+            foreach (Business a in data.business_details)
+            {
+                if (businessID == a.z_biz_id)
+                {
+                    var acceptingDate = LastAcceptingOrdersDate(tempDateTable, a.z_accepting_day, a.z_accepting_time);
+                    var deliveryDate = new DateTime();
+                    //Debug.WriteLine("CURRENT DATE: " + currentDate);
+                    //Debug.WriteLine("LAST ACCEPTING DATE: " + acceptingDate);
+
+                    if (currentDate < acceptingDate)
+                    {
+                        //Debug.WriteLine("ONTIME");
+
+                        deliveryDate = bussinesDeliveryDate(a.z_delivery_day, a.z_delivery_time);
+                        if (deliveryDate < acceptingDate)
+                        {
+                            deliveryDate = deliveryDate.AddDays(7);
+                        }
+
+                        if (!businesDeliverySchedule.Contains(deliveryDate))
+                        {
+                            var element = new ScheduleInfo();
+
+                            element.business_uids = new List<string>();
+                            element.business_uids.Add(a.z_biz_id);
+                            element.delivery_date = deliveryDate.ToString("MMM dd");
+                            element.delivery_dayofweek = deliveryDate.DayOfWeek.ToString();
+                            element.delivery_shortname = deliveryDate.DayOfWeek.ToString().Substring(0, 3).ToUpper();
+                            element.delivery_time = a.z_delivery_time;
+                            element.deliveryTimeStamp = deliveryDate;
+                            element.orderExpTime = "Order by " + acceptingDate.ToString("ddd") + " " + acceptingDate.ToString("htt").ToLower();
+
+                            //Debug.WriteLine("element.delivery_date: " + element.delivery_date);
+                            //Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
+                            //Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
+                            //Debug.WriteLine("element.delivery_time: " + element.delivery_time);
+                            //Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
+                            //Debug.WriteLine("business_uids list: ");
+
+                            //foreach (string ID in element.business_uids)
+                            //{
+                            //    Debug.WriteLine(ID);
+                            //}
+
+                            businesDeliverySchedule.Add(deliveryDate);
+                            businesDisplaySchedule.Add(element);
+                        }
+                        else
+                        {
+                            foreach (ScheduleInfo element in businesDisplaySchedule)
                             {
-                                FarmersMarkets.Add(unselectedBusiness(market));
+                                if (element.deliveryTimeStamp == deliveryDate)
+                                {
+                                    var e = element;
+
+                                    e.business_uids.Add(a.z_biz_id);
+                                    element.business_uids = e.business_uids;
+
+                                    //Debug.WriteLine("element.delivery_date: " + element.delivery_date);
+                                    //Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
+                                    //Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
+                                    //Debug.WriteLine("element.delivery_time: " + element.delivery_time);
+                                    //Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
+                                    //Debug.WriteLine("business_uids list: ");
+
+                                    //foreach (string ID in element.business_uids)
+                                    //{
+                                    //    Debug.WriteLine(ID);
+                                    //}
+
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //Debug.WriteLine("NON ONTIME! -> ROLL OVER TO NEXT DELIVERY DATE");
+
+                        deliveryDate = bussinesDeliveryDate(a.z_delivery_day, a.z_delivery_time);
+
+                        if (!businesDeliverySchedule.Contains(deliveryDate.AddDays(7)))
+                        {
+                            var nextDeliveryDate = deliveryDate.AddDays(7);
+                            var element = new ScheduleInfo();
+
+                            element.business_uids = new List<string>();
+                            element.business_uids.Add(a.z_biz_id);
+                            element.delivery_date = nextDeliveryDate.ToString("MMM dd");
+                            element.delivery_dayofweek = nextDeliveryDate.DayOfWeek.ToString();
+                            element.delivery_shortname = nextDeliveryDate.DayOfWeek.ToString().Substring(0, 3).ToUpper();
+                            element.delivery_time = a.z_delivery_time;
+                            element.deliveryTimeStamp = nextDeliveryDate;
+                            element.orderExpTime = "Order by " + acceptingDate.AddDays(7).ToString("ddd") + " " + acceptingDate.AddDays(7).ToString("htt").ToLower();
+
+                            //Debug.WriteLine("element.delivery_date: " + element.delivery_date);
+                            //Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
+                            //Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
+                            //Debug.WriteLine("element.delivery_time: " + element.delivery_time);
+                            //Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
+                            //Debug.Write("business_uids list: ");
+
+                            //foreach (string ID in element.business_uids)
+                            //{
+                            //    Debug.Write(ID + ", ");
+                            //}
+
+                            businesDeliverySchedule.Add(nextDeliveryDate);
+                            businesDisplaySchedule.Add(element);
+                        }
+                        else
+                        {
+                            var nextDeliveryDate = deliveryDate.AddDays(7);
+
+                            foreach (ScheduleInfo element in businesDisplaySchedule)
+                            {
+                                if (element.deliveryTimeStamp == nextDeliveryDate)
+                                {
+                                    var e = element;
+
+                                    e.business_uids.Add(a.z_biz_id);
+                                    element.business_uids = e.business_uids;
+
+                                    //Debug.WriteLine("element.delivery_date: " + element.delivery_date);
+                                    //Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
+                                    //Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
+                                    //Debug.WriteLine("element.delivery_time: " + element.delivery_time);
+                                    //Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
+                                    //Debug.Write("business_uids list: ");
+
+                                    //foreach (string ID in element.business_uids)
+                                    //{
+                                    //    Debug.Write(ID + ", ");
+                                    //}
+
+                                    break;
+                                }
                             }
                         }
                     }
                 }
             }
-            else
+
+            // DISPLAY SCHEDULE ELEMENTS;
+            //Debug.WriteLine("");
+            //Debug.WriteLine("");
+            //Debug.WriteLine("DISPLAY SCHEDULE ELEMENTS NOT SORTED");
+            //Debug.WriteLine("");
+
+            //foreach (ScheduleInfo element in businesDisplaySchedule)
+            //{
+            //    Debug.WriteLine("element.delivery_date: " + element.delivery_date);
+            //    Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
+            //    Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
+            //    Debug.WriteLine("element.delivery_time: " + element.delivery_time);
+            //    Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
+            //    Debug.Write("business_uids list: ");
+
+            //    foreach (string ID in element.business_uids)
+            //    {
+            //        Debug.Write(ID + ", ");
+            //    }
+
+            //    Debug.WriteLine("");
+            //    Debug.WriteLine("");
+            //}
+
+            businesDeliverySchedule.Sort();
+            List<ScheduleInfo> sortedSchedule = new List<ScheduleInfo>();
+
+            foreach (DateTime deliveryElement in deliverySchedule)
             {
-                foreach (Business b in AllFarmersMarkets)
+                foreach (ScheduleInfo scheduleElement in businesDisplaySchedule)
                 {
-                    FarmersMarkets.Add(unselectedBusiness(b));
+                    if (deliveryElement == scheduleElement.deliveryTimeStamp)
+                    {
+                        sortedSchedule.Add(scheduleElement);
+                    }
                 }
             }
+
+            businesDisplaySchedule = sortedSchedule;
+
+            //Debug.WriteLine("");
+            //Debug.WriteLine("");
+            //Debug.WriteLine("DISPLAY SCHEDULE ELEMENTS SORTED");
+            //Debug.WriteLine("");
+
+            //foreach (ScheduleInfo element in businesDisplaySchedule)
+            //{
+            //    Debug.WriteLine("element.delivery_date: " + element.delivery_date);
+            //    Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
+            //    Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
+            //    Debug.WriteLine("element.delivery_time: " + element.delivery_time);
+            //    Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
+            //    Debug.Write("business_uids list: ");
+
+            //    foreach (string ID in element.business_uids)
+            //    {
+            //        Debug.Write(ID + ", ");
+            //    }
+
+            //    Debug.WriteLine("");
+            //    Debug.WriteLine("");
+            //}
+            return businesDeliverySchedule;
         }
 
-        async void GetBusinesses()                                                              // Finds which businesses belong to the customers zone
+        public List<DateTime> GetTable(DateTime today)
         {
-            string userLat = (string)Application.Current.Properties["user_latitude"];
-            string userLong = (string)Application.Current.Properties["user_longitude"];
-            if (userLat == "0" && userLong == "0")
+            var table = new List<DateTime>();
+            for (int i = 0; i < 7; i++)
             {
-                userLong = "-121.924799";
-                userLat = "37.364027";
+                table.Add(today);
+                today = today.AddDays(1);
             }
-            // post and champ market.
-            var client = new HttpClient();
-            var response = await client.GetAsync(Constant.ZoneUrl + userLong + "," + userLat);
-            string result = response.Content.ReadAsStringAsync().Result;
-            var data = JsonConvert.DeserializeObject<ServingFreshBusiness>(result);
-            AllFarmersMarkets.Clear();
-            AllFarms.Clear();
-            if (data.result != null)
+            return table;
+        }
+
+        public DateTime LastAcceptingOrdersDate(List<DateTime> table, string acceptingDay, string acceptingTime)
+        {
+            var date = DateTime.Parse(acceptingTime);
+
+            foreach (DateTime element in table)
             {
-                foreach (Business b in data.result)
+                if (element.DayOfWeek.ToString().ToUpper() == acceptingDay)
                 {
-                    if (b.business_type == "Farm") AllFarms.Add(b);
-                    else if (b.business_type == "Farmers Market") AllFarmersMarkets.Add(b);
+                    break;
+                }
+                date = date.AddDays(1);
+            }
+
+            return date;
+        }
+
+        public DateTime BussinesDeliveryDate(DateTime lastAcceptingOrdersDate, string day, string time)
+        {
+            string startTime = "";
+
+            foreach (char a in time.ToCharArray())
+            {
+                if (a != '-')
+                {
+                    startTime += a;
+                }
+                else
+                {
+                    break;
                 }
             }
-            ResetFarms();
-            ResetFarmersMarkets();
-            ResetDays();
+
+            var deliveryDate = DateTime.Parse(startTime.Trim());
+            //Debug.WriteLine("DELIVERYY DATE IN BUSINESS" + deliveryDate);
+            //Debug.WriteLine("LAST ACCEPTING DATE IN BUSINESS" + lastAcceptingOrdersDate);
+            if (deliveryDate < lastAcceptingOrdersDate)
+            {
+                deliveryDate = deliveryDate.AddDays(7);
+            }
+            //Debug.WriteLine("DEFAULT DELIVERY DATE: " + deliveryDate);
+
+            for (int i = 0; i < 7; i++)
+            {
+                if (deliveryDate.DayOfWeek.ToString().ToUpper() == day.ToUpper())
+                {
+                    break;
+                }
+                deliveryDate = deliveryDate.AddDays(1);
+            }
+
+            //Debug.WriteLine("DELIVERY DATE: " + deliveryDate);
+            return deliveryDate;
         }
 
-        bool isBusinessOpen(string business_uid, string weekday)
+        public DateTime lastAcceptingOrdersDate(string day, string hour)
         {
-            foreach (Business b in AllFarms)
+            var acceptingDate = DateTime.Parse(hour);
+
+            //Debug.WriteLine("DEFAULT ACCEPTING ORDERS DATE: " + acceptingDate);
+            //Debug.WriteLine("LAST ACCEPTING DAY: " + day.ToUpper());
+
+            for (int i = 0; i < 7; i++)
             {
-                if (b.business_uid == business_uid)
+                if (acceptingDate.DayOfWeek.ToString().ToUpper() == day.ToUpper())
                 {
-                    var hours = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(b.business_delivery_hours);
-                    return hours[weekday][0] != hours[weekday][1];                              // Closed if starting hours = ending hours
+                    break;
+                }
+                acceptingDate = acceptingDate.AddDays(1);
+            }
+
+            //Debug.WriteLine("LAST ACCEPTING ORDERS DATE: " + acceptingDate);
+            return acceptingDate;
+        }
+
+        public DateTime bussinesDeliveryDate(string day, string time)
+        {
+            string startTime = "";
+
+            foreach (char a in time.ToCharArray())
+            {
+                if (a != '-')
+                {
+                    startTime += a;
+                }
+                else
+                {
+                    break;
                 }
             }
-            return false;
-        }
 
-        bool anyBusinessesOpen(List<string> business_uids, string weekday)  
-        {
-            bool anyOpen = false;
-            foreach (string s in business_uids)
+            var deliveryDate = DateTime.Parse(startTime.Trim());
+            //Debug.WriteLine("DEFAULT DELIVERY DATE: " + deliveryDate);
+
+            for (int i = 0; i < 7; i++)
             {
-                if (isBusinessOpen(s, weekday))                                                                 // Calls isBusnesOpen
+                if (deliveryDate.DayOfWeek.ToString().ToUpper() == day.ToUpper())
                 {
-                    anyOpen = true;
+                    break;
                 }
+                deliveryDate = deliveryDate.AddDays(1);
             }
-            return anyOpen;
+
+            //Debug.WriteLine("DELIVERY DATE: " + deliveryDate);
+            return deliveryDate;
         }
 
-        void Open_Checkout(Object sender, EventArgs e)                                                          //Event handler to go to checkout page
-        {
-
-            Application.Current.MainPage = new CheckoutPage(null);
-        }
-
-        void Open_Farm(Object sender, EventArgs e)                                                              //Event handler to go to ItemsPage
+        void Open_Farm(Object sender, EventArgs e)
         {
             var sl = (StackLayout)sender;
             var tgr = (TapGestureRecognizer)sl.GestureRecognizers[0];
-            var dm = (DeliveriesModel)tgr.CommandParameter;
+            var dm = (ScheduleInfo)tgr.CommandParameter;
             string weekday = dm.delivery_dayofweek;
-            if (types.Count == 0)                                                                               // Selects all types if no type is selected
+            //HideMenu(menuFrame);
+            selectedDeliveryDate = dm;
+            var day = DateTime.Parse(selectedDeliveryDate.deliveryTimeStamp.ToString());
+            title.Text = day.ToString("ddd") + ", " + selectedDeliveryDate.delivery_date.ToString();
+            deliveryTime.Text = "Delivery time: " + selectedDeliveryDate.delivery_time;
+            orderBy.Text = "(" + selectedDeliveryDate.orderExpTime + ")";
+
+            Debug.WriteLine(weekday);
+            foreach (string b_uid in dm.business_uids)
             {
-                types.Add("fruit");
-                types.Add("vegetable");
-                types.Add("dessert");
-                types.Add("other");
-            }
-            b_uids.Clear();
-            if (selected_farm_id != "") b_uids.Add(selected_farm_id);
-            else
-            {
-                foreach (BusinessCard bc in Farms)
-                {
-                    if (isBusinessOpen(bc.business_uid, weekday)) b_uids.Add(bc.business_uid);
-                }
+                Debug.WriteLine(b_uid);
             }
 
-            foreach (string type in types)
+            foreach (ScheduleInfo i in displaySchedule)
             {
-                System.Diagnostics.Debug.WriteLine(type);
+                i.colorScheduleUpdate = Color.FromHex("#E0E6E6");
+                i.textColorUpdate = Color.FromHex("#136D74");
             }
+            dm.colorScheduleUpdate = Color.FromHex("#FF8500");
+            dm.textColorUpdate = Color.FromHex("#FFFFFF");
 
-            // Delivery Times of all business who are avaiable this weeek day
-            string startTime = "";
-            string endTime = "";
-            if(b_uids.Count != 0)                                                                               // Selects delivery date
-            {
-                foreach (string ids in b_uids)
-                {
-                    foreach (Business b in AllFarms)
-                    {
-                        if (b.business_uid == ids)
-                        {
-                            var deliveryTime = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(b.business_delivery_hours);
-                            startTime = deliveryTime[weekday][0];
-                            endTime = deliveryTime[weekday][1];
-                            System.Diagnostics.Debug.WriteLine("Start Delivery Time (string): " + deliveryTime[weekday][0]);
-                            System.Diagnostics.Debug.WriteLine("End Delivery Time (string): " + deliveryTime[weekday][1]);
-                            break;
-                        }
-                    }
-                    break;
-                }
 
-                DateTime sTime = DateTime.Parse(startTime);
-                DateTime eTime = DateTime.Parse(endTime);
-
-                string deliveryMonth = dm.delivery_date;
-                string deliveryDay = dm.delivery_shortname;
-                string deliveryStartTime = sTime.ToString("hh:mm tt");
-                string deliveryEndTime = eTime.ToString("hh:mm tt");
-                string deliveryDate = deliveryDay + ", " + deliveryMonth + ", " + DateTime.Now.Year;
-
-                // System.Diagnostics.Debug.WriteLine("Delivery Date: " + deliveryDate);
-                // System.Diagnostics.Debug.WriteLine("Start Delivery Time (string): " + deliveryStartTime);
-                // System.Diagnostics.Debug.WriteLine("End Delivery Time (string): " + deliveryEndTime);
-
-                Application.Current.Properties["delivery_date"] = deliveryDate;
-                Application.Current.Properties["delivery_time"] = "bwt: "+ deliveryStartTime + " - " + deliveryEndTime;
-                Application.Current.Properties["delivery_start_time"] = sTime.ToString("hh:mm:ss");
-                System.Diagnostics.Debug.WriteLine(Application.Current.Properties["delivery_date"]);
-                System.Diagnostics.Debug.WriteLine(Application.Current.Properties["delivery_time"]);
-            }
-            else
-            {
-                Application.Current.Properties["delivery_date"] = "";
-                Application.Current.Properties["delivery_time"] = "";
-            }
-
-            ItemsPage businessItemPage = new ItemsPage(types, b_uids, weekday);
-            Application.Current.MainPage = businessItemPage;                                                    // Goes to Items Page
-        }           
-
-        void Change_Color(Object sender, EventArgs e)
-        {
-            var imgbtn = (ImageButton)sender;
-            var sl = (StackLayout)imgbtn.Parent;
-            var l = (Label)sl.Children[1];
-            var type = "";
-            if (l.Text == "Fruits") type = "fruit";
-            else if (l.Text == "Vegetables") type = "vegetable";
-            else if (l.Text == "Desserts") type = "dessert";
-            else if (l.Text == "Other") type = "other";
-            var tint = (TintImageEffect)imgbtn.Effects[0];
-            if (tint.TintColor == Constants.PrimaryColor)
-            {
-                tint.TintColor = Constants.SecondaryColor;
-                types.Add(type);
-            }
-            else if (tint.TintColor == Constants.SecondaryColor)
-            {
-                tint.TintColor = Constants.PrimaryColor;
-                types.Remove(type);
-            }
-            imgbtn.Effects.Clear();
-            imgbtn.Effects.Add(tint);
-            ResetFarmersMarkets();
-            ResetFarms();
-            ResetDays();
+            updateItemsBackgroundColorAndQuantity(vegetablesList, selectedDeliveryDate);
+            updateItemsBackgroundColorAndQuantity(fruitsList, selectedDeliveryDate);
+            updateItemsBackgroundColorAndQuantity(dessertsList, selectedDeliveryDate);
+            updateItemsBackgroundColorAndQuantity(othersList, selectedDeliveryDate);
+            SetVerticalView(vegetablesList, itemList);
+            SetVerticalView(fruitsList, fruitsVerticalView);
+            SetVerticalView(dessertsList, dessertsVerticalView);
+            SetVerticalView(othersList, othersVerticalView);
+            UpdateNumberOfItemsInCart();
         }
 
-        void Update_Item_Types()
-        {
-            bool hasFruit = false;
-            bool hasVegetable = false;
-            bool hasDessert = false;
-            bool hasOther = false;
-            foreach (BusinessCard bc in Farms)
-            {
-                if (!hasFruit && bc.item_type.Contains("fruit")) hasFruit = true;
-                if (!hasVegetable && bc.item_type.Contains("vegetable")) hasVegetable = true;
-                if (!hasDessert && bc.item_type.Contains("dessert")) hasDessert = true;
-                if (!hasOther && bc.item_type.Contains("other")) hasOther = true;
-            }
-            var tint = (TintImageEffect)FruitIcon.Effects[0];
-            if (hasFruit) tint.TintColor = types.Contains("fruit") ? Constants.SecondaryColor : Constants.PrimaryColor;
-            else tint.TintColor = Color.LightGray;
-            FruitIcon.Effects.Clear();
-            FruitIcon.Effects.Add(tint);
-            tint = (TintImageEffect)VegetableIcon.Effects[0];
-            if (hasVegetable) tint.TintColor = types.Contains("vegetable") ? Constants.SecondaryColor : Constants.PrimaryColor;
-            else tint.TintColor = Color.LightGray;
-            VegetableIcon.Effects.Clear();
-            VegetableIcon.Effects.Add(tint);
-            tint = (TintImageEffect)DessertIcon.Effects[0];
-            if (hasDessert) tint.TintColor = types.Contains("dessert") ? Constants.SecondaryColor : Constants.PrimaryColor;
-            else tint.TintColor = Color.LightGray;
-            DessertIcon.Effects.Clear();
-            DessertIcon.Effects.Add(tint);
-            tint = (TintImageEffect)OtherIcon.Effects[0];
-            if (hasOther) tint.TintColor = types.Contains("other") ? Constants.SecondaryColor : Constants.PrimaryColor;
-            else tint.TintColor = Color.LightGray;
-            OtherIcon.Effects.Clear();
-            OtherIcon.Effects.Add(tint);
-        }
+        //void HideMenu(RowDefinition menuRow)
+        //{
+        //    if (menuRowHeight > 0)
+        //    {
+        //        menuRow.Height = 0;
+        //        menuRowHeight = 0;
+        //    }
+        //}
 
         void Change_Border_Color(Object sender, EventArgs e)
         {
+
             var f = (Frame)sender;
             var tgr = (TapGestureRecognizer)f.GestureRecognizers[0];
             var bc = (BusinessCard)tgr.CommandParameter;
             if (bc.border_color == Color.LightGray)
             {
-                if (bc.business_type == "Farmers Market")
+                business.Clear();
+                business.Add(selectedBusiness(new Business()
                 {
-                    selected_market_id = bc.business_uid;
-                    FarmersMarkets.Clear();
-                    foreach (Business b in AllFarmersMarkets)
+                    business_image = bc.business_image,
+                    business_name = bc.business_name,
+                    z_biz_id = bc.business_uid
+                }));
+                var businessDeliveryDates = GetBusinessSchedule(data, bc.business_uid);
+                List<ScheduleInfo> businessDisplaySchedule = new List<ScheduleInfo>();
+
+                foreach (DateTime deliveryElement in businessDeliveryDates)
+                {
+                    foreach (ScheduleInfo scheduleElement in displaySchedule)
                     {
-                        if (b.business_uid == bc.business_uid)
+                        if (deliveryElement == scheduleElement.deliveryTimeStamp)
                         {
-                            FarmersMarkets.Add(selectedBusiness(b));
+                            businessDisplaySchedule.Add(scheduleElement);
+                            break;
                         }
                     }
-                    ResetFarms();
                 }
-                else
-                {
-                    selected_farm_id = bc.business_uid;
-                    Farms.Clear();
-                    foreach (Business b in AllFarms)
-                    {
-                        if (b.business_uid == bc.business_uid) Farms.Add(selectedBusiness(b));
-                    }
-                    ResetFarmersMarkets();
-                }
+
+                //Debug.WriteLine("");
+                //Debug.WriteLine("");
+                //Debug.WriteLine("DISPLAY SCHEDULE ELEMENTS SORTED");
+                //Debug.WriteLine("");
+
+                //foreach (ScheduleInfo element in businessDisplaySchedule)
+                //{
+                //    Debug.WriteLine("element.delivery_date: " + element.delivery_date);
+                //    Debug.WriteLine("element.delivery_dayofweek: " + element.delivery_dayofweek);
+                //    Debug.WriteLine("element.delivery_shortname: " + element.delivery_shortname);
+                //    Debug.WriteLine("element.delivery_time: " + element.delivery_time);
+                //    Debug.WriteLine("element.deliveryTimeStamp: " + element.deliveryTimeStamp);
+                //    Debug.Write("business_uids list: ");
+
+                //    foreach (string ID in element.business_uids)
+                //    {
+                //        Debug.Write(ID + ", ");
+                //    }
+
+                //    Debug.WriteLine("");
+                //    Debug.WriteLine("");
+                //}
+
+                //farm_list.ItemsSource = business;
+                delivery_list.ItemsSource = businessDisplaySchedule;
             }
             else
             {
-                if (bc.business_type == "Farmers Market")
+                //farm_list.ItemsSource = businesses;
+                delivery_list.ItemsSource = displaySchedule;
+            }
+
+        }
+
+        void AddFavoriteLeftItemOnVerticalView(System.Object sender, System.EventArgs e)
+        {
+            var selectedImage = (ImageButton)sender;
+            var pickedElement = (ItemsModel)selectedImage.CommandParameter;
+
+            if(pickedElement.favoriteIconLeft != "selectedFavoritesIcon.png")
+            {
+                pickedElement.favoriteIconLeftUpdate = "selectedFavoritesIcon.png";
+                AddItemToFavorites(pickedElement.itemNameLeft);
+            }
+            else
+            {
+                pickedElement.favoriteIconLeftUpdate = "unselectedHeartIcon.png";
+                RemoveItemFromFavorites(pickedElement.itemNameLeft);
+            }
+        }
+
+        void AddFavoriteRighttemOnVerticalView(System.Object sender, System.EventArgs e)
+        {
+            var selectedImage = (ImageButton)sender;
+            var pickedElement = (ItemsModel)selectedImage.CommandParameter;
+
+            if (pickedElement.favoriteIconRight != "selectedFavoritesIcon.png")
+            {
+                pickedElement.favoriteIconRightUpdate = "selectedFavoritesIcon.png";
+                AddItemToFavorites(pickedElement.itemNameRight);
+            }
+            else
+            {
+                pickedElement.favoriteIconRightUpdate = "unselectedHeartIcon.png";
+                RemoveItemFromFavorites(pickedElement.itemNameRight);
+            }
+        }
+
+        void FavoriteClick(System.Object sender, System.EventArgs e)
+        {
+            var selectedImage = (ImageButton)sender;
+            var pickedElement = (SingleItem)selectedImage.CommandParameter;
+            if (pickedElement.isItemEnable)
+            {
+                if (pickedElement.updateItemFavoriteImage != "selectedFavoritesIcon.png")
                 {
-                    selected_market_id = "";
+                    pickedElement.updateItemFavoriteImage = "selectedFavoritesIcon.png";
+                    AddItemToFavorites(pickedElement.itemName);
                 }
                 else
                 {
-                    selected_farm_id = "";
+                    pickedElement.updateItemFavoriteImage = "unselectedHeartIcon.png";
+                    RemoveItemFromFavorites(pickedElement.itemName);
                 }
-                ResetFarms();
-                ResetFarmersMarkets();
             }
-            ResetDays();
-            Update_Item_Types();
         }
 
-        void CheckOutClickDeliveryDaysPage(System.Object sender, System.EventArgs e)
+        void AddItemToFavorites(string itemName)
         {
-            Application.Current.MainPage = new CheckoutPage(null);
+            if (!favorites.Contains(itemName))
+            {
+                favorites.Add(itemName);
+            }
         }
 
-        void DeliveryDaysClick(System.Object sender, System.EventArgs e)
+        void RemoveItemFromFavorites(string itemName)
         {
-            // SHOULDN'T MOVE SINCE YOU ARE IN THIS PAGE
+            if (favorites.Contains(itemName))
+            {
+                favorites.Remove(itemName);
+            }
         }
 
-        void OrdersClick(System.Object sender, System.EventArgs e)
+        public static async Task<bool> SetFavoritesList()
+        {
+            var taskResponse = false;
+            if (user.getUserType() == "CUSTOMER")
+            {
+                var client = new System.Net.Http.HttpClient();
+                var favoriteItemByUser = new FavoriteItemByUser()
+                {
+                    customer_uid = user.getUserID(),
+                };
+
+                var serializedObject = JsonConvert.SerializeObject(favoriteItemByUser);
+                var content = new StringContent(serializedObject, Encoding.UTF8, "application/json");
+                var endpointResponse = await client.PostAsync(Constant.GetUserFavorites, content);
+
+                Debug.WriteLine("JSON OBJECT (POST) TO GET USER FAVORITES: " + serializedObject);
+
+                if (endpointResponse.IsSuccessStatusCode)
+                {
+                    var data = await endpointResponse.Content.ReadAsStringAsync();
+                    var parseData = JsonConvert.DeserializeObject<FavoriteGet>(data);
+
+                    if (parseData.result.Count != 0)
+                    {
+                        favorites = JsonConvert.DeserializeObject<List<string>>(parseData.result[0].favorite_produce);
+                        foreach (string itemName in favorites)
+                        {
+                            Debug.WriteLine("FAVORITE ITEMS " + itemName);
+                        }
+                    }
+
+                    taskResponse = true;
+                }
+            }
+
+            return taskResponse;
+        }
+
+        public static List<string> GetFavoritesList()
+        {
+            return favorites;
+        }
+
+        public static void RemoveAllFavoriteItems()
+        {
+            favorites.Clear();
+        }
+
+        void GetFavoritesClick(System.Object sender, System.EventArgs e)
+        {
+            var client = (ImageButton)sender;
+
+            if (client.Source.ToString().Contains("unselectedHeartIcon.png"))
+            {
+                client.Source = "selectedFavoritesIcon.png";
+
+                vegetablesListView.ItemsSource = FavoritesFrom(vegetablesList);
+                fruitsListView.ItemsSource = FavoritesFrom(fruitsList);
+                othersListView.ItemsSource = FavoritesFrom(othersList);
+                dessertsListView.ItemsSource = FavoritesFrom(dessertsList);
+            }
+            else
+            {
+                client.Source = "unselectedHeartIcon.png";
+                vegetablesListView.ItemsSource = vegetablesList;
+                fruitsListView.ItemsSource = fruitsList;
+                othersListView.ItemsSource = othersList;
+                dessertsListView.ItemsSource = dessertsList;
+            }
+        }
+
+        ObservableCollection<SingleItem> FavoritesFrom(ObservableCollection<SingleItem> source)
+        {
+            var list = new ObservableCollection<SingleItem>();
+            foreach (SingleItem element in source)
+            {
+                if (favorites.Contains(element.itemName))
+                {
+                    //var item = element;
+                    //item.itemFavoriteImage = "selectedFavoritesIcon.png";
+                    list.Add(element);
+                }
+            }
+            return list;
+        }
+
+        void ShowHideMenu(System.Object sender, System.EventArgs e)
+        {
+            Application.Current.MainPage.Navigation.PushModalAsync(new MenuPage(), true);
+            //var height = new GridLength(0);
+            //if (menuFrame.Height.Equals(height))
+            //{
+            //    menuFrame.Height = this.Height - 180;
+            //    menuRowHeight = this.Height - 180;
+            //}
+            //else
+            //{
+            //    menuFrame.Height = 0;
+            //    menuRowHeight = this.Height - 180;
+            //}
+        }
+
+        void SeeAllItemsHorizontallyVertically(System.Object sender, System.EventArgs e)
+        {
+            var stacklayout = (StackLayout)sender;
+            var label = (Label)stacklayout.Children[0];
+            var image = (Image)stacklayout.Children[1];
+            
+            if (stacklayout.ClassId == "vegetablesView")
+            {
+                SwitchLayoutViews(vegetablesList, vegetablesListView, itemList, label, image, "vegetables");
+            }
+            else if (stacklayout.ClassId == "fruitsView")
+            {
+                SwitchLayoutViews(fruitsList, fruitsListView, fruitsVerticalView, label, image, "fruits");
+            }
+            else if (stacklayout.ClassId == "othersView")
+            {
+                SwitchLayoutViews(othersList, othersListView, othersVerticalView, label, image, "others");
+            }
+            else if (stacklayout.ClassId == "dessertsView")
+            {
+                SwitchLayoutViews(dessertsList, dessertsListView, dessertsVerticalView, label, image, "desserts");
+            }
+            
+        }
+
+        void SwitchLayoutViews(ObservableCollection<SingleItem> source, CollectionView horizontalView, ListView verticalView, Label viewLabel, Image viewIcon, string category)
+        {
+            if (viewIcon.Source.ToString() == "File: triangleIconFilled.png")
+            {
+                UserDialogs.Instance.ShowLoading("Loading...");
+                viewLabel.Text = "Switch to scroll view";
+                viewIcon.Rotation = 180;
+                viewIcon.Source = "triangleIconEmpty.png";
+                SetImageColor(viewIcon);
+                SetVerticalView(source, verticalView);
+                horizontalView.HeightRequest = 0;
+                var rowHeight = source.Count;
+                if (rowHeight % 2 != 0) { rowHeight++; }
+                verticalView.HeightRequest = 190 * rowHeight / 2;
+                UserDialogs.Instance.HideLoading();
+            }
+            else
+            {
+                viewLabel.Text = "See all " + category;
+                viewIcon.Rotation = 0;
+                viewIcon.Source = "triangleIconFilled.png";
+                SetImageColor(viewIcon);
+                updateItemsBackgroundColorAndQuantity(source, selectedDeliveryDate);
+                horizontalView.HeightRequest = 190;
+                verticalView.HeightRequest = 0;
+
+            }
+        }
+
+        void SetImageColor(Image image)
+        {
+            image.Effects[0] = new TintImageEffect() { TintColor = Color.FromHex("#FF8500") };
+        }
+
+        public static void SetMenuLabel(Label section, string title)
+        {
+            section.Text = title;
+            section.TextColor = Color.FromHex("#FF8500");
+        }
+
+        public static void SetCartLabel(Label cart)
+        {
+            cart.Text = order.Count.ToString();
+        }
+
+        public static void NavigateToStore(System.Object sender, System.EventArgs e)
+        {
+            Application.Current.MainPage = new SelectionPage();
+        }
+
+        public static void NavigateToCart(System.Object sender, System.EventArgs e)
         {
             Application.Current.MainPage = new CheckoutPage();
         }
 
-        void InfoClick(System.Object sender, System.EventArgs e)
+        public static void NavigateToHistory(System.Object sender, System.EventArgs e)
+        {
+            if (user.getUserType() == "CUSTOMER")
+            {
+                Application.Current.MainPage = new HistoryPage();
+            }
+        }
+
+        public static void NavigateToRefunds(System.Object sender, System.EventArgs e)
+        {
+            Application.Current.MainPage = new RefundPage();
+        }
+
+        public static void NavigateToInfo(System.Object sender, System.EventArgs e)
         {
             Application.Current.MainPage = new InfoPage();
         }
 
-        void ProfileClick(System.Object sender, System.EventArgs e)
+        public static void NavigateToProfile(System.Object sender, System.EventArgs e)
         {
-            Application.Current.MainPage = new ProfilePage();
+            if (user.getUserType() == "CUSTOMER")
+            {
+                Application.Current.MainPage = new ProfilePage();
+            }
+        }
+
+        public static void NavigateToSignIn(System.Object sender, System.EventArgs e)
+        {
+            Application.Current.MainPage = new LogInPage();
+        }
+
+        public static void NavigateToSignUp(System.Object sender, System.EventArgs e)
+        {
+            Application.Current.MainPage = new SignUpPage();
+        }
+
+        public static void NavigateToMain(System.Object sender, System.EventArgs e)
+        {
+            ResetUser(user);
+            order.Clear();
+            Application.Current.MainPage = new PrincipalPage();
+        }
+
+        static void ResetUser(Models.User user)
+        {
+            user.setUserType("");
+            user.setUserID("");
+            user.setUserFirstName("");
+            user.setUserLastName("");
+            user.setUserAddress("");
+            user.setUserUnit("");
+            user.setUserCity("");
+            user.setUserState("");
+            user.setUserZipcode("");
+            user.setUserPhoneNumber("");
+            user.setUserLatitude("");
+            user.setUserLongitude("");
+            user.setUserPlatform("");
+            user.setUserDeviceID("");
+            DateTime today = DateTime.Now;
+            user.setUserSessionTime(today);
+
+            string account = JsonConvert.SerializeObject(user);
+            Application.Current.Properties[Constant.Autheticatior] = account;
+            Application.Current.SavePropertiesAsync();
+
+        }
+
+        void NavigateToMainFromSelection(System.Object sender, System.EventArgs e)
+        {
+            NavigateToMain(sender, e);
+        }
+
+        void ShowItemInfoHorizontal(System.Object sender, System.EventArgs e)
+        {
+            var selectedImage = (ImageButton)sender;
+            var pickedElement = (SingleItem)selectedImage.CommandParameter;
+
+            Debug.WriteLine("INFO BUTTON WAS CLICKED");
+            Debug.WriteLine("INFO: " + pickedElement.itemBackViewInfo);
+            if(pickedElement.isItemUnavailable == false)
+            {
+                if (pickedElement.frontView == true)
+                {
+                    pickedElement.updateFrontView = false;
+                    pickedElement.updateBackView = true;
+                }
+                else
+                {
+                    pickedElement.updateBackView = false;
+                    pickedElement.updateFrontView = true;
+                }
+            }
+        }
+
+        void ShowItemInfoVerticalLeft(System.Object sender, System.EventArgs e)
+        {
+            var selectedImage = (ImageButton)sender;
+            var pickedElement = (ItemsModel)selectedImage.CommandParameter;
+
+            Debug.WriteLine("INFO BUTTON WAS CLICKED");
+            Debug.WriteLine("INFO: " + pickedElement.itemBackViewInfoLeft);
+            if (pickedElement.isItemLeftUnavailable == false)
+            {
+                if (pickedElement.frontViewLeft == true)
+                {
+                    pickedElement.updateFrontViewLeft = false;
+                    pickedElement.updateBackViewLeft = true;
+                }
+                else
+                {
+                    pickedElement.updateBackViewLeft = false;
+                    pickedElement.updateFrontViewLeft = true;
+                }
+            }
+        }
+
+        void ShowItemInfoVerticalRight(System.Object sender, System.EventArgs e)
+        {
+            var selectedImage = (ImageButton)sender;
+            var pickedElement = (ItemsModel)selectedImage.CommandParameter;
+
+            Debug.WriteLine("INFO BUTTON WAS CLICKED");
+            Debug.WriteLine("INFO: " + pickedElement.itemBackViewInfoRight);
+
+            if (pickedElement.isItemRightUnavailable == false)
+            {
+                if (pickedElement.frontViewRight == true)
+                {
+                    pickedElement.updateFrontViewRight = false;
+                    pickedElement.updateBackViewRight = true;
+                }
+                else
+                {
+                    pickedElement.updateBackViewRight = false;
+                    pickedElement.updateFrontViewRight = true;
+                }
+            }
         }
     }
 }

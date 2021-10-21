@@ -1,0 +1,179 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="ServingFresh.Views.PrincipalPage">
+    <ContentPage.Content>
+        <ScrollView BackgroundColor="#FF8500" x:Name="scrollView">
+            <StackLayout>
+                <Grid RowSpacing="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="225"></RowDefinition>
+                        <RowDefinition Height="230"></RowDefinition>
+                        <RowDefinition Height="210"></RowDefinition>
+                        <RowDefinition Height="298"></RowDefinition>
+                        <RowDefinition Height="223"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <StackLayout Grid.Row="0" Margin="0,-25,0,0">
+                        <RelativeLayout>
+                            <Frame HasShadow="false"
+                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}"
+                                RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
+                                Padding="0">
+                                <Image Margin="-30,-20,0,0" Source="fruitsVegetablesImage.png"  Aspect="Fill"></Image>
+                            </Frame>
+                            <Grid
+                                Margin="0,0,0,0"
+                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}"
+                                RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Label
+                                    Margin="15,0,0,0"
+                                    VerticalTextAlignment="Center"
+                                    Grid.Column="0"
+                                    LineHeight="0.8"
+                                    Text="Fresh, Organic Produce Delivered" TextColor="White" FontAttributes="Bold" FontSize="39" ></Label>
+                                <StackLayout Grid.Column="1" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
+                                    <Frame HeightRequest="130" WidthRequest="130" HasShadow="False" CornerRadius="20" Padding="5">
+                                        <Image Source="servingFreshIcon.png"></Image>
+                                    </Frame>
+                                </StackLayout>
+                            </Grid>
+                        </RelativeLayout>
+                    </StackLayout>
+                    <StackLayout Grid.Row="1" Margin="0,0,0,0" BackgroundColor="#FF8500" HeightRequest="200" VerticalOptions="CenterAndExpand">
+                        <StackLayout Margin="0,0,0,0" VerticalOptions="Center" HeightRequest="200">
+                        <RelativeLayout
+                            RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
+                            RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                            <StackLayout
+                                Spacing="12"
+                                RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
+                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                <Label Margin="0,5,0,15" Text="Local produce delivered to your doorstep" TextColor="White" FontSize="18" HorizontalTextAlignment="Center" FontAttributes="Bold"></Label>
+                                <Frame WidthRequest="287" HorizontalOptions="Center" HeightRequest="45" Padding="2" BorderColor="#136D74" HasShadow="False">
+                                    <Grid ColumnSpacing="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="34"></ColumnDefinition>
+                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                            <ColumnDefinition Width="34"></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <Image Grid.Column="0" Margin="3" Source="locationIcon.png" BackgroundColor="White"></Image>
+                                        <Frame Padding="0" Grid.Column="1" HasShadow="False" BorderColor="White" VerticalOptions="CenterAndExpand">
+                                             <Entry x:Name="AddressEntry" FontSize="14" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" Placeholder="Search for your address" PlaceholderColor="Gray"  Keyboard="Text" TextColor="Black" TextChanged="OnAddressChanged" Focused="addressEntryFocused" Unfocused="addressEntryUnfocused"/>
+                                        </Frame>
+                                    </Grid>
+                                </Frame>
+                                <!--<Label Text="OR" TextColor="White"  FontSize="Medium" HorizontalTextAlignment="Center" FontAttributes="Bold" ></Label>
+                                <Entry Margin="70,0,70,0" x:Name="zipcodeEntry" Placeholder="Enter Zip Code" FontSize="14" PlaceholderColor="Gray"  HorizontalTextAlignment="Center"></Entry>-->
+                                <Button WidthRequest="287" HorizontalOptions="Center"  Font="14" TextColor="white" Text="Find Local Produce"  BackgroundColor="#136D74" Clicked="FindLocalProduceBaseOnLocation"></Button>
+                                <Frame Margin="0,-68,0,0" Padding="2" HorizontalOptions="CenterAndExpand" BackgroundColor="#E0EBEC" CornerRadius="0" x:Name="addressFrame" IsVisible="false">
+                                    <ListView x:Name="addressList" IsVisible="false" HasUnevenRows="True" SeparatorVisibility="None" RowHeight="40" BackgroundColor="#E0EBEC" HorizontalOptions="CenterAndExpand" WidthRequest="280" HeightRequest="60" ItemSelected="addressSelected">
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate>
+                                                <ViewCell Height="40">
+                                                    <StackLayout HeightRequest="53" VerticalOptions="CenterAndExpand">
+                                                         <Label HeightRequest="53" VerticalTextAlignment="Center" Text="{Binding Address}" FontSize="12" TextColor="Black" LineBreakMode="WordWrap"/>
+                                                        <BoxView HeightRequest="1" Color="#136D74"></BoxView>
+                                                    </StackLayout>
+                                                </ViewCell>
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
+                                </Frame>
+                            </StackLayout>
+                        </RelativeLayout>
+                            </StackLayout>
+                    </StackLayout>
+                    <StackLayout Grid.Row="2" HeightRequest="210" VerticalOptions="Center">
+                        <RelativeLayout>
+                            <Frame
+                                CornerRadius="0"
+                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}"
+                                RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
+                                Padding="0"
+                                HasShadow="False">
+                                <Image Source="vegetablesBackgroundImage.png" Aspect="Fill"></Image>
+                            </Frame>
+                            <Grid
+                                VerticalOptions="Fill"
+                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}"
+                                RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
+                                Padding="0"
+                                ColumnSpacing="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <StackLayout
+                                    Margin="20,20,0,0"
+                                    Grid.Column="0"
+                                    VerticalOptions="Start">
+                                    <ImageButton Scale="0.9" Source="loginLeafIcon.png" Clicked="NavigateToLogIn" BackgroundColor="Transparent" ></ImageButton>
+                                </StackLayout>
+                                <StackLayout
+                                    Margin="0,0,25,20"
+                                    Grid.Column="1"
+                                    VerticalOptions="End">
+                                    <ImageButton Source="signUpLeafIcon.png" Clicked="NavigateToSignUp" BackgroundColor="Transparent"></ImageButton>
+                                </StackLayout>
+                            </Grid>
+                        </RelativeLayout>
+                    </StackLayout>
+                    <StackLayout Grid.Row="3" HeightRequest="298"  BackgroundColor="White" >
+                        <Label Margin="20,10,0,10" Text="Weekly Fresh Produce" TextColor="#136D74" FontAttributes="Bold" FontSize="16"></Label>
+                        <BoxView HeightRequest="2" Color="#136D74" WidthRequest="165" Margin="23,-10,0,0" HorizontalOptions="Start" ></BoxView>
+                        <StackLayout HeightRequest="230" VerticalOptions="CenterAndExpand">
+                             <CollectionView Grid.Column="1" x:Name="vegetablesListView"   Margin="20,0,0,0" ItemsLayout="HorizontalList" HeightRequest="220">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Frame Padding="0,0,15,0" WidthRequest="180" HasShadow="False" BackgroundColor="Transparent">
+                                            <StackLayout Spacing="0">
+                                                <Frame HeightRequest="180" HasShadow="false" Padding="0" CornerRadius="10" Opacity="{Binding itemOpacity}">
+                                                    <RelativeLayout>
+                                                        <Frame
+                                                            BackgroundColor="Transparent"
+                                                            HasShadow="False"
+                                                            HeightRequest="180"
+                                                            Padding="0"
+                                                            CornerRadius="10"
+                                                            IsClippedToBounds="True"
+                                                            RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                                            <Image Source="{Binding itemImage}" Aspect="AspectFill"></Image>
+                                                        </Frame>
+                                                    </RelativeLayout>
+                                                </Frame>
+                                                <Frame HasShadow="false" Padding="2" HeightRequest="20" BorderColor="LightGray" CornerRadius="6"  IsEnabled="{Binding isItemEnable}" BackgroundColor="{Binding itemBackgroundColor}" Opacity="{Binding itemOpacity}">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                                            <ColumnDefinition Width="50"></ColumnDefinition>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Label Grid.Column="0" FontSize="9" Text="{Binding itemName}"  VerticalTextAlignment="Center" TextColor="Black" MaxLines="1" LineBreakMode="TailTruncation"></Label>
+                                                        <Label Grid.Column="1" HorizontalOptions="End" VerticalTextAlignment="Center" Text="{Binding itemPrice}" TextColor="Black" FontAttributes="Bold" FontSize="10"></Label>
+                                                    </Grid>
+                                                </Frame>
+                                            </StackLayout>
+                                        </Frame>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                             </CollectionView>
+                        </StackLayout>
+
+                    </StackLayout>
+                    <StackLayout Grid.Row="4" HeightRequest="223">
+                          <StackLayout VerticalOptions="CenterAndExpand" Spacing="12">
+                              <Button WidthRequest="287" HorizontalOptions="Center" Font="14" TextColor="white" Text="Buy a gift card" BackgroundColor="#136D74" Clicked="NavigateToGiftCardPage"></Button>
+                              <Button WidthRequest="287" HorizontalOptions="Center" Font="14" TextColor="white" Text="Become an ambassador"  BackgroundColor="#136D74" Clicked="BecomeAnAmbassador"></Button>
+                              <StackLayout Orientation="Horizontal" Spacing="20" HeightRequest="36" Margin="0,20,0,20"  HorizontalOptions="CenterAndExpand" VerticalOptions="End">
+                                  <Image Source="facebookWhiteIcon"></Image>
+                                  <Image Source="instagramIcon.png"></Image>
+                              </StackLayout>
+                          </StackLayout>
+                    </StackLayout>
+
+                </Grid>
+            </StackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>
