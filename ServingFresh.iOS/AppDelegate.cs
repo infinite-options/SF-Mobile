@@ -21,10 +21,7 @@ namespace ServingFresh.iOS
     [Register("AppDelegate")]
     public partial class AppDelegate : global::Xamarin.Forms.Platform.iOS.FormsApplicationDelegate
     {
-
-
         private SBNotificationHub Hub { get; set; }
-
 
         //
         // This method is invoked when the application has loaded and is ready to run. In this 
@@ -40,75 +37,31 @@ namespace ServingFresh.iOS
             Xamarin.FormsMaps.Init();
             global::Xamarin.Forms.Forms.Init();
             Forms9Patch.iOS.Settings.Initialize(this);
-            //UIApplication.SharedApplication.UnregisterForRemoteNotifications();
-            //var answer = RegistedDeviceToPushNotifications();
-            //IsEnable = answer;
-            //System.Diagnostics.Debug.WriteLine(answer);
+
+            SetiOSDisplayAlertTheme();
+            SetNotificationDelegate();
+            RegisterForRemoteNotifications();
             LoadApplication(new App());
 
-            base.FinishedLaunching(app, options);
-            // "#FF8500"
-            UINavigationBar.Appearance.TintColor = Color.FromHex("#FFFFFF").ToUIColor();
-
-            //UIView statusBar = UIApplication.SharedApplication.ValueForKey(new NSString("statusBar")) as UIView;
-            //if (statusBar != null && statusBar.RespondsToSelector(new ObjCRuntime.Selector("setBackgroundColor:")))
-            //{
-            //    // change to your desired color 
-            //    statusBar.BackgroundColor = Color.FromHex("#7f6550").ToUIColor();
-            //}
-
-            // Color of the selected tab icon:
-            //UITabBar.Appearance.SelectedImageTintColor = Color.FromHex("#a0050f").ToUIColor();
-            UITabBar.Appearance.SelectedImageTintColor = Color.FromHex("#FF8500").ToUIColor();
-
-            // Color of the tabbar background:
-            //UITabBar.Appearance.BarTintColor = UIColor.FromRGB(247, 247, 247);
-
-            // Color of the selected tab text color:
-            UITabBarItem.Appearance.SetTitleTextAttributes(
-                new UITextAttributes()
-                {
-                    //TextColor = Color.FromHex("#a0050f").ToUIColor()
-                    TextColor = Color.FromHex("#FF8500").ToUIColor()
-                },
-                UIControlState.Selected);
-
-            // Color of the unselected tab icon & text:
-            UITabBarItem.Appearance.SetTitleTextAttributes(
-                new UITextAttributes()
-                {
-                    TextColor = Color.FromHex("#000000").ToUIColor()
-                },
-                UIControlState.Normal);
-            //UIView.AppearanceWhenContainedIn(typeof(UIAlertView)).TintColor = Color.FromHex("#a0050f").ToUIColor();
-            UIView.AppearanceWhenContainedIn(typeof(UIAlertView)).TintColor = Color.FromHex("#FF8500").ToUIColor();
-
-            //UIView.AppearanceWhenContainedIn(typeof(UIAlertController)).TintColor = Color.FromHex("#a0050f").ToUIColor();
-            UIView.AppearanceWhenContainedIn(typeof(UIAlertController)).TintColor = Color.FromHex("#FF8500").ToUIColor();
-
-            if (UIDevice.CurrentDevice.CheckSystemVersion(10, 0))
-            {
-                UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound,
-                                                                        (granted, error) => InvokeOnMainThread(UIApplication.SharedApplication.RegisterForRemoteNotifications));
-            }
-            else if (UIDevice.CurrentDevice.CheckSystemVersion(8, 0))
-            {
-                var pushSettings = UIUserNotificationSettings.GetSettingsForTypes(
-                        UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound,
-                        new NSSet());
-
-                UIApplication.SharedApplication.RegisterUserNotificationSettings(pushSettings);
-                UIApplication.SharedApplication.RegisterForRemoteNotifications();
-            }
-            else
-            {
-                UIRemoteNotificationType notificationTypes = UIRemoteNotificationType.Alert | UIRemoteNotificationType.Badge | UIRemoteNotificationType.Sound;
-                UIApplication.SharedApplication.RegisterForRemoteNotificationTypes(notificationTypes);
-            }
-            // ADDED LINE FOR NOTIFICATIONS WHEN APP IS OPEN
-            UNUserNotificationCenter.Current.Delegate = new NotificationDelegate();
-            return true;
+            return base.FinishedLaunching(app, options);
         }
+
+        // This function sets the delegate for notifications. This is necessary to see notifications within the app
+
+        void SetNotificationDelegate()
+        {
+            UNUserNotificationCenter.Current.Delegate = new NotificationDelegate();
+        }
+
+        // This function sets the color theme on the DisplayAlert boxes. It applys color to text.
+        
+        void SetiOSDisplayAlertTheme()
+        {
+            UIView.AppearanceWhenContainedIn(typeof(UIAlertView)).TintColor = Color.FromHex("#FF8500").ToUIColor();
+            UIView.AppearanceWhenContainedIn(typeof(UIAlertController)).TintColor = Color.FromHex("#FF8500").ToUIColor();
+        }
+
+        // This function directs Google login to return from the browser back to the app
 
         public override bool OpenUrl(UIApplication app, NSUrl url, NSDictionary options)
         {
@@ -121,54 +74,39 @@ namespace ServingFresh.iOS
             return true;
         }
 
-        //public bool RegistedDeviceToPushNotifications()
-        //{
-        //    if (UIDevice.CurrentDevice.CheckSystemVersion(10, 0))
-        //    {
-        //        UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound,
-        //                                                                (granted, error) => InvokeOnMainThread(UIApplication.SharedApplication.RegisterForRemoteNotifications));
-        //    }
-        //    else if (UIDevice.CurrentDevice.CheckSystemVersion(8, 0))
-        //    {
-        //        var pushSettings = UIUserNotificationSettings.GetSettingsForTypes(
-        //                UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound,
-        //                new NSSet());
+        // This function registers device for remote notifications base on system version
 
-        //        UIApplication.SharedApplication.RegisterUserNotificationSettings(pushSettings);
-        //        UIApplication.SharedApplication.RegisterForRemoteNotifications();
-        //    }
-        //    else
-        //    {
-        //        UIRemoteNotificationType notificationTypes = UIRemoteNotificationType.Alert | UIRemoteNotificationType.Badge | UIRemoteNotificationType.Sound;
-        //        UIApplication.SharedApplication.RegisterForRemoteNotificationTypes(notificationTypes);
-        //    }
-        //    return UIApplication.SharedApplication.IsRegisteredForRemoteNotifications;
-        //}
+        void RegisterForRemoteNotifications()
+        {
+            
+            if (UIDevice.CurrentDevice.CheckSystemVersion(10, 0))
+            {
+                UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert |
+                    UNAuthorizationOptions.Badge |
+                    UNAuthorizationOptions.Sound,
+                    (granted, error) =>
+                    {
+                        if (granted)
+                            InvokeOnMainThread(UIApplication.SharedApplication.RegisterForRemoteNotifications);
+                    });
+            }
+            else if (UIDevice.CurrentDevice.CheckSystemVersion(8, 0))
+            {
+                var pushSettings = UIUserNotificationSettings.GetSettingsForTypes(
+                UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound,
+                new NSSet());
 
-        //public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
-        //{
-        //    if (UIDevice.CurrentDevice.CheckSystemVersion(10, 0))
-        //    {
-        //        UNUserNotificationCenter.Current.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Badge | UNAuthorizationOptions.Sound,
-        //                                                                (granted, error) => InvokeOnMainThread(UIApplication.SharedApplication.RegisterForRemoteNotifications));
-        //    }
-        //    else if (UIDevice.CurrentDevice.CheckSystemVersion(8, 0))
-        //    {
-        //        var pushSettings = UIUserNotificationSettings.GetSettingsForTypes(
-        //                UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound,
-        //                new NSSet());
+                UIApplication.SharedApplication.RegisterUserNotificationSettings(pushSettings);
+                UIApplication.SharedApplication.RegisterForRemoteNotifications();
+            }
+            else
+            {
+                UIRemoteNotificationType notificationTypes = UIRemoteNotificationType.Alert | UIRemoteNotificationType.Badge | UIRemoteNotificationType.Sound;
+                UIApplication.SharedApplication.RegisterForRemoteNotificationTypes(notificationTypes);
+            }
+        }
 
-        //        UIApplication.SharedApplication.RegisterUserNotificationSettings(pushSettings);
-        //        UIApplication.SharedApplication.RegisterForRemoteNotifications();
-        //    }
-        //    else
-        //    {
-        //        UIRemoteNotificationType notificationTypes = UIRemoteNotificationType.Alert | UIRemoteNotificationType.Badge | UIRemoteNotificationType.Sound;
-        //        UIApplication.SharedApplication.RegisterForRemoteNotificationTypes(notificationTypes);
-        //    }
-
-        //    return true;
-        //}
+        // This function regiesters the GUID into Azure Hub and expected data template that would be sent by Azure
 
         public override void RegisteredForRemoteNotifications(UIApplication application, NSData deviceToken)
         {
@@ -220,6 +158,8 @@ namespace ServingFresh.iOS
             });
         }
 
+        // The following functions are for Aler Push Notification ______________
+
         public override void ReceivedRemoteNotification(UIApplication application, NSDictionary userInfo)
         {
             ProcessNotification(userInfo, false);
@@ -260,7 +200,11 @@ namespace ServingFresh.iOS
             }
         }
 
-        // ADDED LINE FOR NOTIFICATIONS WHEN APP IS OPEN
+        //  ______________
+
+        // This class implements the void function that allows notifications to be displayed when the notification
+        // arrives when user is within the app
+
         public class NotificationDelegate : UNUserNotificationCenterDelegate {
             public override void WillPresentNotification(UNUserNotificationCenter center, UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler) {completionHandler(UNNotificationPresentationOptions.Alert); }
         }
