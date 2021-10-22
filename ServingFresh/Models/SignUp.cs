@@ -389,7 +389,7 @@ namespace ServingFresh.Models
                 var client = new HttpClient();
                 var serializedObject = JsonConvert.SerializeObject(existingUser);
                 var content = new StringContent(serializedObject, Encoding.UTF8, "application/json");
-                var endpointCall = await client.PostAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/createAccountGuestToCustomer", content);
+                var endpointCall = await client.PostAsync(Constant.UpdateUserProdileRole, content);
 
                 if (endpointCall.IsSuccessStatusCode)
                 {

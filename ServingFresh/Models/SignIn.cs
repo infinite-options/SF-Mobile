@@ -19,12 +19,16 @@ namespace ServingFresh.Models
 
     public class SignIn
     {
+        // Attributes
+
         public class UserTypeEvaluation { public string role { get; set; } public bool statusCode { get; set; } public UserTypeEvaluation() { role = "CUSTOMER"; statusCode = false; } }
         private string deviceId = "";
         private string accessToken;
         private string refreshToken;
         private string platform;
         private AuthenticatorCompletedEventArgs googleAccount;
+
+        // Constructor
 
         public SignIn()
         {
@@ -33,6 +37,10 @@ namespace ServingFresh.Models
             accessToken = "";
             refreshToken = "";
         }
+
+        // DIRECT VERIFICATION FUNCTIONS_______________________________________
+
+        // This function retrives direct user's account salt credentials.
 
         public async Task<AccountSalt> RetrieveAccountSalt(string userEmail)
         {
@@ -94,6 +102,9 @@ namespace ServingFresh.Models
 
             return userInformation;
         }
+
+        // This function verifies if credentails exist and whether or not user is
+        // authenticated by our system. (Overloading)
 
         public async Task<string> VerifyUserCredentials(string userEmail, string userPassword, AccountSalt accountSalt)
         {
@@ -163,14 +174,12 @@ namespace ServingFresh.Models
 
                         isUserVerified = "WRONG SOCIAL MEDIA TO SIGN IN";
 
-                    }else if (authetication.code.ToString() == Constant.ErrorUserDirectLogIn)
-                    {
-                        isUserVerified = "SIGN IN DIRECTLY";
                     }
-                    
+                    else if (authetication.code.ToString() == Constant.ErrorUserDirectLogIn)
+                    {
+                        isUserVerified = "WRONG DIRECT PASSWORD";
+                    }
                 }
-
-
             }
             catch (Exception errorLogInUser)
             {
@@ -181,7 +190,12 @@ namespace ServingFresh.Models
             return isUserVerified;
         }
 
-        // update role, set notifications
+        // DIRECT VERIFICATION FUNCTIONS_______________________________________
+
+        // EVALUATION FUNTIONS FOR DIRECT AND SOCIAL MEDIA ____________________
+
+        // This function evaluates direct user's role and notifications were updated
+        // successfully. status1 = role update status, statu2 = set notifications status. (Overloading)
 
         string EvaluteUserUpdates(bool status1, bool status2)
         {
@@ -207,8 +221,9 @@ namespace ServingFresh.Models
             return result;
         }
 
-
-        // update role, set notification, update tokens
+        // This function evaluates if social media user's role and notifications were updated
+        // successfully. status1 = role update status, statu2 = set notifications status
+        // status3 = update token status. (Overloading)
 
         string EvaluteUserUpdates(bool status1, bool status2, bool status3)
         {
@@ -250,6 +265,9 @@ namespace ServingFresh.Models
             return result;
         }
 
+        // This function evaluates direct user's userType based on role and whether or not
+        // their profile was updated succesfully. (Overloading)
+
         async Task<UserTypeEvaluation> EvaluateUserType(string role, string password)
         {
             UserTypeEvaluation userType = new UserTypeEvaluation();
@@ -286,6 +304,9 @@ namespace ServingFresh.Models
            
         }
 
+        // This function evaluates social media user's userType based on role and whether or not
+        // their profile was updated succesfully. (Overloading)
+
         async Task<UserTypeEvaluation> EvaluateUserType(string role, string mobile_access_token, string mobile_refresh_token, string social_id, string platform)
         {
             UserTypeEvaluation userType = new UserTypeEvaluation();
@@ -299,7 +320,7 @@ namespace ServingFresh.Models
                 }
                 else if (role == "GUEST")
                 {
-                    var didProfileUpdatedSucessfully = await UpdateUserProfile(accessToken, refreshToken, social_id, platform);
+                    var didProfileUpdatedSucessfully = await UpdateUserProfile(mobile_access_token, mobile_refresh_token, social_id, platform);
 
                     if (didProfileUpdatedSucessfully)
                     {
@@ -322,6 +343,8 @@ namespace ServingFresh.Models
 
         }
 
+        // This function updates direct user's role from GUEST to CUSTOMER. (Overloading)
+
         async Task<bool> UpdateUserProfile(string password)
         {
             bool result = false;
@@ -339,6 +362,8 @@ namespace ServingFresh.Models
 
             return result;
         }
+
+        // This function updates social media user's role from GUEST to CUSTOMER. (Overloading)
 
         async Task<bool> UpdateUserProfile(string mobile_access_token, string mobile_refresh_token, string social_id, string platform)
         {
@@ -358,6 +383,12 @@ namespace ServingFresh.Models
             return result;
 
         }
+
+        // EVALUATION FUNTIONS FOR DIRECT AND SOCIAL MEDIA ____________________
+
+        // NOTIFICATION FUNCTION ______________________________________________
+
+        // This function send GUID to database.
 
         async Task<bool> SetUserRemoteNotification()
         {
@@ -399,6 +430,13 @@ namespace ServingFresh.Models
 
             return result;
         }
+
+        // NOTIFICATION FUNCTION ______________________________________________
+
+        // SOCIAL MEDIA VERIFICATION FUNCTION__________________________________
+
+        // This function verifies if credentails exist and whether or not user is
+        // authenticated by our system. (Overloading)
 
         public async Task<string> VerifyUserCredentials(string accessToken = "", string refreshToken = "", AuthenticatorCompletedEventArgs googleAccount = null, AppleAccount appleCredentials = null, string platform = "")
         {
@@ -536,6 +574,12 @@ namespace ServingFresh.Models
             return isUserVerified;
         }
 
+        // SOCIAL MEDIA VERIFICATION FUNCTION__________________________________
+
+        // SOCIAL MEDIA TOKEN UPDATE FUNCTION__________________________________
+
+        // This function updates social media user' access and refresh tokens.
+
         async Task<bool> UpdateAccessRefreshToken(string id, string accessToken, string refreshToken)
         {
             bool result = false;
@@ -572,21 +616,9 @@ namespace ServingFresh.Models
             return result;
         }
 
-        void SaveUser(Models.User user)
-        {
-            string account = JsonConvert.SerializeObject(user);
+        // SOCIAL MEDIA TOKEN UPDATE FUNCTION__________________________________
 
-            if (Application.Current.Properties.Keys.Contains(Constant.Autheticatior))
-            {
-                Application.Current.Properties[Constant.Autheticatior] = account;
-            }
-            else
-            {
-                Application.Current.Properties.Add(Constant.Autheticatior, account);
-            }
-
-            Application.Current.SavePropertiesAsync();
-        }
+        // This function send request to the backend to send user a reset password link.
 
         public async Task<string> ResetPassword(ResetPassword request)
         {
@@ -616,6 +648,26 @@ namespace ServingFresh.Models
             return result;
         }
 
+        // This function saves user profile as a string content in the app properties.
+
+        void SaveUser(Models.User user)
+        {
+            string account = JsonConvert.SerializeObject(user);
+
+            if (Application.Current.Properties.Keys.Contains(Constant.Autheticatior))
+            {
+                Application.Current.Properties[Constant.Autheticatior] = account;
+            }
+            else
+            {
+                Application.Current.Properties.Add(Constant.Autheticatior, account);
+            }
+
+            Application.Current.SavePropertiesAsync();
+        }
+
+        // SETTERS AND GETTERS_________________________________________________
+        
         public void setPlatform(string platform)
         {
             this.platform = platform;
@@ -656,6 +708,8 @@ namespace ServingFresh.Models
             return refreshToken;
         }
 
+        // This function sets and returns the autheticator for Facebook login.
+
         public OAuth2Authenticator GetFacebookAuthetication()
         {
             string clientID = string.Empty;
@@ -676,6 +730,8 @@ namespace ServingFresh.Models
             var authenticator = new OAuth2Authenticator(clientID, Constant.FacebookScope, new Uri(Constant.FacebookAuthorizeUrl), new Uri(redirectURL), null, false);
             return authenticator;
         }
+
+        // This function sets and returns the autheticator for Google login.
 
         public OAuth2Authenticator GetGoogleAuthetication()
         {
@@ -699,55 +755,7 @@ namespace ServingFresh.Models
             return authenticator;
         }
 
-        public async Task<User> VerifyUserCredentials(string email, string socialID, string platform)
-        {
-            User resultUser = null;
-
-            var client = new HttpClient();
-            var socialUser = new SocialLogInPost();
-
-            socialUser.email = email;
-            socialUser.password = "";
-            socialUser.signup_platform = platform;
-            socialUser.social_id = socialID;
-
-            var socialLogInPostSerialized = JsonConvert.SerializeObject(socialUser);
-            var postContent = new StringContent(socialLogInPostSerialized, Encoding.UTF8, "application/json");
-
-            var test = UserDialogs.Instance.Loading("Loading...");
-            var endpointCall = await client.PostAsync(Constant.LogInUrl, postContent);
-            if (endpointCall.IsSuccessStatusCode)
-            {
-               
-                var endpointContent = await endpointCall.Content.ReadAsStringAsync();
-                var authetication = JsonConvert.DeserializeObject<SuccessfulSocialLogIn>(endpointContent);
-                if (authetication.code.ToString() == Constant.AutheticatedSuccesful)
-                {
-                    DateTime today = DateTime.Now;
-                    DateTime expDate = today.AddDays(Constant.days);
-
-                    resultUser = new User();
-                    resultUser.setUserID(authetication.result[0].customer_uid);
-                    resultUser.setUserSessionTime(expDate);
-                    resultUser.setUserPlatform(platform);
-                    resultUser.setUserType(authetication.result[0].role);
-                    resultUser.setUserEmail(authetication.result[0].customer_email);
-                    resultUser.setUserFirstName(authetication.result[0].customer_first_name);
-                    resultUser.setUserLastName(authetication.result[0].customer_last_name);
-                    resultUser.setUserPhoneNumber(authetication.result[0].customer_phone_num);
-                    resultUser.setUserAddress(authetication.result[0].customer_address);
-                    resultUser.setUserUnit(authetication.result[0].customer_unit);
-                    resultUser.setUserCity(authetication.result[0].customer_city);
-                    resultUser.setUserState(authetication.result[0].customer_state);
-                    resultUser.setUserZipcode(authetication.result[0].customer_zip);
-                    resultUser.setUserLatitude(authetication.result[0].customer_lat);
-                    resultUser.setUserLongitude(authetication.result[0].customer_long);
-                }
-            }
-
-            test.Hide();
-            return resultUser;
-        }
+        // This function returns user's Facebook profile.
 
         public FacebookResponse GetFacebookUser(string accessToken){
 
@@ -769,6 +777,8 @@ namespace ServingFresh.Models
             return facebookData;
         }
 
+        // This function returns user's Google profile.
+
         public async Task<GoogleResponse> GetGoogleUser(AuthenticatorCompletedEventArgs googleAccount)
         {
             GoogleResponse googleDate = null;
@@ -788,6 +798,8 @@ namespace ServingFresh.Models
             
             return googleDate;
         }
+
+        // This function returns UserProfile if their account exists in our system.
 
         public async Task<UserProfile> ValidateExistingAccountFromEmail(string email)
         {
@@ -815,6 +827,8 @@ namespace ServingFresh.Models
 
             return result;
         }
+
+        // This function updates users address profile. 
 
         public async Task<bool> UpdateProfile(UserProfile profile)
         {
@@ -845,5 +859,7 @@ namespace ServingFresh.Models
 
             return result;
         }
+
+        // SETTERS AND GETTERS_________________________________________________
     }
 }

@@ -22,14 +22,21 @@ namespace ServingFresh.Views
 {
     public partial class LogInPage : ContentPage
     {
+        // Atributes
+
         public string direction = "";
-        private string deviceId;
+
+        // Constructor: Default
 
         public LogInPage()
         {
             InitializeComponent();
             SetAppleContinueButtonBaseOnPlatform();
         }
+
+        // Constructor: Takes height and direction.
+        // This constructor is use when users try to sign in from with in the app.
+        // For example, a customer could just use the app as a guest and then later on log in from any where in the app.
 
         public LogInPage(double height, string direction)
         {
@@ -40,13 +47,26 @@ namespace ServingFresh.Views
             this.direction = direction;
         }
 
-        async void DirectLogInClick(System.Object sender, System.EventArgs e)
+        void SetAppleContinueButtonBaseOnPlatform()
+        {
+            if (Device.RuntimePlatform == Device.Android)
+            {
+                appleLogInButton.IsVisible = false;
+            }
+        }
+
+        // MAIN LOGIN EVENT HANDLERS _________________________________________________
+
+        // This function handles the direct login request. It first retrives the salt account, then it
+        // verifies the credentails to find out if user gets access or not. This function calls functions
+        // in the sign in class and uses their responses to find out what action to take at this level.
+
+        public async void DirectLogInClick(System.Object sender, System.EventArgs e)
         {
             logInButton.IsEnabled = false;
 
             try
             {
-
                 if (String.IsNullOrEmpty(userEmailAddress.Text) || String.IsNullOrEmpty(userPassword.Text))
                 {
                     if (messageList != null)
@@ -117,39 +137,58 @@ namespace ServingFresh.Views
             logInButton.IsEnabled = true;
         }
 
-        void SetAppleContinueButtonBaseOnPlatform()
-        {
-            if (Device.RuntimePlatform == Device.Android)
-            {
-                appleLogInButton.IsVisible = false;
-            }
-        }
+        // This function handles the Facebook login request. It calls the FacebookAutheticationCompleted function
+        // to find out if user login successfully or not. Note that if the LoginPage is push modally into the navigation
+        // stack you have to pop modally again to present the Facebook login screen. 
 
         public void FacebookLogInClick(System.Object sender, System.EventArgs e)
         {
-            string clientID = string.Empty;
-            string redirectURL = string.Empty;
+            Application.Current.MainPage.Navigation.PopModalAsync();
 
-            switch (Device.RuntimePlatform)
-            {
-                case Device.iOS:
-                    clientID = Constant.FacebookiOSClientID;
-                    redirectURL = Constant.FacebookiOSRedirectUrl;
-                    break;
-                case Device.Android:
-                    clientID = Constant.FacebookAndroidClientID;
-                    redirectURL = Constant.FacebookAndroidRedirectUrl;
-                    break;
-            }
-
-            var authenticator = new OAuth2Authenticator(clientID, Constant.FacebookScope, new Uri(Constant.FacebookAuthorizeUrl), new Uri(redirectURL), null, false);
+            var client = new SignIn();
+            var authenticator = client.GetFacebookAuthetication();
             var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
 
             authenticator.Completed += FacebookAuthenticatorCompleted;
             authenticator.Error += FacebookAutheticatorError;
-
             presenter.Login(authenticator);
         }
+
+        // This function handles the Google login request. It calls the GoogleAutheticationCompleted function
+        // to find out if user login successfully or not. Note that if the LoginPage is push modally into the navigation
+        // stack you have to pop modally again to present the Google login screen. Also, in comparison with the Facebook or Apple
+        // login mechanism Google needs to set up a the state of the autheticator to know when to redirect the user back to the app.
+
+        public void GoogleLogInClick(System.Object sender, System.EventArgs e)
+        {
+            Application.Current.MainPage.Navigation.PopModalAsync();
+
+            var client = new SignIn();
+            var authenticator = client.GetGoogleAuthetication();
+            var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
+
+            AuthenticationState.Authenticator = authenticator;
+
+            authenticator.Completed += GoogleAuthenticatorCompleted;
+            authenticator.Error += GoogleAuthenticatorError;
+            presenter.Login(authenticator);
+        }
+
+        // This function handles the Apple login request. It calls the OnAppleSignInRequest function
+        // to find out if user login successfully or not. 
+
+        public void AppleLogInClick(System.Object sender, System.EventArgs e)
+        {
+            if (Device.RuntimePlatform != Device.Android)
+            {
+                OnAppleSignInRequest();
+            }
+        }
+
+        // AUTHETICATION HANDLERS _________________________________________________
+
+        // This function checks if the user was able to succesfully login to their Facebook account. Once the
+        // user autheticates throught Facebook, we validate their credentials in our system.
 
         async void FacebookAuthenticatorCompleted(object sender, AuthenticatorCompletedEventArgs e)
         {
@@ -178,206 +217,12 @@ namespace ServingFresh.Views
             }
         }
 
-        private async void FacebookAutheticatorError(object sender, AuthenticatorErrorEventArgs e)
-        {
-            var authenticator = sender as OAuth2Authenticator;
-            if (authenticator != null)
-            {
-                authenticator.Completed -= FacebookAuthenticatorCompleted;
-                authenticator.Error -= FacebookAutheticatorError;
-            }
-            Application.Current.MainPage = new LogInPage();
-            await DisplayAlert("Authentication error: ", e.Message, "OK");
-        }
-
-        async void RedirectUserBasedOnVerification(string status, string direction)
-        {
-            try
-            {
-                if (status.Contains("SUCCESSFUL:"))
-                {
-                    UserDialogs.Instance.HideLoading();
-
-                    Debug.WriteLine("DIRECTION VALUE: " + direction);
-                    if (direction == "")
-                    {
-                        Application.Current.MainPage = new SelectionPage();
-                    }
-                    else
-                    {
-                        Dictionary<string, Page> array = new Dictionary<string, Page>();
-
-                        array.Add("ServingFresh.Views.CheckoutPage", new CheckoutPage());
-                        array.Add("ServingFresh.Views.SelectionPage", new SelectionPage());
-                        array.Add("ServingFresh.Views.HistoryPage", new HistoryPage());
-                        array.Add("ServingFresh.Views.RefundPage", new RefundPage());
-                        array.Add("ServingFresh.Views.ProfilePage", new ProfilePage());
-                        array.Add("ServingFresh.Views.ConfirmationPage", new ConfirmationPage());
-                        array.Add("ServingFresh.Views.InfoPage", new InfoPage());
-
-                        var root = Application.Current.MainPage;
-                        Application.Current.MainPage = array[root.ToString()];
-                    }
-
-                }
-                else if (status == "USER NEEDS TO SIGN UP")
-                {
-                    UserDialogs.Instance.HideLoading();
-                    if (messageList != null)
-                    {
-                        if (messageList.ContainsKey("701-000037"))
-                        {
-                            await Application.Current.MainPage.DisplayAlert(messageList["701-000037"].title, messageList["701-000037"].message, messageList["701-000037"].responses);
-                        }
-                        else
-                        {
-                            await Application.Current.MainPage.DisplayAlert("Oops", "It looks like you don't have an account with Serving Fresh. Please sign up!", "OK");
-                        }
-                    }
-                    else
-                    {
-                        await Application.Current.MainPage.DisplayAlert("Oops", "It looks like you don't have an account with Serving Fresh. Please sign up!", "OK");
-                    }
-                    
-                    await Application.Current.MainPage.Navigation.PushModalAsync(new AddressPage(), true);
-                }
-                else if (status == "WRONG SOCIAL MEDIA TO SIGN IN")
-                {
-                    UserDialogs.Instance.HideLoading();
-                    if (messageList != null)
-                    {
-                        if (messageList.ContainsKey("701-000038"))
-                        {
-                            await Application.Current.MainPage.DisplayAlert(messageList["701-000038"].title, messageList["701-000038"].message, messageList["701-000038"].responses);
-                        }
-                        else
-                        {
-                            await Application.Current.MainPage.DisplayAlert("Oops", "Our records show that you have attempted to log in with a different social media account. Please log in through the correct social media platform. Thanks!", "OK");
-                        }
-                    }
-                    else
-                    {
-                        await Application.Current.MainPage.DisplayAlert("Oops", "Our records show that you have attempted to log in with a different social media account. Please log in through the correct social media platform. Thanks!", "OK");
-                    }
-                   
-                }
-                else if (status == "SIGN IN DIRECTLY")
-                {
-                    UserDialogs.Instance.HideLoading();
-                    if (messageList != null)
-                    {
-                        if (messageList.ContainsKey("701-000039"))
-                        {
-                            await Application.Current.MainPage.DisplayAlert(messageList["701-000039"].title, messageList["701-000039"].message, messageList["701-000039"].responses);
-                        }
-                        else
-                        {
-                            await Application.Current.MainPage.DisplayAlert("Oops", "Our records show that you have attempted to log in with a social media account. Please log in through our direct log in. Thanks!", "OK");
-                        }
-                    }
-                    else
-                    {
-                        await Application.Current.MainPage.DisplayAlert("Oops", "Our records show that you have attempted to log in with a social media account. Please log in through our direct log in. Thanks!", "OK");
-                    }
-                   
-                }
-                else if (status == "ERROR1")
-                {
-                    UserDialogs.Instance.HideLoading();
-                    if (messageList != null)
-                    {
-                        if (messageList.ContainsKey("701-000040"))
-                        {
-                            await Application.Current.MainPage.DisplayAlert(messageList["701-000040"].title, messageList["701-000040"].message, messageList["701-000040"].responses);
-                        }
-                        else
-                        {
-                            await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
-                        }
-                    }
-                    else
-                    {
-                        await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
-                    }
-                    
-                }
-                else if (status == "ERROR2")
-                {
-                    UserDialogs.Instance.HideLoading();
-                    if (messageList != null)
-                    {
-                        if (messageList.ContainsKey("701-000040"))
-                        {
-                            await Application.Current.MainPage.DisplayAlert(messageList["701-000040"].title, messageList["701-000040"].message, messageList["701-000040"].responses);
-                        }
-                        else
-                        {
-                            await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
-                        }
-                    }
-                    else
-                    {
-                        await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
-                    }
-                }
-                else
-                {
-                    UserDialogs.Instance.HideLoading();
-                    if (messageList != null)
-                    {
-                        if (messageList.ContainsKey("701-000040"))
-                        {
-                            await Application.Current.MainPage.DisplayAlert(messageList["701-000040"].title, messageList["701-000040"].message, messageList["701-000040"].responses);
-                        }
-                        else
-                        {
-                            await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
-                        }
-                    }
-                    else
-                    {
-                        await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
-                    }
-                }
-            }catch(Exception errorRedirectUserBaseOnVerification)
-            {
-                var client = new Diagnostic();
-                client.parseException(errorRedirectUserBaseOnVerification.ToString(), user);
-            }
-        }
-
-        public void GoogleLogInClick(System.Object sender, System.EventArgs e)
-        {
-            string clientId = string.Empty;
-            string redirectUri = string.Empty;
-
-            switch (Device.RuntimePlatform)
-            {
-                case Device.iOS:
-                    clientId = Constant.GoogleiOSClientID;
-                    redirectUri = Constant.GoogleRedirectUrliOS;
-                    break;
-
-                case Device.Android:
-                    clientId = Constant.GoogleAndroidClientID;
-                    redirectUri = Constant.GoogleRedirectUrlAndroid;
-                    break;
-            }
-
-            var authenticator = new OAuth2Authenticator(clientId, string.Empty, Constant.GoogleScope, new Uri(Constant.GoogleAuthorizeUrl), new Uri(redirectUri), new Uri(Constant.GoogleAccessTokenUrl), null, true);
-            var presenter = new Xamarin.Auth.Presenters.OAuthLoginPresenter();
-
-            authenticator.Completed += GoogleAuthenticatorCompleted;
-            authenticator.Error += GoogleAuthenticatorError;
-
-            AuthenticationState.Authenticator = authenticator;
-            presenter.Login(authenticator);
-            
-        }
+        // This function checks if the user was able to succesfully login to their Google account. Once the
+        // user autheticates throught Google, we validate their credentials in our system.
 
         async void GoogleAuthenticatorCompleted(object sender, AuthenticatorCompletedEventArgs e)
         {
-            
+
             var authenticator = sender as OAuth2Authenticator;
 
             if (authenticator != null)
@@ -395,12 +240,12 @@ namespace ServingFresh.Views
                     var status = await client.VerifyUserCredentials(e.Account.Properties["access_token"], e.Account.Properties["refresh_token"], e, null, "GOOGLE");
                     RedirectUserBasedOnVerification(status, direction);
                 }
-                catch(Exception errorGoogleAutheticatorCompleted)
+                catch (Exception errorGoogleAutheticatorCompleted)
                 {
                     var client = new Diagnostic();
                     client.parseException(errorGoogleAutheticatorCompleted.ToString(), user);
                 }
-                
+
             }
             else
             {
@@ -409,30 +254,8 @@ namespace ServingFresh.Views
             }
         }
 
-        async void GoogleAuthenticatorError(object sender, AuthenticatorErrorEventArgs e)
-        {
-            var authenticator = sender as OAuth2Authenticator;
-
-            if (authenticator != null)
-            {
-                authenticator.Completed -= GoogleAuthenticatorCompleted;
-                authenticator.Error -= GoogleAuthenticatorError;
-            }
-            Application.Current.MainPage = new LogInPage();
-            await DisplayAlert("Authentication error: ", e.Message, "OK");
-        }
-
-        public void AppleLogInClick(System.Object sender, System.EventArgs e)
-        {
-            if (Device.RuntimePlatform != Device.Android)
-            {
-                OnAppleSignInRequest();
-            }
-            else
-            {
-                appleLogInButton.IsVisible = false;
-            }
-        }
+        // This function checks if the user was able to succesfully login to their Apple account. Once the
+        // user autheticates throught Apple, we validate their credentials in our system.
 
         async void OnAppleSignInRequest()
         {
@@ -483,11 +306,221 @@ namespace ServingFresh.Views
             }
         }
 
-        void ReturnBackToPrincipalPage(System.Object sender, System.EventArgs e)
+        // AUTHETICATION HANDLERS _________________________________________________
+
+        // AUTHETICATION ERROR HANDLERS ___________________________________________
+
+        // This function gets call if there was an error authenticating with Facebook.
+
+        private async void FacebookAutheticatorError(object sender, AuthenticatorErrorEventArgs e)
         {
-            Application.Current.MainPage = new PrincipalPage();
+            var authenticator = sender as OAuth2Authenticator;
+            if (authenticator != null)
+            {
+                authenticator.Completed -= FacebookAuthenticatorCompleted;
+                authenticator.Error -= FacebookAutheticatorError;
+            }
+            Application.Current.MainPage = new LogInPage();
+            await DisplayAlert("Authentication error: ", e.Message, "OK");
         }
 
+        // This function gets call if there was an error authenticating with Google.
+
+        async void GoogleAuthenticatorError(object sender, AuthenticatorErrorEventArgs e)
+        {
+            var authenticator = sender as OAuth2Authenticator;
+
+            if (authenticator != null)
+            {
+                authenticator.Completed -= GoogleAuthenticatorCompleted;
+                authenticator.Error -= GoogleAuthenticatorError;
+            }
+            Application.Current.MainPage = new LogInPage();
+            await DisplayAlert("Authentication error: ", e.Message, "OK");
+        }
+
+        // AUTHETICATION ERROR HANDLERS ___________________________________________
+
+        // This function handles the status of each authetication and redirects user to
+        // appropiate page or gives them an alert message to find out what they should do next.
+
+        async void RedirectUserBasedOnVerification(string status, string direction)
+        {
+            try
+            {
+                if (status.Contains("SUCCESSFUL:"))
+                {
+                    UserDialogs.Instance.HideLoading();
+
+                    Debug.WriteLine("DIRECTION VALUE: " + direction);
+                    if (direction == "")
+                    {
+                        Application.Current.MainPage = new SelectionPage();
+                    }
+                    else
+                    {
+                        Dictionary<string, Page> array = new Dictionary<string, Page>();
+
+                        array.Add("ServingFresh.Views.CheckoutPage", new CheckoutPage());
+                        array.Add("ServingFresh.Views.SelectionPage", new SelectionPage());
+                        array.Add("ServingFresh.Views.HistoryPage", new HistoryPage());
+                        array.Add("ServingFresh.Views.RefundPage", new RefundPage());
+                        array.Add("ServingFresh.Views.ProfilePage", new ProfilePage());
+                        array.Add("ServingFresh.Views.ConfirmationPage", new ConfirmationPage());
+                        array.Add("ServingFresh.Views.InfoPage", new InfoPage());
+
+                        var root = Application.Current.MainPage;
+                        Application.Current.MainPage = array[root.ToString()];
+                    }
+
+                }
+                else if (status == "USER NEEDS TO SIGN UP")
+                {
+                    UserDialogs.Instance.HideLoading();
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000037"))
+                        {
+                            await Application.Current.MainPage.DisplayAlert(messageList["701-000037"].title, messageList["701-000037"].message, messageList["701-000037"].responses);
+                        }
+                        else
+                        {
+                            await Application.Current.MainPage.DisplayAlert("Oops", "It looks like you don't have an account with Serving Fresh. Please sign up!", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await Application.Current.MainPage.DisplayAlert("Oops", "It looks like you don't have an account with Serving Fresh. Please sign up!", "OK");
+                    }
+
+                    await Application.Current.MainPage.Navigation.PushModalAsync(new AddressPage(), true);
+                }
+                else if (status == "WRONG DIRECT PASSWORD")
+                {
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000035"))
+                        {
+                            await DisplayAlert(messageList["701-000035"].title, messageList["701-000035"].message, messageList["701-000035"].responses);
+                        }
+                        else
+                        {
+                            await DisplayAlert("Error", "Wrong password was entered", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await DisplayAlert("Error", "Wrong password was entered", "OK");
+                    }
+                }
+                else if (status == "WRONG SOCIAL MEDIA TO SIGN IN")
+                {
+                    UserDialogs.Instance.HideLoading();
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000038"))
+                        {
+                            await Application.Current.MainPage.DisplayAlert(messageList["701-000038"].title, messageList["701-000038"].message, messageList["701-000038"].responses);
+                        }
+                        else
+                        {
+                            await Application.Current.MainPage.DisplayAlert("Oops", "Our records show that you have attempted to log in with a different social media account. Please log in through the correct social media platform. Thanks!", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await Application.Current.MainPage.DisplayAlert("Oops", "Our records show that you have attempted to log in with a different social media account. Please log in through the correct social media platform. Thanks!", "OK");
+                    }
+
+                }
+                else if (status == "SIGN IN DIRECTLY")
+                {
+                    UserDialogs.Instance.HideLoading();
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000039"))
+                        {
+                            await Application.Current.MainPage.DisplayAlert(messageList["701-000039"].title, messageList["701-000039"].message, messageList["701-000039"].responses);
+                        }
+                        else
+                        {
+                            await Application.Current.MainPage.DisplayAlert("Oops", "Our records show that you have attempted to log in with a social media account. Please log in through our direct log in. Thanks!", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await Application.Current.MainPage.DisplayAlert("Oops", "Our records show that you have attempted to log in with a social media account. Please log in through our direct log in. Thanks!", "OK");
+                    }
+
+                }
+                else if (status == "ERROR1")
+                {
+                    UserDialogs.Instance.HideLoading();
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000040"))
+                        {
+                            await Application.Current.MainPage.DisplayAlert(messageList["701-000040"].title, messageList["701-000040"].message, messageList["701-000040"].responses);
+                        }
+                        else
+                        {
+                            await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
+                    }
+
+                }
+                else if (status == "ERROR2")
+                {
+                    UserDialogs.Instance.HideLoading();
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000040"))
+                        {
+                            await Application.Current.MainPage.DisplayAlert(messageList["701-000040"].title, messageList["701-000040"].message, messageList["701-000040"].responses);
+                        }
+                        else
+                        {
+                            await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
+                    }
+                }
+                else
+                {
+                    UserDialogs.Instance.HideLoading();
+                    if (messageList != null)
+                    {
+                        if (messageList.ContainsKey("701-000040"))
+                        {
+                            await Application.Current.MainPage.DisplayAlert(messageList["701-000040"].title, messageList["701-000040"].message, messageList["701-000040"].responses);
+                        }
+                        else
+                        {
+                            await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
+                        }
+                    }
+                    else
+                    {
+                        await Application.Current.MainPage.DisplayAlert("Oops", "There was an error getting your account. Please contact customer service", "OK");
+                    }
+                }
+            }
+            catch (Exception errorRedirectUserBaseOnVerification)
+            {
+                var client = new Diagnostic();
+                client.parseException(errorRedirectUserBaseOnVerification.ToString(), user);
+            }
+        }
+
+        // This function shows and hides password. 
+        
         void ShowHidePassword(System.Object sender, System.EventArgs e)
         {
             Label label = (Label)sender;
@@ -503,17 +536,24 @@ namespace ServingFresh.Views
             }
         }
 
-        void ImageButton_Clicked(System.Object sender, System.EventArgs e)
+        // This function pops the login page which is equivalent to closing the page.
+
+        void CloseLoginPage (System.Object sender, System.EventArgs e)
         {
             Application.Current.MainPage.Navigation.PopModalAsync();
         }
 
+        // This function handles the reset password request. 
+
         void ResetPassword(System.Object sender, System.EventArgs e)
         {
-            UpdatePassword(sender, e);
+            SendUserResetPasswordLink();
         }
 
-        async void UpdatePassword(System.Object sender, System.EventArgs e)
+        // This function sends the user their reset password link by calling
+        // function from the sign in class. 
+
+        async void SendUserResetPasswordLink()
         {
             if (!String.IsNullOrEmpty(userEmailAddress.Text))
             {
