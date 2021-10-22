@@ -171,7 +171,7 @@ namespace ServingFresh.Models
             Interlocked.Exchange(ref this.throttleCts, new CancellationTokenSource()).Cancel();
             _ = Task.Delay(TimeSpan.FromMilliseconds(1000), this.throttleCts.Token)
                 .ContinueWith(
-                delegate { GetPlacesPredictionsAsync(addressList, Addresses, _addressText); },
+                delegate { _ = GetPlacesPredictionsAsync(addressList, Addresses, _addressText); },
                 CancellationToken.None,
                 TaskContinuationOptions.OnlyOnRanToCompletion,
                 TaskScheduler.FromCurrentSynchronizationContext());
@@ -182,7 +182,7 @@ namespace ServingFresh.Models
             Interlocked.Exchange(ref this.throttleCts, new CancellationTokenSource()).Cancel();
             _ = Task.Delay(TimeSpan.FromMilliseconds(500), this.throttleCts.Token)
                 .ContinueWith(
-                delegate { GetPlacesPredictionsAsync(_addressText); },
+                delegate { _ = GetPlacesPredictionsAsync(_addressText); },
                 CancellationToken.None,
                 TaskContinuationOptions.OnlyOnRanToCompletion,
                 TaskScheduler.FromCurrentSynchronizationContext());

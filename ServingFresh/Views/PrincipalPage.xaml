@@ -32,7 +32,16 @@
                                     VerticalTextAlignment="Center"
                                     Grid.Column="0"
                                     LineHeight="0.8"
-                                    Text="Fresh, Organic Produce Delivered" TextColor="White" FontAttributes="Bold" FontSize="39" ></Label>
+                                    Text="Fresh&#10;Organic&#10;Produce&#10;Delivered"  TextColor="White" FontAttributes="Bold">
+                                    <Label.FontSize>
+                                         <OnPlatform x:TypeArguments="x:Double">
+                                            <OnPlatform.Platforms>
+                                                <On Platform="iOS" Value="39" />
+                                                <On Platform="Android" Value="30" />
+                                            </OnPlatform.Platforms>
+                                        </OnPlatform>
+                                    </Label.FontSize>
+                                </Label>
                                 <StackLayout Grid.Column="1" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
                                     <Frame HeightRequest="130" WidthRequest="130" HasShadow="False" CornerRadius="20" Padding="5">
                                         <Image Source="servingFreshIcon.png"></Image>
@@ -169,7 +178,6 @@
                               </StackLayout>
                           </StackLayout>
                     </StackLayout>
-
                 </Grid>
             </StackLayout>
         </ScrollView>

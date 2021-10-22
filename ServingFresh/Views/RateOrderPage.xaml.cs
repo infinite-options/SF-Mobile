@@ -7,7 +7,6 @@ using System.Text;
 using Newtonsoft.Json;
 using ServingFresh.Config;
 using ServingFresh.Models;
-using ServingFresh.ViewModels;
 using Xamarin.Forms;
 using static ServingFresh.Models.RateOrderDetails;
 using static ServingFresh.Views.HistoryPage;

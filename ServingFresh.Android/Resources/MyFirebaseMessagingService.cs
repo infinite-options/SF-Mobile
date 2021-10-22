@@ -78,8 +78,6 @@ namespace ServingFresh.Droid
             // convert the incoming message to a local notification
             SendLocalNotification(messageBody);
 
-            // send the incoming message directly to the MainPage
-            SendMessageToMainPage(messageBody);
         }
 
         void SendLocalNotification(string body)
@@ -104,12 +102,6 @@ namespace ServingFresh.Droid
             var notificationManager = NotificationManager.FromContext(this);
 
             notificationManager.Notify(0, notificationBuilder.Build());
-        }
-
-        void SendMessageToMainPage(string body)
-        {
-            //(App.Current.MainPage as MainPage)?.AddMessage(body);
-            return;
         }
 
         public FirebaseService()

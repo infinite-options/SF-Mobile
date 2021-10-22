@@ -39,8 +39,7 @@ namespace ServingFresh.Views
             try
             {
                 var location = await Geolocation.GetLocationAsync();
-                //location.Latitude = 37.227124;
-                //location.Longitude = -121.886943;
+
                 currentLocation.Latitude = location.Latitude;
                 currentLocation.Longitude = location.Longitude;
 

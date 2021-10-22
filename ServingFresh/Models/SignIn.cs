@@ -19,6 +19,7 @@ namespace ServingFresh.Models
 
     public class SignIn
     {
+        public class UserTypeEvaluation { public string role { get; set; } public bool statusCode { get; set; }}
         private string deviceId = "";
         private string accessToken;
         private string refreshToken;
@@ -33,117 +34,291 @@ namespace ServingFresh.Models
             refreshToken = "";
         }
 
-        public async Task<User> SignInDirectUser(Button button, Entry email, Entry password)
+        public async Task<AccountSalt> RetrieveAccountSalt(string userEmail)
         {
-            User directUser = null;
-            button.IsEnabled = false;
-            if (String.IsNullOrEmpty(email.Text) || String.IsNullOrEmpty(password.Text))
-            {
-                button.IsEnabled = true;
-            }
-            else
-            {
-                var accountSalt = await RetrieveAccountSalt(email.Text.ToLower().Trim());
+            AccountSalt userInformation = null;
 
-                if (accountSalt != null)
+            try
+            {
+                SaltPost saltPost = new SaltPost();
+                saltPost.email = userEmail;
+
+                var saltPostSerilizedObject = JsonConvert.SerializeObject(saltPost);
+                var saltPostContent = new StringContent(saltPostSerilizedObject, Encoding.UTF8, "application/json");
+
+                var client = new HttpClient();
+                var DRSResponse = await client.PostAsync(Constant.AccountSaltUrl, saltPostContent);
+                var DRSMessage = await DRSResponse.Content.ReadAsStringAsync();
+
+                if (DRSResponse.IsSuccessStatusCode)
                 {
-                    var loginAttempt = await LogInUser(email.Text.ToLower().Trim(), password.Text, accountSalt);
+                    var result = await DRSResponse.Content.ReadAsStringAsync();
 
-                    if (loginAttempt != null && loginAttempt.message != "Request failed, wrong password.")
+                    AcountSaltCredentials data = new AcountSaltCredentials();
+                    data = JsonConvert.DeserializeObject<AcountSaltCredentials>(result);
+
+                    if (DRSMessage.Contains(Constant.UseSocialMediaLogin))
                     {
-                        var client = new HttpClient();
-                        var request = new RequestUserInfo();
-                        request.uid = loginAttempt.result[0].customer_uid;
-
-                        var requestSelializedObject = JsonConvert.SerializeObject(request);
-                        var requestContent = new StringContent(requestSelializedObject, Encoding.UTF8, "application/json");
-
-                        var clientRequest = await client.PostAsync(Constant.GetUserInfoUrl, requestContent);
-
-                        if (clientRequest.IsSuccessStatusCode)
+                        userInformation = new AccountSalt
                         {
-                            try
-                            {
-
-                                var SFUser = await clientRequest.Content.ReadAsStringAsync();
-                                var userData = JsonConvert.DeserializeObject<UserInfo>(SFUser);
-
-                                Debug.WriteLine("DIRECT LOGIN ENDPOINT CONTENT: " + SFUser);
-
-                                DateTime today = DateTime.Now;
-                                DateTime expDate = today.AddDays(Constant.days);
-
-                                directUser = new User();
-
-                                directUser.setUserID(userData.result[0].customer_uid);
-                                directUser.setUserSessionTime(expDate);
-                                directUser.setUserPlatform("DIRECT");
-                                directUser.setUserType("CUSTOMER");
-                                directUser.setUserEmail(userData.result[0].customer_email);
-                                directUser.setUserFirstName(userData.result[0].customer_first_name);
-                                directUser.setUserLastName(userData.result[0].customer_last_name);
-                                directUser.setUserPhoneNumber(userData.result[0].customer_phone_num);
-                                directUser.setUserAddress(userData.result[0].customer_address);
-                                directUser.setUserUnit(userData.result[0].customer_unit);
-                                directUser.setUserCity(userData.result[0].customer_city);
-                                directUser.setUserState(userData.result[0].customer_state);
-                                directUser.setUserZipcode(userData.result[0].customer_zip);
-                                directUser.setUserLatitude(userData.result[0].customer_lat);
-                                directUser.setUserLongitude(userData.result[0].customer_long);
-                                SaveUser(directUser);
-
-                                deviceId = Preferences.Get("guid", null);
-
-                                if (deviceId != null)
-                                {
-                                    NotificationPost notificationPost = new NotificationPost();
-
-                                    notificationPost.uid = user.getUserID();
-                                    notificationPost.guid = Preferences.Get("guid", null).Substring(5);
-                                    user.setUserDeviceID(deviceId.Substring(5));
-                                    notificationPost.notification = "TRUE";
-
-                                    var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
-                                    Debug.WriteLine("Notification JSON Object to send: " + notificationSerializedObject);
-
-                                    var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
-
-                                    var clientResponse = await client.PostAsync(Constant.NotificationsUrl, notificationContent);
-
-                                    Debug.WriteLine("Status code: " + clientResponse.IsSuccessStatusCode);
-
-                                    if (clientResponse.IsSuccessStatusCode)
-                                    {
-                                        Debug.WriteLine("We have post the guid to the database");
-                                    }
-                                }
-                            }
-                            catch (Exception errorSignInDirectUser)
-                            {
-                                var client1 = new Diagnostic();
-                                client1.parseException(errorSignInDirectUser.ToString(), user);
-                            }
-                        }
-                        else
+                            password_algorithm = "",
+                            password_salt = "",
+                            message = data.message
+                        };
+                    }
+                    else if (DRSMessage.Contains(Constant.EmailNotFound))
+                    {
+                        userInformation = new AccountSalt
                         {
-
-                        }
+                            password_algorithm = "",
+                            password_salt = "",
+                            message = "USER NEEDS TO SIGN UP"
+                        };
                     }
                     else
                     {
-                        button.IsEnabled = true;
+                        userInformation = new AccountSalt
+                        {
+                            password_algorithm = data.result[0].password_algorithm,
+                            password_salt = data.result[0].password_salt,
+                            message = ""
+                        };
                     }
                 }
-                button.IsEnabled = true;
             }
-            return directUser;
+            catch (Exception errorRetrieveAccountSalt)
+            {
+                var client = new Diagnostic();
+                client.parseException(errorRetrieveAccountSalt.ToString(), user);
+            }
+
+            return userInformation;
+        }
+
+        public async Task<string> VerifyUserCredentials(string userEmail, string userPassword, AccountSalt accountSalt)
+        {
+            string isUserVerified = "";
+
+            try
+            {
+                SHA512 sHA512 = new SHA512Managed();
+                var client = new HttpClient();
+                byte[] data = sHA512.ComputeHash(Encoding.UTF8.GetBytes(userPassword + accountSalt.password_salt));
+                string hashedPassword = BitConverter.ToString(data).Replace("-", string.Empty).ToLower();
+
+                LogInPost loginPostContent = new LogInPost();
+                loginPostContent.email = userEmail;
+                loginPostContent.password = hashedPassword;
+                loginPostContent.social_id = "";
+                loginPostContent.signup_platform = "";
+
+                string loginPostContentJson = JsonConvert.SerializeObject(loginPostContent);
+
+                var httpContent = new StringContent(loginPostContentJson, Encoding.UTF8, "application/json");
+                var response = await client.PostAsync(Constant.LogInUrl, httpContent);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var authetication = JsonConvert.DeserializeObject<SuccessfulSocialLogIn>(responseContent);
+
+                    if (authetication.code.ToString() == Constant.EmailNotFound)
+                    {
+                        isUserVerified = "USER NEEDS TO SIGN UP";
+                    }
+                    else if (authetication.code.ToString() == Constant.AutheticatedSuccesful)
+                    {
+                        isUserVerified = "LOGIN USER";
+
+                        DateTime today = DateTime.Now;
+                        DateTime expDate = today.AddDays(Constant.days);
+
+                        var role = await EvaluateUserType(authetication.result[0].role, userPassword);
+
+                        user.setUserType(role);
+                        user.setUserID(authetication.result[0].customer_uid);
+                        user.setUserSessionTime(expDate);
+                        user.setUserPlatform(platform);
+                        user.setUserEmail(authetication.result[0].customer_email);
+                        user.setUserFirstName(authetication.result[0].customer_first_name);
+                        user.setUserLastName(authetication.result[0].customer_last_name);
+                        user.setUserPhoneNumber(authetication.result[0].customer_phone_num);
+                        user.setUserAddress(authetication.result[0].customer_address);
+                        user.setUserUnit(authetication.result[0].customer_unit);
+                        user.setUserCity(authetication.result[0].customer_city);
+                        user.setUserState(authetication.result[0].customer_state);
+                        user.setUserZipcode(authetication.result[0].customer_zip);
+                        user.setUserLatitude(authetication.result[0].customer_lat);
+                        user.setUserLongitude(authetication.result[0].customer_long);
+
+                        SetUserRemoteNotification();
+                        SaveUser(user);
+                    }
+                    else if (authetication.code.ToString() == Constant.ErrorPlatform)
+                    {
+                        //var RDSCode = JsonConvert.DeserializeObject<RDSLogInMessage>(responseContent);
+
+                        isUserVerified = "WRONG SOCIAL MEDIA TO SIGN IN";
+
+                    }else if (authetication.code.ToString() == Constant.ErrorUserDirectLogIn)
+                    {
+                        isUserVerified = "SIGN IN DIRECTLY";
+                    }
+                    
+                }
+
+
+            }
+            catch (Exception errorLogInUser)
+            {
+                var client = new Diagnostic();
+                client.parseException(errorLogInUser.ToString(), user);
+            }
+
+            return isUserVerified;
+        }
+
+        async Task<string> EvaluateUserType(string role, string password)
+        {
+            string userType = "CUSTOMER";
+
+            try
+            {
+                if (role == "CUSTOMER" || role == "ADMIN")
+                {
+                    userType = "CUSTOMER";
+                }
+                else if (role == "GUEST")
+                {
+                    var didProfileUpdatedSucessfully = await UpdateUserProfile(password);
+
+                    if (didProfileUpdatedSucessfully)
+                    {
+                        userType = "CUSTOMER";
+                    }
+                    else
+                    {
+                        userType = "GUEST";
+                    }
+                }
+            }
+            catch
+            {
+
+            }
+
+            return userType;
+           
+        }
+
+        async Task<string> EvaluateUserType(string role, string mobile_access_token, string mobile_refresh_token, string social_id, string platform)
+        {
+            string userType = "CUSTOMER";
+
+            try
+            {
+                if (role == "CUSTOMER" || role == "ADMIN")
+                {
+                    userType = "CUSTOMER";
+                }
+                else if (role == "GUEST")
+                {
+                    var didProfileUpdatedSucessfully = await UpdateUserProfile(accessToken, refreshToken, social_id, platform);
+
+                    if (didProfileUpdatedSucessfully)
+                    {
+                        userType = "CUSTOMER";
+                    }
+                    else
+                    {
+                        userType = "GUEST";
+                    }
+                }
+            }
+            catch
+            {
+
+            }
+
+            return userType;
+
+        }
+
+        async Task<bool> UpdateUserProfile(string password)
+        {
+            bool result = false;
+
+            try
+            {
+                var clientSignUp = new SignUp();
+                var content = clientSignUp.UpdateDirectUser(user, password);
+                result = await SignUp.SignUpNewUser(content);
+            }
+            catch
+            {
+                Debug.Write("ERROR UPDATING DIRECT USER'S PROFILE FROM GUEST TO CUSTOMER");
+            }
+
+            return result;
+        }
+
+        async Task<bool> UpdateUserProfile(string mobile_access_token, string mobile_refresh_token, string social_id, string platform)
+        {
+            bool result = false;
+
+            try
+            {
+                var clientSignUp = new SignUp();
+                var content = clientSignUp.UpdateSocialUser(user, mobile_access_token, mobile_refresh_token, social_id, platform);
+                result = await SignUp.SignUpNewUser(content);
+            }
+            catch
+            {
+                Debug.Write("ERROR UPDATING SOCIAL MEDIA USER'S PROFILE FROM GUEST TO CUSTOMER");
+            }
+
+            return result;
+
+        }
+
+        async void SetUserRemoteNotification()
+        {
+            deviceId = Preferences.Get("guid", null);
+
+            if (deviceId != null)
+            {
+                var client = new HttpClient();
+                NotificationPost notificationPost = new NotificationPost();
+
+                notificationPost.uid = user.getUserID();
+                notificationPost.guid = deviceId.Substring(5);
+                user.setUserDeviceID(deviceId.Substring(5));
+                notificationPost.notification = "TRUE";
+
+                var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
+                var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
+                var clientResponse = await client.PostAsync(Constant.NotificationsUrl, notificationContent);
+
+                if (clientResponse.IsSuccessStatusCode)
+                {
+                    Debug.WriteLine("GUID WAS WRITTEN SUCCESFULLY WERE SET SUCESSFULLY");
+                }
+                else
+                {
+                    Debug.WriteLine("ERROR SETTING NOTIFICATIONS");
+                }
+            }
         }
 
         public async Task<string> VerifyUserCredentials(string accessToken = "", string refreshToken = "", AuthenticatorCompletedEventArgs googleAccount = null, AppleAccount appleCredentials = null, string platform = "")
         {
             var isUserVerified = "";
+
             try
             {
+                string _accessToken = accessToken;
+                string _refreshToken = refreshToken;
+
                 var client = new HttpClient();
                 var socialLogInPost = new SocialLogInPost();
 
@@ -162,6 +337,9 @@ namespace ServingFresh.Models
                     socialLogInPost.social_id = googleData.id;
                     Debug.WriteLine("IMAGE: " + googleData.picture);
                     user.setUserImage(googleData.picture);
+
+                    _accessToken = accessToken;
+                    _refreshToken = refreshToken;
                 }
                 else if (platform == "FACEBOOK")
                 {
@@ -173,11 +351,17 @@ namespace ServingFresh.Models
 
                     socialLogInPost.email = facebookData.email;
                     socialLogInPost.social_id = facebookData.id;
+
+                    _accessToken = accessToken;
+                    _refreshToken = refreshToken;
                 }
                 else if (platform == "APPLE")
                 {
                     socialLogInPost.email = appleCredentials.Email;
                     socialLogInPost.social_id = appleCredentials.UserId;
+
+                    _accessToken = appleCredentials.Token;
+                    _refreshToken = appleCredentials.Token;
                 }
 
                 socialLogInPost.password = "";
@@ -201,121 +385,33 @@ namespace ServingFresh.Models
                         {
                             try
                             {
-                                var data = JsonConvert.DeserializeObject<SuccessfulSocialLogIn>(responseContent);
-                                user.setUserID(data.result[0].customer_uid);
+                                isUserVerified = "LOGIN USER";
 
-                                UpdateTokensPost updateTokesPost = new UpdateTokensPost();
-                                updateTokesPost.uid = data.result[0].customer_uid;
-                                if (platform == "GOOGLE")
-                                {
-                                    updateTokesPost.mobile_access_token = accessToken;
-                                    updateTokesPost.mobile_refresh_token = refreshToken;
-                                }
-                                else if (platform == "FACEBOOK")
-                                {
-                                    updateTokesPost.mobile_access_token = accessToken;
-                                    updateTokesPost.mobile_refresh_token = accessToken;
-                                }
-                                else if (platform == "APPLE")
-                                {
-                                    updateTokesPost.mobile_access_token = appleCredentials.Token;
-                                    updateTokesPost.mobile_refresh_token = appleCredentials.Token;
-                                }
+                                DateTime today = DateTime.Now;
+                                DateTime expDate = today.AddDays(Constant.days);
 
-                                var updateTokesPostSerializedObject = JsonConvert.SerializeObject(updateTokesPost);
-                                var updateTokesContent = new StringContent(updateTokesPostSerializedObject, Encoding.UTF8, "application/json");
-                                var updateTokesResponse = await client.PostAsync(Constant.UpdateTokensUrl, updateTokesContent);
-                                var updateTokenResponseContent = await updateTokesResponse.Content.ReadAsStringAsync();
+                                var role = await EvaluateUserType(authetication.result[0].role, accessToken, refreshToken, socialLogInPost.social_id, platform);
 
-                                if (updateTokesResponse.IsSuccessStatusCode)
-                                {
-                                    var user1 = new RequestUserInfo();
-                                    user1.uid = data.result[0].customer_uid;
+                                user.setUserType(role);
+                                user.setUserID(authetication.result[0].customer_uid);
+                                user.setUserSessionTime(expDate);
+                                user.setUserPlatform(platform);
+                                user.setUserEmail(authetication.result[0].customer_email);
+                                user.setUserFirstName(authetication.result[0].customer_first_name);
+                                user.setUserLastName(authetication.result[0].customer_last_name);
+                                user.setUserPhoneNumber(authetication.result[0].customer_phone_num);
+                                user.setUserAddress(authetication.result[0].customer_address);
+                                user.setUserUnit(authetication.result[0].customer_unit);
+                                user.setUserCity(authetication.result[0].customer_city);
+                                user.setUserState(authetication.result[0].customer_state);
+                                user.setUserZipcode(authetication.result[0].customer_zip);
+                                user.setUserLatitude(authetication.result[0].customer_lat);
+                                user.setUserLongitude(authetication.result[0].customer_long);
 
-                                    var requestSelializedObject = JsonConvert.SerializeObject(user1);
-                                    var requestContent = new StringContent(requestSelializedObject, Encoding.UTF8, "application/json");
+                                SetUserRemoteNotification();
+                                UpdateAccessRefreshToken(user.getUserID(), accessToken, refreshToken);
 
-                                    var clientRequest = await client.PostAsync(Constant.GetUserInfoUrl, requestContent);
-
-                                    if (clientRequest.IsSuccessStatusCode)
-                                    {
-                                        var userSfJSON = await clientRequest.Content.ReadAsStringAsync();
-                                        var userProfile = JsonConvert.DeserializeObject<UserInfo>(userSfJSON);
-
-                                        DateTime today = DateTime.Now;
-                                        DateTime expDate = today.AddDays(Constant.days);
-
-                                        user.setUserID(data.result[0].customer_uid);
-                                        user.setUserSessionTime(expDate);
-                                        user.setUserPlatform(platform);
-                                        user.setUserType("CUSTOMER");
-                                        user.setUserEmail(userProfile.result[0].customer_email);
-                                        user.setUserFirstName(userProfile.result[0].customer_first_name);
-                                        user.setUserLastName(userProfile.result[0].customer_last_name);
-                                        user.setUserPhoneNumber(userProfile.result[0].customer_phone_num);
-                                        user.setUserAddress(userProfile.result[0].customer_address);
-                                        user.setUserUnit(userProfile.result[0].customer_unit);
-                                        user.setUserCity(userProfile.result[0].customer_city);
-                                        user.setUserState(userProfile.result[0].customer_state);
-                                        user.setUserZipcode(userProfile.result[0].customer_zip);
-                                        user.setUserLatitude(userProfile.result[0].customer_lat);
-                                        user.setUserLongitude(userProfile.result[0].customer_long);
-
-                                        SaveUser(user);
-
-                                        if (data.result[0].role == "GUEST")
-                                        {
-                                            var clientSignUp = new SignUp();
-                                            var content = clientSignUp.UpdateSocialUser(user, userProfile.result[0].mobile_access_token, userProfile.result[0].mobile_refresh_token, userProfile.result[0].social_id, platform);
-                                            var signUpStatus = await SignUp.SignUpNewUser(content);
-                                        }
-
-                                        isUserVerified = "LOGIN USER";
-
-                                        if (Device.RuntimePlatform == Device.iOS)
-                                        {
-                                            deviceId = Preferences.Get("guid", null);
-                                            if (deviceId != null) { Debug.WriteLine("This is the iOS GUID from Log in: " + deviceId); }
-                                        }
-                                        else
-                                        {
-                                            deviceId = Preferences.Get("guid", null);
-                                            if (deviceId != null) { Debug.WriteLine("This is the Android GUID from Log in " + deviceId); }
-                                        }
-
-                                        if (deviceId != null)
-                                        {
-                                            NotificationPost notificationPost = new NotificationPost();
-
-                                            notificationPost.uid = user.getUserID();
-                                            notificationPost.guid = deviceId.Substring(5);
-                                            user.setUserDeviceID(deviceId.Substring(5));
-                                            notificationPost.notification = "TRUE";
-
-                                            var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
-                                            Debug.WriteLine("Notification JSON Object to send: " + notificationSerializedObject);
-
-                                            var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
-
-                                            var clientResponse = await client.PostAsync(Constant.NotificationsUrl, notificationContent);
-
-                                            Debug.WriteLine("Status code: " + clientResponse.IsSuccessStatusCode);
-
-                                            if (clientResponse.IsSuccessStatusCode)
-                                            {
-                                                Debug.WriteLine("We have post the guid to the database");
-                                            }
-                                        }
-                                    }
-                                    else
-                                    {
-                                        isUserVerified = "ERROR1";
-                                    }
-                                }
-                                else
-                                {
-                                    isUserVerified = "ERROR2";
-                                }
+                                SaveUser(user);
                             }
                             catch (Exception second)
                             {
@@ -335,15 +431,34 @@ namespace ServingFresh.Models
                         }
                     }
                 }
-                return isUserVerified;
             }
             catch (Exception errorVerifyUserCredentials)
             {
-
                 var client = new Diagnostic();
                 client.parseException(errorVerifyUserCredentials.ToString(), user);
                 isUserVerified = "ERROR";
-                return isUserVerified;
+            }
+
+            return isUserVerified;
+        }
+
+        async void UpdateAccessRefreshToken(string id, string accessToken, string refreshToken)
+        {
+            var client = new HttpClient();
+
+            UpdateTokensPost updateTokesPost = new UpdateTokensPost();
+
+            updateTokesPost.uid = id;
+            updateTokesPost.mobile_access_token = accessToken;
+            updateTokesPost.mobile_refresh_token = refreshToken;
+
+            var updateTokesPostSerializedObject = JsonConvert.SerializeObject(updateTokesPost);
+            var updateTokesContent = new StringContent(updateTokesPostSerializedObject, Encoding.UTF8, "application/json");
+            var updateTokesResponse = await client.PostAsync(Constant.UpdateTokensUrl, updateTokesContent);
+
+            if (!updateTokesResponse.IsSuccessStatusCode)
+            {
+                Debug.WriteLine("ERROR UPDATING ACCESS AND REFRESH TOKENS");
             }
         }
 
@@ -365,30 +480,30 @@ namespace ServingFresh.Models
 
         public async Task<string> ResetPassword(ResetPassword request)
         {
+            string result = "";
+
             try
             {
-                string result = "";
+
                 var client = new HttpClient();
                 var serializedObject = JsonConvert.SerializeObject(request);
                 var content = new StringContent(serializedObject, Encoding.UTF8, "application/json");
                 var endpointCall = await client.PostAsync(Constant.ResetPasswork, content);
 
-                Debug.WriteLine("JSON TO BE SENT " + serializedObject);
 
                 if (endpointCall.IsSuccessStatusCode)
                 {
                     var endpointContentString = await endpointCall.Content.ReadAsStringAsync();
-                    Debug.WriteLine("RESPONSE " + endpointContentString);
                     result = endpointContentString;
                 }
 
-                return result;
             }catch(Exception errorResetPassword)
             {
                 var client = new Diagnostic();
                 client.parseException(errorResetPassword.ToString(), user);
-                return "";
             }
+
+            return result;
         }
 
         public void setPlatform(string platform)
@@ -430,107 +545,6 @@ namespace ServingFresh.Models
         {
             return refreshToken;
         }
-
-        private async Task<AccountSalt> RetrieveAccountSalt(string userEmail)
-        {
-            try
-            {
-                Debug.WriteLine(userEmail);
-
-                SaltPost saltPost = new SaltPost();
-                saltPost.email = userEmail;
-
-                var saltPostSerilizedObject = JsonConvert.SerializeObject(saltPost);
-                var saltPostContent = new StringContent(saltPostSerilizedObject, Encoding.UTF8, "application/json");
-
-                Debug.WriteLine(saltPostSerilizedObject);
-
-                var client = new HttpClient();
-                var DRSResponse = await client.PostAsync(Constant.AccountSaltUrl, saltPostContent);
-                var DRSMessage = await DRSResponse.Content.ReadAsStringAsync();
-                Debug.WriteLine(DRSMessage);
-
-                AccountSalt userInformation = null;
-
-                if (DRSResponse.IsSuccessStatusCode)
-                {
-                    var result = await DRSResponse.Content.ReadAsStringAsync();
-
-                    AcountSaltCredentials data = new AcountSaltCredentials();
-                    data = JsonConvert.DeserializeObject<AcountSaltCredentials>(result);
-
-                    if (DRSMessage.Contains(Constant.UseSocialMediaLogin))
-                    {
-
-                        Debug.WriteLine(DRSMessage);
-
-                    }
-                    else if (DRSMessage.Contains(Constant.EmailNotFound))
-                    {
-                       
-                    }
-                    else
-                    {
-                        userInformation = new AccountSalt
-                        {
-                            password_algorithm = data.result[0].password_algorithm,
-                            password_salt = data.result[0].password_salt
-                        };
-                    }
-                }
-
-                return userInformation;
-            }
-            catch (Exception errorRetrieveAccountSalt)
-            {
-                var client = new Diagnostic();
-                client.parseException(errorRetrieveAccountSalt.ToString(), user);
-                return null;
-            }
-        }
-
-        private async Task<LogInResponse> LogInUser(string userEmail, string password, AccountSalt accountSalt)
-        {
-            try
-            {
-                SHA512 sHA512 = new SHA512Managed();
-                var client = new HttpClient();
-                byte[] data = sHA512.ComputeHash(Encoding.UTF8.GetBytes(password + accountSalt.password_salt));
-                string hashedPassword = BitConverter.ToString(data).Replace("-", string.Empty).ToLower();
-
-                LogInPost loginPostContent = new LogInPost();
-                loginPostContent.email = userEmail;
-                loginPostContent.password = hashedPassword;
-                loginPostContent.social_id = "";
-                loginPostContent.signup_platform = "";
-
-                string loginPostContentJson = JsonConvert.SerializeObject(loginPostContent);
-
-                var httpContent = new StringContent(loginPostContentJson, Encoding.UTF8, "application/json");
-                var response = await client.PostAsync(Constant.LogInUrl, httpContent);
-                var message = await response.Content.ReadAsStringAsync();
-                Debug.WriteLine(message);
-
-                if (message.Contains(Constant.AutheticatedSuccesful))
-                {
-
-                    var responseContent = await response.Content.ReadAsStringAsync();
-                    var loginResponse = JsonConvert.DeserializeObject<LogInResponse>(responseContent);
-                    return loginResponse;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            catch (Exception errorLogInUser)
-            {
-                var client = new Diagnostic();
-                client.parseException(errorLogInUser.ToString(), user);
-                return null;
-            }
-        }
-
 
         public OAuth2Authenticator GetFacebookAuthetication()
         {
@@ -574,7 +588,6 @@ namespace ServingFresh.Models
             var authenticator = new OAuth2Authenticator(clientId, string.Empty, Constant.GoogleScope, new Uri(Constant.GoogleAuthorizeUrl), new Uri(redirectUri), new Uri(Constant.GoogleAccessTokenUrl), null, true);
             return authenticator;
         }
-
 
         public async Task<User> VerifyUserCredentials(string email, string socialID, string platform)
         {
@@ -626,68 +639,79 @@ namespace ServingFresh.Models
             return resultUser;
         }
 
-
         public FacebookResponse GetFacebookUser(string accessToken){
 
             FacebookResponse facebookData = null;
 
-            var client = new HttpClient();
-            var facebookResponse = client.GetStringAsync(Constant.FacebookUserInfoUrl + accessToken);
-            var facebookUserData = facebookResponse.Result;
+            try
+            {
+                var client = new HttpClient();
+                var facebookResponse = client.GetStringAsync(Constant.FacebookUserInfoUrl + accessToken);
+                var facebookUserData = facebookResponse.Result;
 
-            facebookData = JsonConvert.DeserializeObject<FacebookResponse>(facebookUserData);
+                facebookData = JsonConvert.DeserializeObject<FacebookResponse>(facebookUserData);
+            }
+            catch
+            {
+
+            }
+
             return facebookData;
         }
 
         public async Task<GoogleResponse> GetGoogleUser(AuthenticatorCompletedEventArgs googleAccount)
         {
             GoogleResponse googleDate = null;
-            var request = new OAuth2Request("GET", new Uri(Constant.GoogleUserInfoUrl), null, googleAccount.Account);
-            var GoogleResponse = await request.GetResponseAsync();
-            var googelUserData = GoogleResponse.GetResponseText();
 
-            googleDate = JsonConvert.DeserializeObject<GoogleResponse>(googelUserData);
+            try
+            {
+                var request = new OAuth2Request("GET", new Uri(Constant.GoogleUserInfoUrl), null, googleAccount.Account);
+                var GoogleResponse = await request.GetResponseAsync();
+                var googelUserData = GoogleResponse.GetResponseText();
+
+                googleDate = JsonConvert.DeserializeObject<GoogleResponse>(googelUserData);
+            }
+            catch
+            {
+
+            }
+            
             return googleDate;
         }
 
         public async Task<UserProfile> ValidateExistingAccountFromEmail(string email)
         {
+            UserProfile result = null;
+
             try
             {
-                UserProfile result = null;
-
-                var client = new System.Net.Http.HttpClient();
+                var client = new HttpClient();
                 var endpointCall = await client.GetAsync(Constant.UpdateUserProfile + email);
-
 
                 if (endpointCall.IsSuccessStatusCode)
                 {
                     var endpointContent = await endpointCall.Content.ReadAsStringAsync();
-                    Debug.WriteLine("PROFILE: " + endpointContent);
                     var profile = JsonConvert.DeserializeObject<UserProfile>(endpointContent);
                     if (profile.result.Count != 0)
                     {
                         result = profile;
                     }
-
                 }
-
-                return result;
             }catch(Exception errorValidateExistingAccountFromEmail)
             {
                 var client = new Diagnostic();
                 client.parseException(errorValidateExistingAccountFromEmail.ToString(), user);
-                UserProfile result = null;
-                return result;
             }
+
+            return result;
         }
 
         public async Task<bool> UpdateProfile(UserProfile profile)
         {
+            bool result = false;
+
             try
             {
-                bool result = false;
-
                 var client = new HttpClient();
                 var updateClient = new UpdatedProfile();
                 var updatedProfile = updateClient.GetUpdatedProfile(profile);
@@ -696,22 +720,20 @@ namespace ServingFresh.Models
                 var content = new StringContent(serializedObject, Encoding.UTF8, "application/json");
                 var endpointCall = await client.PostAsync(Constant.UpdateUserProfileAddress, content);
 
-                Debug.WriteLine("JSON TO BE SEND: " + serializedObject);
-
                 if (endpointCall.IsSuccessStatusCode)
                 {
                     var endpointContentString = await endpointCall.Content.ReadAsStringAsync();
-                    Debug.WriteLine("UPDATED PROFILE: " + endpointContentString);
                     result = true;
                 }
 
-                return result;
-            }catch(Exception errorUpdateProfile)
+            }
+            catch(Exception errorUpdateProfile)
             {
                 var client = new Diagnostic();
                 client.parseException(errorUpdateProfile.ToString(), user);
-                return false;
             }
+
+            return result;
         }
     }
 }

@@ -23,80 +23,24 @@ namespace ServingFresh.Views
     public partial class LogInPage : ContentPage
     {
         public string direction = "";
-        public Page realod = null;
-        public event EventHandler SignIn;
-        public bool createAccount = false;
-        INotifications appleNotification = DependencyService.Get<INotifications>();
         private string deviceId;
 
         public LogInPage()
         {
-            //grids.BackgroundColor = Color.FromHex("AB000000");
             InitializeComponent();
-            //grids.BackgroundColor = Color.FromHex("AB000000");
-            BackgroundColor = Color.FromHex("AB000000");
-            if (Device.RuntimePlatform == Device.Android)
-            {
-                System.Diagnostics.Debug.WriteLine("Running on Android: Line 32");
-                Console.WriteLine("guid: " + Preferences.Get("guid", null));
-                appleLogInButton.IsEnabled = false;
-            }
-
-
-            if (Device.RuntimePlatform == Device.iOS)
-            {
-                deviceId = Preferences.Get("guid", null);
-                if (deviceId != null) { Debug.WriteLine("This is the iOS GUID from Log in: " + deviceId); }
-            }
-            else
-            {
-                deviceId = Preferences.Get("guid", null);
-                if (deviceId != null) { Debug.WriteLine("This is the Android GUID from Log in " + deviceId); }
-            }
+            SetAppleContinueButtonBaseOnPlatform();
         }
 
         public LogInPage(double height, string direction)
         {
             InitializeComponent();
-            BackgroundColor = Color.FromHex("AB000000");
+            SetAppleContinueButtonBaseOnPlatform();
+
             logInFrame.Margin = new Thickness(0, height, 0, 0);
             this.direction = direction;
-            //realod = toload;
-
-            if (Device.RuntimePlatform == Device.Android)
-            {
-                System.Diagnostics.Debug.WriteLine("Running on Android: Line 32");
-                Console.WriteLine("guid: " + Preferences.Get("guid", null));
-                appleLogInButton.IsEnabled = false;
-            }
-
-
-            if (Device.RuntimePlatform == Device.iOS)
-            {
-                deviceId = Preferences.Get("guid", null);
-                if (deviceId != null) { Debug.WriteLine("This is the iOS GUID from Log in: " + deviceId); }
-            }
-            else
-            {
-                deviceId = Preferences.Get("guid", null);
-                if (deviceId != null) { Debug.WriteLine("This is the Android GUID from Log in " + deviceId); }
-            }
-            
         }
 
-
-        public async void MessageFromSelectionPage(string title, string message)
-        {
-            await DisplayAlert(title, message, "OK");
-        }
-
-
-        public async void AddMessage(string body)
-        {
-            await DisplayAlert("Aler!", body, "OK");
-        }
-
-        private async void DirectLogInClick(System.Object sender, System.EventArgs e)
+        async void DirectLogInClick(System.Object sender, System.EventArgs e)
         {
             try
             {
@@ -123,160 +67,174 @@ namespace ServingFresh.Views
                 }
                 else
                 {
-                    var accountSalt = await RetrieveAccountSalt(userEmailAddress.Text.ToLower().Trim());
+                    var signInClient = new SignIn();
+
+                    var accountSalt = await signInClient.RetrieveAccountSalt(userEmailAddress.Text.ToLower().Trim());
 
                     if (accountSalt != null)
                     {
-                        var loginAttempt = await LogInUser(userEmailAddress.Text.ToLower().Trim(), userPassword.Text, accountSalt);
-
-                        if (loginAttempt != null && loginAttempt.message != "Request failed, wrong password.")
+                        if(accountSalt.message != "USER NEEDS TO SIGN UP")
                         {
-                            var client = new HttpClient();
-                            var request = new RequestUserInfo();
-                            request.uid = loginAttempt.result[0].customer_uid;
+                            await DisplayAlert("Oops", accountSalt.message, "OK");
+                        }
+                        else if (accountSalt.message == "USER NEEDS TO SIGN UP")
+                        {
+                            await Application.Current.MainPage.Navigation.PopModalAsync();
+                            RedirectUserBasedOnVerification(accountSalt.message, direction);
+                        }
+                        else
+                        {
+                            var loginAttempt = await signInClient.LogInUser(userEmailAddress.Text.ToLower().Trim(), userPassword.Text, accountSalt);
 
-                            var requestSelializedObject = JsonConvert.SerializeObject(request);
-                            var requestContent = new StringContent(requestSelializedObject, Encoding.UTF8, "application/json");
-
-                            var clientRequest = await client.PostAsync(Constant.GetUserInfoUrl, requestContent);
-
-                            if (clientRequest.IsSuccessStatusCode)
+                            if (loginAttempt != null && loginAttempt.message != "Request failed, wrong password.")
                             {
-                                try
+                                var client = new HttpClient();
+                                var request = new RequestUserInfo();
+                                request.uid = loginAttempt.result[0].customer_uid;
+
+                                var requestSelializedObject = JsonConvert.SerializeObject(request);
+                                var requestContent = new StringContent(requestSelializedObject, Encoding.UTF8, "application/json");
+
+                                var clientRequest = await client.PostAsync(Constant.GetUserInfoUrl, requestContent);
+
+                                if (clientRequest.IsSuccessStatusCode)
                                 {
-                                    var SFUser = await clientRequest.Content.ReadAsStringAsync();
-                                    var userData = JsonConvert.DeserializeObject<UserInfo>(SFUser);
-
-                                    DateTime today = DateTime.Now;
-                                    DateTime expDate = today.AddDays(Constant.days);
-
-                                    user.setUserID(userData.result[0].customer_uid);
-                                    user.setUserSessionTime(expDate);
-                                    user.setUserPlatform("DIRECT");
-                                    user.setUserType("CUSTOMER");
-                                    user.setUserEmail(userData.result[0].customer_email);
-                                    user.setUserFirstName(userData.result[0].customer_first_name);
-                                    user.setUserLastName(userData.result[0].customer_last_name);
-                                    user.setUserPhoneNumber(userData.result[0].customer_phone_num);
-                                    user.setUserAddress(userData.result[0].customer_address);
-                                    user.setUserUnit(userData.result[0].customer_unit);
-                                    user.setUserCity(userData.result[0].customer_city);
-                                    user.setUserState(userData.result[0].customer_state);
-                                    user.setUserZipcode(userData.result[0].customer_zip);
-                                    user.setUserLatitude(userData.result[0].customer_lat);
-                                    user.setUserLongitude(userData.result[0].customer_long);
-
-                                    SaveUser(user);
-
-                                    if (Device.RuntimePlatform == Device.iOS)
+                                    try
                                     {
-                                        deviceId = Preferences.Get("guid", null);
-                                        if (deviceId != null) { Debug.WriteLine("This is the iOS GUID from Log in: " + deviceId); }
-                                    }
-                                    else
-                                    {
-                                        deviceId = Preferences.Get("guid", null);
-                                        if (deviceId != null) { Debug.WriteLine("This is the Android GUID from Log in " + deviceId); }
-                                    }
+                                        var SFUser = await clientRequest.Content.ReadAsStringAsync();
+                                        var userData = JsonConvert.DeserializeObject<UserInfo>(SFUser);
 
-                                    if (deviceId != null)
-                                    {
-                                        NotificationPost notificationPost = new NotificationPost();
+                                        DateTime today = DateTime.Now;
+                                        DateTime expDate = today.AddDays(Constant.days);
 
-                                        notificationPost.uid = user.getUserID();
-                                        notificationPost.guid = deviceId.Substring(5);
-                                        user.setUserDeviceID(deviceId.Substring(5));
-                                        notificationPost.notification = "TRUE";
+                                        user.setUserID(userData.result[0].customer_uid);
+                                        user.setUserSessionTime(expDate);
+                                        user.setUserPlatform("DIRECT");
+                                        user.setUserType("CUSTOMER");
+                                        user.setUserEmail(userData.result[0].customer_email);
+                                        user.setUserFirstName(userData.result[0].customer_first_name);
+                                        user.setUserLastName(userData.result[0].customer_last_name);
+                                        user.setUserPhoneNumber(userData.result[0].customer_phone_num);
+                                        user.setUserAddress(userData.result[0].customer_address);
+                                        user.setUserUnit(userData.result[0].customer_unit);
+                                        user.setUserCity(userData.result[0].customer_city);
+                                        user.setUserState(userData.result[0].customer_state);
+                                        user.setUserZipcode(userData.result[0].customer_zip);
+                                        user.setUserLatitude(userData.result[0].customer_lat);
+                                        user.setUserLongitude(userData.result[0].customer_long);
 
-                                        var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
-                                        Debug.WriteLine("Notification JSON Object to send: " + notificationSerializedObject);
+                                        SaveUser(user);
 
-                                        var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
-
-                                        var clientResponse = await client.PostAsync(Constant.NotificationsUrl, notificationContent);
-
-                                        Debug.WriteLine("Status code: " + clientResponse.IsSuccessStatusCode);
-
-                                        if (clientResponse.IsSuccessStatusCode)
+                                        if (Device.RuntimePlatform == Device.iOS)
                                         {
-                                            System.Diagnostics.Debug.WriteLine("We have post the guid to the database");
+                                            deviceId = Preferences.Get("guid", null);
+                                            if (deviceId != null) { Debug.WriteLine("This is the iOS GUID from Log in: " + deviceId); }
                                         }
                                         else
                                         {
-                                            if (messageList != null)
+                                            deviceId = Preferences.Get("guid", null);
+                                            if (deviceId != null) { Debug.WriteLine("This is the Android GUID from Log in " + deviceId); }
+                                        }
+
+                                        if (deviceId != null)
+                                        {
+                                            NotificationPost notificationPost = new NotificationPost();
+
+                                            notificationPost.uid = user.getUserID();
+                                            notificationPost.guid = deviceId.Substring(5);
+                                            user.setUserDeviceID(deviceId.Substring(5));
+                                            notificationPost.notification = "TRUE";
+
+                                            var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
+                                            Debug.WriteLine("Notification JSON Object to send: " + notificationSerializedObject);
+
+                                            var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
+
+                                            var clientResponse = await client.PostAsync(Constant.NotificationsUrl, notificationContent);
+
+                                            Debug.WriteLine("Status code: " + clientResponse.IsSuccessStatusCode);
+
+                                            if (clientResponse.IsSuccessStatusCode)
                                             {
-                                                if (messageList.ContainsKey("701-000033"))
+                                                System.Diagnostics.Debug.WriteLine("We have post the guid to the database");
+                                            }
+                                            else
+                                            {
+                                                if (messageList != null)
                                                 {
-                                                    await DisplayAlert(messageList["701-000033"].title, messageList["701-000033"].message, messageList["701-000033"].responses);
+                                                    if (messageList.ContainsKey("701-000033"))
+                                                    {
+                                                        await DisplayAlert(messageList["701-000033"].title, messageList["701-000033"].message, messageList["701-000033"].responses);
+                                                    }
+                                                    else
+                                                    {
+                                                        await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
+                                                    }
                                                 }
                                                 else
                                                 {
                                                     await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
                                                 }
+
                                             }
-                                            else
-                                            {
-                                                await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
-                                            }
-                                           
                                         }
-                                    }
-                                    if (direction == "")
-                                    {
-                                        Application.Current.MainPage = new SelectionPage();
-                                    }
-                                    else
-                                    {
-                                        await Application.Current.MainPage.Navigation.PopModalAsync();
-                                    }
+                                        if (direction == "")
+                                        {
+                                            Application.Current.MainPage = new SelectionPage();
+                                        }
+                                        else
+                                        {
+                                            await Application.Current.MainPage.Navigation.PopModalAsync();
+                                        }
 
-                                }
-                                catch (Exception ex)
-                                {
-
-                                    System.Diagnostics.Debug.WriteLine(ex.Message);
-                                }
-                            }
-                            else
-                            {
-                                if (messageList != null)
-                                {
-                                    if (messageList.ContainsKey("701-000034"))
+                                    }
+                                    catch (Exception ex)
                                     {
-                                        await DisplayAlert(messageList["701-000034"].title, messageList["701-000034"].message, messageList["701-000034"].responses);
+
+                                        System.Diagnostics.Debug.WriteLine(ex.Message);
+                                    }
+                                }
+                                else
+                                {
+                                    if (messageList != null)
+                                    {
+                                        if (messageList.ContainsKey("701-000034"))
+                                        {
+                                            await DisplayAlert(messageList["701-000034"].title, messageList["701-000034"].message, messageList["701-000034"].responses);
+                                        }
+                                        else
+                                        {
+                                            await DisplayAlert("Alert!", "Our internal system was not able to retrieve your user information. We are working to solve this issue.", "OK");
+                                        }
                                     }
                                     else
                                     {
                                         await DisplayAlert("Alert!", "Our internal system was not able to retrieve your user information. We are working to solve this issue.", "OK");
                                     }
-                                }
-                                else
-                                {
-                                    await DisplayAlert("Alert!", "Our internal system was not able to retrieve your user information. We are working to solve this issue.", "OK");
-                                }
-                                
-                            }
-                        }
-                        else
-                        {
 
-                            if (messageList != null)
+                                }
+                            }
+                            else
                             {
-                                if (messageList.ContainsKey("701-000035"))
+
+                                if (messageList != null)
                                 {
-                                    await DisplayAlert(messageList["701-000035"].title, messageList["701-000035"].message, messageList["701-000035"].responses);
+                                    if (messageList.ContainsKey("701-000035"))
+                                    {
+                                        await DisplayAlert(messageList["701-000035"].title, messageList["701-000035"].message, messageList["701-000035"].responses);
+                                    }
+                                    else
+                                    {
+                                        await DisplayAlert("Error", "Wrong password was entered", "OK");
+                                    }
                                 }
                                 else
                                 {
                                     await DisplayAlert("Error", "Wrong password was entered", "OK");
                                 }
+
+                                logInButton.IsEnabled = true;
                             }
-                            else
-                            {
-                                await DisplayAlert("Error", "Wrong password was entered", "OK");
-                            }
-                            
-                            logInButton.IsEnabled = true;
                         }
                     }
                     logInButton.IsEnabled = true;
@@ -285,6 +243,14 @@ namespace ServingFresh.Views
             {
                 var client = new Diagnostic();
                 client.parseException(errorDirectLogIn.ToString(), user);
+            }
+        }
+
+        void SetAppleContinueButtonBaseOnPlatform()
+        {
+            if (Device.RuntimePlatform == Device.Android)
+            {
+                appleLogInButton.IsVisible = false;
             }
         }
 
@@ -304,125 +270,8 @@ namespace ServingFresh.Views
             Application.Current.SavePropertiesAsync();
         }
 
-        private async Task<AccountSalt> RetrieveAccountSalt(string userEmail)
-        {
-            try
-            {
-                Debug.WriteLine(userEmail);
-
-                SaltPost saltPost = new SaltPost();
-                saltPost.email = userEmail;
-
-                var saltPostSerilizedObject = JsonConvert.SerializeObject(saltPost);
-                var saltPostContent = new StringContent(saltPostSerilizedObject, Encoding.UTF8, "application/json");
-
-                Debug.WriteLine(saltPostSerilizedObject);
-
-                var client = new HttpClient();
-                var DRSResponse = await client.PostAsync(Constant.AccountSaltUrl, saltPostContent);
-                var DRSMessage = await DRSResponse.Content.ReadAsStringAsync();
-                Debug.WriteLine(DRSMessage);
-
-                AccountSalt userInformation = null;
-
-                if (DRSResponse.IsSuccessStatusCode)
-                {
-                    var result = await DRSResponse.Content.ReadAsStringAsync();
-
-                    AcountSaltCredentials data = new AcountSaltCredentials();
-                    data = JsonConvert.DeserializeObject<AcountSaltCredentials>(result);
-
-                    if (DRSMessage.Contains(Constant.UseSocialMediaLogin))
-                    {
-                        createAccount = true;
-                        Debug.WriteLine(DRSMessage);
-                        await DisplayAlert("Oops!", data.message, "OK");
-                    }
-                    else if (DRSMessage.Contains(Constant.EmailNotFound))
-                    {
-
-                        if (messageList != null)
-                        {
-                            if (messageList.ContainsKey("701-000036"))
-                            {
-                                await DisplayAlert(messageList["701-000036"].title, messageList["701-000036"].message, messageList["701-000036"].responses);
-                            }
-                            else
-                            {
-                                await DisplayAlert("Oops!", "Our records show that you don't have an accout. Please sign up!", "OK");
-                            }
-                        }
-                        else
-                        {
-                            await DisplayAlert("Oops!", "Our records show that you don't have an accout. Please sign up!", "OK");
-                        }
-                        
-                    }
-                    else
-                    {
-                        userInformation = new AccountSalt
-                        {
-                            password_algorithm = data.result[0].password_algorithm,
-                            password_salt = data.result[0].password_salt
-                        };
-                    }
-                }
-
-                return userInformation;
-            }
-            catch (Exception errorRetrieveAccountSalt)
-            {
-                var client = new Diagnostic();
-                client.parseException(errorRetrieveAccountSalt.ToString(), user);
-                return null;
-            }
-        }
-
-        public async Task<LogInResponse> LogInUser(string userEmail, string userPassword, AccountSalt accountSalt)
-        {
-            try
-            {
-                SHA512 sHA512 = new SHA512Managed();
-                var client = new HttpClient();
-                byte[] data = sHA512.ComputeHash(Encoding.UTF8.GetBytes(userPassword + accountSalt.password_salt)); 
-                string hashedPassword = BitConverter.ToString(data).Replace("-", string.Empty).ToLower(); 
-
-                LogInPost loginPostContent = new LogInPost();
-                loginPostContent.email = userEmail;
-                loginPostContent.password = hashedPassword;
-                loginPostContent.social_id = "";
-                loginPostContent.signup_platform = "";
-
-                string loginPostContentJson = JsonConvert.SerializeObject(loginPostContent); 
-
-                var httpContent = new StringContent(loginPostContentJson, Encoding.UTF8, "application/json"); 
-                var response = await client.PostAsync(Constant.LogInUrl, httpContent); 
-                var message = await response.Content.ReadAsStringAsync();
-                Debug.WriteLine(message);
-
-                if (message.Contains(Constant.AutheticatedSuccesful))
-                {
-
-                    var responseContent = await response.Content.ReadAsStringAsync();
-                    var loginResponse = JsonConvert.DeserializeObject<LogInResponse>(responseContent);
-                    return loginResponse;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            catch (Exception errorLogInUser)
-            {
-                var client = new Diagnostic();
-                client.parseException(errorLogInUser.ToString(), user);
-                return null;
-            }
-        }
-
         public void FacebookLogInClick(System.Object sender, System.EventArgs e)
         {
-            Application.Current.MainPage.Navigation.PopModalAsync();
             string clientID = string.Empty;
             string redirectURL = string.Empty;
 
@@ -447,7 +296,7 @@ namespace ServingFresh.Views
             presenter.Login(authenticator);
         }
 
-        public async void FacebookAuthenticatorCompleted(object sender, AuthenticatorCompletedEventArgs e)
+        async void FacebookAuthenticatorCompleted(object sender, AuthenticatorCompletedEventArgs e)
         {
             var authenticator = sender as OAuth2Authenticator;
 
@@ -461,8 +310,6 @@ namespace ServingFresh.Views
             {
                 try
                 {
-                   // Application.Current.MainPage = new SelectionPage(e.Account.Properties["access_token"], "", null, null, "FACEBOOK");
-
                     var client = new SignIn();
                     UserDialogs.Instance.ShowLoading("Retrieving your SF account...");
                     var status = await client.VerifyUserCredentials(e.Account.Properties["access_token"], "", null, null, "FACEBOOK");
@@ -481,23 +328,25 @@ namespace ServingFresh.Views
             }
         }
 
-
-        public async void AppleLogIn(string accessToken = "", string refreshToken = "", AuthenticatorCompletedEventArgs googleAccount = null, AppleAccount appleCredentials = null, string platform = "")
+        private async void FacebookAutheticatorError(object sender, AuthenticatorErrorEventArgs e)
         {
-            var client = new SignIn();
-            UserDialogs.Instance.ShowLoading("Retrieving your SF account...");
-            var status = await client.VerifyUserCredentials(accessToken, refreshToken, googleAccount, appleCredentials, platform);
-            RedirectUserBasedOnVerification(status, direction);
+            var authenticator = sender as OAuth2Authenticator;
+            if (authenticator != null)
+            {
+                authenticator.Completed -= FacebookAuthenticatorCompleted;
+                authenticator.Error -= FacebookAutheticatorError;
+            }
+            Application.Current.MainPage = new LogInPage();
+            await DisplayAlert("Authentication error: ", e.Message, "OK");
         }
 
-        public async void RedirectUserBasedOnVerification(string status, string direction)
+        async void RedirectUserBasedOnVerification(string status, string direction)
         {
             try
             {
                 if (status == "LOGIN USER")
                 {
                     UserDialogs.Instance.HideLoading();
-                    //await Application.Current.MainPage.DisplayAlert("Great!", "You have successfully loged in!", "OK");
 
                     Debug.WriteLine("DIRECTION VALUE: " + direction);
                     if (direction == "")
@@ -507,6 +356,7 @@ namespace ServingFresh.Views
                     else
                     {
                         Dictionary<string, Page> array = new Dictionary<string, Page>();
+
                         array.Add("ServingFresh.Views.CheckoutPage", new CheckoutPage());
                         array.Add("ServingFresh.Views.SelectionPage", new SelectionPage());
                         array.Add("ServingFresh.Views.HistoryPage", new HistoryPage());
@@ -516,7 +366,6 @@ namespace ServingFresh.Views
                         array.Add("ServingFresh.Views.InfoPage", new InfoPage());
 
                         var root = Application.Current.MainPage;
-                        Debug.WriteLine("ROOT VALUE: " + root);
                         Application.Current.MainPage = array[root.ToString()];
                     }
 
@@ -647,22 +496,8 @@ namespace ServingFresh.Views
             }
         }
 
-
-        private async void FacebookAutheticatorError(object sender, AuthenticatorErrorEventArgs e)
-        {
-            var authenticator = sender as OAuth2Authenticator;
-            if (authenticator != null)
-            {
-                authenticator.Completed -= FacebookAuthenticatorCompleted;
-                authenticator.Error -= FacebookAutheticatorError;
-            }
-            Application.Current.MainPage = new LogInPage();
-            await DisplayAlert("Authentication error: ", e.Message, "OK");
-        }
-
         public void GoogleLogInClick(System.Object sender, System.EventArgs e)
         {
-            Application.Current.MainPage.Navigation.PopModalAsync();
             string clientId = string.Empty;
             string redirectUri = string.Empty;
 
@@ -689,7 +524,8 @@ namespace ServingFresh.Views
             presenter.Login(authenticator);
             
         }
-        private async void GoogleAuthenticatorCompleted(object sender, AuthenticatorCompletedEventArgs e)
+
+        async void GoogleAuthenticatorCompleted(object sender, AuthenticatorCompletedEventArgs e)
         {
             
             var authenticator = sender as OAuth2Authenticator;
@@ -723,8 +559,7 @@ namespace ServingFresh.Views
             }
         }
 
-
-        private async void GoogleAuthenticatorError(object sender, AuthenticatorErrorEventArgs e)
+        async void GoogleAuthenticatorError(object sender, AuthenticatorErrorEventArgs e)
         {
             var authenticator = sender as OAuth2Authenticator;
 
@@ -743,33 +578,13 @@ namespace ServingFresh.Views
             {
                 OnAppleSignInRequest();
             }
-        }
-
-        public void InvokeSignInEvent(object sender, EventArgs e)
-            => SignIn?.Invoke(sender, e);
-
-        private async void AppleError(object sender, EventArgs e)
-        {
-            if (messageList != null)
-            {
-                if (messageList.ContainsKey("701-000041"))
-                {
-                    await DisplayAlert(messageList["701-000041"].title, messageList["701-000041"].message, messageList["701-000041"].responses);
-                }
-                else
-                {
-                    await DisplayAlert("Error", "We weren't able to set an account for you", "OK");
-                }
-            }
             else
             {
-                await DisplayAlert("Error", "We weren't able to set an account for you", "OK");
+                appleLogInButton.IsVisible = false;
             }
-            
         }
 
-
-        public async void OnAppleSignInRequest()
+        async void OnAppleSignInRequest()
         {
             try
             {
@@ -808,10 +623,8 @@ namespace ServingFresh.Views
                         UserDialogs.Instance.ShowLoading("Retrieving your SF account...");
                         var status = await client.VerifyUserCredentials("", "", null, account, "APPLE");
                         RedirectUserBasedOnVerification(status, direction);
-
                     }
                 }
-
             }
             catch (Exception errorAppleSignInRequest)
             {
