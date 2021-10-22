@@ -47,6 +47,22 @@ namespace ServingFresh.Views
             this.direction = direction;
         }
 
+        public LogInPage(string platform)
+        {
+            if(platform == Constant.Facebook)
+            {
+                FacebookLogInClick(new System.Object(), new EventArgs());
+            }
+            else if (platform == Constant.Google)
+            {
+                GoogleLogInClick(new System.Object(), new EventArgs());
+            }
+            else if (platform == Constant.Apple)
+            {
+                AppleLogInClick(new System.Object(), new EventArgs());
+            }
+        }
+
         void SetAppleContinueButtonBaseOnPlatform()
         {
             if (Device.RuntimePlatform == Device.Android)
@@ -93,13 +109,12 @@ namespace ServingFresh.Views
 
                     if (accountSalt != null)
                     {
-                        if (accountSalt.password_algorithm == null && accountSalt.password_salt == null && accountSalt.message == "")
+                        if (accountSalt.password_algorithm == null && accountSalt.password_salt == null && accountSalt.message != "USER NEEDS TO SIGN UP")
                         {
                             await DisplayAlert("Oops", accountSalt.message, "OK");
                         }
                         else if (accountSalt.password_algorithm == null && accountSalt.password_salt == null && accountSalt.message == "USER NEEDS TO SIGN UP")
                         {
-                            await Application.Current.MainPage.Navigation.PopModalAsync();
                             RedirectUserBasedOnVerification(accountSalt.message, direction);
                         }
                         else if (accountSalt.password_algorithm != null && accountSalt.password_salt != null && accountSalt.message == null)
@@ -291,12 +306,12 @@ namespace ServingFresh.Views
                         }
 
                         account.Email = email;
-
-                        var client = new SignIn();
-                        UserDialogs.Instance.ShowLoading("Retrieving your SF account...");
-                        var status = await client.VerifyUserCredentials("", "", null, account, "APPLE");
-                        RedirectUserBasedOnVerification(status, direction);
                     }
+
+                    var client = new SignIn();
+                    UserDialogs.Instance.ShowLoading("Retrieving your SF account...");
+                    var status = await client.VerifyUserCredentials("", "", null, account, "APPLE");
+                    RedirectUserBasedOnVerification(status, direction);
                 }
             }
             catch (Exception errorAppleSignInRequest)
@@ -392,7 +407,7 @@ namespace ServingFresh.Views
                     {
                         await Application.Current.MainPage.DisplayAlert("Oops", "It looks like you don't have an account with Serving Fresh. Please sign up!", "OK");
                     }
-
+                    await Navigation.PopModalAsync(false);
                     await Application.Current.MainPage.Navigation.PushModalAsync(new AddressPage(), true);
                 }
                 else if (status == "WRONG DIRECT PASSWORD")
