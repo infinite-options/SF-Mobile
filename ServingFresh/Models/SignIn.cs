@@ -19,7 +19,7 @@ namespace ServingFresh.Models
 
     public class SignIn
     {
-        public class UserTypeEvaluation { public string role { get; set; } public bool statusCode { get; set; }}
+        public class UserTypeEvaluation { public string role { get; set; } public bool statusCode { get; set; } public UserTypeEvaluation() { role = "CUSTOMER"; statusCode = false; } }
         private string deviceId = "";
         private string accessToken;
         private string refreshToken;
@@ -61,17 +61,17 @@ namespace ServingFresh.Models
                     {
                         userInformation = new AccountSalt
                         {
-                            password_algorithm = "",
-                            password_salt = "",
-                            message = data.message
+                            password_algorithm = null,
+                            password_salt = null,
+                            message = data.message == null ? "" : data.message
                         };
                     }
                     else if (DRSMessage.Contains(Constant.EmailNotFound))
                     {
                         userInformation = new AccountSalt
                         {
-                            password_algorithm = "",
-                            password_salt = "",
+                            password_algorithm = null,
+                            password_salt = null,
                             message = "USER NEEDS TO SIGN UP"
                         };
                     }
@@ -81,7 +81,7 @@ namespace ServingFresh.Models
                         {
                             password_algorithm = data.result[0].password_algorithm,
                             password_salt = data.result[0].password_salt,
-                            message = ""
+                            message = null
                         };
                     }
                 }
@@ -133,12 +133,12 @@ namespace ServingFresh.Models
                         DateTime today = DateTime.Now;
                         DateTime expDate = today.AddDays(Constant.days);
 
-                        var role = await EvaluateUserType(authetication.result[0].role, userPassword);
+                        var status1 = await EvaluateUserType(authetication.result[0].role, userPassword);
 
-                        user.setUserType(role);
+                        user.setUserType(status1.role);
                         user.setUserID(authetication.result[0].customer_uid);
                         user.setUserSessionTime(expDate);
-                        user.setUserPlatform(platform);
+                        user.setUserPlatform("DIRECT");
                         user.setUserEmail(authetication.result[0].customer_email);
                         user.setUserFirstName(authetication.result[0].customer_first_name);
                         user.setUserLastName(authetication.result[0].customer_last_name);
@@ -151,7 +151,10 @@ namespace ServingFresh.Models
                         user.setUserLatitude(authetication.result[0].customer_lat);
                         user.setUserLongitude(authetication.result[0].customer_long);
 
-                        SetUserRemoteNotification();
+                        var status2 = await SetUserRemoteNotification();
+
+                        isUserVerified = EvaluteUserUpdates(status1.statusCode, status2);
+
                         SaveUser(user);
                     }
                     else if (authetication.code.ToString() == Constant.ErrorPlatform)
@@ -178,15 +181,85 @@ namespace ServingFresh.Models
             return isUserVerified;
         }
 
-        async Task<string> EvaluateUserType(string role, string password)
+        // update role, set notifications
+
+        string EvaluteUserUpdates(bool status1, bool status2)
         {
-            string userType = "CUSTOMER";
+            string result = "SUCCESSFUL:0";
+
+            if(status1 && status2) // 11
+            {
+                result = "SUCCESSFUL:0";
+            }
+            else if (status1 == true && status2 == false) // 10
+            {
+                result = "SUCCESSFUL:1";
+            }
+            else if (status1 == false && status2 == true) // 01
+            {
+                result = "SUCCESSFUL:2";
+            }
+            else if (status1 == false && status2 == false) // 00
+            {
+                result = "SUCCESSFUL:3";
+            }
+
+            return result;
+        }
+
+
+        // update role, set notification, update tokens
+
+        string EvaluteUserUpdates(bool status1, bool status2, bool status3)
+        {
+            string result = "SUCCESSFUL:0";
+
+            if (status1 && status2 && status3) // 111
+            {
+                result = "SUCCESSFUL:0";
+            }
+            else if (status1 == true && status2 == true && status3 == false) // 110
+            {
+                result = "SUCCESSFUL:5";
+            }
+            else if (status1 == true && status2 == false && status3 == true) // 101
+            {
+                result = "SUCCESSFUL:6";
+            }
+            else if (status1 == true && status2 == false && status3 == false) // 100
+            {
+                result = "SUCCESSFUL:7";
+            }
+            else if (status1 == true && status2 == false && status3 == false) // 011
+            {
+                result = "SUCCESSFUL:8";
+            }
+            else if (status1 == true && status2 == false && status3 == false) // 010
+            {
+                result = "SUCCESSFUL:9";
+            }
+            else if (status1 == true && status2 == false && status3 == false) // 001
+            {
+                result = "SUCCESSFUL:10";
+            }
+            else if (status1 == true && status2 == false && status3 == false) // 000
+            {
+                result = "SUCCESSFUL:11";
+            }
+
+            return result;
+        }
+
+        async Task<UserTypeEvaluation> EvaluateUserType(string role, string password)
+        {
+            UserTypeEvaluation userType = new UserTypeEvaluation();
 
             try
             {
                 if (role == "CUSTOMER" || role == "ADMIN")
                 {
-                    userType = "CUSTOMER";
+                    userType.role = "CUSTOMER";
+                    userType.statusCode = true;
                 }
                 else if (role == "GUEST")
                 {
@@ -194,11 +267,13 @@ namespace ServingFresh.Models
 
                     if (didProfileUpdatedSucessfully)
                     {
-                        userType = "CUSTOMER";
+                        userType.role = "CUSTOMER";
+                        userType.statusCode = true;
                     }
                     else
                     {
-                        userType = "GUEST";
+                        userType.role = "GUEST";
+                        userType.statusCode = false;
                     }
                 }
             }
@@ -211,15 +286,16 @@ namespace ServingFresh.Models
            
         }
 
-        async Task<string> EvaluateUserType(string role, string mobile_access_token, string mobile_refresh_token, string social_id, string platform)
+        async Task<UserTypeEvaluation> EvaluateUserType(string role, string mobile_access_token, string mobile_refresh_token, string social_id, string platform)
         {
-            string userType = "CUSTOMER";
+            UserTypeEvaluation userType = new UserTypeEvaluation();
 
             try
             {
                 if (role == "CUSTOMER" || role == "ADMIN")
                 {
-                    userType = "CUSTOMER";
+                    userType.role = "CUSTOMER";
+                    userType.statusCode = true;
                 }
                 else if (role == "GUEST")
                 {
@@ -227,11 +303,13 @@ namespace ServingFresh.Models
 
                     if (didProfileUpdatedSucessfully)
                     {
-                        userType = "CUSTOMER";
+                        userType.role = "CUSTOMER";
+                        userType.statusCode = true;
                     }
                     else
                     {
-                        userType = "GUEST";
+                        userType.role = "GUEST";
+                        userType.statusCode = false;
                     }
                 }
             }
@@ -281,33 +359,45 @@ namespace ServingFresh.Models
 
         }
 
-        async void SetUserRemoteNotification()
+        async Task<bool> SetUserRemoteNotification()
         {
-            deviceId = Preferences.Get("guid", null);
+            bool result = false;
 
-            if (deviceId != null)
+            try
             {
-                var client = new HttpClient();
-                NotificationPost notificationPost = new NotificationPost();
+                deviceId = Preferences.Get("guid", null);
 
-                notificationPost.uid = user.getUserID();
-                notificationPost.guid = deviceId.Substring(5);
-                user.setUserDeviceID(deviceId.Substring(5));
-                notificationPost.notification = "TRUE";
-
-                var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
-                var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
-                var clientResponse = await client.PostAsync(Constant.NotificationsUrl, notificationContent);
-
-                if (clientResponse.IsSuccessStatusCode)
+                if (deviceId != null)
                 {
-                    Debug.WriteLine("GUID WAS WRITTEN SUCCESFULLY WERE SET SUCESSFULLY");
-                }
-                else
-                {
-                    Debug.WriteLine("ERROR SETTING NOTIFICATIONS");
+                    var client = new HttpClient();
+                    NotificationPost notificationPost = new NotificationPost();
+
+                    notificationPost.uid = user.getUserID();
+                    notificationPost.guid = deviceId.Substring(5);
+                    user.setUserDeviceID(deviceId.Substring(5));
+                    notificationPost.notification = "TRUE";
+
+                    var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
+                    var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
+                    var clientResponse = await client.PostAsync(Constant.NotificationsUrl, notificationContent);
+
+                    if (clientResponse.IsSuccessStatusCode)
+                    {
+                        result = true;
+                        Debug.WriteLine("GUID WAS WRITTEN SUCCESFULLY WERE SET SUCESSFULLY");
+                    }
+                    else
+                    {
+                        Debug.WriteLine("ERROR SETTING GUID FOR NOTIFICATIONS");
+                    }
                 }
             }
+            catch
+            {
+
+            }
+
+            return result;
         }
 
         public async Task<string> VerifyUserCredentials(string accessToken = "", string refreshToken = "", AuthenticatorCompletedEventArgs googleAccount = null, AppleAccount appleCredentials = null, string platform = "")
@@ -385,14 +475,14 @@ namespace ServingFresh.Models
                         {
                             try
                             {
-                                isUserVerified = "LOGIN USER";
+                               
 
                                 DateTime today = DateTime.Now;
                                 DateTime expDate = today.AddDays(Constant.days);
 
-                                var role = await EvaluateUserType(authetication.result[0].role, accessToken, refreshToken, socialLogInPost.social_id, platform);
+                                var status1 = await EvaluateUserType(authetication.result[0].role, accessToken, refreshToken, socialLogInPost.social_id, platform);
 
-                                user.setUserType(role);
+                                user.setUserType(status1.role);
                                 user.setUserID(authetication.result[0].customer_uid);
                                 user.setUserSessionTime(expDate);
                                 user.setUserPlatform(platform);
@@ -408,8 +498,12 @@ namespace ServingFresh.Models
                                 user.setUserLatitude(authetication.result[0].customer_lat);
                                 user.setUserLongitude(authetication.result[0].customer_long);
 
-                                SetUserRemoteNotification();
-                                UpdateAccessRefreshToken(user.getUserID(), accessToken, refreshToken);
+                                var status2 = await SetUserRemoteNotification();
+                                var status3 = await UpdateAccessRefreshToken(user.getUserID(), accessToken, refreshToken);
+
+                                //  isUserVerified = "LOGIN USER";
+
+                                isUserVerified = EvaluteUserUpdates(status1.statusCode, status2, status3);
 
                                 SaveUser(user);
                             }
@@ -442,24 +536,40 @@ namespace ServingFresh.Models
             return isUserVerified;
         }
 
-        async void UpdateAccessRefreshToken(string id, string accessToken, string refreshToken)
+        async Task<bool> UpdateAccessRefreshToken(string id, string accessToken, string refreshToken)
         {
-            var client = new HttpClient();
+            bool result = false;
 
-            UpdateTokensPost updateTokesPost = new UpdateTokensPost();
-
-            updateTokesPost.uid = id;
-            updateTokesPost.mobile_access_token = accessToken;
-            updateTokesPost.mobile_refresh_token = refreshToken;
-
-            var updateTokesPostSerializedObject = JsonConvert.SerializeObject(updateTokesPost);
-            var updateTokesContent = new StringContent(updateTokesPostSerializedObject, Encoding.UTF8, "application/json");
-            var updateTokesResponse = await client.PostAsync(Constant.UpdateTokensUrl, updateTokesContent);
-
-            if (!updateTokesResponse.IsSuccessStatusCode)
+            try
             {
-                Debug.WriteLine("ERROR UPDATING ACCESS AND REFRESH TOKENS");
+                var client = new HttpClient();
+
+                UpdateTokensPost updateTokesPost = new UpdateTokensPost();
+
+                updateTokesPost.uid = id;
+                updateTokesPost.mobile_access_token = accessToken;
+                updateTokesPost.mobile_refresh_token = refreshToken;
+
+                var updateTokesPostSerializedObject = JsonConvert.SerializeObject(updateTokesPost);
+                var updateTokesContent = new StringContent(updateTokesPostSerializedObject, Encoding.UTF8, "application/json");
+                var updateTokesResponse = await client.PostAsync(Constant.UpdateTokensUrl, updateTokesContent);
+
+                if (updateTokesResponse.IsSuccessStatusCode)
+                {
+                    result = true;
+                    Debug.WriteLine("UPDATING ACCESS AND REFRESH TOKENS WAS SUCESSFULLY");
+                }
+                else
+                {
+                    Debug.WriteLine("ERROR UPDATING ACCESS AND REFRESH TOKENS");
+                }
             }
+            catch
+            {
+
+            }
+
+            return result;
         }
 
         void SaveUser(Models.User user)

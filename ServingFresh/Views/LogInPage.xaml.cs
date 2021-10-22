@@ -42,9 +42,11 @@ namespace ServingFresh.Views
 
         async void DirectLogInClick(System.Object sender, System.EventArgs e)
         {
+            logInButton.IsEnabled = false;
+
             try
             {
-                logInButton.IsEnabled = false;
+
                 if (String.IsNullOrEmpty(userEmailAddress.Text) || String.IsNullOrEmpty(userPassword.Text))
                 {
                     if (messageList != null)
@@ -62,8 +64,6 @@ namespace ServingFresh.Views
                     {
                         await DisplayAlert("Error", "Please fill in all fields", "OK");
                     }
-                   
-                    logInButton.IsEnabled = true;
                 }
                 else
                 {
@@ -73,177 +73,48 @@ namespace ServingFresh.Views
 
                     if (accountSalt != null)
                     {
-                        if(accountSalt.message != "USER NEEDS TO SIGN UP")
+                        if (accountSalt.password_algorithm == null && accountSalt.password_salt == null && accountSalt.message == "")
                         {
                             await DisplayAlert("Oops", accountSalt.message, "OK");
                         }
-                        else if (accountSalt.message == "USER NEEDS TO SIGN UP")
+                        else if (accountSalt.password_algorithm == null && accountSalt.password_salt == null && accountSalt.message == "USER NEEDS TO SIGN UP")
                         {
                             await Application.Current.MainPage.Navigation.PopModalAsync();
                             RedirectUserBasedOnVerification(accountSalt.message, direction);
                         }
-                        else
+                        else if (accountSalt.password_algorithm != null && accountSalt.password_salt != null && accountSalt.message == null)
                         {
-                            var loginAttempt = await signInClient.LogInUser(userEmailAddress.Text.ToLower().Trim(), userPassword.Text, accountSalt);
+                            var status = await signInClient.VerifyUserCredentials(userEmailAddress.Text.ToLower().Trim(), userPassword.Text, accountSalt);
 
-                            if (loginAttempt != null && loginAttempt.message != "Request failed, wrong password.")
+                            RedirectUserBasedOnVerification(status, direction);
+                        }
+                    }
+                    else
+                    {
+                        if (messageList != null)
+                        {
+                            if (messageList.ContainsKey("701-000034"))
                             {
-                                var client = new HttpClient();
-                                var request = new RequestUserInfo();
-                                request.uid = loginAttempt.result[0].customer_uid;
-
-                                var requestSelializedObject = JsonConvert.SerializeObject(request);
-                                var requestContent = new StringContent(requestSelializedObject, Encoding.UTF8, "application/json");
-
-                                var clientRequest = await client.PostAsync(Constant.GetUserInfoUrl, requestContent);
-
-                                if (clientRequest.IsSuccessStatusCode)
-                                {
-                                    try
-                                    {
-                                        var SFUser = await clientRequest.Content.ReadAsStringAsync();
-                                        var userData = JsonConvert.DeserializeObject<UserInfo>(SFUser);
-
-                                        DateTime today = DateTime.Now;
-                                        DateTime expDate = today.AddDays(Constant.days);
-
-                                        user.setUserID(userData.result[0].customer_uid);
-                                        user.setUserSessionTime(expDate);
-                                        user.setUserPlatform("DIRECT");
-                                        user.setUserType("CUSTOMER");
-                                        user.setUserEmail(userData.result[0].customer_email);
-                                        user.setUserFirstName(userData.result[0].customer_first_name);
-                                        user.setUserLastName(userData.result[0].customer_last_name);
-                                        user.setUserPhoneNumber(userData.result[0].customer_phone_num);
-                                        user.setUserAddress(userData.result[0].customer_address);
-                                        user.setUserUnit(userData.result[0].customer_unit);
-                                        user.setUserCity(userData.result[0].customer_city);
-                                        user.setUserState(userData.result[0].customer_state);
-                                        user.setUserZipcode(userData.result[0].customer_zip);
-                                        user.setUserLatitude(userData.result[0].customer_lat);
-                                        user.setUserLongitude(userData.result[0].customer_long);
-
-                                        SaveUser(user);
-
-                                        if (Device.RuntimePlatform == Device.iOS)
-                                        {
-                                            deviceId = Preferences.Get("guid", null);
-                                            if (deviceId != null) { Debug.WriteLine("This is the iOS GUID from Log in: " + deviceId); }
-                                        }
-                                        else
-                                        {
-                                            deviceId = Preferences.Get("guid", null);
-                                            if (deviceId != null) { Debug.WriteLine("This is the Android GUID from Log in " + deviceId); }
-                                        }
-
-                                        if (deviceId != null)
-                                        {
-                                            NotificationPost notificationPost = new NotificationPost();
-
-                                            notificationPost.uid = user.getUserID();
-                                            notificationPost.guid = deviceId.Substring(5);
-                                            user.setUserDeviceID(deviceId.Substring(5));
-                                            notificationPost.notification = "TRUE";
-
-                                            var notificationSerializedObject = JsonConvert.SerializeObject(notificationPost);
-                                            Debug.WriteLine("Notification JSON Object to send: " + notificationSerializedObject);
-
-                                            var notificationContent = new StringContent(notificationSerializedObject, Encoding.UTF8, "application/json");
-
-                                            var clientResponse = await client.PostAsync(Constant.NotificationsUrl, notificationContent);
-
-                                            Debug.WriteLine("Status code: " + clientResponse.IsSuccessStatusCode);
-
-                                            if (clientResponse.IsSuccessStatusCode)
-                                            {
-                                                System.Diagnostics.Debug.WriteLine("We have post the guid to the database");
-                                            }
-                                            else
-                                            {
-                                                if (messageList != null)
-                                                {
-                                                    if (messageList.ContainsKey("701-000033"))
-                                                    {
-                                                        await DisplayAlert(messageList["701-000033"].title, messageList["701-000033"].message, messageList["701-000033"].responses);
-                                                    }
-                                                    else
-                                                    {
-                                                        await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    await DisplayAlert("Ooops!", "Something went wrong. We are not able to send you notification at this moment", "OK");
-                                                }
-
-                                            }
-                                        }
-                                        if (direction == "")
-                                        {
-                                            Application.Current.MainPage = new SelectionPage();
-                                        }
-                                        else
-                                        {
-                                            await Application.Current.MainPage.Navigation.PopModalAsync();
-                                        }
-
-                                    }
-                                    catch (Exception ex)
-                                    {
-
-                                        System.Diagnostics.Debug.WriteLine(ex.Message);
-                                    }
-                                }
-                                else
-                                {
-                                    if (messageList != null)
-                                    {
-                                        if (messageList.ContainsKey("701-000034"))
-                                        {
-                                            await DisplayAlert(messageList["701-000034"].title, messageList["701-000034"].message, messageList["701-000034"].responses);
-                                        }
-                                        else
-                                        {
-                                            await DisplayAlert("Alert!", "Our internal system was not able to retrieve your user information. We are working to solve this issue.", "OK");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        await DisplayAlert("Alert!", "Our internal system was not able to retrieve your user information. We are working to solve this issue.", "OK");
-                                    }
-
-                                }
+                                await DisplayAlert(messageList["701-000034"].title, messageList["701-000034"].message, messageList["701-000034"].responses);
                             }
                             else
                             {
-
-                                if (messageList != null)
-                                {
-                                    if (messageList.ContainsKey("701-000035"))
-                                    {
-                                        await DisplayAlert(messageList["701-000035"].title, messageList["701-000035"].message, messageList["701-000035"].responses);
-                                    }
-                                    else
-                                    {
-                                        await DisplayAlert("Error", "Wrong password was entered", "OK");
-                                    }
-                                }
-                                else
-                                {
-                                    await DisplayAlert("Error", "Wrong password was entered", "OK");
-                                }
-
-                                logInButton.IsEnabled = true;
+                                await DisplayAlert("Alert!", "Our internal system was not able to retrieve your user information. We are working to solve this issue.", "OK");
                             }
                         }
+                        else
+                        {
+                            await DisplayAlert("Alert!", "Our internal system was not able to retrieve your user information. We are working to solve this issue.", "OK");
+                        }
                     }
-                    logInButton.IsEnabled = true;
                 }
             }catch(Exception errorDirectLogIn)
             {
                 var client = new Diagnostic();
                 client.parseException(errorDirectLogIn.ToString(), user);
             }
+
+            logInButton.IsEnabled = true;
         }
 
         void SetAppleContinueButtonBaseOnPlatform()
@@ -252,22 +123,6 @@ namespace ServingFresh.Views
             {
                 appleLogInButton.IsVisible = false;
             }
-        }
-
-        void SaveUser(Models.User user)
-        {
-            string account = JsonConvert.SerializeObject(user);
-
-            if (Application.Current.Properties.Keys.Contains(Constant.Autheticatior))
-            {
-                Application.Current.Properties[Constant.Autheticatior] = account;
-            }
-            else
-            {
-                Application.Current.Properties.Add(Constant.Autheticatior, account);
-            }
-
-            Application.Current.SavePropertiesAsync();
         }
 
         public void FacebookLogInClick(System.Object sender, System.EventArgs e)
@@ -321,11 +176,6 @@ namespace ServingFresh.Views
                     client.parseException(errorFacebookAuthenticatorCompleted.ToString(), user);
                 }
             }
-            else
-            {
-               // Application.Current.MainPage = new LogInPage();
-               //await DisplayAlert("Error", "Facebook was not able to autheticate your account", "OK");
-            }
         }
 
         private async void FacebookAutheticatorError(object sender, AuthenticatorErrorEventArgs e)
@@ -344,7 +194,7 @@ namespace ServingFresh.Views
         {
             try
             {
-                if (status == "LOGIN USER")
+                if (status.Contains("SUCCESSFUL:"))
                 {
                     UserDialogs.Instance.HideLoading();
 
