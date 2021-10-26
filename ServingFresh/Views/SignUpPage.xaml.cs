@@ -678,7 +678,8 @@ namespace ServingFresh.Views
         {
             Application.Current.MainPage.Navigation.PopModalAsync();
         }
-        public event EventHandler SignIn;
+
+
         void appleLogInButton_Clicked(System.Object sender, System.EventArgs e)
         {
             if (Device.RuntimePlatform == Device.iOS)
@@ -687,12 +688,9 @@ namespace ServingFresh.Views
             }
             else
             {
-                // hide apple button?
+                appleLogInButton.IsVisible = false;
             }
         }
-
-        public void InvokeSignInEvent(object sender, EventArgs e)
-           => SignIn?.Invoke(sender, e);
 
         public async void OnAppleSignInRequest()
         {
@@ -759,39 +757,10 @@ namespace ServingFresh.Views
                     {
                         SignUpAlert();
                     }
-
-                    //var client = new HttpClient();
-                    //var getAppleEmail = new AppleEmail();
-                    //getAppleEmail.social_id = account.UserId;
-
-                    //var socialLogInPostSerialized = JsonConvert.SerializeObject(getAppleEmail);
-
-                    //System.Diagnostics.Debug.WriteLine(socialLogInPostSerialized);
-
-                    //var postContent = new StringContent(socialLogInPostSerialized, Encoding.UTF8, "application/json");
-                    //var RDSResponse = await client.PostAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/AppleEmail", postContent);
-                    //var responseContent = await RDSResponse.Content.ReadAsStringAsync();
-
-                    //System.Diagnostics.Debug.WriteLine(responseContent);
-                    //if (RDSResponse.IsSuccessStatusCode)
-                    //{
-                    //    var data = JsonConvert.DeserializeObject<AppleUser>(responseContent);
-                    //    Application.Current.Properties[account.UserId.ToString()] = data.result[0].customer_email;
-                    //    account.Email = (string)Application.Current.Properties[account.UserId.ToString()];
-                    //    var root = (LogInPage)Application.Current.MainPage;
-                    //    root.AppleLogIn("", "", null, account, "APPLE");
-                    //    //Application.Current.MainPage = new SelectionPage("", "", null, account, "APPLE");
-                    //    //AppleUserProfileAsync(account.UserId, account.Token, (string)Application.Current.Properties[account.UserId.ToString()], account.Name);
-                    //}
-                    //else
-                    //{
-                    //    await Application.Current.MainPage.DisplayAlert("Ooops", "Our system is not working. We can't process your request at this moment", "OK");
-                    //}
-
                 }
                 else
                 {
-                    //AppleError?.Invoke(this, default(EventArgs));
+                   
                 }
             }
             catch (Exception errorAppleSignInRequest)
@@ -800,17 +769,5 @@ namespace ServingFresh.Views
                 client.parseException(errorAppleSignInRequest.ToString(), user);
             }
         }
-
-        public void AppleLogInClick(System.Object sender, System.EventArgs e)
-        {
-            //SignIn?.Invoke(sender, e);
-            //var c = (ImageButton)sender;
-            //c.Command?.Execute(c.CommandParameter);
-        }
-
-        //public void InvokeSignInEvent(object sender, EventArgs e)
-        //    => SignIn?.Invoke(sender, e);
-
-
     }
 }

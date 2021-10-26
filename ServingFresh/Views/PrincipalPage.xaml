@@ -32,7 +32,16 @@
                                     VerticalTextAlignment="Center"
                                     Grid.Column="0"
                                     LineHeight="0.8"
-                                    Text="Fresh, Organic Produce Delivered" TextColor="White" FontAttributes="Bold" FontSize="39" ></Label>
+                                    Text="Fresh&#10;Organic&#10;Produce&#10;Delivered"  TextColor="White" FontAttributes="Bold">
+                                    <Label.FontSize>
+                                         <OnPlatform x:TypeArguments="x:Double">
+                                            <OnPlatform.Platforms>
+                                                <On Platform="iOS" Value="39" />
+                                                <On Platform="Android" Value="30" />
+                                            </OnPlatform.Platforms>
+                                        </OnPlatform>
+                                    </Label.FontSize>
+                                </Label>
                                 <StackLayout Grid.Column="1" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
                                     <Frame HeightRequest="130" WidthRequest="130" HasShadow="False" CornerRadius="20" Padding="5">
                                         <Image Source="servingFreshIcon.png"></Image>
@@ -64,8 +73,6 @@
                                         </Frame>
                                     </Grid>
                                 </Frame>
-                                <!--<Label Text="OR" TextColor="White"  FontSize="Medium" HorizontalTextAlignment="Center" FontAttributes="Bold" ></Label>
-                                <Entry Margin="70,0,70,0" x:Name="zipcodeEntry" Placeholder="Enter Zip Code" FontSize="14" PlaceholderColor="Gray"  HorizontalTextAlignment="Center"></Entry>-->
                                 <Button WidthRequest="287" HorizontalOptions="Center"  Font="14" TextColor="white" Text="Find Local Produce"  BackgroundColor="#136D74" Clicked="FindLocalProduceBaseOnLocation"></Button>
                                 <Frame Margin="0,-68,0,0" Padding="2" HorizontalOptions="CenterAndExpand" BackgroundColor="#E0EBEC" CornerRadius="0" x:Name="addressFrame" IsVisible="false">
                                     <ListView x:Name="addressList" IsVisible="false" HasUnevenRows="True" SeparatorVisibility="None" RowHeight="40" BackgroundColor="#E0EBEC" HorizontalOptions="CenterAndExpand" WidthRequest="280" HeightRequest="60" ItemSelected="addressSelected">
@@ -171,7 +178,6 @@
                               </StackLayout>
                           </StackLayout>
                     </StackLayout>
-
                 </Grid>
             </StackLayout>
         </ScrollView>

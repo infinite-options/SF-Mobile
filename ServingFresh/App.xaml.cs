@@ -15,17 +15,22 @@ namespace ServingFresh
 {
     public partial class App : Application
     {
+        //
+
         public const string LoggedInKey = "LoggedIn";
         public const string AppleUserIdKey = "AppleUserIdKey";
         string userId;
         public static Dictionary<string, MessageResult> messageList = null;
-        
+
+        // 
+
         public App()
         {
             InitializeComponent();            
             try
             {
                 SetAlertMessageList();
+
                 if (Application.Current.Properties.Keys.Contains(Constant.Autheticatior))
                 {
                     var tempUser = JsonConvert.DeserializeObject<User>(Current.Properties[Constant.Autheticatior].ToString());
@@ -40,27 +45,21 @@ namespace ServingFresh
                     }
                     else
                     {
-                        LogInPage client = new LogInPage();
-                        MainPage = client;
-
+                        MainPage = new PrincipalPage();
 
                         string socialPlatform = tempUser.getUserPlatform();
 
                         if (socialPlatform.Equals(Constant.Facebook))
                         {
-                            client.FacebookLogInClick(new object(), new EventArgs());
+                            Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(Constant.Facebook));
                         }
                         else if (socialPlatform.Equals(Constant.Google))
                         {
-                            client.GoogleLogInClick(new object(), new EventArgs());
+                            Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(Constant.Google));
                         }
                         else if (socialPlatform.Equals(Constant.Apple))
                         {
-                            client.AppleLogInClick(new object(), new EventArgs());
-                        }
-                        else
-                        {
-                            MainPage = new PrincipalPage();
+                            Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(Constant.Apple));
                         }
                     }
                 }
@@ -95,7 +94,7 @@ namespace ServingFresh
                         case AppleSignInCredentialState.Revoked:
                             SecureStorage.Remove(AppleUserIdKey);
                             Preferences.Set(LoggedInKey, false);
-                            MainPage = new LogInPage();
+                            MainPage = new PrincipalPage();
                             break;
                     }
                 }

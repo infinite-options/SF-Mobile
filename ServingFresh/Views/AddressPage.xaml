@@ -2,71 +2,72 @@
 <ContentPage
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    x:Class="ServingFresh.Views.AddressPage">
-<ContentPage.Content>
-      <Frame Margin="0,180,0,0" BackgroundColor="WhiteSmoke">
-        <StackLayout>
+    x:Class="ServingFresh.Views.AddressPage"
+    NavigationPage.HasNavigationBar="False"
+    BackgroundColor="#AB000000">
+    <ContentPage.Content>
+        <Frame Margin="0,180,0,0" BackgroundColor="WhiteSmoke">
             <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="50"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="50"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-                <Label Grid.Column="1" Margin="0,0,0,0" HeightRequest="140" Text="Sign up" TextColor="#136D74" FontSize="32" FontAttributes="Bold" TextDecorations="Underline" HorizontalTextAlignment="Center" ></Label>
-                <ImageButton Grid.Column="2" Padding="0,0,2,0" HeightRequest="30" BackgroundColor="Transparent" Source="closeFrameIcon.png" HorizontalOptions="End" Clicked="CloseSignUpPage"></ImageButton>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="AUTO"></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="50"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="50"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="1" Margin="0,0,0,0" Text="Sign Up" TextColor="#136D74" FontSize="32" FontAttributes="Bold" TextDecorations="Underline" HorizontalTextAlignment="Center" ></Label>
+                        <ImageButton Grid.Column="2" Padding="0,0,2,0" HeightRequest="30" BackgroundColor="Transparent" Source="closeFrameIcon.png" HorizontalOptions="End" Clicked="CloseSignUpPage"></ImageButton>
+                    </Grid>
+                    <ScrollView Grid.Row="1" Margin="0,10,0,0" x:Name="addressScrollView" Padding="0,0,0,200">
+                        <StackLayout Spacing="5">
+                            <Label Margin="0,5,0,5" Text="Let’s first make sure we deliver to you."  TextColor="#000000" FontSize="18" HorizontalTextAlignment="Center"></Label>
+                            <Entry HeightRequest="44" x:Name="firstName" Placeholder="First Name" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                            <Entry HeightRequest="44" x:Name="lastName" Placeholder="Last Name" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                            <StackLayout HeightRequest="140">
+                                <RelativeLayout
+                                    RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
+                                    RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                    <StackLayout Spacing="5"
+                                            RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
+                                            RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
+                                            <Entry x:Name="signUpAddress1Entry" HeightRequest="44" FontSize="16" Placeholder="Street Address" PlaceholderColor="#6D7278"  Keyboard="Text" TextColor="#6D7278" TextChanged="signUpAddress1Entry_TextChanged" Focused="signUpAddress1Entry_Focused" Unfocused="signUpAddress1Entry_Unfocused"/>
+                                            <StackLayout Spacing="5" >
+                                                <Grid HeightRequest="44">
+                                                    <Entry Grid.Column="0" x:Name="signUpAddress2Entry" Placeholder="Unit" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                                                    <Entry Grid.Column="1" x:Name="signUpCityEntry" Placeholder="City" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                                                </Grid>
+                                                <Grid HeightRequest="44">
+                                                    <Entry Grid.Column="0" x:Name="signUpStateEntry" Placeholder="State" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                                                    <Entry Grid.Column="1" x:Name="signUpZipcodeEntry" Placeholder="Zip Code" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                                                </Grid>
+                                            </StackLayout>
+                                        <Frame Margin="0,-100,0,0" Padding="2" BackgroundColor="#E0EBEC" CornerRadius="0" HorizontalOptions="CenterAndExpand" x:Name="signUpAddressFrame" IsVisible="false">
+                                            <ListView x:Name="SignUpAddressList" IsVisible="false" BackgroundColor="#E0EBEC"  HeightRequest="100"  ItemsSource="{Binding Addresses}" ItemSelected="SignUpAddressList_ItemSelected">
+                                                <ListView.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <ViewCell>
+                                                            <StackLayout HeightRequest="53" VerticalOptions="CenterAndExpand">
+                                                                <Label HeightRequest="53" VerticalTextAlignment="Center" Text="{Binding Address}" FontSize="12" TextColor="Black" LineBreakMode="WordWrap"/>
+                                                            <BoxView HeightRequest="1" Color="#136D74"></BoxView>
+                                                        </StackLayout>
+                                                        </ViewCell>
+                                                    </DataTemplate>
+                                                </ListView.ItemTemplate>
+                                            </ListView>
+                                        </Frame>
+                                    </StackLayout>
+                                </RelativeLayout>
+                            </StackLayout>
+                            <Entry WidthRequest="372" HeightRequest="44" x:Name="signUpPhone" Keyboard="Numeric" Placeholder="Phone number" MaxLength="10" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
+                            <Button Margin="0,10,0,0" CornerRadius="13" HorizontalOptions="CenterAndExpand" WidthRequest="287" HeightRequest="48" Text="Continue" Clicked="ContinueWithSignUp"  FontAttributes="Bold" TextColor="White" FontSize="20" BackgroundColor="#FF8500"></Button>
+                        </StackLayout>
+                    </ScrollView>
+                </Grid>
             </Grid>
-            
-            <ScrollView Margin="0,10,0,0" x:Name="addressScrollView" Padding="0,0,0,200">
-                <StackLayout>
-                    <StackLayout Spacing="5">
-                        <Label Margin="0,5,0,5" Text="Let’s first make sure we deliver to you."  TextColor="#000000" FontSize="18" HorizontalTextAlignment="Center"></Label>
-                        <Entry HeightRequest="44" x:Name="firstName" Placeholder="First Name" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
-                        <Entry HeightRequest="44" x:Name="lastName" Placeholder="Last Name" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
-                        <StackLayout HeightRequest="140">
-                            <RelativeLayout
-                                RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
-                                RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
-                                <StackLayout Spacing="5"
-                                        RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
-                                        RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}">
-                                        <Entry x:Name="signUpAddress1Entry" HeightRequest="44" FontSize="16" Placeholder="Street Address" PlaceholderColor="#6D7278"  Keyboard="Text" TextColor="#6D7278" TextChanged="signUpAddress1Entry_TextChanged" Focused="signUpAddress1Entry_Focused" Unfocused="signUpAddress1Entry_Unfocused"/>
-                                        <StackLayout Spacing="5" >
-                                            <Grid HeightRequest="44">
-                                                <Entry Grid.Column="0" x:Name="signUpAddress2Entry" Placeholder="Unit" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
-                                                <Entry Grid.Column="1" x:Name="signUpCityEntry" Placeholder="City" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
-                                            </Grid>
-                                            <Grid HeightRequest="44">
-                                                <Entry Grid.Column="0" x:Name="signUpStateEntry" Placeholder="State" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
-                                                <Entry Grid.Column="1" x:Name="signUpZipcodeEntry" Placeholder="Zip Code" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
-                                            </Grid>
-                                        </StackLayout>
-                                    <Frame Margin="0,-100,0,0" Padding="2" BackgroundColor="#E0EBEC" CornerRadius="0" HorizontalOptions="CenterAndExpand" x:Name="signUpAddressFrame" IsVisible="false">
-                                        <ListView x:Name="SignUpAddressList" IsVisible="false" BackgroundColor="#E0EBEC"  HeightRequest="100"  ItemsSource="{Binding Addresses}" ItemSelected="SignUpAddressList_ItemSelected">
-                                            <ListView.ItemTemplate>
-                                                <DataTemplate>
-                                                    <ViewCell>
-                                                     <StackLayout HeightRequest="53" VerticalOptions="CenterAndExpand">
-                                                         <Label HeightRequest="53" VerticalTextAlignment="Center" Text="{Binding Address}" FontSize="12" TextColor="Black" LineBreakMode="WordWrap"/>
-                                                        <BoxView HeightRequest="1" Color="#136D74"></BoxView>
-                                                    </StackLayout>
-                                                    </ViewCell>
-                                                </DataTemplate>
-                                            </ListView.ItemTemplate>
-                                        </ListView>
-
-
-                                    </Frame>
-                                </StackLayout>
-                            </RelativeLayout>
-                          </StackLayout>
-                         <Entry WidthRequest="372" HeightRequest="44" x:Name="signUpPhone" Keyboard="Numeric" Placeholder="Phone number" MaxLength="10" PlaceholderColor="#6D7278" TextColor="#6D7278" FontSize="16"></Entry>
-                         <Button Margin="0,10,0,0" CornerRadius="13" HorizontalOptions="CenterAndExpand" WidthRequest="287" HeightRequest="48" Text="Continue" Clicked="ContinueWithSignUp"  FontAttributes="Bold" TextColor="White" FontSize="20" BackgroundColor="#FF8500"></Button>
-                    </StackLayout>
-                </StackLayout>
-            </ScrollView>
-            </StackLayout>
-      </Frame>
-       
-
+        </Frame>
     </ContentPage.Content>
 </ContentPage>

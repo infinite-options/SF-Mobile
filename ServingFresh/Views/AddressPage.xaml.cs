@@ -13,10 +13,10 @@ namespace ServingFresh.Views
     {
         private Address addr = new Address();
         private AddressAutocomplete addressToValidate = null;
+
         public AddressPage()
         {
             InitializeComponent();
-            BackgroundColor = Color.FromHex("AB000000");
         }
 
         async void ContinueWithSignUp(System.Object sender, System.EventArgs e)

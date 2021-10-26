@@ -7,7 +7,7 @@
 		<provider android:name="android.support.v4.content.FileProvider" android:authorities="${applicationId}.fileprovider" android:exported="false" android:grantUriPermissions="true">
 			<meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths"></meta-data>
 		</provider> -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="1.7.7" package="com.servingfresh" android:versionCode="97">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="1.7.8" package="com.servingfresh" android:versionCode="100">
 	<!--<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" package="com.servingfresh">-->
 	<uses-sdk android:minSdkVersion="26" android:targetSdkVersion="29" />
 	<!-- copied from https://docs.microsoft.com/en-us/azure/notification-hubs/xamarin-notification-hubs-push-notifications-android-gcm#create-a-firebase-project-and-enable-firebase-cloud-messaging -->

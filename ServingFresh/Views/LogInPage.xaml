@@ -1,103 +1,79 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<ContentPage xmlns="http://xamarin.com/schemas/2014/forms" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="ServingFresh.Views.LogInPage">
+<ContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="ServingFresh.Views.LogInPage"
+    NavigationPage.HasNavigationBar="False"
+    BackgroundColor="#AB000000">
     <ContentPage.Content>
-    <Frame x:Name="logInFrame" Margin="0,170,0,0" BackgroundColor="WhiteSmoke">
-        <StackLayout>
-            <Grid HeightRequest="55" >
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="100"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="100"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-                <Label Grid.Column="1" Margin="0,0,0,0" Text="Log In" TextColor="#136D74" FontSize="32" FontAttributes="Bold" TextDecorations="Underline" HorizontalTextAlignment="Center" ></Label>
-                <ImageButton Grid.Column="2" Padding="0,0,2,0" HeightRequest="30" BackgroundColor="Transparent" Source="closeFrameIcon.png" HorizontalOptions="End" Clicked="ImageButton_Clicked"></ImageButton>
-            </Grid>
-        <ScrollView x:Name="scrollView" Margin="0,5,0,0">
-        <StackLayout x:Name="grids" BackgroundColor="WhiteSmoke"  HorizontalOptions="Center">
-            <StackLayout>
-                <ImageButton x:Name="appleLogInButton" BackgroundColor="Transparent" Clicked="AppleLogInClick" Command = "{Binding SignInWithAppleCommand}" Source="continueWithApple2.png" HeightRequest="48"></ImageButton>
-                <ImageButton Clicked="FacebookLogInClick" BackgroundColor="Transparent" Source="continueWithFacebook.png" HeightRequest="48"></ImageButton>
-                <ImageButton Clicked="GoogleLogInClick" BackgroundColor="Transparent" Source="continueWithGoogle.png" HeightRequest="48"></ImageButton>
-            </StackLayout>
-            <BoxView Margin="0,10,0,10" HeightRequest="1" Color="#136D74"></BoxView>
-            <Label Text="Or continue with email" HorizontalTextAlignment="Center" TextColor="Black" FontSize="17"></Label>
-            <Entry
-                x:Name="userEmailAddress"
-                HeightRequest="40"
-                Placeholder="Email address"
-                HorizontalTextAlignment="Start"
-                Keyboard="Email"
-                PlaceholderColor="#6D7278"
-                TextColor="Gray"
-                FontSize="18">
-            </Entry>
+        <Frame x:Name="logInFrame" Margin="0,180,0,0" BackgroundColor="WhiteSmoke">
             <Grid>
-                <Entry
-                    x:Name="userPassword"
-                    HeightRequest="40"
-                    WidthRequest="372"
-                    HorizontalOptions="Center"
-                    Placeholder="Enter Password"
-                    IsPassword="True"
-                    HorizontalTextAlignment="Start"
-                    Keyboard="Email"
-                    PlaceholderColor="#6D7278"
-                    TextColor="Gray"
-                    FontSize="18">
-                </Entry>
-                <Label Text="Show password" Margin="0,0,26,0" TextColor="#6D7278" FontSize="14"  VerticalOptions="Center" HorizontalOptions="End">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="ShowHidePassword"></TapGestureRecognizer>
-                    </Label.GestureRecognizers>
-                </Label>
-            </Grid>
-            <Button
-                    x:Name="logInButton"
-                    Margin="50,20,50,0"
-                    Text="Login"
-                    FontSize="20"
-                    FontAttributes="Bold"
-                    TextColor="White"
-                    BackgroundColor="#FF8500"
-                    Clicked="DirectLogInClick">
-            </Button>
-            <Button Text="Reset password" TextColor="#6D7278" Clicked="ResetPassword" BackgroundColor="Transparent"></Button>
-            <StackLayout x:Name="resetPasswordStackLayout" IsVisible="false">
                 <Grid>
-                <Entry
-                    x:Name="newPassword"
-                    HeightRequest="52"
-                    WidthRequest="372"
-                    HorizontalOptions="Center"
-                    Placeholder="Enter New Password"
-                    IsPassword="True"
-                    HorizontalTextAlignment="Start"
-                    Keyboard="Email"
-                    PlaceholderColor="#6D7278"
-                    TextColor="Gray"
-                    FontSize="18">
-                </Entry>
-                <Label Text="Show password" Margin="0,0,26,0" TextColor="#6D7278" FontSize="14"  VerticalOptions="Center" HorizontalOptions="End">
-                    <Label.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="ShowHidePassword"></TapGestureRecognizer>
-                    </Label.GestureRecognizers>
-                </Label>
-               
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="AUTO"></RowDefinition>
+                        <RowDefinition Height="*"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="50"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="50"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="1" Margin="0,0,0,0" Text="Log In" TextColor="#136D74" FontSize="32" FontAttributes="Bold" TextDecorations="Underline" HorizontalTextAlignment="Center"></Label>
+                        <ImageButton Grid.Column="2" Padding="0,0,2,0" HeightRequest="30" BackgroundColor="Transparent" Source="closeFrameIcon.png" HorizontalOptions="End" Clicked="CloseLoginPage"></ImageButton>
+                    </Grid>
+                    <ScrollView Grid.Row="1" x:Name="scrollView" Margin="0,5,0,0">
+                        <StackLayout BackgroundColor="WhiteSmoke"  HorizontalOptions="Center">
+                            <StackLayout>
+                                <ImageButton x:Name="appleLogInButton" BackgroundColor="Transparent" Clicked="AppleLogInClick" Source="continueWithApple2.png" HeightRequest="48"></ImageButton>
+                                <ImageButton Clicked="FacebookLogInClick" BackgroundColor="Transparent" Source="continueWithFacebook.png" HeightRequest="48"></ImageButton>
+                                <ImageButton Clicked="GoogleLogInClick" BackgroundColor="Transparent" Source="continueWithGoogle.png" HeightRequest="48"></ImageButton>
+                            </StackLayout>
+                            <BoxView Margin="0,10,0,10" HeightRequest="1" Color="#136D74"></BoxView>
+                            <Label Text="Or continue with email" HorizontalTextAlignment="Center" TextColor="Black" FontSize="17"></Label>
+                            <Entry
+                                x:Name="userEmailAddress"
+                                Placeholder="Email address"
+                                HorizontalTextAlignment="Start"
+                                Keyboard="Email"
+                                PlaceholderColor="#6D7278"
+                                TextColor="Gray"
+                                FontSize="18">
+                            </Entry>
+                            <Grid>
+                                <Entry
+                                    x:Name="userPassword"
+                                    WidthRequest="372"
+                                    HorizontalOptions="Center"
+                                    Placeholder="Enter Password"
+                                    IsPassword="True"
+                                    HorizontalTextAlignment="Start"
+                                    Keyboard="Email"
+                                    PlaceholderColor="#6D7278"
+                                    TextColor="Gray"
+                                    FontSize="18">
+                                </Entry>
+                                <Label Text="Show password" Margin="0,0,26,0" TextColor="#6D7278" FontSize="14"  VerticalOptions="Center" HorizontalOptions="End">
+                                    <Label.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="ShowHidePassword"></TapGestureRecognizer>
+                                    </Label.GestureRecognizers>
+                                </Label>
+                            </Grid>
+                            <Button
+                                    x:Name="logInButton"
+                                    Margin="50,20,50,0"
+                                    Text="Login"
+                                    FontSize="20"
+                                    FontAttributes="Bold"
+                                    TextColor="White"
+                                    BackgroundColor="#FF8500"
+                                    Clicked="DirectLogInClick">
+                            </Button>
+                            <Button Text="Reset password" TextColor="#6D7278" Clicked="ResetPassword" BackgroundColor="Transparent"></Button>
+                        </StackLayout>
+                   </ScrollView>
+                </Grid>
             </Grid>
-                 <Button
-                    Margin="50,10,50,0"
-                    Text="Update password"
-                    FontSize="20"
-                    FontAttributes="Bold"
-                    TextColor="White"
-                    BackgroundColor="#FF8500"
-                    Clicked="UpdatePassword">
-                </Button>
-            </StackLayout>
-        </StackLayout>
-       </ScrollView>
-            </StackLayout>
-    </Frame>
-     
+        </Frame>
     </ContentPage.Content>
 </ContentPage>

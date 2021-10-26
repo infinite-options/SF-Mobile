@@ -22,6 +22,7 @@ namespace ServingFresh.Views
         public readonly static Models.User user = new Models.User();
         Location currentLocation;
         private AddressAutocomplete addressToValidate = null;
+
         public PrincipalPage()
         {
             InitializeComponent();
@@ -38,8 +39,7 @@ namespace ServingFresh.Views
             try
             {
                 var location = await Geolocation.GetLocationAsync();
-                //location.Latitude = 37.227124;
-                //location.Longitude = -121.886943;
+
                 currentLocation.Latitude = location.Latitude;
                 currentLocation.Longitude = location.Longitude;
 
@@ -62,9 +62,9 @@ namespace ServingFresh.Views
                             $"SubThoroughfare: {placemark.SubThoroughfare}\n" +
                             $"Thoroughfare:    {placemark.Thoroughfare}\n";
 
-                        Debug.WriteLine(geocodeAddress);
+                        //Debug.WriteLine(geocodeAddress);
                     }
-                    Debug.WriteLine($"Latitude: {location.Latitude}, Longitude: {location.Longitude}, Altitude: {location.Altitude}");
+                    //Debug.WriteLine($"Latitude: {location.Latitude}, Longitude: {location.Longitude}, Altitude: {location.Altitude}");
                 }
 
             }
@@ -250,8 +250,6 @@ namespace ServingFresh.Views
             bool animate = false;
             scrollView.ScrollToAsync(0, 5, animate);
             Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(),true);
-            //logInRow.Height = this.Height - 200;
-            //logInFrame.Margin = new Thickness(5, -this.Height + 400, 5, 0);
         }
 
         void NavigateToSignUp(System.Object sender, System.EventArgs e)
@@ -405,19 +403,9 @@ namespace ServingFresh.Views
                 var userLat = "37.227124";
                 var userLong = "-121.886943";
 
-                //Debug.WriteLine("INPUT 1: " + userLat);
-                //Debug.WriteLine("INPUT 2: " + userLong);
-
-                //if (userLat == "0" && userLong == "0"){ userLong = "-121.8866517"; userLat = "37.2270928";}
-
                 var client = new HttpClient();
                 var response = await client.GetAsync(Constant.ProduceByLocation + userLong + "," + userLat);
                 var result = await response.Content.ReadAsStringAsync();
-
-                //Debug.WriteLine("URL: " + Constant.ProduceByLocation + userLong + "," + userLat);
-
-                //Debug.WriteLine("CALL TO ENDPOINT SUCCESSFULL?: " + response.IsSuccessStatusCode);
-                //Debug.WriteLine("JSON RETURNED: " + result);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -427,7 +415,6 @@ namespace ServingFresh.Views
                 }
                 else
                 {
-                    //await DisplayAlert("Oops!", "Our system is down. We are working to fix this issue.", "OK");
                     return;
                 }
             }catch(Exception errorGetBusiness)
@@ -466,18 +453,12 @@ namespace ServingFresh.Views
                             else
                             {
                                 List<DateTime> creationDates = new List<DateTime>();
-                                //Debug.WriteLine("NAME {0}, {1}", savedItem.item_name, a.item_name);
-                                //Debug.WriteLine("SAVED ITEM UID {0}, SAVED TIME STAMP {1}", savedItem.item_uid, savedItem.created_at);
-                                //Debug.WriteLine("NEW ITEM UID {0}, NEW TIME STAMP {1}", a.item_uid, a.created_at);
-
                                 creationDates.Add(DateTime.Parse(savedItem.created_at));
                                 creationDates.Add(DateTime.Parse(a.created_at));
                                 creationDates.Sort();
 
                                 if (creationDates[0] != creationDates[1])
                                 {
-                                    //Debug.WriteLine("CREATED FIRST {0}, STRING DATETIME INDEX 0 {1}", creationDates[0], creationDates[0].ToString("yyyy-MM-dd HH:mm:ss"));
-
                                     if (savedItem.created_at != creationDates[0].ToString("yyyy-MM-dd HH:mm:ss"))
                                     {
                                         savedItem = a;
@@ -495,11 +476,9 @@ namespace ServingFresh.Views
 
                                     if (savedItemId != itemsIdsList[0].ToString())
                                     {
-                                        //savedItem.item_uid = a.item_uid;
                                         savedItem = a;
                                     }
                                 }
-                                //Debug.WriteLine("SELECTED ITEM UID: " + savedItem.item_uid);
                                 uniqueItems[key] = savedItem;
                             }
                         }

@@ -382,31 +382,28 @@ namespace ServingFresh.Models
 
         public static async Task<bool> SignUpNewUser(UpdateProfile existingUser)
         {
+            bool result = false;
+
             try
             {
-                bool result = false;
                 var client = new HttpClient();
                 var serializedObject = JsonConvert.SerializeObject(existingUser);
                 var content = new StringContent(serializedObject, Encoding.UTF8, "application/json");
-                var endpointCall = await client.PostAsync("https://tsx3rnuidi.execute-api.us-west-1.amazonaws.com/dev/api/v2/createAccountGuestToCustomer", content);
-
-                Debug.WriteLine("USER ROLE: " + existingUser.role);
-                Debug.WriteLine("JSON TO SEND VIA SIGN UP ENDPOINT: " + serializedObject);
+                var endpointCall = await client.PostAsync(Constant.UpdateUserProdileRole, content);
 
                 if (endpointCall.IsSuccessStatusCode)
                 {
-                    var endpointContentString = await endpointCall.Content.ReadAsStringAsync();
-                    Debug.WriteLine("UPDATED PROFILE: " + endpointContentString);
                     result = true;
                 }
 
-                return result;
+               
             }catch(Exception errorSignUpNewUser)
             {
                 var client = new Diagnostic();
                 client.parseException(errorSignUpNewUser.ToString(), user);
-                return false;
             }
+
+            return result;
         }
 
         public async void WriteDeviceID(User user)

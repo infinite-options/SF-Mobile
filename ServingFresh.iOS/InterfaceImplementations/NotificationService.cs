@@ -14,8 +14,6 @@ namespace ServingFresh.iOS.AppleNotificationService
         {
         }
 
-
-
         public bool IsNotifications()
         {
             return RegistedDeviceToPushNotifications();
