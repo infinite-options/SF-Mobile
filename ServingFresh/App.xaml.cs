@@ -15,15 +15,18 @@ namespace ServingFresh
 {
     public partial class App : Application
     {
-        //
-
+        // Apple parameters
         public const string LoggedInKey = "LoggedIn";
         public const string AppleUserIdKey = "AppleUserIdKey";
         string userId;
+
+        // Mobile Alerts
         public static Dictionary<string, MessageResult> messageList = null;
 
-        // 
 
+
+
+        // Constructor
         public App()
         {
             InitializeComponent();            
@@ -132,8 +135,10 @@ namespace ServingFresh
 
         async void SetAlertMessageList()
         {
+            // created a variable of type AlertMessage
             var messageClient = new AlertMessage();
-            messageList = await messageClient.GetMessageList();
+            // now you can run any public function within AlertMessage class
+            messageList = await messageClient.GetMessageList();  // results in a dictionary of alerts
         }
     }
 }
