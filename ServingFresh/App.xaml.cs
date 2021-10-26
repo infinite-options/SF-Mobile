@@ -34,6 +34,13 @@ namespace ServingFresh
             {
                 SetAlertMessageList();
 
+
+                foreach (string key in Application.Current.Properties.Keys)
+                {
+                    Debug.WriteLine("Key: {0},  Value: {1}", key, Application.Current.Properties[key]);
+                }
+
+
                 if (Application.Current.Properties.Keys.Contains(Constant.Autheticatior))
                 {
                     var tempUser = JsonConvert.DeserializeObject<User>(Current.Properties[Constant.Autheticatior].ToString());
