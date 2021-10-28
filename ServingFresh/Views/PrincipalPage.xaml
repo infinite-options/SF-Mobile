@@ -13,7 +13,8 @@
                     </Grid.RowDefinitions>
                     <StackLayout Grid.Row="0" Margin="0,-25,0,0">
                         <RelativeLayout>
-                            <Frame HasShadow="false"
+                            
+                            <Frame HasShadow="false" 
                                 RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Factor=1}"
                                 RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=1}"
                                 Padding="0">
@@ -32,7 +33,7 @@
                                     VerticalTextAlignment="Center"
                                     Grid.Column="0"
                                     LineHeight="0.8"
-                                    Text="Fresh&#10;Organic&#10;Produce&#10;Delivered"  TextColor="White" FontAttributes="Bold">
+                                    Text="Frsh&#10;Organic&#10;Produce&#10;Delivered"  TextColor="White" FontAttributes="Bold">
                                     <Label.FontSize>
                                          <OnPlatform x:TypeArguments="x:Double">
                                             <OnPlatform.Platforms>
@@ -48,6 +49,7 @@
                                     </Frame>
                                 </StackLayout>
                             </Grid>
+                          
                         </RelativeLayout>
                     </StackLayout>
                     <StackLayout Grid.Row="1" Margin="0,0,0,0" BackgroundColor="#FF8500" HeightRequest="200" VerticalOptions="CenterAndExpand">
@@ -131,7 +133,7 @@
                         <Label Margin="20,10,0,10" Text="Weekly Fresh Produce" TextColor="#136D74" FontAttributes="Bold" FontSize="16"></Label>
                         <BoxView HeightRequest="2" Color="#136D74" WidthRequest="165" Margin="23,-10,0,0" HorizontalOptions="Start" ></BoxView>
                         <StackLayout HeightRequest="230" VerticalOptions="CenterAndExpand">
-                             <CollectionView Grid.Column="1" x:Name="vegetablesListView"   Margin="20,0,0,0" ItemsLayout="HorizontalList" HeightRequest="220">
+                             <CollectionView  x:Name="vegetablesListView" Margin="20,0,0,0" ItemsLayout="HorizontalList" HeightRequest="220">
                                 <CollectionView.ItemTemplate>
                                     <DataTemplate>
                                         <Frame Padding="0,0,15,0" WidthRequest="180" HasShadow="False" BackgroundColor="Transparent">

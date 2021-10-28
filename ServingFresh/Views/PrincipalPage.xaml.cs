@@ -249,6 +249,7 @@ namespace ServingFresh.Views
         {
             bool animate = false;
             scrollView.ScrollToAsync(0, 5, animate);
+            // This is how you call a Modal
             Application.Current.MainPage.Navigation.PushModalAsync(new LogInPage(),true);
         }
 
@@ -500,6 +501,7 @@ namespace ServingFresh.Views
                     listOfItems = listUniqueItems;
 
                     vegetablesListView.ItemsSource = SetItemList(listOfItems, "Vegetables");
+               
                 }
 
             }
