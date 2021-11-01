@@ -18,68 +18,8 @@ namespace ServingFresh.Models
         public const string GooglePlacesApiDetailsPath = "https://maps.googleapis.com/maps/api/place/details/json?key={0}&place_id={1}&fields=address_components";
         private static HttpClient _httpClientInstance;
         public static HttpClient HttpClientInstance => _httpClientInstance ?? (_httpClientInstance = new HttpClient());
-        private ObservableCollection<AddressAutocomplete> _addresses;
         public event PropertyChangedEventHandler PropertyChanged;
-        private CancellationTokenSource throttleCts = new CancellationTokenSource();
         string zip;
-
-        public async Task GetPlacesPredictionsAsync(ListView addressList, ObservableCollection<AddressAutocomplete> Addresses, string _addressText)
-        {
-            try
-            {
-
-                CancellationToken cancellationToken = new CancellationTokenSource(TimeSpan.FromMinutes(2)).Token;
-
-                using (HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, string.Format(GooglePlacesApiAutoCompletePath, Constant.GooglePlacesApiKey, WebUtility.UrlEncode(_addressText))))
-                {
-
-                    using (HttpResponseMessage message = await HttpClientInstance.SendAsync(request, HttpCompletionOption.ResponseContentRead, cancellationToken).ConfigureAwait(false))
-                    {
-
-                        if (message.IsSuccessStatusCode)
-                        {
-                            string json = await message.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            Debug.WriteLine("RESPONSE FROM GOOGLE ADDRESS PREDICTION: " + json);
-                            PlacesLocationPredictions predictionList = await Task.Run(() => JsonConvert.DeserializeObject<PlacesLocationPredictions>(json)).ConfigureAwait(false);
-
-                            if (predictionList.Status == "OK")
-                            {
-                                if (predictionList.Predictions.Count > 0)
-                                {
-                                    foreach (Prediction prediction in predictionList.Predictions)
-                                    {
-                                        string[] predictionSplit = prediction.Description.Split(',');
-
-                                        Console.WriteLine("Place ID: " + prediction.PlaceId);
-                                        // comment zipcode 
-                                        //await setZipcode(prediction.PlaceId);
-                                        Console.WriteLine("After setZipcode:\n" + prediction.Description.Trim() + "\n" + predictionSplit[0].Trim() + "\n" + predictionSplit[1].Trim() + "\n" + predictionSplit[2].Trim() + "\n" + zip);
-                                        Addresses.Add(new AddressAutocomplete
-                                        {
-                                            Address = prediction.Description.Trim(),
-                                            Street = predictionSplit[0].Trim(),
-                                            City = predictionSplit[1].Trim(),
-                                            State = predictionSplit[2].Trim(),
-                                            ZipCode = "",
-                                            PredictionID = prediction.PlaceId
-                                        });
-                                        addressList.ItemsSource = Addresses;
-                                    }
-                                }
-                            }
-                            else
-                            {
-
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception prediction)
-            {
-                Debug.WriteLine("MESSAGE WHEN LIST IS NOT READY TO UPDATE: " + prediction.Message);
-            }
-        }
 
         public async Task<string> getZipcode(string placeId)
         {
@@ -166,65 +106,26 @@ namespace ServingFresh.Models
             }
         }
 
-        public void OnAddressChanged(ListView addressList, ObservableCollection<AddressAutocomplete> Addresses, string _addressText)
-        {
-            Interlocked.Exchange(ref this.throttleCts, new CancellationTokenSource()).Cancel();
-            _ = Task.Delay(TimeSpan.FromMilliseconds(1000), this.throttleCts.Token)
-                .ContinueWith(
-                delegate { _ = GetPlacesPredictionsAsync(addressList, Addresses, _addressText); },
-                CancellationToken.None,
-                TaskContinuationOptions.OnlyOnRanToCompletion,
-                TaskScheduler.FromCurrentSynchronizationContext());
-        }
-
-        public void OnAddressChanged(ListView addressList, string _addressText)
-        {
-            Interlocked.Exchange(ref this.throttleCts, new CancellationTokenSource()).Cancel();
-            _ = Task.Delay(TimeSpan.FromMilliseconds(500), this.throttleCts.Token)
-                .ContinueWith(
-                delegate { _ = GetPlacesPredictionsAsync(_addressText); },
-                CancellationToken.None,
-                TaskContinuationOptions.OnlyOnRanToCompletion,
-                TaskScheduler.FromCurrentSynchronizationContext());
-        }
-
         public void addressEntryFocused(ListView addressList)
         {
             addressList.IsVisible = true;
-            //foreach (Grid g in grids)
-            //{
-            //    g.IsVisible = false;
-            //}
         }
 
         public void addressEntryUnfocused(ListView addressList)
         {
             addressList.IsVisible = false;
-
-            //foreach (Grid g in grids)
-            //{
-            //    g.IsVisible = true;
-            //}
         }
 
         public void addressEntryFocused(ListView addressList, Frame frame)
         {
             addressList.IsVisible = true;
             frame.IsVisible = true;
-            //foreach (Grid g in grids)
-            //{
-            //    g.IsVisible = false;
-            //}
         }
 
         public void addressEntryUnfocused(ListView addressList, Frame frame)
         {
             addressList.IsVisible = false;
             frame.IsVisible = false;
-            //foreach (Grid g in grids)
-            //{
-            //    g.IsVisible = true;
-            //}
         }
 
         public void addressSelectedFillEntries(AddressAutocomplete selectedAddress, Entry address1, Entry address2, Entry city, Entry state, Entry zipcode)
@@ -242,7 +143,6 @@ namespace ServingFresh.Models
             addressList.IsVisible = false;
             frame.IsVisible = false;
             entry.Text = ((AddressAutocomplete)addressList.SelectedItem).Street + ", " + ((AddressAutocomplete)addressList.SelectedItem).City + ", " + ((AddressAutocomplete)addressList.SelectedItem).State + ", " + ((AddressAutocomplete)addressList.SelectedItem).ZipCode;
-            //entry.Text = ((AddressAutocomplete)addressList.SelectedItem).Street;
             selectedAddress.Street = ((AddressAutocomplete)addressList.SelectedItem).Street;
             selectedAddress.City = ((AddressAutocomplete)addressList.SelectedItem).City;
             selectedAddress.State = ((AddressAutocomplete)addressList.SelectedItem).State;
@@ -256,8 +156,6 @@ namespace ServingFresh.Models
             AddressAutocomplete selectedAddress = new AddressAutocomplete();
             addressList.IsVisible = false;
             frame.IsVisible = false;
-            //entry.Text = ((AddressAutocomplete)addressList.SelectedItem).Street + ", " + ((AddressAutocomplete)addressList.SelectedItem).City + ", " + ((AddressAutocomplete)addressList.SelectedItem).State + ", " + ((AddressAutocomplete)addressList.SelectedItem).ZipCode;
-            //entry.Text = ((AddressAutocomplete)addressList.SelectedItem).Street;
             selectedAddress.Street = ((AddressAutocomplete)addressList.SelectedItem).Street;
             selectedAddress.City = ((AddressAutocomplete)addressList.SelectedItem).City;
             selectedAddress.State = ((AddressAutocomplete)addressList.SelectedItem).State;
@@ -297,8 +195,6 @@ namespace ServingFresh.Models
             state.Text = null;
             zipcode.Text = null;
         }
-
-
 
         protected void OnPropertyChanged(string propertyName)
         {

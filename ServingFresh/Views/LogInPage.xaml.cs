@@ -335,7 +335,7 @@ namespace ServingFresh.Views
                 authenticator.Completed -= FacebookAuthenticatorCompleted;
                 authenticator.Error -= FacebookAutheticatorError;
             }
-            Application.Current.MainPage = new LogInPage();
+            Application.Current.MainPage = new PrincipalPage();
             await DisplayAlert("Authentication error: ", e.Message, "OK");
         }
 
@@ -350,7 +350,7 @@ namespace ServingFresh.Views
                 authenticator.Completed -= GoogleAuthenticatorCompleted;
                 authenticator.Error -= GoogleAuthenticatorError;
             }
-            Application.Current.MainPage = new LogInPage();
+            Application.Current.MainPage = new PrincipalPage();
             await DisplayAlert("Authentication error: ", e.Message, "OK");
         }
 

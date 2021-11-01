@@ -15,11 +15,15 @@ namespace ServingFresh
 {
     public partial class App : Application
     {
+        //
+
         public const string LoggedInKey = "LoggedIn";
         public const string AppleUserIdKey = "AppleUserIdKey";
         string userId;
         public static Dictionary<string, MessageResult> messageList = null;
-        
+
+        // 
+
         public App()
         {
             InitializeComponent();            

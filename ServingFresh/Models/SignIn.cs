@@ -139,8 +139,6 @@ namespace ServingFresh.Models
                     }
                     else if (authetication.code.ToString() == Constant.AutheticatedSuccesful)
                     {
-                        isUserVerified = "LOGIN USER";
-
                         DateTime today = DateTime.Now;
                         DateTime expDate = today.AddDays(Constant.days);
 
@@ -513,8 +511,6 @@ namespace ServingFresh.Models
                         {
                             try
                             {
-                               
-
                                 DateTime today = DateTime.Now;
                                 DateTime expDate = today.AddDays(Constant.days);
 
